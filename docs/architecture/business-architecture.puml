@@ -41,6 +41,13 @@ package "核心业务功能域" {
     component "交易管理" as TransactionMgmt <<Process>>
     component "资产管理" as AssetMgmt <<Process>>
     component "观察列表管理" as WatchListMgmt <<Process>>
+    component "债券分析" as BondAnalysis <<Process>>
+    component "期权定价" as OptionsPricing <<Process>>
+    component "组合优化" as PortfolioOptimization <<Process>>
+    component "统计分析" as StatisticalAnalysis <<Process>>
+    component "技术指标分析" as TechnicalIndicators <<Process>>
+    component "估值分析" as ValuationAnalysis <<Process>>
+    component "数据可视化" as DataVisualization <<Process>>
 
     note right of PortfolioMgmt
         <b>业务功能</b>
@@ -65,6 +72,63 @@ package "核心业务功能域" {
         - 风险预警机制
         - 风险报告生成
     end note
+
+    note right of BondAnalysis
+        <b>业务功能</b>
+        - 债券收益率计算(YTM)
+        - 久期分析(Macaulay/Modified)
+        - 凸度计算
+        - 债券估值定价
+    end note
+
+    note right of OptionsPricing
+        <b>业务功能</b>
+        - Black-Scholes定价
+        - 二叉树定价模型
+        - Greeks计算(Delta/Gamma/Theta/Vega/Rho)
+        - 隐含波动率计算
+    end note
+
+    note right of PortfolioOptimization
+        <b>业务功能</b>
+        - 马科维茨优化
+        - 有效前沿计算
+        - 最大夏普比率组合
+        - 权重约束优化
+    end note
+
+    note right of StatisticalAnalysis
+        <b>业务功能</b>
+        - 相关性分析
+        - CAPM模型
+        - Fama-French模型
+        - 回归分析
+    end note
+
+    note right of TechnicalIndicators
+        <b>业务功能</b>
+        - 移动平均线(MA/EMA)
+        - 动量指标(RSI/MACD)
+        - 波动率指标
+        - 成交量指标
+    end note
+
+    note right of ValuationAnalysis
+        <b>业务功能</b>
+        - DCF估值模型
+        - 相对估值法
+        - 股息折现模型(DDM)
+        - 估值报告生成
+    end note
+
+    note right of DataVisualization
+        <b>业务功能</b>
+        - K线图展示
+        - 趋势图表
+        - 热力图分析
+        - 雷达图对比
+        - 仪表盘展示
+    end note
 }
 
 package "业务服务层" {
@@ -72,6 +136,9 @@ package "业务服务层" {
     component "市场数据服务" as MarketService <<Service>>
     component "风险分析服务" as RiskService <<Service>>
     component "交易服务" as TransactionService <<Service>>
+    component "金融计算服务" as CalculationService <<Service>>
+    component "数据可视化服务" as VisualizationService <<Service>>
+    component "云基础设施服务" as CloudService <<Service>>
 
     note right of PortfolioService
         提供投资组合相关的
@@ -82,6 +149,30 @@ package "业务服务层" {
         提供市场数据相关的
         业务服务能力
     end note
+
+    note right of CalculationService
+        提供金融计算服务
+        - 收益计算
+        - 风险计算
+        - 格式化工具
+    end note
+
+    note right of VisualizationService
+        提供数据可视化服务
+        - 图表渲染
+        - 数据格式化
+        - 主题管理
+    end note
+
+    note right of CloudService
+        提供AWS云服务
+        - S3对象存储
+        - DynamoDB数据库
+        - Lambda无服务器计算
+        - SQS消息队列
+        - SNS通知服务
+        - API Gateway网关
+    end note
 }
 
 ' 业务参与者到业务功能的关联
@@ -91,10 +182,18 @@ Investor --> RiskMgmt
 Investor --> TransactionMgmt
 Investor --> AssetMgmt
 Investor --> WatchListMgmt
+Investor --> BondAnalysis
+Investor --> OptionsPricing
+Investor --> PortfolioOptimization
+Investor --> StatisticalAnalysis
+Investor --> TechnicalIndicators
+Investor --> ValuationAnalysis
+Investor --> DataVisualization
 
 Admin --> PortfolioMgmt
 Admin --> MarketAnalysis
 Admin --> RiskMgmt
+Admin --> CloudService
 
 ' 业务功能到业务服务的关联
 PortfolioMgmt --> PortfolioService
@@ -109,11 +208,36 @@ PortfolioMgmt --> RiskService
 
 TransactionMgmt --> TransactionService
 
+BondAnalysis --> CalculationService
+OptionsPricing --> CalculationService
+PortfolioOptimization --> CalculationService
+StatisticalAnalysis --> CalculationService
+TechnicalIndicators --> CalculationService
+ValuationAnalysis --> CalculationService
+PortfolioMgmt --> CalculationService
+
+DataVisualization --> VisualizationService
+MarketAnalysis --> VisualizationService
+PortfolioMgmt --> VisualizationService
+
+PortfolioService --> CloudService
+MarketService --> CloudService
+RiskService --> CloudService
+TransactionService --> CloudService
+CalculationService --> CloudService
+
 ' 业务功能间的价值流
 PortfolioMgmt ..> RiskMgmt : 风险评估
 MarketAnalysis ..> PortfolioMgmt : 投资建议
 AssetMgmt ..> PortfolioMgmt : 配置优化
 TransactionMgmt ..> PortfolioMgmt : 交易更新
+BondAnalysis ..> PortfolioMgmt : 债券持仓分析
+OptionsPricing ..> PortfolioMgmt : 期权持仓分析
+PortfolioOptimization ..> PortfolioMgmt : 优化配置建议
+StatisticalAnalysis ..> PortfolioMgmt : 统计特征分析
+TechnicalIndicators ..> MarketAnalysis : 技术信号
+ValuationAnalysis ..> PortfolioMgmt : 估值结果
+DataVisualization ..> PortfolioMgmt : 可视化展示
 
 legend right
     |<#E8F4F8> 业务参与者 |

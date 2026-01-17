@@ -18,21 +18,38 @@ skinparam component {
 title TOGAF 应用架构 - FinPulse 金融科技平台
 
 package "展示层 (Presentation Layer)" <<Presentation>> {
-    component "Next.js应用" as NextApp {
-        component "页面路由" as PageRouter
-        component "布局组件" as Layout
-        component "主题提供者" as ThemeProvider
+    component "apps/web" as WebApp {
+        component "Next.js 16应用" as NextApp {
+            component "App Router" as AppRouter
+            component "Server Components" as ServerComponents
+            component "API Routes" as APIRoutes
+            component "布局组件" as Layout
+            component "主题提供者" as ThemeProvider
+        }
     }
 
-    component "UI组件库" as UIComponent {
-        component "基础组件" as BaseUI
-        component "业务组件" as BusinessUI
+    component "@fintech/ui" as UIComponent {
+        component "基础UI组件" as BaseUI
+        component "Radix UI原语" as RadixPrimitives
     }
 
-    component "数据可视化" as DataVisualization {
-        component "Recharts图表库" as Charts
-        component "性能图表" as PerformanceChart
-        component "趋势图表" as TrendChart
+    component "@fintech/finance-charts" as FinanceCharts {
+        component "K线图" as CandlestickChart
+        component "折线图" as LineChart
+        component "面积图" as AreaChart
+        component "成交量图" as VolumeChart
+        component "热力图" as HeatmapChart
+        component "仪表盘图" as GaugeChart
+        component "雷达图" as RadarChart
+        component "瀑布图" as WaterfallChart
+    }
+
+    component "数据可视化库" as ChartLibraries {
+        component "Recharts" as Recharts
+        component "Lightweight Charts" as LightweightCharts
+        component "Chart.js" as ChartJS
+        component "D3.js" as D3JS
+        component "React Sparklines" as Sparklines
     }
 
     component "表单管理" as FormMgmt {
@@ -42,48 +59,150 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
 }
 
 package "业务逻辑层 (Business Layer)" <<Business>> {
-    component "投资组合模块" as PortfolioModule {
-        component "投资组合控制器" as PortfolioController
-        component "资产配置服务" as AssetService
+    package "金融计算包组" {
+        component "@fintech/calculations" as CalculationsPkg {
+            component "投资组合计算" as PortfolioCalc
+            component "收益计算" as ReturnsCalc
+            component "风险计算" as RiskCalc
+            component "格式化工具" as Formatters
+        }
+
+        component "@fintech/bond-calculations" as BondCalcPkg {
+            component "收益率计算(YTM)" as YieldCalc
+            component "久期计算" as DurationCalc
+            component "凸度计算" as ConvexityCalc
+            component "债券估值" as BondValuation
+        }
+
+        component "@fintech/options-pricing" as OptionsPkg {
+            component "Black-Scholes" as BlackScholes
+            component "二叉树模型" as Binomial
+            component "Greeks计算" as Greeks
+            component "隐含波动率" as ImpliedVol
+        }
+
+        component "@fintech/portfolio-optimization" as PortfolioOptPkg {
+            component "马科维茨优化" as Markowitz
+            component "有效前沿" as EfficientFrontier
+            component "权重约束" as Constraints
+            component "夏普比率" as SharpeRatio
+        }
+
+        component "@fintech/statistical-analysis" as StatisticalPkg {
+            component "相关性分析" as Correlation
+            component "CAPM模型" as CAPM
+            component "Fama-French" as FamaFrench
+            component "回归分析" as Regression
+        }
+
+        component "@fintech/technical-indicators" as TechnicalPkg {
+            component "移动平均" as MovingAverages
+            component "动量指标" as Momentum
+            component "波动率指标" as Volatility
+            component "成交量指标" as Volume
+        }
+
+        component "@fintech/valuation" as ValuationPkg {
+            component "DCF估值" as DCF
+            component "相对估值" as RelativeValuation
+            component "DDM模型" as DDM
+        }
     }
 
-    component "市场数据模块" as MarketModule {
-        component "市场数据控制器" as MarketController
-        component "趋势分析服务" as TrendService
+    package "基础设施包组" {
+        component "@fintech/aws" as AWSPkg {
+            component "S3客户端" as S3Client
+            component "DynamoDB客户端" as DynamoDBClient
+            component "Lambda客户端" as LambdaClient
+            component "SQS客户端" as SQSClient
+            component "SNS客户端" as SNSClient
+            component "API Gateway客户端" as APIGatewayClient
+            component "AWS配置" as AWSConfig
+        }
+
+        component "@fintech/performance" as PerformancePkg {
+            component "防抖" as Debounce
+            component "节流" as Throttle
+            component "懒加载" as Lazy
+            component "记忆化" as Memoize
+            component "性能监控" as PerformanceMonitor
+        }
+
+        component "@fintech/test-utils" as TestUtilsPkg {
+            component "测试工具" as TestUtils
+            component "Mock数据" as MockData
+        }
+
+        component "@fintech/utils" as UtilsPkg {
+            component "工具函数" as Utils
+        }
     }
 
-    component "交易模块" as TransactionModule {
-        component "交易控制器" as TransactionController
-        component "交易记录服务" as TransactionService
-    }
+    package "应用业务模块" {
+        component "投资组合模块" as PortfolioModule {
+            component "投资组合控制器" as PortfolioController
+            component "资产配置服务" as AssetService
+        }
 
-    component "风险管理模块" as RiskModule {
-        component "风险控制器" as RiskController
-        component "风险分析服务" as RiskService
-    }
+        component "市场数据模块" as MarketModule {
+            component "市场数据控制器" as MarketController
+            component "趋势分析服务" as TrendService
+        }
 
-    component "用户模块" as UserModule {
-        component "用户控制器" as UserController
-        component "偏好管理服务" as PreferenceService
+        component "交易模块" as TransactionModule {
+            component "交易控制器" as TransactionController
+            component "交易记录服务" as TransactionService
+        }
+
+        component "风险管理模块" as RiskModule {
+            component "风险控制器" as RiskController
+            component "风险分析服务" as RiskService
+        }
+
+        component "用户模块" as UserModule {
+            component "用户控制器" as UserController
+            component "偏好管理服务" as PreferenceService
+        }
     }
 }
 
 package "数据访问层 (Data Access Layer)" <<Data>> {
-    component "数据服务" as DataService {
-        component "数据访问对象" as DAO
+    component "AWS数据服务" as AWSDataService {
+        component "DynamoDB数据访问" as DynamoDBDAO
+        component "S3对象存储" as S3Storage
         component "数据缓存" as Cache
     }
 
     component "状态管理" as StateMgmt {
         component "React状态" as ReactState
         component "上下文管理" as Context
+        component "服务器状态" as ServerState
+    }
+
+    component "数据访问对象" as DAO {
+        component "投资组合DAO" as PortfolioDAO
+        component "市场数据DAO" as MarketDAO
+        component "交易记录DAO" as TransactionDAO
     }
 }
 
 package "外部服务层 (External Services)" <<External>> {
-    component "VercelAnalytics" as Analytics
-    component "市场数据API" as MarketAPI
-    component "存储服务" as Storage
+    component "AWS云服务" as AWSServices {
+        component "Lambda函数" as LambdaService
+        component "SQS队列" as SQSService
+        component "SNS通知" as SNSService
+        component "API Gateway" as APIGatewayService
+    }
+
+    component "Vercel服务" as VercelServices {
+        component "Vercel Analytics" as Analytics
+        component "Vercel部署平台" as VercelPlatform
+    }
+
+    component "第三方API" as ThirdPartyAPI {
+        component "市场数据API" as MarketAPI
+        component "金融数据API" as FinanceAPI
+    }
 }
 
 ' API 接口定义
@@ -93,44 +212,90 @@ interface "交易API" as TransactionAPI
 interface "风险分析API" as RiskAPI
 
 ' 展示层内部关系
-NextApp --> UIComponent
-NextApp --> DataVisualization
-NextApp --> FormMgmt
-PageRouter --> Layout
+NextApp --> AppRouter
+NextApp --> ServerComponents
+NextApp --> APIRoutes
+AppRouter --> Layout
 Layout --> ThemeProvider
-BaseUI --> BusinessUI
+NextApp --> UIComponent
+NextApp --> FinanceCharts
+NextApp --> FormMgmt
+BaseUI --> RadixPrimitives
 FormLibrary --> Validator
 
-' 业务组件到业务逻辑层的关联
-BusinessUI --> PortfolioModule
-BusinessUI --> MarketModule
-BusinessUI --> TransactionModule
-BusinessUI --> RiskModule
-PerformanceChart --> PortfolioModule
-TrendChart --> MarketModule
+' 图表组件到图表库的依赖
+FinanceCharts --> Recharts
+FinanceCharts --> LightweightCharts
+FinanceCharts --> ChartJS
+FinanceCharts --> D3JS
+FinanceCharts --> Sparklines
 
-' 业务逻辑层内部关系
+' 应用业务模块到计算包的依赖
+PortfolioModule --> CalculationsPkg
+PortfolioModule --> PortfolioOptPkg
+RiskModule --> CalculationsPkg
+RiskModule --> StatisticalPkg
+MarketModule --> TechnicalPkg
+MarketModule --> StatisticalPkg
+PortfolioModule --> ValuationPkg
+
+' 金融计算包组内部关系
+PortfolioCalc --> ReturnsCalc
+PortfolioCalc --> RiskCalc
+Markowitz --> EfficientFrontier
+Markowitz --> Constraints
+BlackScholes --> Greeks
+Binomial --> BlackScholes
+
+' 应用业务模块内部关系
 PortfolioController --> AssetService
 MarketController --> TrendService
 TransactionController --> TransactionService
 RiskController --> RiskService
 UserController --> PreferenceService
 
+' 应用业务模块到基础设施包
+PortfolioModule --> PerformancePkg
+MarketModule --> PerformancePkg
+TransactionModule --> PerformancePkg
+PortfolioModule --> AWSPkg
+MarketModule --> AWSPkg
+TransactionModule --> AWSPkg
+RiskModule --> AWSPkg
+UserModule --> AWSPkg
+
 ' 业务逻辑层到数据访问层
-PortfolioModule --> DataService
-MarketModule --> DataService
-TransactionModule --> DataService
-RiskModule --> DataService
-UserModule --> DataService
+PortfolioModule --> AWSDataService
+MarketModule --> AWSDataService
+TransactionModule --> AWSDataService
+RiskModule --> AWSDataService
+UserModule --> AWSDataService
+PortfolioModule --> DAO
+MarketModule --> DAO
+TransactionModule --> DAO
 
 PortfolioModule --> StateMgmt
 MarketModule --> StateMgmt
+TransactionModule --> StateMgmt
 
 ' 数据访问层到外部服务
-DataService --> MarketAPI
-DataService --> Storage
-DataService --> Cache
+AWSDataService --> DynamoDBDAO
+AWSDataService --> S3Storage
+DynamoDBDAO --> AWSPkg
+S3Storage --> AWSPkg
+AWSPkg --> LambdaService
+AWSPkg --> SQSService
+AWSPkg --> SNSService
+AWSPkg --> APIGatewayService
+
+AWSDataService --> MarketAPI
 NextApp --> Analytics
+NextApp --> VercelPlatform
+
+' 展示层使用图表
+NextApp --> FinanceCharts
+FinanceCharts --> CalculationsPkg
+FinanceCharts --> TechnicalPkg
 
 ' 业务逻辑层实现接口
 PortfolioModule ..> PortfolioAPI : implements

@@ -41,6 +41,7 @@ package "核心数据组件" {
         - 持有数量 (Decimal)
         - 当前价格 (Decimal)
         - 市值 (Decimal)
+        - 资产类型 (Enum: 股票/债券/期权)
     end note
 
     note right of TransactionData
@@ -60,6 +61,7 @@ package "核心数据组件" {
         - 资产代码 (String)
         - 时间戳 (DateTime)
         - 开盘价/收盘价 (Decimal)
+        - 最高价/最低价 (Decimal)
         - 成交量 (Decimal)
         - 涨跌幅 (Decimal)
     end note
@@ -72,6 +74,117 @@ package "核心数据组件" {
         - 波动率 (Decimal)
         - 夏普比率 (Decimal)
         - VaR值 (Decimal)
+        - Beta值 (Decimal)
+    end note
+}
+
+package "金融计算数据实体" {
+    component "债券数据" as BondData <<DataEntity>>
+    component "期权数据" as OptionsData <<DataEntity>>
+    component "技术指标数据" as TechnicalIndicatorData <<DataEntity>>
+    component "组合优化数据" as PortfolioOptimizationData <<DataEntity>>
+    component "统计数据" as StatisticalData <<DataEntity>>
+    component "估值数据" as ValuationData <<DataEntity>>
+
+    note right of BondData
+        <b>数据属性</b>
+        - 债券ID (UUID)
+        - 面值 (Decimal)
+        - 票面利率 (Decimal)
+        - 到期收益率(YTM) (Decimal)
+        - 久期(Macaulay/Modified) (Decimal)
+        - 凸度 (Decimal)
+        - 到期年限 (Decimal)
+        - 付息频率 (Integer)
+    end note
+
+    note right of OptionsData
+        <b>数据属性</b>
+        - 期权ID (UUID)
+        - 标的资产代码 (String)
+        - 执行价格 (Decimal)
+        - 到期时间 (DateTime)
+        - 期权类型 (Enum: Call/Put)
+        - 无风险利率 (Decimal)
+        - 波动率 (Decimal)
+        - Black-Scholes价格 (Decimal)
+        - Greeks: Delta/Gamma/Theta/Vega/Rho (Decimal)
+        - 隐含波动率 (Decimal)
+    end note
+
+    note right of TechnicalIndicatorData
+        <b>数据属性</b>
+        - 指标ID (UUID)
+        - 资产代码 (String)
+        - 时间戳 (DateTime)
+        - 移动平均线(MA/EMA) (Decimal)
+        - 相对强弱指数(RSI) (Decimal)
+        - MACD指标 (Decimal)
+        - 波动率指标 (Decimal)
+        - 成交量指标 (Decimal)
+    end note
+
+    note right of PortfolioOptimizationData
+        <b>数据属性</b>
+        - 优化ID (UUID)
+        - 组合ID (UUID)
+        - 权重分配 (Array<Decimal>)
+        - 期望收益率 (Decimal)
+        - 方差/波动率 (Decimal)
+        - 夏普比率 (Decimal)
+        - 有效前沿点 (Array)
+        - 约束条件 (JSON)
+    end note
+
+    note right of StatisticalData
+        <b>数据属性</b>
+        - 统计ID (UUID)
+        - 资产代码1 (String)
+        - 资产代码2 (String)
+        - 相关系数 (Decimal)
+        - CAPM Beta (Decimal)
+        - Alpha值 (Decimal)
+        - Fama-French因子 (Decimal)
+        - 回归系数 (Array<Decimal>)
+    end note
+
+    note right of ValuationData
+        <b>数据属性</b>
+        - 估值ID (UUID)
+        - 资产代码 (String)
+        - 估值方法 (Enum: DCF/DDM/相对估值)
+        - 企业价值(EV) (Decimal)
+        - 股权价值 (Decimal)
+        - 目标价 (Decimal)
+        - 估值倍数 (Decimal)
+        - 折现率 (Decimal)
+        - 增长率 (Decimal)
+    end note
+}
+
+package "AWS存储数据实体" {
+    component "S3对象数据" as S3ObjectData <<DataEntity>>
+    component "DynamoDB表数据" as DynamoDBTableData <<DataEntity>>
+
+    note right of S3ObjectData
+        <b>数据属性</b>
+        - 对象Key (String)
+        - Bucket名称 (String)
+        - 文件类型 (String)
+        - 文件大小 (Long)
+        - ETag (String)
+        - 上传时间 (DateTime)
+        - 访问权限 (Enum)
+    end note
+
+    note right of DynamoDBTableData
+        <b>数据属性</b>
+        - 表名 (String)
+        - 主键 (Partition Key)
+        - 排序键 (Sort Key)
+        - 属性项 (Map)
+        - TTL属性 (DateTime)
+        - 全局二级索引 (GSI)
     end note
 }
 
@@ -80,6 +193,7 @@ package "数据关系" {
     UserData "1" --> "N" PortfolioData : 拥有
     PortfolioData "1" --> "N" AssetData : 包含
     PortfolioData "1" --> "1" RiskMetricsData : 评估
+    PortfolioData "1" --> "0..1" PortfolioOptimizationData : 优化结果
 
     ' 交易关系
     UserData "1" --> "N" TransactionData : 执行
@@ -88,6 +202,7 @@ package "数据关系" {
 
     ' 市场数据关系
     AssetData "1" --> "N" MarketData : 关联
+    MarketData "1" --> "N" TechnicalIndicatorData : 计算指标
 
     ' 观察列表关系
     UserData "1" --> "N" WatchListData : 创建
@@ -95,6 +210,30 @@ package "数据关系" {
 
     ' 用户偏好关系
     UserData "1" --> "1" UserPreferenceData : 拥有
+
+    ' 债券关系
+    AssetData "1" --> "0..1" BondData : 债券属性
+    BondData "1" --> "N" MarketData : 价格数据
+
+    ' 期权关系
+    AssetData "1" --> "0..1" OptionsData : 期权属性
+    OptionsData "1" --> "1" AssetData : 标的资产
+    MarketData "1" --> "0..1" OptionsData : 定价输入
+
+    ' 统计数据关系
+    AssetData "1" --> "N" StatisticalData : 相关性分析
+    StatisticalData "1" --> "1" AssetData : 资产1
+    StatisticalData "1" --> "1" AssetData : 资产2
+
+    ' 估值数据关系
+    AssetData "1" --> "N" ValuationData : 估值结果
+    MarketData "1" --> "N" ValuationData : 估值输入
+
+    ' AWS存储关系
+    PortfolioData "1" --> "0..N" S3ObjectData : 附件存储
+    TransactionData "1" --> "0..N" S3ObjectData : 交易凭证
+    UserData "1" --> "0..N" DynamoDBTableData : 数据存储
+    PortfolioData "1" --> "0..1" DynamoDBTableData : 持久化
 }
 
 package "数据流向" {
@@ -103,6 +242,7 @@ package "数据流向" {
         - 实时市场API
         - 历史数据存储
         - 第三方数据服务
+        - AWS Lambda数据抓取
     end note
 
     note right of TransactionData
@@ -110,12 +250,54 @@ package "数据流向" {
         交易记录 --> 更新投资组合
         交易记录 --> 更新资产持仓
         交易记录 --> 触发风险重算
+        交易记录 --> 存储到DynamoDB
+        交易记录 --> 触发SQS消息
     end note
 
     note right of RiskMetricsData
         <b>计算依赖：</b>
         投资组合数据 + 市场数据
+        + 统计数据
         --> 风险指标计算
+    end note
+
+    note right of TechnicalIndicatorData
+        <b>计算流程：</b>
+        市场数据 --> 技术指标计算
+        --> 存储指标结果
+        --> 触发交易信号
+    end note
+
+    note right of PortfolioOptimizationData
+        <b>优化流程：</b>
+        投资组合数据 + 市场数据
+        + 统计数据
+        --> 马科维茨优化
+        --> 生成权重分配
+        --> 存储优化结果
+    end note
+
+    note right of ValuationData
+        <b>估值流程：</b>
+        市场数据 + 财务报表数据
+        --> DCF/DDM/相对估值计算
+        --> 生成估值结果
+        --> 存储估值数据
+    end note
+
+    note right of S3ObjectData
+        <b>存储流程：</b>
+        文件上传 --> S3存储
+        --> 生成访问URL
+        --> 记录元数据到DynamoDB
+    end note
+
+    note right of DynamoDBTableData
+        <b>数据流程：</b>
+        应用数据 --> DynamoDB写入
+        --> 自动备份
+        --> 全局二级索引
+        --> Lambda触发器
     end note
 }
 

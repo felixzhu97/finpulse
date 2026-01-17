@@ -18,10 +18,11 @@ skinparam component {
 title TOGAF 技术架构 - FinPulse 金融科技平台
 
 package "前端技术栈" <<Frontend>> {
-    component "Next.js16" as NextJS
-    component "React19" as React
-    component "TypeScript5" as TypeScript
-    component "TailwindCSS4.1" as Tailwind
+    component "Next.js 16.0.10" as NextJS
+    component "React 19.2.0" as React
+    component "React DOM 19.2.0" as ReactDOM
+    component "TypeScript 5" as TypeScript
+    component "Tailwind CSS 4.1.9" as Tailwind
     
     note right of NextJS
         <b>全栈React框架</b>
@@ -29,102 +30,239 @@ package "前端技术栈" <<Frontend>> {
         - Server Components
         - API Routes
         - SSG/SSR
+        - 自动代码分割
+        - 图片优化
     end note
     
-    note right of React: UI库\n函数组件、Hooks、Context API
-    note right of TypeScript: 类型安全\n静态类型检查、接口定义
-    note right of Tailwind: 样式框架\n实用优先CSS、响应式设计
+    note right of React: UI库\n函数组件、Hooks、Context API\nReact 19新特性
+    note right of ReactDOM: DOM渲染\n服务器端渲染支持
+    note right of TypeScript: 类型安全\n静态类型检查、接口定义\n严格模式
+    note right of Tailwind: 样式框架\n实用优先CSS、响应式设计\nPostCSS 4.x
 }
 
 package "UI框架与组件" <<Frontend>> {
-    component "RadixUI" as RadixUI
-    component "LucideReact" as Lucide
+    component "Radix UI" as RadixUI {
+        component "Accordion" as RadixAccordion
+        component "Dialog" as RadixDialog
+        component "Dropdown Menu" as RadixDropdown
+        component "Select" as RadixSelect
+        component "Tabs" as RadixTabs
+        component "Toast" as RadixToast
+        component "Tooltip" as RadixTooltip
+        note right: 20+个无样式组件原语\n可访问性优先\n键盘导航支持
+    }
+    component "Lucide React 0.454.0" as Lucide
+    component "CMDK 1.0.4" as CMDK
+    component "Sonner 1.7.4" as Sonner
+    component "Vaul 1.1.2" as Vaul
     
-    note right of RadixUI: 无样式组件原语\n可访问性优先、键盘导航
-    note right of Lucide: 图标库\nSVG优化、树摇优化
+    note right of Lucide: 图标库\n1000+图标\nSVG优化、树摇优化
+    note right of CMDK: 命令菜单组件\n快速搜索\n键盘导航
+    note right of Sonner: Toast通知组件\n基于Radix Toast\n动画效果
+    note right of Vaul: 抽屉组件\n移动端优化\n流畅动画
 }
 
-package "数据可视化" <<Frontend>> {
-    component "Recharts" as Recharts
-    component "ReactSparklines" as Sparklines
+package "数据可视化库" <<Frontend>> {
+    component "Recharts 2.15.4" as Recharts
+    component "Lightweight Charts 4.2.0" as LightweightCharts
+    component "Chart.js 4.4.3" as ChartJS
+    component "React Chart.js 2 5.2.0" as ReactChartJS
+    component "D3.js 7.9.0" as D3JS
+    component "D3 Scale 4.0.2" as D3Scale
+    component "D3 Color 3.1.0" as D3Color
+    component "React Sparklines 1.7.0" as Sparklines
     
-    note right of Recharts: 图表库\n性能图表、趋势图表
+    note right of Recharts: React图表库\n性能图表、趋势图表\n响应式设计
+    note right of LightweightCharts: 高性能图表\nTradingView风格\nK线图支持
+    note right of ChartJS: 通用图表库\n多种图表类型\n可定制主题
+    note right of D3JS: 数据驱动文档\n强大的数据可视化\n底层图表构建
 }
 
 package "工具库" <<Frontend>> {
-    component "ReactHookForm" as HookForm
-    component "Zod" as Zod
-    component "date-fns" as DateFns
-    component "next-themes" as Themes
+    component "React Hook Form 7.60.0" as HookForm
+    component "@hookform/resolvers 3.10.0" as HookFormResolvers
+    component "Zod 3.25.76" as Zod
+    component "date-fns 4.1.0" as DateFns
+    component "react-day-picker 9.8.0" as DayPicker
+    component "next-themes 0.4.6" as Themes
+    component "input-otp 1.4.1" as InputOTP
+    component "embla-carousel-react 8.5.1" as EmblaCarousel
+    component "react-resizable-panels 2.1.7" as ResizablePanels
     
-    note right of HookForm: 表单管理\n性能优化、验证集成
-    note right of Zod: 数据验证\nSchema定义、运行时验证
+    note right of HookForm: 表单管理\n性能优化、验证集成\n零依赖
+    note right of HookFormResolvers: 表单验证解析器\nZod集成\nYup集成
+    note right of Zod: 数据验证\nTypeScript优先\nSchema定义、运行时验证
+    note right of DateFns: 日期处理库\n不可变API\n国际化支持
+    note right of Themes: 主题管理\n暗色模式支持\n系统主题检测
 }
 
 package "构建工具链" <<Build>> {
     component "Next.js构建系统" as BuildSystem
-    component "TypeScript编译器" as TSCompiler
-    component "PostCSS" as PostCSS
+    component "TypeScript 5编译器" as TSCompiler
+    component "PostCSS 8.5" as PostCSS
+    component "@tailwindcss/postcss 4.1.9" as TailwindPostCSS
     component "ESLint" as ESLint
+    component "Vite 5.4.11" as Vite
+    component "tw-animate-css 1.3.3" as TwAnimate
     
-    note right of BuildSystem: 内置构建工具\n代码分割、优化打包
-    note right of TSCompiler: TS编译\n类型检查、代码转换
+    note right of BuildSystem: 内置构建工具\n代码分割、优化打包\nSWC编译器
+    note right of TSCompiler: TS编译\n类型检查、代码转换\n项目引用支持
+    note right of PostCSS: CSS后处理器\nTailwind集成\nAutoprefixer
+    note right of Vite: 快速构建工具\nStorybook使用\nHMR支持
 }
 
 package "部署平台" <<Deploy>> {
     component "Vercel平台" as Vercel
-    component "VercelAnalytics" as Analytics
+    component "Vercel Analytics 1.3.1" as Analytics
     component "Git集成" as GitIntegration
+    component "pnpm 10.6.0" as PNPM
     
-    note right of Vercel: 托管平台\n自动部署、CDN分发
-    note right of Analytics: 分析工具\n页面访问、性能监控
+    note right of Vercel: 托管平台\n自动部署、CDN分发\n边缘计算
+    note right of Analytics: 分析工具\n页面访问、性能监控\nWeb Vitals
+    note right of PNPM: Monorepo管理\n工作空间(workspace)\n高效依赖管理
+}
+
+package "AWS SDK" <<Infra>> {
+    component "@aws-sdk/client-s3 3.721.0" as AWSS3
+    component "@aws-sdk/client-dynamodb 3.721.0" as AWSDynamoDB
+    component "@aws-sdk/util-dynamodb 3.721.0" as AWSUtilDynamoDB
+    component "@aws-sdk/client-lambda 3.721.0" as AWSLambda
+    component "@aws-sdk/client-sqs 3.721.0" as AWSSQS
+    component "@aws-sdk/client-sns 3.721.0" as AWSSNS
+    component "@aws-sdk/client-apigatewayv2 3.721.0" as AWSAPIGatewayV2
+    component "@aws-sdk/client-apigatewaymanagementapi 3.721.0" as AWSAPIGatewayMgmt
+    
+    note right of AWSS3: S3对象存储\n文件上传下载\n预签名URL
+    note right of AWSDynamoDB: NoSQL数据库\n键值存储\n查询和扫描
+    note right of AWSLambda: 无服务器计算\n函数调用\n事件驱动
+    note right of AWSSQS: 消息队列\n异步处理\n解耦系统
+    note right of AWSSNS: 通知服务\n发布订阅\n多协议支持
+    note right of AWSAPIGatewayV2: API网关\nHTTP/WebSocket API\n路由管理
+}
+
+package "测试工具" <<Build>> {
+    component "Vitest 2.1.8" as Vitest
+    component "Storybook 8.3.6" as Storybook
+    component "@storybook/react-vite 8.3.6" as StorybookReactVite
+    component "@storybook/addon-essentials 8.3.6" as StorybookAddons
+    
+    note right of Vitest: 单元测试框架\n快速执行\nVite集成
+    note right of Storybook: 组件开发工具\n可视化测试\n交互式文档
 }
 
 package "基础设施层" <<Infra>> {
-    component "CDN" as CDNNode
+    component "AWS S3" as S3Service
+    component "AWS DynamoDB" as DynamoDBService
+    component "AWS Lambda" as LambdaService
+    component "AWS SQS" as SQSService
+    component "AWS SNS" as SNSService
+    component "AWS API Gateway" as APIGatewayService
+    component "Vercel CDN" as CDNNode
     component "边缘计算" as EdgeNode
-    component "对象存储" as StorageNode
     component "域名与SSL" as DomainSSL
 }
 
 ' 前端技术栈内部关系
 NextJS --> React
+NextJS --> ReactDOM
 NextJS --> TypeScript
 NextJS --> Tailwind
+React --> ReactDOM
 React --> TypeScript
 
 ' UI框架关系
 NextJS --> RadixUI
 NextJS --> Lucide
+NextJS --> CMDK
+NextJS --> Sonner
+NextJS --> Vaul
+RadixUI --> RadixAccordion
+RadixUI --> RadixDialog
+RadixUI --> RadixDropdown
+RadixUI --> RadixSelect
+RadixUI --> RadixTabs
+RadixUI --> RadixToast
+RadixUI --> RadixTooltip
+Sonner --> RadixToast
 RadixUI --> Tailwind
 
 ' 数据可视化关系
 NextJS --> Recharts
+NextJS --> LightweightCharts
+NextJS --> ChartJS
+NextJS --> ReactChartJS
+NextJS --> D3JS
 NextJS --> Sparklines
 React --> Recharts
+React --> ReactChartJS
+ReactChartJS --> ChartJS
+D3JS --> D3Scale
+D3JS --> D3Color
 
 ' 工具库关系
 NextJS --> HookForm
-HookForm --> Zod
+HookForm --> HookFormResolvers
+HookFormResolvers --> Zod
 NextJS --> DateFns
+NextJS --> DayPicker
+DayPicker --> DateFns
 NextJS --> Themes
+NextJS --> InputOTP
+NextJS --> EmblaCarousel
+NextJS --> ResizablePanels
 
 ' 构建工具关系
 BuildSystem --> TSCompiler
 BuildSystem --> PostCSS
 BuildSystem --> ESLint
-PostCSS --> Tailwind
+PostCSS --> TailwindPostCSS
+TailwindPostCSS --> Tailwind
+Tailwind --> TwAnimate
+Vite --> TSCompiler
+
+' Monorepo工具关系
+PNPM --> NextJS
+PNPM --> React
+PNPM --> TypeScript
+
+' AWS SDK关系
+AWSS3 --> S3Service
+AWSDynamoDB --> DynamoDBService
+AWSDynamoDB --> AWSUtilDynamoDB
+AWSLambda --> LambdaService
+AWSSQS --> SQSService
+AWSSNS --> SNSService
+AWSAPIGatewayV2 --> APIGatewayService
+AWSAPIGatewayMgmt --> APIGatewayService
+NextJS --> AWSS3
+NextJS --> AWSDynamoDB
+NextJS --> AWSLambda
+NextJS --> AWSSQS
+NextJS --> AWSSNS
+NextJS --> AWSAPIGatewayV2
+
+' 测试工具关系
+Vitest --> TSCompiler
+Storybook --> StorybookReactVite
+StorybookReactVite --> Vite
+Storybook --> StorybookAddons
 
 ' 部署关系
 BuildSystem --> Vercel
 Vercel --> Analytics
 Vercel --> GitIntegration
 Vercel --> DomainSSL
+PNPM --> Vercel
 
 ' 基础设施关系
 Vercel --> CDNNode
 Vercel --> EdgeNode
-Vercel --> StorageNode
+APIGatewayService --> LambdaService
+LambdaService --> S3Service
+LambdaService --> DynamoDBService
+LambdaService --> SQSService
+LambdaService --> SNSService
+S3Service --> StorageNode
 
 ' 技术标准说明
 package "技术标准与规范" {
@@ -166,14 +304,19 @@ legend right
     |<#E3F2FD> 前端技术 | 用户界面技术栈
     |<#F3E5F5> 构建工具 | 编译和打包工具
     |<#E8F5E9> 部署平台 | 发布和托管平台
-    |<#FFF3E0> 基础设施 | 底层基础设施
+    |<#FFF3E0> 基础设施 | 底层基础设施和AWS服务
     |
     <b>技术特点：</b>
-    • 全栈React框架
-    • 类型安全开发
-    • 现代化UI组件
-    • 自动化部署流程
+    • 全栈React框架 (Next.js 16)
+    • 类型安全开发 (TypeScript 5)
+    • 现代化UI组件 (Radix UI)
+    • 多图表库支持 (Recharts/Lightweight Charts/Chart.js/D3)
+    • Monorepo架构 (pnpm workspace)
+    • AWS云服务集成
+    • 自动化部署流程 (Vercel)
     • 全球CDN加速
+    • 单元测试 (Vitest)
+    • 组件开发工具 (Storybook)
 endlegend
 
 @enduml
