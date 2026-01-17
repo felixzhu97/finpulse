@@ -69,6 +69,11 @@ FinPulse 是一个现代化的金融科技分析平台，为投资者提供全�
 - **React 19.2** - UI 库
 - **TypeScript 5.0** - 类型安全
 
+### Monorepo 工具
+
+- **pnpm Workspaces** - 包管理和工作区管理
+- **TypeScript Project References** - 跨包类型检查
+
 ### UI 组件库
 
 - **Radix UI** - 无样式、可访问的组件原语
@@ -82,41 +87,51 @@ FinPulse 是一个现代化的金融科技分析平台，为投资者提供全�
 - **Zod** - 数据验证
 - **date-fns** - 日期处理
 - **next-themes** - 主题切换
-- **clsx** & **tailwind-merge** - 样式工具
+- **clsx** & **tailwind-merge** - 样式工具（在 `@fintech/utils` 包中）
 
 ### 部署与分析
 
 - **Vercel** - 部署平台
 - **Vercel Analytics** - 网站分析
 
+## 🏗️ 项目架构
+
+本项目采用 **monorepo** 架构，使用 pnpm workspaces 管理多个包：
+
+- **apps/web** - Next.js 主应用（前端应用）
+- **packages/ui** - 共享 UI 组件库
+- **packages/utils** - 共享工具函数库
+
+这种架构的优势：
+- 代码复用：共享组件和工具函数可以在多个应用中使用
+- 独立开发：每个包可以独立开发、测试和版本控制
+- 类型安全：通过 TypeScript 项目引用实现跨包类型检查
+- 高效构建：只构建变更的包，提高开发效率
+
 ## 🚀 快速开始
 
 ### 环境要求
 
 - Node.js 18+
-- pnpm (推荐) 或 npm / yarn
+- pnpm 10.6.0+ (必需，项目使用 pnpm workspaces)
 
 ### 安装依赖
 
 ```bash
-# 使用 pnpm (推荐)
+# 在项目根目录安装所有依赖（包括所有包）
 pnpm install
-
-# 或使用 npm
-npm install
-
-# 或使用 yarn
-yarn install
 ```
+
+pnpm 会自动识别 `pnpm-workspace.yaml` 配置，并安装所有工作区的依赖。
 
 ### 开发模式
 
 ```bash
-# 启动开发服务器
+# 启动 web 应用开发服务器
 pnpm dev
 
-# 或
-npm run dev
+# 或直接在 apps/web 目录下运行
+pnpm --filter web dev
 ```
 
 访问 [http://localhost:3000](http://localhost:3000) 查看应用。
@@ -124,8 +139,11 @@ npm run dev
 ### 构建生产版本
 
 ```bash
-# 构建生产版本
+# 构建 web 应用
 pnpm build
+
+# 或构建所有包
+pnpm --filter "./apps/*" build
 
 # 启动生产服务器
 pnpm start
@@ -134,45 +152,129 @@ pnpm start
 ### 代码检查
 
 ```bash
-# 运行 ESLint
+# 运行 ESLint（在 web 应用）
 pnpm lint
+
+# 或运行所有包的 lint
+pnpm --filter "./apps/*" lint
+```
+
+### 工作区脚本
+
+```bash
+# 在特定包中运行脚本
+pnpm --filter web <script>
+pnpm --filter @fintech/ui <script>
+pnpm --filter @fintech/utils <script>
+
+# 在所有包中运行脚本
+pnpm -r <script>
+
+# 查看工作区信息
+pnpm list -r
+```
+
+### 开发指南
+
+#### 添加新依赖
+
+```bash
+# 在特定包中添加依赖
+pnpm --filter web add <package>
+pnpm --filter @fintech/ui add <package>
+pnpm --filter @fintech/utils add <package>
+
+# 添加开发依赖
+pnpm --filter web add -D <package>
+```
+
+#### 在包之间添加依赖
+
+如果 `apps/web` 需要使用 `@fintech/ui`，只需在 `apps/web/package.json` 中添加：
+
+```json
+{
+  "dependencies": {
+    "@fintech/ui": "workspace:*"
+  }
+}
+```
+
+然后运行 `pnpm install` 即可。
+
+#### 类型检查
+
+```bash
+# 检查所有包的类型
+pnpm -r type-check
+
+# 检查特定包的类型
+pnpm --filter @fintech/ui type-check
+pnpm --filter @fintech/utils type-check
 ```
 
 ## 📁 项目结构
 
 ```
 fintech-project/
-├── app/                      # Next.js App Router 目录
-│   ├── layout.tsx           # 根布局
-│   ├── page.tsx             # 主页面（仪表盘）
-│   └── globals.css          # 全局样式
-├── components/               # React 组件
-│   ├── ui/                  # 基础 UI 组件
-│   │   ├── avatar.tsx
-│   │   ├── badge.tsx
-│   │   ├── button.tsx
-│   │   ├── card.tsx
-│   │   └── ...
-│   ├── header.tsx           # 顶部导航栏
-│   ├── sidebar.tsx          # 侧边栏
-│   ├── portfolio-overview.tsx   # 投资组合概览
-│   ├── market-trends.tsx    # 市场趋势
-│   ├── asset-allocation.tsx # 资产配置
-│   ├── performance-chart.tsx # 性能图表
-│   ├── recent-transactions.tsx # 交易记录
-│   ├── watch-list.tsx       # 观察列表
-│   ├── risk-analysis.tsx    # 风险分析
-│   └── quick-actions.tsx    # 快速操作
-├── lib/                     # 工具函数
-│   └── utils.ts             # 通用工具函数
-├── public/                  # 静态资源
-├── styles/                  # 样式文件
-├── next.config.mjs          # Next.js 配置
-├── tsconfig.json            # TypeScript 配置
-├── tailwind.config.ts       # Tailwind CSS 配置
-├── components.json          # shadcn/ui 配置
-└── package.json             # 项目依赖
+├── apps/
+│   └── web/                      # Next.js 主应用
+│       ├── app/                  # Next.js App Router 目录
+│       │   ├── layout.tsx       # 根布局
+│       │   ├── page.tsx         # 主页面（仪表盘）
+│       │   └── globals.css      # 全局样式
+│       ├── components/           # 业务组件
+│       │   ├── header.tsx       # 顶部导航栏
+│       │   ├── sidebar.tsx      # 侧边栏
+│       │   ├── portfolio-overview.tsx   # 投资组合概览
+│       │   ├── market-trends.tsx        # 市场趋势
+│       │   ├── asset-allocation.tsx     # 资产配置
+│       │   ├── performance-chart.tsx    # 性能图表
+│       │   ├── recent-transactions.tsx  # 交易记录
+│       │   ├── watch-list.tsx           # 观察列表
+│       │   ├── risk-analysis.tsx        # 风险分析
+│       │   └── quick-actions.tsx        # 快速操作
+│       ├── public/               # 静态资源
+│       ├── styles/               # 样式文件
+│       ├── next.config.mjs       # Next.js 配置
+│       ├── components.json       # shadcn/ui 配置
+│       ├── package.json          # 应用依赖
+│       └── tsconfig.json         # TypeScript 配置
+├── packages/
+│   ├── ui/                       # UI 组件库 (@fintech/ui)
+│   │   ├── src/
+│   │   │   ├── components/       # UI 组件
+│   │   │   │   ├── avatar.tsx
+│   │   │   │   ├── badge.tsx
+│   │   │   │   ├── button.tsx
+│   │   │   │   ├── card.tsx
+│   │   │   │   ├── dropdown-menu.tsx
+│   │   │   │   ├── input.tsx
+│   │   │   │   └── progress.tsx
+│   │   │   └── index.ts          # 导出入口
+│   │   ├── package.json          # 包配置
+│   │   └── tsconfig.json         # TypeScript 配置
+│   └── utils/                    # 工具函数库 (@fintech/utils)
+│       ├── src/
+│       │   └── index.ts          # 工具函数导出
+│       ├── package.json          # 包配置
+│       └── tsconfig.json         # TypeScript 配置
+├── package.json                  # 根 package.json (workspaces 配置)
+├── pnpm-workspace.yaml           # pnpm workspaces 配置
+├── pnpm-lock.yaml                # 依赖锁定文件
+└── tsconfig.json                 # 根 TypeScript 配置
 ```
+
+### 包说明
+
+#### `apps/web`
+Next.js 主应用，包含所有业务逻辑和页面。依赖于 `@fintech/ui` 和 `@fintech/utils`。
+
+#### `packages/ui`
+共享 UI 组件库，基于 Radix UI 和 Tailwind CSS 构建的组件集合。可在多个应用中复用。
+
+#### `packages/utils`
+共享工具函数库，包含通用的工具函数（如 `cn` 用于样式合并）。
 
 ## 🎨 设计特性
 
@@ -216,12 +318,32 @@ fintech-project/
 
 项目已配置为自动部署到 Vercel。每次推送到主分支都会自动触发部署。
 
+### Vercel 配置
+
+由于项目采用 monorepo 结构，需要在 Vercel 中配置：
+
+1. **根目录**: `/`
+2. **构建命令**: `pnpm --filter web build`
+3. **输出目录**: `apps/web/.next`
+4. **安装命令**: `pnpm install`
+
 ### 手动部署
 
 1. 将代码推送到 GitHub
 2. 在 Vercel 中导入项目
-3. 配置环境变量（如需要）
-4. 部署完成
+3. 配置构建设置（根目录、构建命令等）
+4. 配置环境变量（如需要）
+5. 部署完成
+
+### 本地预览生产版本
+
+```bash
+# 构建生产版本
+pnpm build
+
+# 启动生产服务器
+pnpm start
+```
 
 ## 📄 许可证
 

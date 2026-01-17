@@ -1,24 +1,35 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+.pnpm-store
+
+# monorepo - 各包的 node_modules
+apps/*/node_modules
+packages/*/node_modules
 
 # testing
 /coverage
 *.lcov
 
 # next.js
-/.next/
-/out/
+.next/
+out/
+apps/*/.next/
+apps/*/out/
 .next
 out
 
 # production
-/build
-/dist
+build/
+dist/
+apps/*/build/
+apps/*/dist/
+packages/*/build/
+packages/*/dist/
 
 # misc
 .DS_Store

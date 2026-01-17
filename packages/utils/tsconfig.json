@@ -4,16 +4,14 @@
     "lib": ["ES2020"],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "declaration": true,
+    "declarationMap": true,
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "files": [],
-  "references": [
-    { "path": "./apps/web" },
-    { "path": "./packages/ui" },
-    { "path": "./packages/utils" }
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
