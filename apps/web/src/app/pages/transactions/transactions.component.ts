@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, GridReadyEvent, GridApi, themeQuartz } from 'ag-grid-community';
+import { ColDef, GridReadyEvent, GridApi } from 'ag-grid-community';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent } from '../../shared/components/card/card.component';
+import { finpulseAgGridTheme } from '../../shared/ag-grid/ag-grid-theme';
 
 interface Transaction {
   id: string;
@@ -16,12 +17,6 @@ interface Transaction {
   status: 'Completed' | 'Pending' | 'Failed';
   fee: number;
 }
-
-const fintechDarkGridTheme = themeQuartz.withParams({
-  backgroundColor: '#101827',
-  foregroundColor: '#ffffff',
-  browserColorScheme: 'dark'
-});
 
 @Component({
   selector: 'app-transactions',
@@ -55,7 +50,7 @@ const fintechDarkGridTheme = themeQuartz.withParams({
 })
 export class TransactionsComponent {
   private gridApi!: GridApi;
-  gridTheme = fintechDarkGridTheme;
+  gridTheme = finpulseAgGridTheme;
 
   rowData: Transaction[] = [
     { id: '1', date: '2026-01-27', type: 'Buy', symbol: 'AAPL', name: 'Apple Inc.', quantity: 10, price: 182.52, amount: 1825.20, status: 'Completed', fee: 1.00 },

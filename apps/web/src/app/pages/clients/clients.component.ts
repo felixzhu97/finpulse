@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, GridReadyEvent, GridApi, themeQuartz } from 'ag-grid-community';
+import { ColDef, GridReadyEvent, GridApi } from 'ag-grid-community';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent } from '../../shared/components/card/card.component';
+import { finpulseAgGridTheme } from '../../shared/ag-grid/ag-grid-theme';
 
 interface Client {
   id: string;
@@ -16,12 +17,6 @@ interface Client {
   status: 'Active' | 'Inactive' | 'Pending';
   riskProfile: 'Conservative' | 'Moderate' | 'Aggressive';
 }
-
-const fintechDarkGridTheme = themeQuartz.withParams({
-  backgroundColor: '#101827',
-  foregroundColor: '#ffffff',
-  browserColorScheme: 'dark'
-});
 
 @Component({
   selector: 'app-clients',
@@ -55,7 +50,7 @@ const fintechDarkGridTheme = themeQuartz.withParams({
 })
 export class ClientsComponent {
   private gridApi!: GridApi;
-  gridTheme = fintechDarkGridTheme;
+  gridTheme = finpulseAgGridTheme;
 
   rowData: Client[] = [
     { id: '1', name: 'John Smith', email: 'john.smith@email.com', phone: '+1 234-567-8900', portfolioValue: 1250000, totalAssets: 8, activeInvestments: 5, joinDate: '2024-01-15', status: 'Active', riskProfile: 'Moderate' },

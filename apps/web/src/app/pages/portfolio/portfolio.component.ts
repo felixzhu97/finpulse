@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, GridReadyEvent, GridApi, themeQuartz } from 'ag-grid-community';
+import { ColDef, GridReadyEvent, GridApi } from 'ag-grid-community';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent } from '../../shared/components/card/card.component';
+import { finpulseAgGridTheme } from '../../shared/ag-grid/ag-grid-theme';
 
 interface PortfolioItem {
   symbol: string;
@@ -17,12 +18,6 @@ interface PortfolioItem {
   allocation: number;
   sector: string;
 }
-
-const fintechDarkGridTheme = themeQuartz.withParams({
-  backgroundColor: '#101827',
-  foregroundColor: '#ffffff',
-  browserColorScheme: 'dark'
-});
 
 @Component({
   selector: 'app-portfolio',
@@ -56,7 +51,7 @@ const fintechDarkGridTheme = themeQuartz.withParams({
 })
 export class PortfolioComponent {
   private gridApi!: GridApi;
-  gridTheme = fintechDarkGridTheme;
+  gridTheme = finpulseAgGridTheme;
 
   rowData: PortfolioItem[] = [
     { symbol: 'AAPL', name: 'Apple Inc.', quantity: 50, avgPrice: 175.20, currentPrice: 182.52, marketValue: 9126.00, costBasis: 8760.00, gainLoss: 366.00, gainLossPercent: 4.18, allocation: 18.5, sector: 'Technology' },

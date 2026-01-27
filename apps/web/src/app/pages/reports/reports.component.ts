@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, GridReadyEvent, GridApi, themeQuartz } from 'ag-grid-community';
+import { ColDef, GridReadyEvent, GridApi } from 'ag-grid-community';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent } from '../../shared/components/card/card.component';
+import { finpulseAgGridTheme } from '../../shared/ag-grid/ag-grid-theme';
 
 interface Report {
   id: string;
@@ -14,12 +15,6 @@ interface Report {
   fileSize: string;
   format: 'PDF' | 'Excel' | 'CSV';
 }
-
-const fintechDarkGridTheme = themeQuartz.withParams({
-  backgroundColor: '#101827',
-  foregroundColor: '#ffffff',
-  browserColorScheme: 'dark'
-});
 
 @Component({
   selector: 'app-reports',
@@ -53,7 +48,7 @@ const fintechDarkGridTheme = themeQuartz.withParams({
 })
 export class ReportsComponent {
   private gridApi!: GridApi;
-  gridTheme = fintechDarkGridTheme;
+  gridTheme = finpulseAgGridTheme;
 
   rowData: Report[] = [
     { id: '1', title: 'Q4 2025 Performance Report', type: 'Performance', generatedDate: '2026-01-15', period: 'Q4 2025', status: 'Ready', fileSize: '2.4 MB', format: 'PDF' },
