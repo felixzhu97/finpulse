@@ -103,3 +103,5 @@ storybook-static
 
 # Sentry
 .sentryclirc
+
+.angular/
