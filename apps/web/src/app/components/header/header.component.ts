@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { InputComponent } from '../../shared/components/input/input.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
-import { AvatarComponent, AvatarImageComponent, AvatarFallbackComponent } from '../../shared/components/avatar/avatar.component';
+import { AvatarComponent, AvatarImageComponent } from '../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-header',
@@ -14,8 +14,7 @@ import { AvatarComponent, AvatarImageComponent, AvatarFallbackComponent } from '
     InputComponent,
     BadgeComponent,
     AvatarComponent,
-    AvatarImageComponent,
-    AvatarFallbackComponent
+    AvatarImageComponent
   ],
   template: `
     <header class="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
@@ -73,9 +72,12 @@ import { AvatarComponent, AvatarImageComponent, AvatarFallbackComponent } from '
           <!-- Profile -->
           <div class="relative">
             <app-button variant="ghost" className="flex items-center gap-2 pl-2 pr-3">
-              <app-avatar className="w-8 h-8 border-2 border-primary/50">
-                <app-avatar-image src="/professional-asian-man-avatar.png"></app-avatar-image>
-                <app-avatar-fallback className="bg-primary/20 text-primary">JC</app-avatar-fallback>
+              <app-avatar className="w-8 h-8 border-2 border-primary/50 overflow-hidden">
+                <app-avatar-image
+                  className="object-cover"
+                  src="/assets/buffett-avatar.png"
+                  alt="Warren Buffett"
+                ></app-avatar-image>
               </app-avatar>
               <div class="text-left hidden lg:block">
                 <p class="text-sm font-medium">John Chen</p>

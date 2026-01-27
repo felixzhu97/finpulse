@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 interface MenuItem {
   icon: string;
   label: string;
-  active?: boolean;
+  route: string;
 }
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
     <aside
       [class]="'fixed left-0 top-0 h-screen bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-300 z-50 ' + (collapsed ? 'w-20' : 'w-64')"
@@ -32,16 +33,18 @@ interface MenuItem {
       <!-- Main Menu -->
       <nav class="flex-1 py-6 px-3 overflow-y-auto">
         <div class="space-y-1">
-          <button
+          <a
             *ngFor="let item of menuItems; let i = index"
-            [class]="'w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 group ' + (item.active ? 'bg-primary/10 text-primary glow-border' : 'text-muted-foreground hover:bg-secondary hover:text-foreground')"
+            [routerLink]="item.route"
+            routerLinkActive="bg-primary/10 text-primary glow-border"
+            [routerLinkActiveOptions]="{exact: item.route === '/'}"
+            class="w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 group text-muted-foreground hover:bg-secondary hover:text-foreground"
           >
-            <svg class="w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110" [class.text-primary]="item.active" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getIconPath(item.icon)" />
             </svg>
             <span *ngIf="!collapsed" class="font-medium truncate">{{ item.label }}</span>
-            <div *ngIf="item.active && !collapsed" class="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-          </button>
+          </a>
         </div>
       </nav>
 
@@ -79,22 +82,24 @@ interface MenuItem {
 export class SidebarComponent {
   collapsed = false;
 
+  constructor(public router: Router) {}
+
   menuItems: MenuItem[] = [
-    { icon: 'dashboard', label: 'Dashboard', active: true },
-    { icon: 'trending', label: 'Market Trends' },
-    { icon: 'wallet', label: 'Portfolio' },
-    { icon: 'pie', label: 'Asset Allocation' },
-    { icon: 'line-chart', label: 'Analytics' },
-    { icon: 'shield', label: 'Risk Management' },
-    { icon: 'credit-card', label: 'Transactions' },
-    { icon: 'users', label: 'Clients' },
-    { icon: 'file-text', label: 'Reports' }
+    { icon: 'dashboard', label: 'Dashboard', route: '/' },
+    { icon: 'wallet', label: 'Portfolio', route: '/portfolio' },
+    { icon: 'trending', label: 'Market Trends', route: '#' },
+    { icon: 'pie', label: 'Asset Allocation', route: '#' },
+    { icon: 'line-chart', label: 'Analytics', route: '#' },
+    { icon: 'shield', label: 'Risk Management', route: '#' },
+    { icon: 'credit-card', label: 'Transactions', route: '/transactions' },
+    { icon: 'users', label: 'Clients', route: '/clients' },
+    { icon: 'file-text', label: 'Reports', route: '/reports' }
   ];
 
   bottomItems: MenuItem[] = [
-    { icon: 'bell', label: 'Notifications' },
-    { icon: 'settings', label: 'Settings' },
-    { icon: 'help', label: 'Help' }
+    { icon: 'bell', label: 'Notifications', route: '#' },
+    { icon: 'settings', label: 'Settings', route: '#' },
+    { icon: 'help', label: 'Help', route: '#' }
   ];
 
   getIconPath(icon: string): string {

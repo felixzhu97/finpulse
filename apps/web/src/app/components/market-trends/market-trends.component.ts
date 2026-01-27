@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent } from '../../shared/components/card/card.component';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartType } from 'chart.js';
 
 interface Market {
   name: string;
@@ -14,7 +16,7 @@ interface Market {
 @Component({
   selector: 'app-market-trends',
   standalone: true,
-  imports: [CommonModule, CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent],
+  imports: [CommonModule, CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent, BaseChartDirective],
   template: `
     <app-card className="bg-card border-border glass h-full">
       <app-card-header className="pb-2">
@@ -30,15 +32,12 @@ interface Market {
             <p class="text-xs text-muted-foreground">{{ market.code }}</p>
           </div>
           <div class="w-20 h-8 mx-4">
-            <!-- Simple sparkline placeholder -->
-            <svg class="w-full h-full" viewBox="0 0 80 32" preserveAspectRatio="none">
-              <polyline
-                [attr.points]="getSparklinePoints(market.data)"
-                [attr.stroke]="market.trend === 'up' ? 'oklch(0.7 0.22 160)' : 'oklch(0.6 0.2 25)'"
-                fill="none"
-                [attr.stroke-width]="2"
-              />
-            </svg>
+            <canvas baseChart
+              [type]="chartType"
+              [data]="getChartData(market)"
+              [options]="getChartOptions(market)"
+              [legend]="false">
+            </canvas>
           </div>
           <div class="text-right">
             <p class="font-semibold text-sm">{{ market.price }}</p>
@@ -59,6 +58,8 @@ interface Market {
   styles: []
 })
 export class MarketTrendsComponent {
+  chartType: ChartType = 'line';
+
   markets: Market[] = [
     {
       name: 'Shanghai Composite',
@@ -102,17 +103,49 @@ export class MarketTrendsComponent {
     }
   ];
 
-  getSparklinePoints(data: number[]): string {
-    const width = 80;
-    const height = 32;
-    const max = Math.max(...data);
-    const min = Math.min(...data);
-    const range = max - min || 1;
-    
-    return data.map((value, index) => {
-      const x = (index / (data.length - 1)) * width;
-      const y = height - ((value - min) / range) * height;
-      return `${x},${y}`;
-    }).join(' ');
+  getChartData(market: Market): ChartConfiguration['data'] {
+    return {
+      labels: market.data.map((_, i) => ''),
+      datasets: [
+        {
+          data: market.data,
+          borderColor: market.trend === 'up' ? 'oklch(0.7 0.22 160)' : 'oklch(0.6 0.2 25)',
+          backgroundColor: market.trend === 'up' ? 'oklch(0.7 0.22 160 / 0.1)' : 'oklch(0.6 0.2 25 / 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 0,
+          borderWidth: 2
+        }
+      ]
+    };
+  }
+
+  getChartOptions(market: Market): ChartConfiguration['options'] {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          enabled: false
+        }
+      },
+      scales: {
+        x: {
+          display: false
+        },
+        y: {
+          display: false
+        }
+      },
+      elements: {
+        point: {
+          radius: 0
+        }
+      }
+    };
   }
 }
