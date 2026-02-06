@@ -104,6 +104,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 - **apps/web** - Angular-based financial analytics web console.
 - **apps/mobile** - React Native demo mobile app.
 - **apps/mobile-portfolio** - React Native mobile app focused on portfolio overview and key metrics.
+- **services/portfolio-analytics** - Java Spring Boot backend using DDD to serve portfolio analytics.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
 
@@ -226,6 +227,8 @@ fintech-project/
 │   ├── web/                      # Angular financial analytics web app
 │   ├── mobile/                   # React Native mobile demo app
 │   └── mobile-portfolio/         # React Native portfolio overview mobile app
+├── services/
+│   └── portfolio-analytics/      # Java Spring Boot portfolio analytics service (DDD)
 ├── packages/
 │   ├── ui/                       # UI component library (@fintech/ui)
 │   └── utils/                    # Utility function library (@fintech/utils)

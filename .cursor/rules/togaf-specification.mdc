@@ -32,6 +32,7 @@ TOGAF (The Open Group Architecture Framework) 是企业架构开发的标准框�
 - UI 组件库：`@fintech/ui`、`@fintech/utils`
 - 业务组件：投资组合总览、市场趋势、资产配置、风险分析、交易记录等
 - 应用服务层：投资组合服务、市场数据服务、风险分析服务、报表服务
+- 后端服务层：`services/portfolio-analytics`（基于 Spring Boot 的组合分析服务，采用 DDD 分层）
 
 **文档位置**：`docs/architecture/application-architecture.puml`
 
@@ -42,6 +43,7 @@ TOGAF (The Open Group Architecture Framework) 是企业架构开发的标准框�
 - `apps/mobile-portfolio/` - 投资组合移动端应用
 - `packages/ui/` - UI 组件库
 - `packages/utils/` - 工具函数库
+- `services/portfolio-analytics/` - 组合分析与数据聚合服务层
 
 ### Data Architecture（数据架构）
 
@@ -61,6 +63,7 @@ TOGAF (The Open Group Architecture Framework) 是企业架构开发的标准框�
 
 - `apps/web/` - 消费分析数据的 Web 界面
 - `apps/mobile/`、`apps/mobile-portfolio/` - 消费分析数据的移动客户端
+- `services/portfolio-analytics/src/main/java/com/fintech/portfolio` - 组合领域模型与历史数据生成
 
 ### Technology Architecture（技术架构）
 
