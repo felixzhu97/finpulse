@@ -6,27 +6,27 @@
 
 **Linux/macOS:**
 ```bash
-cd packages/bigdata-java
+cd services/bigdata-java
 ./start.sh
 ```
 
 **Windows:**
 ```cmd
-cd packages\bigdata-java
+cd services\bigdata-java
 start.bat
 ```
 
 ### 方法 2: 使用 Maven
 
 ```bash
-cd packages/bigdata-java
+cd services/bigdata-java
 mvn spring-boot:run
 ```
 
 ### 方法 3: 构建并运行 JAR
 
 ```bash
-cd packages/bigdata-java
+cd services/bigdata-java
 mvn clean package
 java -jar target/bigdata-java-0.1.0.jar
 ```

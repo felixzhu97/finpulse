@@ -10,6 +10,7 @@
 2. [应用架构图](#应用架构图-application-architecture)
 3. [数据架构图](#数据架构图-data-architecture)
 4. [技术架构图](#技术架构图-technology-architecture)
+5. 领域视角下的金融系统图（`docs/architecture/domain` 目录）
 
 ## 🎯 架构概述
 
@@ -231,6 +232,15 @@
 - **安全标准**: HTTPS 强制、CSP、XSS 防护、数据验证
 - **可访问性标准**: WCAG 2.1 AA 级、键盘导航、ARIA 标签
 
+### 金融系统领域视图 (Finance System Domain Views)
+
+**目录**: `docs/architecture/domain`
+
+**文件**:
+- `finance-system.puml`: 从渠道、边缘服务、核心金融服务、数据与分析以及外部系统五个层次展示整体金融系统组件和依赖关系。
+- `finance-system-domains.puml`: 从业务领域角度划分客户与账户、投资与交易、支付与资金、风控与合规、数据与洞察五大域，并展示域间依赖。
+- `finance-system-flows.puml`: 以流程视图展示开户、入金、交易以及风险和报表的端到端核心业务流。
+
 ## 🛠️ 如何使用
 
 ### 查看架构图
@@ -255,6 +265,9 @@
    plantuml application-architecture.puml
    plantuml data-architecture.puml
    plantuml technology-architecture.puml
+   plantuml domain/finance-system.puml
+   plantuml domain/finance-system-domains.puml
+   plantuml domain/finance-system-flows.puml
    
    # 生成 SVG 图片（推荐，矢量图）
    plantuml -tsvg business-architecture.puml
@@ -360,7 +373,7 @@
 
 **影响**:
 - 采用混合架构：TypeScript 前端 + Java 后端服务
-- 新增 `packages/bigdata-java/` Java Spring Boot 服务
+- 新增 `services/bigdata-java/` Java Spring Boot 服务
 - 新增 `packages/bigdata/` TypeScript 客户端包
 - 通过 REST API 进行跨语言通信
 - 所有大数据操作通过 Java 服务执行

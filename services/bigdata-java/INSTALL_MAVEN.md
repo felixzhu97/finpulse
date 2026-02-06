@@ -84,9 +84,8 @@ choco install maven
 ### 设置 Maven Wrapper
 
 ```bash
-cd packages/bigdata-java
+cd services/bigdata-java
 
-# 如果项目还没有 Maven Wrapper，可以添加它
 mvn wrapper:wrapper
 ```
 

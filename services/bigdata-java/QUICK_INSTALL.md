@@ -21,7 +21,7 @@ mvn --version
 安装完成后：
 
 ```bash
-cd packages/bigdata-java
+cd services/bigdata-java
 ./start.sh
 ```
 

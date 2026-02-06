@@ -1,0 +1,80 @@
+@startuml
+skinparam linetype ortho
+
+skinparam component {
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+package "Customer and Accounts" {
+  component "Customer Domain" as CustomerDomain
+  component "Identity Domain" as IdentityDomain
+  component "Account Domain" as AccountDomain
+}
+
+package "Investing and Trading" {
+  component "Portfolio Domain" as PortfolioDomain
+  component "Order Domain" as OrderDomain
+  component "Execution Domain" as ExecutionDomain
+  component "Position Domain" as PositionDomain
+}
+
+package "Payments and Treasury" {
+  component "Wallet Domain" as WalletDomain
+  component "Payment Domain" as PaymentDomain
+  component "Settlement Domain" as SettlementDomain
+  component "Treasury Domain" as TreasuryDomain
+}
+
+package "Risk and Compliance" {
+  component "Risk Domain" as RiskDomain
+  component "Limit Management Domain" as LimitDomain
+  component "KYC Domain" as KycDomain
+  component "AML Domain" as AmlDomain
+  component "Monitoring Domain" as MonitoringDomain
+}
+
+package "Data and Insights" {
+  component "Market Data Domain" as MarketDataDomain
+  component "Reference Data Domain" as ReferenceDataDomain
+  component "Reporting Domain" as ReportingDomain
+  component "Analytics Domain" as AnalyticsDomain
+}
+
+CustomerDomain --> IdentityDomain
+CustomerDomain --> AccountDomain
+AccountDomain --> PositionDomain
+AccountDomain --> WalletDomain
+
+PortfolioDomain --> PositionDomain
+OrderDomain --> ExecutionDomain
+ExecutionDomain --> PositionDomain
+
+WalletDomain --> PaymentDomain
+PaymentDomain --> SettlementDomain
+SettlementDomain --> TreasuryDomain
+
+RiskDomain --> LimitDomain
+RiskDomain --> PositionDomain
+RiskDomain --> MarketDataDomain
+LimitDomain --> OrderDomain
+
+KycDomain --> CustomerDomain
+AmlDomain --> PaymentDomain
+MonitoringDomain --> OrderDomain
+MonitoringDomain --> PaymentDomain
+
+ReportingDomain --> AccountDomain
+ReportingDomain --> PositionDomain
+ReportingDomain --> PaymentDomain
+ReportingDomain --> RiskDomain
+
+AnalyticsDomain --> MarketDataDomain
+AnalyticsDomain --> ReferenceDataDomain
+AnalyticsDomain --> ReportingDomain
+
+MarketDataDomain --> PortfolioDomain
+ReferenceDataDomain --> AccountDomain
+
+@enduml
+
