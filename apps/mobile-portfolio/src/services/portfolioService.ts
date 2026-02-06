@@ -1,30 +1,66 @@
-import type { Account, Holding, Portfolio } from "../types/portfolio";
+import type {
+  Account,
+  Holding,
+  Portfolio,
+  PortfolioHistoryPoint,
+} from "../types/portfolio";
 import { demoPortfolio } from "../mocks/portfolioData";
 
-export function getPortfolio(): Portfolio {
+const API_BASE_URL = "http://localhost:8080/api/v1";
+
+async function fetchPortfolio(): Promise<Portfolio | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/portfolio`);
+    if (!response.ok) {
+      return null;
+    }
+    const data = (await response.json()) as Portfolio;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+let cachedPortfolio: Portfolio | null = null;
+
+export async function getPortfolio(): Promise<Portfolio> {
+  if (cachedPortfolio) {
+    return cachedPortfolio;
+  }
+  const fromApi = await fetchPortfolio();
+  if (fromApi) {
+    cachedPortfolio = fromApi;
+    return fromApi;
+  }
+  cachedPortfolio = demoPortfolio;
   return demoPortfolio;
 }
 
-export function getAccounts(): Account[] {
-  return demoPortfolio.accounts;
+export async function getAccounts(): Promise<Account[]> {
+  const portfolio = await getPortfolio();
+  return portfolio.accounts;
 }
 
-export function getAccountById(id: string): Account | undefined {
-  return demoPortfolio.accounts.find((account) => account.id === id);
+export async function getAccountById(id: string): Promise<Account | undefined> {
+  const portfolio = await getPortfolio();
+  return portfolio.accounts.find((account) => account.id === id);
 }
 
-export function getHoldingsByAccount(id: string): Holding[] {
-  const account = getAccountById(id);
+export async function getHoldingsByAccount(id: string): Promise<Holding[]> {
+  const account = await getAccountById(id);
   return account?.holdings ?? [];
 }
 
-export function getAssetAllocationByAccountType(): {
-  type: Account["type"];
-  value: number;
-}[] {
+export async function getAssetAllocationByAccountType(): Promise<
+  {
+    type: Account["type"];
+    value: number;
+  }[]
+> {
+  const portfolio = await getPortfolio();
   const grouped = new Map<Account["type"], number>();
 
-  demoPortfolio.accounts.forEach((account) => {
+  portfolio.accounts.forEach((account) => {
     const current = grouped.get(account.type) ?? 0;
     grouped.set(account.type, current + Math.max(account.balance, 0));
   });
@@ -35,11 +71,17 @@ export function getAssetAllocationByAccountType(): {
   }));
 }
 
-export function getRiskSummary(): {
+export async function getPortfolioHistory(): Promise<PortfolioHistoryPoint[]> {
+  const portfolio = await getPortfolio();
+  return portfolio.history;
+}
+
+export async function getRiskSummary(): Promise<{
   highRatio: number;
   topHoldingsConcentration: number;
-} {
-  const allHoldings: Holding[] = demoPortfolio.accounts.flatMap(
+}> {
+  const portfolio = await getPortfolio();
+  const allHoldings: Holding[] = portfolio.accounts.flatMap(
     (account) => account.holdings,
   );
 

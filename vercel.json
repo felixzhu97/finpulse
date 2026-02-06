@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm install && pnpm --filter web build --configuration production",
+  "buildCommand": "pnpm install && pnpm --filter finpulse-web build --configuration production",
   "outputDirectory": "apps/web/dist/web/browser",
   "installCommand": "pnpm install",
   "framework": null,

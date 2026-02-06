@@ -63,10 +63,11 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 ## 🛠️ Tech Stack
 
-### Frontend Framework
+### Frontend Frameworks
 
-- **Next.js 16.0** - React full-stack framework
-- **React 19.2** - UI library
+- **Angular 21** - Web analytics console (`apps/web`)
+- **React Native + Expo** - Mobile apps (`apps/mobile`, `apps/mobile-portfolio`)
+- **React 19.2** - UI components and shared libraries
 - **TypeScript 5.0** - Type safety
 
 ### Monorepo Tools
@@ -74,12 +75,14 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 - **pnpm Workspaces** - Package and workspace management
 - **TypeScript Project References** - Cross-package type checking
 
-### UI Component Library
+### UI & Visualization
 
-- **Radix UI** - Unstyled, accessible component primitives
+- **Radix UI** - Unstyled, accessible component primitives (in `@fintech/ui`)
 - **Tailwind CSS 4.1** - Utility-first CSS framework
 - **Lucide React** - Icon library
-- **Recharts** - Charting library
+- **Chart.js + ng2-charts + chartjs-chart-financial** - Web charts and financial (candlestick) charts
+- **react-native-wagmi-charts** - Professional mobile stock charts (line, candlestick, crosshair)
+- **react-native-chart-kit** - Lightweight mobile charts for portfolio metrics
 
 ### Utility Libraries
 
@@ -98,15 +101,17 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 This project uses a **monorepo** architecture managed with pnpm workspaces:
 
-- **apps/web** - Next.js main application (frontend app)
-- **packages/ui** - Shared UI component library
-- **packages/utils** - Shared utility function library
+- **apps/web** - Angular-based financial analytics web console.
+- **apps/mobile** - React Native demo mobile app.
+- **apps/mobile-portfolio** - React Native mobile app focused on portfolio overview and key metrics.
+- **packages/ui** - Shared UI component library.
+- **packages/utils** - Shared utility function library.
 
 Benefits of this architecture:
-- Code reuse: Shared components and utilities can be used across multiple applications
-- Independent development: Each package can be developed, tested, and versioned independently
-- Type safety: Cross-package type checking through TypeScript project references
-- Efficient builds: Only build changed packages, improving development efficiency
+- Code reuse: Shared components and utilities can be used across multiple applications.
+- Independent development: Each package can be developed, tested, and versioned independently.
+- Type safety: Cross-package type checking through TypeScript project references.
+- Efficient builds: Only build changed packages, improving development efficiency.
 
 ## 🚀 Quick Start
 
@@ -218,47 +223,13 @@ pnpm --filter @fintech/utils type-check
 ```
 fintech-project/
 ├── apps/
-│   └── web/                      # Next.js main application
-│       ├── app/                  # Next.js App Router directory
-│       │   ├── layout.tsx       # Root layout
-│       │   ├── page.tsx         # Main page (dashboard)
-│       │   └── globals.css      # Global styles
-│       ├── components/           # Business components
-│       │   ├── header.tsx       # Top navigation bar
-│       │   ├── sidebar.tsx      # Sidebar
-│       │   ├── portfolio-overview.tsx   # Portfolio overview
-│       │   ├── market-trends.tsx        # Market trends
-│       │   ├── asset-allocation.tsx     # Asset allocation
-│       │   ├── performance-chart.tsx    # Performance chart
-│       │   ├── recent-transactions.tsx  # Transaction records
-│       │   ├── watch-list.tsx           # Watch list
-│       │   ├── risk-analysis.tsx        # Risk analysis
-│       │   └── quick-actions.tsx        # Quick actions
-│       ├── public/               # Static assets
-│       ├── styles/               # Style files
-│       ├── next.config.mjs       # Next.js configuration
-│       ├── components.json       # shadcn/ui configuration
-│       ├── package.json          # Application dependencies
-│       └── tsconfig.json         # TypeScript configuration
+│   ├── web/                      # Angular financial analytics web app
+│   ├── mobile/                   # React Native mobile demo app
+│   └── mobile-portfolio/         # React Native portfolio overview mobile app
 ├── packages/
 │   ├── ui/                       # UI component library (@fintech/ui)
-│   │   ├── src/
-│   │   │   ├── components/       # UI components
-│   │   │   │   ├── avatar.tsx
-│   │   │   │   ├── badge.tsx
-│   │   │   │   ├── button.tsx
-│   │   │   │   ├── card.tsx
-│   │   │   │   ├── dropdown-menu.tsx
-│   │   │   │   ├── input.tsx
-│   │   │   │   └── progress.tsx
-│   │   │   └── index.ts          # Export entry
-│   │   ├── package.json          # Package configuration
-│   │   └── tsconfig.json         # TypeScript configuration
 │   └── utils/                    # Utility function library (@fintech/utils)
-│       ├── src/
-│       │   └── index.ts          # Utility function exports
-│       ├── package.json          # Package configuration
-│       └── tsconfig.json         # TypeScript configuration
+├── docs/                         # Architecture and domain documentation
 ├── package.json                  # Root package.json (workspaces configuration)
 ├── pnpm-workspace.yaml           # pnpm workspaces configuration
 ├── pnpm-lock.yaml                # Dependency lock file
@@ -268,13 +239,21 @@ fintech-project/
 ### Package Descriptions
 
 #### `apps/web`
-Next.js main application containing all business logic and pages. Depends on `@fintech/ui` and `@fintech/utils`.
+Angular-based financial analytics web console. Uses `chart.js`/`ng2-charts` for performance charts and `chartjs-chart-financial` for candlestick stock charts. Depends on `@fintech/ui` and `@fintech/utils`.
 
 #### `packages/ui`
 Shared UI component library, a collection of components built on Radix UI and Tailwind CSS. Can be reused across multiple applications.
 
 #### `packages/utils`
 Shared utility function library containing common utility functions (such as `cn` for style merging).
+
+## 🗺️ Roadmap & TODO
+
+High-level tasks and roadmap items for the whole monorepo are tracked in:
+
+- `docs/TODO.md` – cross-cutting TODO list for architecture, web, mobile, big data services, and shared packages.
+
+Before each significant release, review that file together with the architecture documents under `docs/architecture` and update items as work is completed.
 
 ## 🎨 Design Features
 
@@ -298,9 +277,17 @@ Provides visual analysis of market trends to help users understand market dynami
 
 Displays asset allocation in chart form, supporting multiple visualization methods such as pie charts and bar charts.
 
-### PerformanceChart
+### PerformanceChart (web)
 
-Uses Recharts to draw historical performance curves of the portfolio.
+Uses `chart.js` via `ng2-charts` to draw historical performance curves of the portfolio.
+
+### StockChart (web)
+
+Uses `chart.js` + `chartjs-chart-financial` to render candlestick stock charts for price history.
+
+### ProfessionalStockChart (mobile)
+
+Uses `react-native-wagmi-charts` to provide interactive mobile stock charts (price line, candlestick, crosshair, price/time labels).
 
 ### RiskAnalysis
 

@@ -1,6 +1,11 @@
-import type { Portfolio } from "../types/portfolio";
+const express = require("express");
+const cors = require("cors");
 
-export const demoPortfolio: Portfolio = {
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const demoPortfolio = {
   id: "demo-portfolio",
   ownerName: "Demo User",
   baseCurrency: "USD",
@@ -91,4 +96,13 @@ export const demoPortfolio: Portfolio = {
     { date: "2024-09-07", value: 145700 },
   ],
 };
+
+app.get("/api/v1/portfolio", (req, res) => {
+  res.json(demoPortfolio);
+});
+
+const port = 8080;
+app.listen(port, () => {
+  console.log(`portfolio-api listening on http://localhost:${port}`);
+});
 

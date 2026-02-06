@@ -1,13 +1,47 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { FlatList, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { getAccountById, getHoldingsByAccount } from "@/src/services/portfolioService";
 import { HoldingListItem } from "@/src/components/HoldingListItem";
+import type { Account, Holding } from "@/src/types/portfolio";
 
 export default function AccountDetailScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
   const router = useRouter();
 
   const accountId = params.id;
+
+  const [account, setAccount] = useState<Account | null>(null);
+  const [holdings, setHoldings] = useState<Holding[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!accountId) {
+      return;
+    }
+
+    let active = true;
+
+    const load = async () => {
+      const a = await getAccountById(accountId);
+      const h = await getHoldingsByAccount(accountId);
+
+      if (!active) {
+        return;
+      }
+
+      setAccount(a ?? null);
+      setHoldings(h);
+      setLoading(false);
+    };
+
+    load();
+
+    return () => {
+      active = false;
+    };
+  }, [accountId]);
 
   if (!accountId) {
     return (
@@ -23,8 +57,19 @@ export default function AccountDetailScreen() {
     );
   }
 
-  const account = getAccountById(accountId);
-  const holdings = getHoldingsByAccount(accountId);
+  if (loading) {
+    return (
+      <SafeAreaView
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text>Loading account...</Text>
+      </SafeAreaView>
+    );
+  }
 
   if (!account) {
     return (

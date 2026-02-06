@@ -4,14 +4,14 @@
   "private": true,
   "packageManager": "pnpm@10.6.0",
   "scripts": {
-    "dev": "pnpm --filter web dev",
-    "dev:mobile": "pnpm --filter react-native-app start",
+    "dev": "pnpm --filter finpulse-web dev",
+    "dev:mobile": "pnpm --filter finpulse-mobile start",
     "dev:mobile-portfolio": "pnpm --filter mobile-portfolio start",
-    "build": "pnpm --filter web build",
-    "start": "pnpm --filter web start",
-    "start:web": "pnpm --filter web start",
-    "start:mobile": "pnpm --filter react-native-app start",
+    "build": "pnpm --filter finpulse-web build",
+    "start": "pnpm --filter finpulse-web start",
+    "start:web": "pnpm --filter finpulse-web start",
+    "start:mobile": "pnpm --filter finpulse-mobile start",
     "start:mobile-portfolio": "pnpm --filter mobile-portfolio start",
-    "lint": "pnpm --filter web lint"
+    "lint": "pnpm --filter finpulse-web lint"
   }
 }

@@ -1,13 +1,114 @@
-import { ScrollView, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 import { PortfolioSummary } from "@/src/components/PortfolioSummary";
-import { getPortfolio, getAssetAllocationByAccountType } from "@/src/services/portfolioService";
+import {
+  getPortfolio,
+  getAssetAllocationByAccountType,
+  getPortfolioHistory,
+} from "@/src/services/portfolioService";
 import { MetricCard } from "@/src/components/MetricCard";
+import { AssetAllocationChart } from "@/src/components/AssetAllocationChart";
+import { NetWorthLineChart } from "@/src/components/NetWorthLineChart";
+import { ProfessionalStockChart } from "@/src/components/ProfessionalStockChart";
+import type {
+  Account,
+  Portfolio,
+  PortfolioHistoryPoint,
+} from "@/src/types/portfolio";
 
 export default function DashboardScreen() {
-  const portfolio = getPortfolio();
-  const allocation = getAssetAllocationByAccountType();
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [allocation, setAllocation] = useState<
+    { type: Account["type"]; value: number }[]
+  >([]);
+  const [history, setHistory] = useState<PortfolioHistoryPoint[]>([]);
 
-  const totalValue = allocation.reduce((sum, item) => sum + item.value, 0);
+  const base = Date.now() - 5 * 24 * 60 * 60 * 1000;
+
+  const stockLinePoints = [
+    { timestamp: base + 1 * 24 * 60 * 60 * 1000, value: 102.4 },
+    { timestamp: base + 2 * 24 * 60 * 60 * 1000, value: 101.8 },
+    { timestamp: base + 3 * 24 * 60 * 60 * 1000, value: 103.2 },
+    { timestamp: base + 4 * 24 * 60 * 60 * 1000, value: 104.6 },
+    { timestamp: base + 5 * 24 * 60 * 60 * 1000, value: 103.9 },
+  ];
+
+  const stockCandlePoints = [
+    {
+      timestamp: base + 1 * 24 * 60 * 60 * 1000,
+      open: 102.4,
+      high: 105.2,
+      low: 101.8,
+      close: 103.5,
+    },
+    {
+      timestamp: base + 2 * 24 * 60 * 60 * 1000,
+      open: 103.5,
+      high: 104.1,
+      low: 100.9,
+      close: 101.2,
+    },
+    {
+      timestamp: base + 3 * 24 * 60 * 60 * 1000,
+      open: 101.2,
+      high: 104.8,
+      low: 100.5,
+      close: 104.3,
+    },
+    {
+      timestamp: base + 4 * 24 * 60 * 60 * 1000,
+      open: 104.3,
+      high: 106.0,
+      low: 103.6,
+      close: 105.8,
+    },
+    {
+      timestamp: base + 5 * 24 * 60 * 60 * 1000,
+      open: 105.8,
+      high: 107.2,
+      low: 104.9,
+      close: 106.4,
+    },
+  ];
+
+  useEffect(() => {
+    let active = true;
+
+    const load = async () => {
+      const p = await getPortfolio();
+      const a = await getAssetAllocationByAccountType();
+      const h = await getPortfolioHistory();
+
+      if (!active) {
+        return;
+      }
+
+      setPortfolio(p);
+      setAllocation(a);
+      setHistory(h);
+    };
+
+    load();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (!portfolio) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f3f4f6",
+        }}
+      >
+        <Text>Loading portfolio...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView
@@ -16,62 +117,43 @@ export default function DashboardScreen() {
     >
       <PortfolioSummary portfolio={portfolio} />
       <View style={{ marginTop: 24, gap: 12 }}>
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: "600",
+            color: "#111827",
+            marginBottom: 4,
+          }}
+        >
+          Net worth trend
+        </Text>
+        <NetWorthLineChart points={history} />
         <MetricCard
           label="Accounts"
           value={String(portfolio.accounts.length)}
           helper="Total accounts in this portfolio"
         />
-        <View
+        <AssetAllocationChart
+          items={allocation.map((item) => ({
+            label: item.type,
+            value: item.value,
+          }))}
+        />
+        <Text
           style={{
-            padding: 12,
-            borderRadius: 12,
-            backgroundColor: "#ffffff",
-            borderWidth: 1,
-            borderColor: "rgba(15, 23, 42, 0.06)",
+            fontSize: 14,
+            fontWeight: "600",
+            color: "#111827",
+            marginTop: 12,
+            marginBottom: 4,
           }}
         >
-          {allocation.map((item) => {
-            const ratio = totalValue === 0 ? 0 : item.value / totalValue;
-            const label = item.type;
-            const percent = (ratio * 100).toFixed(1);
-
-            return (
-              <View
-                key={item.type}
-                style={{
-                  marginBottom: 8,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginBottom: 4,
-                  }}
-                >
-                  <View style={{ flexDirection: "row", gap: 4 }}>
-                    <View
-                      style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: 4,
-                        backgroundColor: "#4f46e5",
-                        marginTop: 6,
-                      }}
-                    />
-                    <View>
-                      <MetricCard
-                        label={label}
-                        value={`${percent}%`}
-                        helper=""
-                      />
-                    </View>
-                  </View>
-                </View>
-              </View>
-            );
-          })}
-        </View>
+          Sample professional stock chart
+        </Text>
+        <ProfessionalStockChart
+          linePoints={stockLinePoints}
+          candlePoints={stockCandlePoints}
+        />
       </View>
     </ScrollView>
   );

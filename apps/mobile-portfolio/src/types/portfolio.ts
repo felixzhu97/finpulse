@@ -39,11 +39,17 @@ export interface PortfolioSummary {
   weekChange: number;
 }
 
+export interface PortfolioHistoryPoint {
+  date: string;
+  value: number;
+}
+
 export interface Portfolio {
   id: string;
   ownerName: string;
   baseCurrency: CurrencyCode;
   accounts: Account[];
   summary: PortfolioSummary;
+  history: PortfolioHistoryPoint[];
 }
 

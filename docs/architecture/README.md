@@ -59,10 +59,10 @@
 
 **架构分层**:
 1. **展示层 (Presentation Layer)**
-   - Next.js 应用（页面路由、布局、主题）
-   - UI 组件库（Radix UI 基础组件、业务组件）
-   - 数据可视化（Recharts 图表库）
-   - 表单管理（React Hook Form + Zod）
+   - Web 应用：`apps/web`（基于 Angular 的金融分析控制台）
+   - 移动应用：`apps/mobile`、`apps/mobile-portfolio`（基于 React Native 的移动客户端）
+   - UI 组件库：`packages/ui`（共享 UI 组件）
+   - 数据可视化（Chart.js、ng2-charts、chartjs-chart-financial、react-native-chart-kit、react-native-wagmi-charts 等）
 
 2. **业务逻辑层 (Business Layer)**
    - 投资组合模块
@@ -70,11 +70,10 @@
    - 交易模块
    - 风险管理模块
    - 用户模块
-   - 大数据服务（通过 `services/bigdata-java` 提供）
 
 3. **数据访问层 (Data Access Layer)**
    - 数据服务（DAO、缓存）
-   - 状态管理（React 状态、上下文）
+   - 状态管理（前端状态容器、上下文）
 
 4. **外部服务层 (External Services)**
    - Vercel Analytics
@@ -93,6 +92,13 @@
 - Spark API
 - Flink API
 - Hadoop API
+
+#### Mobile Applications
+
+在应用架构中，移动端应用承担以下角色：
+
+- 为投资者和业务用户提供随时随地访问投资组合和关键指标的入口。
+- 与 Web 控制台共享核心领域模型和部分组件（例如通过 `packages/ui`、`packages/utils`）。
 
 ### 数据架构图 (Data Architecture)
 
@@ -174,44 +180,43 @@
 
 **技术栈层次**:
 1. **前端技术栈**
-   - Next.js 16（全栈 React 框架）
+   - Angular（金融分析 Web 控制台）
+   - React Native + Expo（移动应用）
    - React 19（UI 库）
    - TypeScript 5（类型安全）
-   - Tailwind CSS 4.1（样式框架）
 
 2. **UI 框架与组件**
    - Radix UI（无样式组件原语）
+   - Tailwind CSS / 自定义样式
    - Lucide React（图标库）
 
 3. **数据可视化**
-   - Recharts（图表库）
-   - React Sparklines（小型图表）
+   - Chart.js + ng2-charts（Web 图表）
+   - chartjs-chart-financial（Web K 线等金融图表）
+   - react-native-chart-kit（移动端轻量级图表）
+   - react-native-wagmi-charts（移动端专业股票图表）
 
 4. **工具库**
-   - React Hook Form（表单管理）
-   - Zod（数据验证）
-   - date-fns（日期处理）
-   - next-themes（主题管理）
+   - 表单管理与验证（例如 React Hook Form、Zod）
+   - 日期处理库
+   - 主题管理与样式合并工具
 
 5. **构建工具链**
-   - Next.js 构建系统
+   - 前端构建系统（Angular CLI、相关打包工具）
    - TypeScript 编译器
-   - PostCSS
    - ESLint
    - Maven 构建系统
    - Java 编译器
    - Spring Boot 打包工具
 
 6. **部署平台**
-   - Vercel 平台（托管和部署）
-   - Vercel Analytics（分析工具）
+   - Vercel 平台（托管和部署 Web 应用）
    - Git 集成（版本控制）
    - Java 服务部署（独立 JAR 或容器化）
    - REST API 服务端点
 
 7. **基础设施层**
    - CDN（内容分发网络）
-   - 边缘计算
    - 对象存储
 
 8. **大数据技术栈**
@@ -224,9 +229,19 @@
 
 **技术标准**:
 - **开发规范**: TypeScript 严格模式、ESLint 代码规范、组件化开发
-- **性能标准**: 首屏加载 < 3s、代码分割优化、图片懒加载
+- **性能标准**: 关键页面加载性能可观测并持续优化
 - **安全标准**: HTTPS 强制、CSP、XSS 防护、数据验证
-- **可访问性标准**: WCAG 2.1 AA 级、键盘导航、ARIA 标签
+- **可访问性标准**: 参考 WCAG 2.1 AA 级、键盘导航、ARIA 标签
+
+### Architecture TODO Alignment
+
+为了保持架构文档与实现的一致性，FinPulse 在技术和应用架构层面引入了统一的 TODO 视图：
+
+- 高层跨系统任务集中记录在 `docs/TODO.md` 中（架构、Web、移动、Big Data、共享包等）。
+- 每次重要架构调整时，需要同步更新：
+  - PlantUML 架构图（如本目录下的 `*.puml` 文件）。
+  - 本文件 `docs/architecture/README.md` 中的相关章节。
+  - `docs/TODO.md` 中对应的任务条目（新增、更新或关闭）。
 
 ### 金融系统领域视图 (Finance System Domain Views)
 
@@ -368,10 +383,9 @@
 - 技术栈选择：使用各语言生态中最成熟的工具
 
 **影响**:
-- 采用混合架构：TypeScript 前端 + Java 后端服务
-- 新增 `services/bigdata-java/` Java Spring Boot 服务
-- 通过 REST API 进行跨语言通信
-- 所有大数据操作通过 Java 服务执行
+- 采用混合架构：TypeScript 前端 + （可选的）Java 后端服务
+- 通过 REST API 进行跨语言通信（如有需要时引入）
+- 大数据相关能力可以通过外部服务或后续扩展提供
 
 ---
 

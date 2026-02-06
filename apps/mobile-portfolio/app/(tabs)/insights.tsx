@@ -1,22 +1,46 @@
-import { ScrollView, Text, View } from "react-native";
+import { Dimensions, ScrollView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { BarChart } from "react-native-chart-kit";
 import { getRiskSummary } from "@/src/services/portfolioService";
 import { MetricCard } from "@/src/components/MetricCard";
 
 export default function InsightsScreen() {
-  const risk = getRiskSummary();
+  const [highRatio, setHighRatio] = useState(0);
+  const [topConcentration, setTopConcentration] = useState(0);
 
-  const highRiskPercent = (risk.highRatio * 100).toFixed(1);
-  const concentrationPercent = (risk.topHoldingsConcentration * 100).toFixed(1);
+  useEffect(() => {
+    let active = true;
+
+    const load = async () => {
+      const risk = await getRiskSummary();
+      if (!active) {
+        return;
+      }
+      setHighRatio(risk.highRatio);
+      setTopConcentration(risk.topHoldingsConcentration);
+    };
+
+    load();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const highRiskPercent = (highRatio * 100).toFixed(1);
+  const concentrationPercent = (topConcentration * 100).toFixed(1);
 
   const highRiskText =
-    risk.highRatio > 0.4
+    highRatio > 0.4
       ? "High exposure to high-risk assets."
       : "High-risk exposure is moderate.";
 
   const concentrationText =
-    risk.topHoldingsConcentration > 0.5
+    topConcentration > 0.5
       ? "Portfolio is highly concentrated in top holdings."
       : "Portfolio concentration looks balanced.";
+
+  const width = Dimensions.get("window").width - 32;
 
   return (
     <ScrollView
@@ -31,14 +55,55 @@ export default function InsightsScreen() {
           label="High-risk exposure"
           value={`${highRiskPercent}%`}
           helper={highRiskText}
-          tone={risk.highRatio > 0.4 ? "negative" : "default"}
+          tone={highRatio > 0.4 ? "negative" : "default"}
         />
         <MetricCard
           label="Top 5 holdings concentration"
           value={`${concentrationPercent}%`}
           helper={concentrationText}
-          tone={risk.topHoldingsConcentration > 0.5 ? "negative" : "default"}
+          tone={topConcentration > 0.5 ? "negative" : "default"}
         />
+        <View
+          style={{
+            borderRadius: 12,
+            backgroundColor: "#ffffff",
+            borderWidth: 1,
+            borderColor: "rgba(15, 23, 42, 0.06)",
+            paddingVertical: 8,
+          }}
+        >
+          <BarChart
+            data={{
+              labels: ["High risk", "Top 5"],
+              datasets: [
+                {
+                  data: [
+                    Number(highRiskPercent),
+                    Number(concentrationPercent),
+                  ],
+                },
+              ],
+            }}
+            width={width}
+            height={200}
+            fromZero
+            chartConfig={{
+              backgroundGradientFrom: "#ffffff",
+              backgroundGradientTo: "#ffffff",
+              color: () => "#4f46e5",
+              labelColor: () => "#4b5563",
+              decimalPlaces: 1,
+              propsForBackgroundLines: {
+                strokeWidth: 0,
+              },
+            }}
+            withInnerLines={false}
+            showBarTops={false}
+            style={{
+              marginLeft: -16,
+            }}
+          />
+        </View>
         <View
           style={{
             padding: 12,

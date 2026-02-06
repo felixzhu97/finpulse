@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "finpulse-web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -23,6 +23,7 @@
     "ag-grid-community": "^33.0.0",
     "autoprefixer": "^10.4.20",
     "chart.js": "^4.4.3",
+    "chartjs-chart-financial": "^0.2.1",
     "date-fns": "4.1.0",
     "ng2-charts": "^8.0.0",
     "rxjs": "^7.8.1",
