@@ -32,7 +32,7 @@ TOGAF (The Open Group Architecture Framework) 是企业架构开发的标准框�
 - UI 组件库：`@fintech/ui`、`@fintech/utils`
 - 业务组件：投资组合总览、市场趋势、资产配置、风险分析、交易记录等
 - 应用服务层：投资组合服务、市场数据服务、风险分析服务、报表服务
-- 后端服务层：`services/portfolio-analytics`（基于 Spring Boot 的组合分析服务，采用 DDD 分层）
+- 后端服务层：`services/portfolio-analytics`（基于 FastAPI 的组合分析服务，采用 DDD 分层）
 
 **文档位置**：`docs/architecture/application-architecture.puml`
 
@@ -63,7 +63,7 @@ TOGAF (The Open Group Architecture Framework) 是企业架构开发的标准框�
 
 - `apps/web/` - 消费分析数据的 Web 界面
 - `apps/mobile/`、`apps/mobile-portfolio/` - 消费分析数据的移动客户端
-- `services/portfolio-analytics/src/main/java/com/fintech/portfolio` - 组合领域模型与历史数据生成
+- `services/portfolio-analytics/app` - 组合领域模型、应用服务与 REST API
 
 ### Technology Architecture（技术架构）
 
@@ -73,11 +73,11 @@ TOGAF (The Open Group Architecture Framework) 是企业架构开发的标准框�
 
 - 表示层：浏览器、Angular Web 应用、React Native 移动应用
 - 应用层：Monorepo 结构、TypeScript、pnpm Workspaces
-- 框架层：Angular、React、Expo、Radix UI 等
+- 框架层：Angular、React、Expo、Radix UI、FastAPI 等
 - 可视化层：Chart.js、ng2-charts、chartjs-chart-financial（Web），react-native-chart-kit、react-native-wagmi-charts（移动端）
-- 构建工具层：Angular CLI、TypeScript Compiler、ESLint、Maven
-- 运行时层：Node.js、Java Runtime
-- 部署层：Vercel 平台、Java 服务部署环境
+- 构建工具层：Angular CLI、TypeScript Compiler、ESLint、Python tooling
+- 运行时层：Node.js、Python Runtime
+- 部署层：Vercel 平台、Python/FastAPI 服务部署环境
 
 **文档位置**：`docs/architecture/technology-architecture.puml`
 
@@ -210,15 +210,18 @@ docs/architecture/
 - `apps/mobile/`、`apps/mobile-portfolio/` - 移动应用
 - `packages/ui/` - UI 组件库层
 - `packages/utils/` - 工具库层
+- `services/portfolio-analytics/` - 投资组合分析与聚合服务（FastAPI + DDD）
 
 **数据架构** →
 
 - Web 与移动应用中消费分析与报表数据的 API 客户端
+- `services/portfolio-analytics/app` 中的领域模型和 REST API
 
 **技术架构** →
 
 - 根级配置：`package.json`、`pnpm-workspace.yaml`、`tsconfig.json`、`vercel.json`
 - 前端应用：`apps/web/`、`apps/mobile/`、`apps/mobile-portfolio/`
+- 后端服务：`services/portfolio-analytics/`（FastAPI 服务）
 
 ## 架构治理规则
 

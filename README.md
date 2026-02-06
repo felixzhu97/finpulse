@@ -75,6 +75,10 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 - **pnpm Workspaces** - Package and workspace management
 - **TypeScript Project References** - Cross-package type checking
 
+### Backend Services
+
+- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`)
+
 ### UI & Visualization
 
 - **Radix UI** - Unstyled, accessible component primitives (in `@fintech/ui`)
@@ -104,7 +108,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 - **apps/web** - Angular-based financial analytics web console.
 - **apps/mobile** - React Native demo mobile app.
 - **apps/mobile-portfolio** - React Native mobile app focused on portfolio overview and key metrics.
-- **services/portfolio-analytics** - Java Spring Boot backend using DDD to serve portfolio analytics.
+- **services/portfolio-analytics** - Python FastAPI backend using DDD to serve portfolio analytics.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
 
@@ -120,6 +124,7 @@ Benefits of this architecture:
 
 - Node.js 18+
 - pnpm 10.6.0+ (required, project uses pnpm workspaces)
+- Python 3.10+ (for backend FastAPI service)
 
 ### Install Dependencies
 
@@ -141,6 +146,21 @@ pnpm --filter web dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to view the application.
+
+### Backend service (Python FastAPI)
+
+```bash
+cd services/portfolio-analytics
+python -m venv .venv
+source .venv/bin/activate  # On Windows use .venv\Scripts\activate
+pip install -r requirements.txt
+
+uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+```
+
+The mobile portfolio app will call:
+
+- `GET http://localhost:8080/api/v1/portfolio`
 
 ### Build Production Version
 
@@ -228,7 +248,7 @@ fintech-project/
 │   ├── mobile/                   # React Native mobile demo app
 │   └── mobile-portfolio/         # React Native portfolio overview mobile app
 ├── services/
-│   └── portfolio-analytics/      # Java Spring Boot portfolio analytics service (DDD)
+│   └── portfolio-analytics/      # Python FastAPI portfolio analytics service (DDD)
 ├── packages/
 │   ├── ui/                       # UI component library (@fintech/ui)
 │   └── utils/                    # Utility function library (@fintech/utils)
