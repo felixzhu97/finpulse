@@ -70,11 +70,7 @@
    - 交易模块
    - 风险管理模块
    - 用户模块
-   - 大数据集成层 (`@fintech/bigdata`)
-     - SparkClient（Spark 会话、SQL 查询、批处理作业）
-     - FlinkClient（流处理作业、集群管理）
-     - HDFSClient（文件读写、目录管理）
-     - YARNClient（应用管理、集群指标）
+   - 大数据服务（通过 `services/bigdata-java` 提供）
 
 3. **数据访问层 (Data Access Layer)**
    - 数据服务（DAO、缓存）
@@ -374,7 +370,6 @@
 **影响**:
 - 采用混合架构：TypeScript 前端 + Java 后端服务
 - 新增 `services/bigdata-java/` Java Spring Boot 服务
-- 新增 `packages/bigdata/` TypeScript 客户端包
 - 通过 REST API 进行跨语言通信
 - 所有大数据操作通过 Java 服务执行
 
