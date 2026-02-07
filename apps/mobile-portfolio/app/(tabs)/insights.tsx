@@ -1,4 +1,4 @@
-import { Dimensions, ScrollView, Text, View } from "react-native";
+import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useEffect, useState } from "react";
 import { BarChart } from "react-native-chart-kit";
 import { getRiskSummary } from "@/src/services/portfolioService";
@@ -43,14 +43,8 @@ export default function InsightsScreen() {
   const width = Dimensions.get("window").width - 32;
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: "#f3f4f6" }}
-      contentContainerStyle={{
-        padding: 16,
-        paddingBottom: 32,
-      }}
-    >
-      <View style={{ gap: 16 }}>
+    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      <View style={styles.block}>
         <MetricCard
           label="High-risk exposure"
           value={`${highRiskPercent}%`}
@@ -63,15 +57,7 @@ export default function InsightsScreen() {
           helper={concentrationText}
           tone={topConcentration > 0.5 ? "negative" : "default"}
         />
-        <View
-          style={{
-            borderRadius: 12,
-            backgroundColor: "#ffffff",
-            borderWidth: 1,
-            borderColor: "rgba(15, 23, 42, 0.06)",
-            paddingVertical: 8,
-          }}
-        >
+        <View style={styles.chartCard}>
           <BarChart
             data={{
               labels: ["High risk", "Top 5"],
@@ -99,37 +85,12 @@ export default function InsightsScreen() {
             }}
             withInnerLines={false}
             showBarTops={false}
-            style={{
-              marginLeft: -16,
-            }}
+            style={styles.barChart}
           />
         </View>
-        <View
-          style={{
-            padding: 12,
-            borderRadius: 12,
-            backgroundColor: "#ffffff",
-            borderWidth: 1,
-            borderColor: "rgba(15, 23, 42, 0.06)",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: "600",
-              marginBottom: 8,
-              color: "#111827",
-            }}
-          >
-            Summary
-          </Text>
-          <Text
-            style={{
-              fontSize: 13,
-              color: "#4b5563",
-              lineHeight: 18,
-            }}
-          >
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryTitle}>Summary</Text>
+          <Text style={styles.summaryBody}>
             This page gives a quick overview of how your portfolio risk and
             concentration look based on simple rules. It is a starting point and
             can be extended with more analytics later.
@@ -140,3 +101,46 @@ export default function InsightsScreen() {
   );
 }
 
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#f3f4f6",
+  },
+  content: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+  block: {
+    gap: 16,
+  },
+  chartCard: {
+    borderRadius: 12,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "rgba(15, 23, 42, 0.06)",
+    paddingVertical: 8,
+    overflow: "hidden",
+    width: "100%",
+  },
+  barChart: {
+    marginLeft: -16,
+  },
+  summaryCard: {
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "rgba(15, 23, 42, 0.06)",
+  },
+  summaryTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 8,
+    color: "#111827",
+  },
+  summaryBody: {
+    fontSize: 13,
+    color: "#4b5563",
+    lineHeight: 18,
+  },
+});

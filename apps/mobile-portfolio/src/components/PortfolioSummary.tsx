@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 import type { Portfolio } from "../types/portfolio";
 import { MetricCard } from "./MetricCard";
 
@@ -34,23 +34,14 @@ export function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
     summary.totalAssets === 0 ? 0 : summary.weekChange / summary.totalAssets;
 
   return (
-    <View
-      style={{
-        gap: 12,
-      }}
-    >
+    <View style={styles.block}>
       <MetricCard
         label="Net worth"
         value={formatCurrency(summary.netWorth, currency)}
         helper={`Assets ${formatCurrency(summary.totalAssets, currency)} · Liabilities ${formatCurrency(summary.totalLiabilities, currency)}`}
       />
-      <View
-        style={{
-          flexDirection: "row",
-          gap: 12,
-        }}
-      >
-        <View style={{ flex: 1 }}>
+      <View style={styles.row}>
+        <View style={styles.half}>
           <MetricCard
             label="Today"
             value={formatCurrency(summary.todayChange, currency)}
@@ -58,7 +49,7 @@ export function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
             tone={summary.todayChange >= 0 ? "positive" : "negative"}
           />
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={styles.half}>
           <MetricCard
             label="This week"
             value={formatCurrency(summary.weekChange, currency)}
@@ -71,3 +62,15 @@ export function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
   );
 }
 
+const styles = StyleSheet.create({
+  block: {
+    gap: 12,
+  },
+  row: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  half: {
+    flex: 1,
+  },
+});

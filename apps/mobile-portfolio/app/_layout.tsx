@@ -10,7 +10,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "react-native";
+import { useColorScheme, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
@@ -34,8 +34,8 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <StatusBar style="auto" translucent />
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <SafeAreaView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={styles.root}>
+        <SafeAreaView style={styles.root}>
           <Stack initialRouteName="(tabs)">
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
@@ -53,3 +53,8 @@ export default function RootLayout() {
   );
 }
 
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});

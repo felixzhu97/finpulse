@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { Account } from "../types/portfolio";
 
 interface AccountListItemProps {
@@ -47,56 +47,25 @@ export function AccountListItem({ account, onPress }: AccountListItemProps) {
 
   return (
     <Pressable onPress={onPress}>
-      <View
-        style={{
-          paddingVertical: 12,
-          paddingHorizontal: 4,
-          borderBottomWidth: 1,
-          borderBottomColor: "rgba(15, 23, 42, 0.06)",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+      <View style={styles.row}>
         <View>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "500",
-              color: "#111827",
-            }}
-          >
-            {account.name}
-          </Text>
-          <Text
-            style={{
-              marginTop: 2,
-              fontSize: 12,
-              color: "#6b7280",
-            }}
-          >
+          <Text style={styles.name}>{account.name}</Text>
+          <Text style={styles.meta}>
             {getAccountTypeLabel(account.type)} ·{" "}
             {account.holdings.length > 0
               ? `${account.holdings.length} holdings`
               : "No holdings"}
           </Text>
         </View>
-        <View style={{ alignItems: "flex-end" }}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: isNegative ? "#b91c1c" : "#111827",
-            }}
-          >
+        <View style={styles.right}>
+          <Text style={[styles.value, isNegative && styles.valueNegative]}>
             {formatCurrency(account.balance, account.currency)}
           </Text>
           <Text
-            style={{
-              marginTop: 2,
-              fontSize: 12,
-              color: account.todayChange >= 0 ? "#16a34a" : "#b91c1c",
-            }}
+            style={[
+              styles.meta,
+              account.todayChange >= 0 ? styles.positive : styles.negative,
+            ]}
           >
             {formatSigned(account.todayChange)}
           </Text>
@@ -106,3 +75,41 @@ export function AccountListItem({ account, onPress }: AccountListItemProps) {
   );
 }
 
+const styles = StyleSheet.create({
+  row: {
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(15, 23, 42, 0.06)",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#111827",
+  },
+  meta: {
+    marginTop: 2,
+    fontSize: 12,
+    color: "#6b7280",
+  },
+  right: {
+    alignItems: "flex-end",
+  },
+  value: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  valueNegative: {
+    color: "#b91c1c",
+  },
+  positive: {
+    color: "#16a34a",
+  },
+  negative: {
+    color: "#b91c1c",
+  },
+});

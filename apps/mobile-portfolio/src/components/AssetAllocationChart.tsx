@@ -1,4 +1,4 @@
-import { Dimensions, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 
 type AllocationItem = {
@@ -35,15 +35,7 @@ export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
   }));
 
   return (
-    <View
-      style={{
-        borderRadius: 12,
-        backgroundColor: "#ffffff",
-        borderWidth: 1,
-        borderColor: "rgba(15, 23, 42, 0.06)",
-        paddingVertical: 8,
-      }}
-    >
+    <View style={styles.container}>
       <PieChart
         data={chartData}
         width={width}
@@ -64,4 +56,12 @@ export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
   );
 }
 
-
+const styles = StyleSheet.create({
+  container: {
+    borderRadius: 12,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "rgba(15, 23, 42, 0.06)",
+    paddingVertical: 8,
+  },
+});

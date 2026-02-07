@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAccountById, getHoldingsByAccount } from "@/src/services/portfolioService";
 import { HoldingListItem } from "@/src/components/HoldingListItem";
@@ -45,13 +45,7 @@ export default function AccountDetailScreen() {
 
   if (!accountId) {
     return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <SafeAreaView style={styles.centered}>
         <Text>Account not found.</Text>
       </SafeAreaView>
     );
@@ -59,13 +53,7 @@ export default function AccountDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <SafeAreaView style={styles.centered}>
         <Text>Loading account...</Text>
       </SafeAreaView>
     );
@@ -73,56 +61,29 @@ export default function AccountDetailScreen() {
 
   if (!account) {
     return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <SafeAreaView style={styles.centered}>
         <Text>Account not found.</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f3f4f6" }}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          backgroundColor: "#ffffff",
-          borderBottomWidth: 1,
-          borderBottomColor: "rgba(15, 23, 42, 0.06)",
-        }}
-      >
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={{ fontSize: 16 }}>Back</Text>
+    <SafeAreaView style={styles.screen}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} hitSlop={styles.backHitSlop}>
+          <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
-        <Text
-          style={{
-            marginLeft: 16,
-            fontSize: 18,
-            fontWeight: "600",
-          }}
-        >
+        <Text numberOfLines={1} style={styles.title}>
           {account.name}
         </Text>
       </View>
-      <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 8 }}>
+      <View style={styles.content}>
         <FlatList
           data={holdings}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <HoldingListItem holding={item} />}
           ListEmptyComponent={
-            <View
-              style={{
-                paddingVertical: 24,
-                alignItems: "center",
-              }}
-            >
+            <View style={styles.empty}>
               <Text>No holdings in this account.</Text>
             </View>
           }
@@ -132,3 +93,46 @@ export default function AccountDetailScreen() {
   );
 }
 
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  screen: {
+    flex: 1,
+    backgroundColor: "#f3f4f6",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 12,
+    backgroundColor: "#ffffff",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(15, 23, 42, 0.06)",
+    gap: 16,
+  },
+  backHitSlop: { top: 8, bottom: 8, left: 8, right: 8 },
+  backText: {
+    fontSize: 16,
+    color: "#2563eb",
+  },
+  title: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    minWidth: 0,
+  },
+  empty: {
+    paddingVertical: 24,
+    alignItems: "center",
+  },
+});

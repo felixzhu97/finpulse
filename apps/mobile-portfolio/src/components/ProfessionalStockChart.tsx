@@ -10,21 +10,6 @@ interface ProfessionalStockChartProps {
   candlePoints: CandlePoint[];
 }
 
-const cardStyle = {
-  borderRadius: 12,
-  backgroundColor: "#ffffff",
-  borderWidth: 1,
-  borderColor: "rgba(15, 23, 42, 0.06)",
-  paddingVertical: 12,
-  paddingHorizontal: 8,
-  overflow: "hidden" as const,
-};
-
-const labelStyle = { fontSize: 14, fontWeight: "600" as const, color: "#111827", marginBottom: 8 };
-const priceStyle = { fontSize: 13, color: "#111827", fontWeight: "500" as const };
-const timeStyle = { fontSize: 12, color: "#6b7280" };
-const footerStyle = { flexDirection: "row" as const, justifyContent: "space-between" as const, marginTop: 8 };
-
 export function ProfessionalStockChart({ linePoints, candlePoints }: ProfessionalStockChartProps) {
   const [width, setWidth] = useState(0);
   const chartWidth = width > 0 ? width - 16 : undefined;
@@ -33,31 +18,29 @@ export function ProfessionalStockChart({ linePoints, candlePoints }: Professiona
 
   return (
     <View style={styles.wrapper} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
-      <View style={cardStyle}>
-        <Text style={labelStyle}>Price line</Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>Price line</Text>
         <LineChart.Provider data={linePoints}>
           <LineChart height={160} width={chartWidth}>
-            <LineChart.Path color="red">
-              <LineChart.Gradient />
-            </LineChart.Path>
+            <LineChart.Path color="#2563eb" />
             <LineChart.CursorCrosshair />
           </LineChart>
-          <View style={footerStyle}>
-            <LineChart.PriceText style={priceStyle} />
-            <LineChart.DatetimeText style={timeStyle} />
+          <View style={styles.footer}>
+            <LineChart.PriceText style={styles.priceText} />
+            <LineChart.DatetimeText style={styles.timeText} />
           </View>
         </LineChart.Provider>
       </View>
-      <View style={cardStyle}>
-        <Text style={labelStyle}>Candlestick</Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>Candlestick</Text>
         <CandlestickChart.Provider data={candlePoints}>
           <CandlestickChart height={200} width={chartWidth}>
             <CandlestickChart.Candles />
             <CandlestickChart.Crosshair />
           </CandlestickChart>
-          <View style={footerStyle}>
-            <CandlestickChart.PriceText type="close" style={priceStyle} />
-            <CandlestickChart.DatetimeText style={timeStyle} />
+          <View style={styles.footer}>
+            <CandlestickChart.PriceText type="close" style={styles.priceText} />
+            <CandlestickChart.DatetimeText style={styles.timeText} />
           </View>
         </CandlestickChart.Provider>
       </View>
@@ -66,6 +49,38 @@ export function ProfessionalStockChart({ linePoints, candlePoints }: Professiona
 }
 
 const styles = StyleSheet.create({
-  wrapper: { gap: 12, width: "100%", overflow: "hidden" },
+  wrapper: {
+    gap: 12,
+    width: "100%",
+    overflow: "hidden",
+  },
+  card: {
+    borderRadius: 12,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "rgba(15, 23, 42, 0.06)",
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    overflow: "hidden",
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 8,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+  priceText: {
+    fontSize: 13,
+    color: "#111827",
+    fontWeight: "500",
+  },
+  timeText: {
+    fontSize: 12,
+    color: "#6b7280",
+  },
 });
-

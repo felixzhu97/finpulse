@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import type { PortfolioHistoryPoint } from "../types/portfolio";
 
@@ -19,18 +19,7 @@ export function NetWorthLineChart({ points }: NetWorthLineChartProps) {
   });
 
   return (
-    <View
-      style={{
-        borderRadius: 12,
-        backgroundColor: "#ffffff",
-        borderWidth: 1,
-        borderColor: "rgba(15, 23, 42, 0.06)",
-        paddingVertical: 8,
-        overflow: "hidden",
-        width: "100%",
-      }}
-      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
-    >
+    <View style={styles.container} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       {width > 0 && (
         <LineChart
           data={{ labels, datasets: [{ data }] }}
@@ -50,10 +39,24 @@ export function NetWorthLineChart({ points }: NetWorthLineChartProps) {
             decimalPlaces: 0,
             propsForBackgroundLines: { strokeWidth: 0 },
           }}
-          style={{ marginHorizontal: 0 }}
+          style={styles.chart}
         />
       )}
     </View>
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    borderRadius: 12,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "rgba(15, 23, 42, 0.06)",
+    paddingVertical: 8,
+    overflow: "hidden",
+    width: "100%",
+  },
+  chart: {
+    marginHorizontal: 0,
+  },
+});

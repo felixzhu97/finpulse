@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import type { PortfolioHistoryPoint } from "../types/portfolio";
 
 interface PortfolioPerformanceChartProps {
@@ -40,82 +40,69 @@ export function PortfolioPerformanceChart({
   const range = max - min || 1;
 
   return (
-    <View
-      style={{
-        padding: 12,
-        borderRadius: 12,
-        backgroundColor: "#ffffff",
-        borderWidth: 1,
-        borderColor: "rgba(15, 23, 42, 0.06)",
-        gap: 8,
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 14,
-          fontWeight: "600",
-          color: "#111827",
-        }}
-      >
-        Portfolio performance
-      </Text>
-      <View
-        style={{
-          height: 64,
-          flexDirection: "row",
-          alignItems: "flex-end",
-          gap: 4,
-        }}
-      >
+    <View style={styles.card}>
+      <Text style={styles.title}>Portfolio performance</Text>
+      <View style={styles.barsRow}>
         {points.map((point) => {
           const ratio = (point.value - min) / range;
           const height = Math.max(0.1, ratio);
 
           return (
-            <View
-              key={point.date}
-              style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "flex-end",
-              }}
-            >
+            <View key={point.date} style={styles.barWrap}>
               <View
-                style={{
-                  width: 6,
-                  height: `${height * 100}%`,
-                  borderRadius: 999,
-                  backgroundColor: "#16a34a",
-                }}
+                style={[
+                  styles.bar,
+                  { height: `${height * 100}%` },
+                ]}
               />
             </View>
           );
         })}
       </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 11,
-            color: "#6b7280",
-          }}
-        >
-          {points[0]?.date}
-        </Text>
-        <Text
-          style={{
-            fontSize: 11,
-            color: "#6b7280",
-          }}
-        >
-          {points[points.length - 1]?.date}
-        </Text>
+      <View style={styles.footer}>
+        <Text style={styles.dateText}>{points[0]?.date}</Text>
+        <Text style={styles.dateText}>{points[points.length - 1]?.date}</Text>
       </View>
     </View>
   );
 }
 
+const styles = StyleSheet.create({
+  card: {
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "rgba(15, 23, 42, 0.06)",
+    gap: 8,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  barsRow: {
+    height: 64,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 4,
+  },
+  barWrap: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  bar: {
+    width: 6,
+    borderRadius: 999,
+    backgroundColor: "#16a34a",
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  dateText: {
+    fontSize: 11,
+    color: "#6b7280",
+  },
+});

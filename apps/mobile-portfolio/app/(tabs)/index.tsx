@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { NativeLineChart, NativeDemoCard } from "@/src/components/native";
 import { PortfolioSummary } from "@/src/components/PortfolioSummary";
@@ -100,14 +100,7 @@ export default function DashboardScreen() {
 
   if (!portfolio) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#f3f4f6",
-        }}
-      >
+      <View style={styles.centered}>
         <Text>Loading portfolio...</Text>
       </View>
     );
@@ -115,37 +108,18 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: "#f3f4f6" }}
-      contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+      style={styles.screen}
+      contentContainerStyle={styles.content}
       scrollEnabled={!chartScrollLock}
     >
       <PortfolioSummary portfolio={portfolio} />
-      <Text
-        style={{
-          fontSize: 14,
-          fontWeight: "600",
-          color: "#111827",
-          marginTop: 24,
-          marginBottom: 8,
-        }}
-      >
-        Native demo card (iOS/Android view)
-      </Text>
+      <Text style={styles.sectionTitle}>Native demo card (iOS/Android view)</Text>
       <NativeDemoCard
         title="Native demo card (iOS/Android)"
-        style={{ height: 80, marginBottom: 24, borderRadius: 12 }}
+        style={styles.nativeCard}
       />
-      <View style={{ marginTop: 0, gap: 12 }}>
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: "#111827",
-            marginBottom: 4,
-          }}
-        >
-          Net worth trend
-        </Text>
+      <View style={styles.block}>
+        <Text style={styles.subsectionTitle}>Net worth trend</Text>
         <NetWorthLineChart points={history} />
         <MetricCard
           label="Accounts"
@@ -158,35 +132,15 @@ export default function DashboardScreen() {
             value: item.value,
           }))}
         />
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: "#111827",
-            marginTop: 12,
-            marginBottom: 4,
-          }}
-        >
-          Native line chart (Metal / OpenGL ES)
-        </Text>
+        <Text style={[styles.subsectionTitle, styles.subsectionTitleSpaced]}>Native line chart (Metal / OpenGL ES)</Text>
         <NativeLineChart
           data={history.length > 0 ? history.map((p) => p.value) : stockLinePoints.map((p) => p.value)}
           timestamps={history.length > 0 ? history.map((p) => new Date(p.date).getTime()) : stockLinePoints.map((p) => p.timestamp)}
-          style={{ height: 200, marginBottom: 12 }}
+          style={styles.nativeChart}
           onInteractionStart={() => setChartScrollLock(true)}
           onInteractionEnd={() => setChartScrollLock(false)}
         />
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: "600",
-            color: "#111827",
-            marginTop: 12,
-            marginBottom: 4,
-          }}
-        >
-          Sample professional stock chart
-        </Text>
+        <Text style={[styles.subsectionTitle, styles.subsectionTitleSpaced]}>Sample professional stock chart</Text>
         <ProfessionalStockChart
           linePoints={stockLinePoints}
           candlePoints={stockCandlePoints}
@@ -196,3 +150,48 @@ export default function DashboardScreen() {
   );
 }
 
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f3f4f6",
+  },
+  screen: {
+    flex: 1,
+    backgroundColor: "#f3f4f6",
+  },
+  content: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#111827",
+    marginTop: 24,
+    marginBottom: 8,
+  },
+  nativeCard: {
+    height: 80,
+    marginBottom: 24,
+    borderRadius: 12,
+  },
+  block: {
+    marginTop: 0,
+    gap: 12,
+  },
+  subsectionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 4,
+  },
+  subsectionTitleSpaced: {
+    marginTop: 12,
+  },
+  nativeChart: {
+    height: 200,
+    marginBottom: 12,
+  },
+});

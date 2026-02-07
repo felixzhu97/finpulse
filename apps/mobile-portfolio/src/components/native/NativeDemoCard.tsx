@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { ViewProps } from "react-native";
-import { Platform, requireNativeComponent, Text, View } from "react-native";
+import { Platform, requireNativeComponent, StyleSheet, Text, View } from "react-native";
 
 export type NativeDemoCardProps = { title?: string } & ViewProps;
 
@@ -10,11 +10,23 @@ const NativeView =
 export function NativeDemoCard(props: NativeDemoCardProps) {
   if (Platform.OS === "web") {
     return (
-      <View {...props} style={[props.style, { backgroundColor: "#e5e5e5", justifyContent: "center", padding: 16 }]}>
-        <Text style={{ textAlign: "center", fontSize: 16 }}>{props.title ?? "Native Demo Card (Web fallback)"}</Text>
+      <View {...props} style={[props.style, styles.webFallback]}>
+        <Text style={styles.webText}>{props.title ?? "Native Demo Card (Web fallback)"}</Text>
       </View>
     );
   }
   const C = NativeView as ComponentType<NativeDemoCardProps>;
   return <C {...props} />;
 }
+
+const styles = StyleSheet.create({
+  webFallback: {
+    backgroundColor: "#e5e5e5",
+    justifyContent: "center",
+    padding: 16,
+  },
+  webText: {
+    textAlign: "center",
+    fontSize: 16,
+  },
+});
