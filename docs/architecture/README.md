@@ -51,18 +51,19 @@
 - 交易记录 → 大数据分析 → 风险管理（模式识别）
 - 大数据分析 → 统计分析（增强分析能力）
 
-### 应用架构图 (Application Architecture)
+### Application Architecture
 
-**文件**: `application-architecture.puml`
+**File**: `application-architecture.puml`
 
-**描述**: 展示 FinPulse 平台的应用架构，包括应用组件的分层结构和交互关系。
+**Description**: Application architecture of the FinPulse platform: layered application components and their interactions.
 
-**架构分层**:
-1. **展示层 (Presentation Layer)**
-   - Web 应用：`apps/web`（基于 Angular 的金融分析控制台）
-   - 移动应用：`apps/mobile`、`apps/mobile-portfolio`（基于 React Native 的移动客户端）
-   - UI 组件库：`packages/ui`（共享 UI 组件）
-   - 数据可视化（Chart.js、ng2-charts、chartjs-chart-financial、react-native-chart-kit、react-native-wagmi-charts 等）
+**Layers**:
+1. **Presentation Layer**
+   - Web app: `apps/web` (Angular-based financial analytics console)
+   - Mobile apps: `apps/mobile`, `apps/mobile-portfolio` (React Native clients; mobile-portfolio uses Expo)
+   - **Native UI (mobile-portfolio)**: Custom native view **NativeCard** (iOS: `RCTViewManager` + Objective-C view; Android: `SimpleViewManager` + Kotlin view), exposed to RN via `requireNativeComponent`. Code: `ios/mobileportfolio/NativeCardViewManager.*`, `android/.../NativeCardView*.kt`, `NativeCardPackage.kt`, `src/components/NativeCard.tsx`.
+   - UI component library: `packages/ui`
+   - Data visualization: Chart.js, ng2-charts, chartjs-chart-financial, react-native-chart-kit, react-native-wagmi-charts
 
 2. **业务逻辑层 (Business Layer)**
    - 投资组合模块
@@ -95,10 +96,9 @@
 
 #### Mobile Applications
 
-在应用架构中，移动端应用承担以下角色：
-
-- 为投资者和业务用户提供随时随地访问投资组合和关键指标的入口。
-- 与 Web 控制台共享核心领域模型和部分组件（例如通过 `packages/ui`、`packages/utils`）。
+- Provide investors and business users access to portfolio and key metrics from mobile devices.
+- Share core domain models and utilities with the web console (e.g. `packages/ui`, `packages/utils`).
+- **apps/mobile-portfolio** includes a custom native view (**NativeCard**) for iOS and Android, implemented with React Native view managers (no Expo Modules); used on the dashboard for a native card strip.
 
 ### 数据架构图 (Data Architecture)
 
@@ -178,30 +178,34 @@
 
 **描述**: 展示 FinPulse 平台的技术架构，包括技术栈、构建工具和部署平台。
 
-**技术栈层次**:
-1. **前端技术栈**
-   - Angular（金融分析 Web 控制台）
-   - React Native + Expo（移动应用）
-   - React 19（UI 库）
-   - TypeScript 5（类型安全）
+**Technology stack**:
+1. **Front-end**
+   - Angular (financial analytics web console)
+   - React Native + Expo (mobile apps)
+   - React 19 (UI library)
+   - TypeScript 5 (type safety)
 
-2. **UI 框架与组件**
+2. **Mobile native (apps/mobile-portfolio)**
+   - iOS: Xcode, CocoaPods, Objective-C (`NativeCardViewManager`, `NativeCardView`)
+   - Android: Gradle, Kotlin (`NativeCardView`, `NativeCardViewManager`, `NativeCardPackage`)
+   - Bridge: `requireNativeComponent("NativeCard")` in JS
+
+3. **UI frameworks and components**
    - Radix UI（无样式组件原语）
    - Tailwind CSS / 自定义样式
    - Lucide React（图标库）
 
-3. **数据可视化**
-   - Chart.js + ng2-charts（Web 图表）
-   - chartjs-chart-financial（Web K 线等金融图表）
-   - react-native-chart-kit（移动端轻量级图表）
-   - react-native-wagmi-charts（移动端专业股票图表）
+4. **Data visualization**
+   - Chart.js + ng2-charts (web)
+   - chartjs-chart-financial (web financial/candlestick)
+   - react-native-chart-kit (mobile lightweight charts)
+   - react-native-wagmi-charts (mobile professional stock charts)
 
-4. **工具库**
-   - 表单管理与验证（例如 React Hook Form、Zod）
-   - 日期处理库
-   - 主题管理与样式合并工具
+5. **Utilities**
+   - Form and validation (e.g. React Hook Form, Zod)
+   - Date handling, theme and style utilities
 
-5. **构建工具链**
+6. **Build and tooling**
    - 前端构建系统（Angular CLI、相关打包工具）
    - TypeScript 编译器
    - ESLint
@@ -209,17 +213,16 @@
    - Java 编译器
    - Spring Boot 打包工具
 
-6. **部署平台**
-   - Vercel 平台（托管和部署 Web 应用）
-   - Git 集成（版本控制）
-   - Java 服务部署（独立 JAR 或容器化）
-   - REST API 服务端点
+7. **Deployment**
+   - Vercel (web hosting)
+   - Git integration
+   - Java service deployment (JAR or containerized)
+   - REST API endpoints
 
-7. **基础设施层**
-   - CDN（内容分发网络）
-   - 对象存储
+8. **Infrastructure**
+   - CDN, object storage
 
-8. **大数据技术栈**
+9. **Big data stack**
    - Java 17+（JVM 运行时）
    - Spring Boot 3.2.0（应用框架）
    - Maven 3.6+（构建工具）

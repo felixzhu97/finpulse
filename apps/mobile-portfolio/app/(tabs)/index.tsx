@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
+import { NativeCard } from "@/src/components/NativeCard";
 import { PortfolioSummary } from "@/src/components/PortfolioSummary";
 import {
   getPortfolio,
@@ -116,7 +117,22 @@ export default function DashboardScreen() {
       contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
     >
       <PortfolioSummary portfolio={portfolio} />
-      <View style={{ marginTop: 24, gap: 12 }}>
+      <Text
+        style={{
+          fontSize: 14,
+          fontWeight: "600",
+          color: "#111827",
+          marginTop: 24,
+          marginBottom: 8,
+        }}
+      >
+        Native card (iOS/Android view)
+      </Text>
+      <NativeCard
+        title="Native component (iOS/Android)"
+        style={{ height: 80, marginBottom: 24, borderRadius: 12 }}
+      />
+      <View style={{ marginTop: 0, gap: 12 }}>
         <Text
           style={{
             fontSize: 14,

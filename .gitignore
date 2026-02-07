@@ -7,7 +7,7 @@ node_modules
 .yarn/install-state.gz
 .pnpm-store
 
-# monorepo - 各包的 node_modules
+# monorepo workspace node_modules
 apps/*/node_modules
 packages/*/node_modules
 
@@ -113,3 +113,27 @@ __pycache__/
 .venv/
 venv/
 env/
+
+# Expo / React Native (mobile-portfolio, mobile)
+.expo/
+*.orig.*
+*.jks
+*.keystore
+!**/debug.keystore
+metro-health-check*
+*.apk
+*.aab
+*.ipa
+
+# iOS (Xcode / CocoaPods)
+ios/Pods/
+ios/build/
+*.xcuserstate
+*.xcuserdatad/
+
+# Android (Gradle)
+android/build/
+android/.gradle/
+android/app/build/
+android/local.properties
+**/android/**/build/

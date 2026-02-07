@@ -96,6 +96,19 @@ package "工具库" <<Frontend>> {
     note right of Themes: 主题管理\n暗色模式支持\n系统主题检测
 }
 
+package "Mobile (React Native / Expo)" <<Frontend>> {
+    component "Expo 54" as Expo
+    component "React Native 0.81" as RN
+    component "react-native-wagmi-charts" as RNWagmi
+    component "NativeCard (native view)" as NativeCardTech {
+        component "iOS RCTViewManager" as NativeCardIOSTech
+        component "Android SimpleViewManager" as NativeCardAndroidTech
+    }
+    note right of Expo: Expo SDK\nMetro, prebuild\niOS/Android
+    note right of RN: React Native core\nrequireNativeComponent\nView managers
+    note right of NativeCardTech: apps/mobile-portfolio\nCustom native UI
+}
+
 package "构建工具链" <<Build>> {
     component "Next.js构建系统" as BuildSystem
     component "TypeScript 5编译器" as TSCompiler
@@ -250,6 +263,15 @@ Vite --> TSCompiler
 PNPM --> NextJS
 PNPM --> React
 PNPM --> TypeScript
+PNPM --> Expo
+
+' Mobile (React Native / Expo) 关系
+React --> RN
+Expo --> RN
+RN --> NativeCardTech
+NativeCardTech --> NativeCardIOSTech
+NativeCardTech --> NativeCardAndroidTech
+RN --> RNWagmi
 
 ' AWS SDK关系
 AWSS3 --> S3Service

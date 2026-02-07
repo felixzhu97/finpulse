@@ -1,282 +1,283 @@
-# TOGAF 规范
+# TOGAF Specification
 
-## 核心概念
+## Core Concepts
 
-TOGAF (The Open Group Architecture Framework) 是企业架构开发的标准框架，包含：
+TOGAF (The Open Group Architecture Framework) is a standard framework for enterprise architecture development. It includes:
 
-1. **ADM** (Architecture Development Method) - 架构开发方法
-2. **四大架构域** - 业务、应用、数据、技术架构
-3. **架构内容框架** - 架构产物的标准结构
-4. **架构能力框架** - 企业架构治理能力
+1. **ADM** (Architecture Development Method) – architecture development method
+2. **Four architecture domains** – Business, Application, Data, Technology
+3. **Architecture Content Framework** – standard structure for architecture deliverables
+4. **Architecture Capability Framework** – enterprise architecture governance
 
-## 四大架构域
+## Four Architecture Domains
 
-### Business Architecture（业务架构）
+### Business Architecture
 
-**定义**：描述组织的业务流程、组织结构、业务能力和业务价值流
+**Definition**: Describes the organization’s business processes, structure, capabilities, and value streams.
 
-**在本项目中**：
+**In this project**:
 
-- 投资组合管理、市场分析、风险管理、交易管理、报表与合规
-- 业务流程：开户、入金、交易、风险评估、报表生成
+- Portfolio management, market analysis, risk management, transaction management, reporting and compliance
+- Business flows: account opening, funding, trading, risk assessment, report generation
 
-**文档位置**：`docs/architecture/business-architecture.puml`
+**Document location**: `docs/architecture/business-architecture.puml`
 
-### Application Architecture（应用架构）
+### Application Architecture
 
-**定义**：描述应用系统的结构、应用组件、接口和交互关系
+**Definition**: Describes application system structure, components, interfaces, and interactions.
 
-**在本项目中**：
+**In this project**:
 
-- 前端应用层：Web 应用（`apps/web`）、投资组合移动应用（`apps/mobile-portfolio`）、其他移动客户端（`apps/mobile`）
-- UI 组件库：`@fintech/ui`、`@fintech/utils`
-- 业务组件：投资组合总览、市场趋势、资产配置、风险分析、交易记录等
-- 应用服务层：投资组合服务、市场数据服务、风险分析服务、报表服务
-- 后端服务层：`services/portfolio-analytics`（基于 FastAPI 的组合分析服务，采用 DDD 分层）
+- Front-end applications: Web app (`apps/web`), portfolio mobile app (`apps/mobile-portfolio`), other mobile clients (`apps/mobile`)
+- UI component libraries: `@fintech/ui`, `@fintech/utils`
+- Business components: portfolio overview, market trends, asset allocation, risk analysis, transaction records, etc.
+- Application services: portfolio service, market data service, risk analysis service, reporting service
+- Back-end services: `services/portfolio-analytics` (FastAPI-based portfolio analytics with DDD layering)
+- **Mobile native UI**: `apps/mobile-portfolio` includes a custom native view (**NativeCard**) implemented with React Native’s `RCTViewManager` (iOS) and `SimpleViewManager` (Android), exposed to JS via `requireNativeComponent`. Native code lives in the app: `ios/mobileportfolio/NativeCardViewManager.*`, `android/.../NativeCardView*.kt`, `NativeCardPackage.kt`; JS wrapper in `src/components/NativeCard.tsx`.
 
-**文档位置**：`docs/architecture/application-architecture.puml`
+**Document location**: `docs/architecture/application-architecture.puml`
 
-**代码位置**：
+**Code locations**:
 
-- `apps/web/` - 金融分析 Web 控制台
-- `apps/mobile/` - 移动端演示应用
-- `apps/mobile-portfolio/` - 投资组合移动端应用
-- `packages/ui/` - UI 组件库
-- `packages/utils/` - 工具函数库
-- `services/portfolio-analytics/` - 组合分析与数据聚合服务层
+- `apps/web/` – Financial analytics web console
+- `apps/mobile/` – Mobile demo app
+- `apps/mobile-portfolio/` – Portfolio mobile app (Expo + RN, with NativeCard native view)
+- `packages/ui/` – UI component library
+- `packages/utils/` – Utility library
+- `services/portfolio-analytics/` – Portfolio analytics and data aggregation service layer
 
-### Data Architecture（数据架构）
+### Data Architecture
 
-**定义**：描述数据的结构、数据流、数据存储和数据管理
+**Definition**: Describes data structures, data flows, storage, and management.
 
-**在本项目中**：
+**In this project**:
 
-- 数据源层：市场数据源、交易记录、账户与客户信息、风险指标
-- 数据采集层：Web 与移动应用上报的数据、批量导入数据
-- 数据处理层：本地或外部服务进行的风险计算与聚合
-- 数据存储层：关系型数据库或数据仓库、日志与报表存储
-- 数据展示层：Web 控制台和移动端中的图表、报表和分析视图
+- Data sources: market data, transaction records, account and customer data, risk metrics
+- Data ingestion: data from web and mobile apps, batch imports
+- Data processing: risk and aggregation logic (local or external services)
+- Data storage: relational DB or data warehouse, logs and report storage
+- Data presentation: charts, reports, and analysis views in web and mobile
 
-**文档位置**：`docs/architecture/data-architecture.puml`
+**Document location**: `docs/architecture/data-architecture.puml`
 
-**代码位置**：
+**Code locations**:
 
-- `apps/web/` - 消费分析数据的 Web 界面
-- `apps/mobile/`、`apps/mobile-portfolio/` - 消费分析数据的移动客户端
-- `services/portfolio-analytics/app` - 组合领域模型、应用服务与 REST API
+- `apps/web/` – Web UI consuming analytics data
+- `apps/mobile/`, `apps/mobile-portfolio/` – Mobile clients consuming analytics data
+- `services/portfolio-analytics/app` – Domain models, application services, REST API
 
-### Technology Architecture（技术架构）
+### Technology Architecture
 
-**定义**：描述技术平台、基础设施、技术标准和部署架构
+**Definition**: Describes technology platforms, infrastructure, standards, and deployment.
 
-**在本项目中**：
+**In this project**:
 
-- 表示层：浏览器、Angular Web 应用、React Native 移动应用
-- 应用层：Monorepo 结构、TypeScript、pnpm Workspaces
-- 框架层：Angular、React、Expo、Radix UI、FastAPI 等
-- 可视化层：Chart.js、ng2-charts、chartjs-chart-financial（Web），react-native-chart-kit、react-native-wagmi-charts（移动端）
-- 构建工具层：Angular CLI、TypeScript Compiler、ESLint、Python tooling
-- 运行时层：Node.js、Python Runtime
-- 部署层：Vercel 平台、Python/FastAPI 服务部署环境
+- Presentation: browsers, Angular web app, React Native mobile apps (Expo)
+- Application: Monorepo, TypeScript, pnpm Workspaces
+- Frameworks: Angular, React, Expo, Radix UI, FastAPI
+- Visualization: Chart.js, ng2-charts, chartjs-chart-financial (web); react-native-chart-kit, react-native-wagmi-charts (mobile)
+- **Native mobile**: iOS (Xcode, CocoaPods, Objective-C/Swift), Android (Gradle, Kotlin); custom native views (e.g. NativeCard) via RCTViewManager / SimpleViewManager
+- Build: Angular CLI, TypeScript compiler, ESLint, Python tooling
+- Runtime: Node.js, Python
+- Deployment: Vercel, Python/FastAPI hosting
 
-**文档位置**：`docs/architecture/technology-architecture.puml`
+**Document location**: `docs/architecture/technology-architecture.puml`
 
-## ADM 核心流程
+## ADM Core Phases
 
-ADM 是 TOGAF 的架构开发方法，包含 9 个阶段（核心简化版）：
+ADM is TOGAF’s architecture development method (simplified):
 
-### 阶段 A：架构愿景 (Architecture Vision)
+### Phase A: Architecture Vision
 
-- 定义架构范围、目标、利益相关者
-- 识别业务驱动因素和业务需求
+- Define scope, objectives, stakeholders
+- Identify business drivers and requirements
 
-### 阶段 B：业务架构 (Business Architecture)
+### Phase B: Business Architecture
 
-- 建立业务架构基线
-- 开发业务架构目标
-- 识别业务架构差距
+- Establish business architecture baseline
+- Develop target business architecture
+- Identify gaps
 
-### 阶段 C：信息系统架构 (Information Systems Architecture)
+### Phase C: Information Systems Architecture
 
-- 数据架构（阶段 C1）：数据实体、数据关系、数据流
-- 应用架构（阶段 C2）：应用组件、应用接口、应用交互
+- Data architecture (C1): data entities, relationships, flows
+- Application architecture (C2): application components, interfaces, interactions
 
-### 阶段 D：技术架构 (Technology Architecture)
+### Phase D: Technology Architecture
 
-- 定义技术平台
-- 识别技术标准和规范
-- 制定技术架构蓝图
+- Define technology platform
+- Identify standards and guidelines
+- Produce technology architecture blueprint
 
-### 阶段 E：机会和解决方案 (Opportunities and Solutions)
+### Phase E: Opportunities and Solutions
 
-- 识别架构实施机会
-- 制定实施路线图
-- 评估风险和依赖
+- Identify implementation opportunities
+- Define roadmap
+- Assess risks and dependencies
 
-### 阶段 F：迁移规划 (Migration Planning)
+### Phase F: Migration Planning
 
-- 制定详细的迁移计划
-- 定义过渡架构
-- 制定实施时间表
+- Detailed migration plan
+- Transition architectures
+- Implementation schedule
 
-### 阶段 G：实施治理 (Implementation Governance)
+### Phase G: Implementation Governance
 
-- 监督架构实施
-- 确保实施符合架构标准
-- 管理架构变更请求
+- Oversee implementation
+- Ensure compliance with architecture
+- Manage change requests
 
-### 阶段 H：架构变更管理 (Architecture Change Management)
+### Phase H: Architecture Change Management
 
-- 管理架构变更
-- 维护架构连续性
-- 评估架构演进需求
+- Manage architecture changes
+- Maintain continuity
+- Assess evolution needs
 
-### 需求管理 (Requirements Management)
+### Requirements Management
 
-- 贯穿所有阶段的持续活动
-- 管理架构需求的变更和追溯
+- Ongoing across all phases
+- Manage and trace architecture requirements
 
-## 架构原则
+## Architecture Principles
 
-### 1. 业务原则
+### 1. Business
 
-- **原则至上**：业务需求驱动架构决策
-- **信息资产**：数据是企业资产，需要统一管理
-- **技术无关性**：业务架构独立于技术实现
+- **Business first**: Business needs drive architecture decisions
+- **Information as asset**: Data is a corporate asset and managed consistently
+- **Technology-agnostic**: Business architecture is independent of technology
 
-### 2. 应用原则
+### 2. Application
 
-- **组件化**：应用以组件形式构建，便于重用和维护
-- **接口标准化**：组件间通过标准化接口交互
-- **服务导向**：采用服务导向的架构设计
+- **Component-based**: Applications built from reusable components
+- **Standard interfaces**: Components interact via standard interfaces
+- **Service-oriented**: Service-oriented design
 
-### 3. 数据原则
+### 3. Data
 
-- **数据共享**：数据在应用间共享，避免重复
-- **数据安全**：数据访问受控，确保安全性
-- **数据质量**：数据必须准确、完整、及时
+- **Data sharing**: Data shared across applications, avoid duplication
+- **Data security**: Controlled access and security
+- **Data quality**: Accurate, complete, timely data
 
-### 4. 技术原则
+### 4. Technology
 
-- **技术标准化**：采用行业标准技术，减少技术债务
-- **平台化**：构建可重用的技术平台
-- **可扩展性**：技术架构支持业务增长和扩展
+- **Standards**: Use industry standards to reduce technical debt
+- **Platform**: Reusable technology platform
+- **Scalability**: Architecture supports growth and extension
 
-## 架构产物
+## Architecture Deliverables
 
-### 架构基线 (Baseline Architecture)
+### Baseline Architecture
 
-- 描述当前架构状态
-- 作为对比参考点
+- Describes current state
+- Reference for comparison
 
-### 目标架构 (Target Architecture)
+### Target Architecture
 
-- 描述期望的架构状态
-- 满足业务和技术目标
+- Describes desired state
+- Meets business and technology objectives
 
-### 差距分析 (Gap Analysis)
+### Gap Analysis
 
-- 识别基线和目标架构间的差距
-- 定义填补差距的解决方案
+- Identify gaps between baseline and target
+- Define solutions to close gaps
 
-### 过渡架构 (Transition Architecture)
+### Transition Architecture
 
-- 定义从基线到目标的中间状态
-- 支持分阶段实施
+- Intermediate states from baseline to target
+- Supports phased implementation
 
-## 项目映射
+## Project Mapping
 
-### 架构文档
+### Architecture Documents
 
 ```text
 docs/architecture/
-├── business-architecture.puml      # 业务架构图
-├── application-architecture.puml   # 应用架构图
-├── data-architecture.puml          # 数据架构图
-├── technology-architecture.puml    # 技术架构图
+├── business-architecture.puml
+├── application-architecture.puml
+├── data-architecture.puml
+├── technology-architecture.puml
 └── domain/
     ├── finance-system.puml
     ├── finance-system-domains.puml
     └── finance-system-flows.puml
 ```
 
-### 代码结构映射
+### Code Structure Mapping
 
-**业务架构** → 业务需求和能力定义（参考 `docs/domain` 下的金融系统领域图）
+**Business architecture** → Business needs and capabilities (see `docs/domain` for finance system domain diagrams).
 
-**应用架构** →
+**Application architecture** →
 
-- `apps/web/` - Web 控制台应用
-- `apps/mobile/`、`apps/mobile-portfolio/` - 移动应用
-- `packages/ui/` - UI 组件库层
-- `packages/utils/` - 工具库层
-- `services/portfolio-analytics/` - 投资组合分析与聚合服务（FastAPI + DDD）
+- `apps/web/` – Web console
+- `apps/mobile/`, `apps/mobile-portfolio/` – Mobile apps (mobile-portfolio includes NativeCard native view)
+- `packages/ui/` – UI component layer
+- `packages/utils/` – Utility layer
+- `services/portfolio-analytics/` – Portfolio analytics service (FastAPI + DDD)
 
-**数据架构** →
+**Data architecture** →
 
-- Web 与移动应用中消费分析与报表数据的 API 客户端
-- `services/portfolio-analytics/app` 中的领域模型和 REST API
+- API clients in web and mobile consuming analytics and reporting data
+- Domain models and REST API in `services/portfolio-analytics/app`
 
-**技术架构** →
+**Technology architecture** →
 
-- 根级配置：`package.json`、`pnpm-workspace.yaml`、`tsconfig.json`、`vercel.json`
-- 前端应用：`apps/web/`、`apps/mobile/`、`apps/mobile-portfolio/`
-- 后端服务：`services/portfolio-analytics/`（FastAPI 服务）
+- Root config: `package.json`, `pnpm-workspace.yaml`, `tsconfig.json`, `vercel.json`
+- Front-end: `apps/web/`, `apps/mobile/`, `apps/mobile-portfolio/` (native views in iOS/Android)
+- Back-end: `services/portfolio-analytics/` (FastAPI)
 
-## 架构治理规则
+## Governance Rules
 
-### 架构评审
+### Architecture Review
 
-- 新功能开发前进行架构影响分析
-- 重大变更需要架构评审
-- 确保架构文档与代码同步更新
+- Architecture impact analysis before major features
+- Significant changes require architecture review
+- Keep architecture documentation in sync with code
 
-### 依赖管理
+### Dependency
 
 ```text
-业务架构 → 应用架构 → 数据架构 → 技术架构
+Business → Application → Data → Technology
 ```
 
-- 上层架构依赖下层架构
-- 下层架构变更需评估上层影响
-- 禁止反向依赖
+- Upper layers depend on lower layers
+- Changes in lower layers must consider impact on upper layers
+- No reverse dependencies
 
-### 文档维护
+### Document Maintenance
 
-- 架构变更时同步更新架构图
-- 保持架构文档与代码实现一致
-- 定期审查架构对齐情况
-- 对于影响整体架构或跨系统的改动，同步更新：
+- Update architecture diagrams when the architecture changes
+- Keep documentation aligned with implementation
+- Review alignment periodically
+- For changes that affect overall or cross-system architecture, update:
   - `docs/architecture/README.md`
-  - 相关 PlantUML 架构图
-  - `docs/TODO.md` 中对应的高层任务条目
+  - Relevant PlantUML diagrams
+  - Corresponding items in `docs/TODO.md`
 
-## 检查清单
+## Checklists
 
-### 新功能开发
+### New Feature Development
 
-- [ ] 明确功能所属的架构域
-- [ ] 评估对现有架构的影响
-- [ ] 确保符合架构原则
-- [ ] 更新相关架构文档
+- [ ] Identify architecture domain(s)
+- [ ] Assess impact on existing architecture
+- [ ] Ensure compliance with principles
+- [ ] Update relevant architecture docs
 
-### 架构变更
+### Architecture Change
 
-- [ ] 识别受影响的架构域
-- [ ] 进行差距分析
-- [ ] 定义过渡方案
-- [ ] 更新架构图和文档
-- [ ] 通知相关利益相关者
+- [ ] Identify affected domains
+- [ ] Perform gap analysis
+- [ ] Define transition approach
+- [ ] Update diagrams and docs
+- [ ] Notify stakeholders
 
-### 架构对齐
+### Architecture Alignment
 
-- [ ] 代码实现符合架构设计
-- [ ] 架构文档反映实际状态
-- [ ] 遵循架构依赖规则
-- [ ] 符合架构原则要求
+- [ ] Implementation matches architecture
+- [ ] Documentation reflects current state
+- [ ] Dependency rules followed
+- [ ] Principles satisfied
 
-## 参考资源
+## References
 
-- [TOGAF 官方文档](https://www.opengroup.org/togaf)
-- [项目 TOGAF 架构图](../docs/togaf/README.md)
-- [架构概览图](../docs/togaf/overview.puml)
+- [TOGAF](https://www.opengroup.org/togaf)
+- Project architecture docs: `docs/architecture/README.md`

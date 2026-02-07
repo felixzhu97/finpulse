@@ -56,6 +56,15 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
         component "ReactHookForm" as FormLibrary
         component "Zod验证器" as Validator
     }
+
+    component "apps/mobile-portfolio" as MobilePortfolio {
+        component "Expo + React Native" as ExpoRN
+        component "NativeCard (native view)" as NativeCard {
+            component "iOS RCTViewManager" as NativeCardIOS
+            component "Android SimpleViewManager" as NativeCardAndroid
+        }
+        component "react-native-wagmi-charts" as RNCharts
+    }
 }
 
 package "业务逻辑层 (Business Layer)" <<Business>> {
@@ -235,6 +244,12 @@ interface "风险分析API" as RiskAPI
 interface "Spark API" as SparkAPI
 interface "Flink API" as FlinkAPI
 interface "Hadoop API" as HadoopAPI
+
+' Mobile portfolio native view
+ExpoRN --> NativeCard
+NativeCard --> NativeCardIOS
+NativeCard --> NativeCardAndroid
+MobilePortfolio --> RNCharts
 
 ' 展示层内部关系
 NextApp --> AppRouter

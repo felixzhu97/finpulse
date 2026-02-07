@@ -1,6 +1,6 @@
 # Fintech Project TODO
 
-High-level TODO list for the entire `fintech-project` monorepo.  
+High-level TODO list for the entire `fintech-project` monorepo.
 This list complements, but does not replace, issue tracking in Git platforms.
 
 ## Architecture & Documentation
@@ -26,6 +26,7 @@ This list complements, but does not replace, issue tracking in Git platforms.
 - [ ] Add basic error and empty states for all portfolio and account screens.
 - [ ] Align visual style of mobile apps with the shared design language used on web.
 - [ ] Introduce simple analytics or logging hooks for key in-app events.
+- [ ] Implement a custom chart render using Metal/Vulkan.
 
 ## Shared Packages (`packages/ui`, `packages/utils`, others)
 
@@ -40,4 +41,3 @@ This list complements, but does not replace, issue tracking in Git platforms.
 - [ ] Define a lightweight release checklist referencing this TODO file and architecture docs.
 - [ ] Ensure every significant architectural change updates: PlantUML diagrams, `docs/architecture/README.md`, and relevant sections in this `docs/TODO.md`.
 - [ ] Add short “getting started” guides for new contributors to each major app and service.
-
