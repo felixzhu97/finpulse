@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
-import { NativeCard } from "@/src/components/NativeCard";
+import { Text, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import { NativeLineChart, NativeDemoCard } from "@/src/components/native";
 import { PortfolioSummary } from "@/src/components/PortfolioSummary";
 import {
   getPortfolio,
@@ -23,6 +24,7 @@ export default function DashboardScreen() {
     { type: Account["type"]; value: number }[]
   >([]);
   const [history, setHistory] = useState<PortfolioHistoryPoint[]>([]);
+  const [chartScrollLock, setChartScrollLock] = useState(false);
 
   const base = Date.now() - 5 * 24 * 60 * 60 * 1000;
 
@@ -115,6 +117,7 @@ export default function DashboardScreen() {
     <ScrollView
       style={{ flex: 1, backgroundColor: "#f3f4f6" }}
       contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+      scrollEnabled={!chartScrollLock}
     >
       <PortfolioSummary portfolio={portfolio} />
       <Text
@@ -126,10 +129,10 @@ export default function DashboardScreen() {
           marginBottom: 8,
         }}
       >
-        Native card (iOS/Android view)
+        Native demo card (iOS/Android view)
       </Text>
-      <NativeCard
-        title="Native component (iOS/Android)"
+      <NativeDemoCard
+        title="Native demo card (iOS/Android)"
         style={{ height: 80, marginBottom: 24, borderRadius: 12 }}
       />
       <View style={{ marginTop: 0, gap: 12 }}>
@@ -154,6 +157,24 @@ export default function DashboardScreen() {
             label: item.type,
             value: item.value,
           }))}
+        />
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: "600",
+            color: "#111827",
+            marginTop: 12,
+            marginBottom: 4,
+          }}
+        >
+          Native line chart (Metal / OpenGL ES)
+        </Text>
+        <NativeLineChart
+          data={history.length > 0 ? history.map((p) => p.value) : stockLinePoints.map((p) => p.value)}
+          timestamps={history.length > 0 ? history.map((p) => new Date(p.date).getTime()) : stockLinePoints.map((p) => p.timestamp)}
+          style={{ height: 200, marginBottom: 12 }}
+          onInteractionStart={() => setChartScrollLock(true)}
+          onInteractionEnd={() => setChartScrollLock(false)}
         />
         <Text
           style={{

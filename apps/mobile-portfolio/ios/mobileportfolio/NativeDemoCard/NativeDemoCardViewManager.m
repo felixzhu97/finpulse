@@ -1,14 +1,14 @@
-#import "NativeCardViewManager.h"
+#import "NativeDemoCardViewManager.h"
 #import <React/RCTViewManager.h>
 #import <UIKit/UIKit.h>
 
-@interface NativeCardView : UIView
+@interface NativeDemoCardView : UIView
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, strong) UILabel *label;
 @property (nonatomic, strong) UIView *contentView;
 @end
 
-@implementation NativeCardView
+@implementation NativeDemoCardView
 
 - (instancetype)initWithFrame:(CGRect)frame {
   if (self = [super initWithFrame:frame]) {
@@ -19,7 +19,7 @@
     _contentView.layer.cornerRadius = 12;
     [self addSubview:_contentView];
     _label = [[UILabel alloc] initWithFrame:CGRectZero];
-    _label.text = @"Native Card (iOS)";
+    _label.text = @"Native Demo Card (iOS)";
     _label.textAlignment = NSTextAlignmentCenter;
     _label.font = [UIFont systemFontOfSize:16 weight:UIFontWeightMedium];
     _label.textColor = UIColor.labelColor;
@@ -30,7 +30,7 @@
 
 - (void)setTitle:(NSString *)title {
   _title = [title copy];
-  _label.text = title.length ? title : @"Native Card (iOS)";
+  _label.text = title.length ? title : @"Native Demo Card (iOS)";
 }
 
 - (void)layoutSubviews {
@@ -41,14 +41,14 @@
 
 @end
 
-@implementation NativeCardViewManager
+@implementation NativeDemoCardViewManager
 
-RCT_EXPORT_MODULE(NativeCard)
+RCT_EXPORT_MODULE(NativeDemoCard)
 
 RCT_EXPORT_VIEW_PROPERTY(title, NSString)
 
 - (UIView *)view {
-  return [[NativeCardView alloc] init];
+  return [[NativeDemoCardView alloc] init];
 }
 
 @end

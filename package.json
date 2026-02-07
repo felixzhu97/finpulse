@@ -14,6 +14,8 @@
     "start:web": "pnpm --filter finpulse-web start",
     "start:mobile": "pnpm --filter finpulse-mobile start",
     "start:mobile-portfolio": "pnpm --filter mobile-portfolio start",
+    "start:mobile-portfolio-android": "pnpm --filter mobile-portfolio android",
+    "start:mobile-portfolio-ios": "pnpm --filter mobile-portfolio ios",
     "lint": "pnpm --filter finpulse-web lint"
   }
 }

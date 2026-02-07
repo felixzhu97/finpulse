@@ -59,9 +59,13 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
 
     component "apps/mobile-portfolio" as MobilePortfolio {
         component "Expo + React Native" as ExpoRN
-        component "NativeCard (native view)" as NativeCard {
-            component "iOS RCTViewManager" as NativeCardIOS
-            component "Android SimpleViewManager" as NativeCardAndroid
+        component "NativeDemoCard (demo native card)" as NativeDemoCard {
+            component "iOS RCTViewManager" as NativeDemoCardIOS
+            component "Android SimpleViewManager" as NativeDemoCardAndroid
+        }
+        component "NativeLineChart (portfolio line chart)" as NativeLineChart {
+            component "iOS Metal (MTKView)" as NativeLineChartIOS
+            component "Android OpenGL ES 3" as NativeLineChartAndroid
         }
         component "react-native-wagmi-charts" as RNCharts
     }
@@ -245,10 +249,13 @@ interface "Spark API" as SparkAPI
 interface "Flink API" as FlinkAPI
 interface "Hadoop API" as HadoopAPI
 
-' Mobile portfolio native view
-ExpoRN --> NativeCard
-NativeCard --> NativeCardIOS
-NativeCard --> NativeCardAndroid
+' Mobile portfolio native views
+ExpoRN --> NativeDemoCard
+NativeDemoCard --> NativeDemoCardIOS
+NativeDemoCard --> NativeDemoCardAndroid
+ExpoRN --> NativeLineChart
+NativeLineChart --> NativeLineChartIOS
+NativeLineChart --> NativeLineChartAndroid
 MobilePortfolio --> RNCharts
 
 ' 展示层内部关系

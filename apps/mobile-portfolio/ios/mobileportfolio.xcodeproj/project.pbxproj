@@ -14,7 +14,11 @@
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		EC41811ED6CCD1139A309E53 /* libPods-mobileportfolio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C06262AC2361DE170D99B9F8 /* libPods-mobileportfolio.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
-		A1B2C3D62E0307B40044C1D9 /* NativeCardViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D52E0307B40044C1D9 /* NativeCardViewManager.m */; };
+		A1B2C3D62E0307B40044C1D9 /* NativeDemoCardViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D52E0307B40044C1D9 /* NativeDemoCardViewManager.m */; };
+		B1C2D3E42E0307B40044C1D9 /* NativeLineChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E52E0307B40044C1D9 /* NativeLineChartViewManager.m */; };
+		B1C2D3E62E0307B40044C1D9 /* NativeLineChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E72E0307B40044C1D9 /* NativeLineChartViewManager.swift */; };
+		B1C2D3E82E0307B40044C1D9 /* NativeLineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E92E0307B40044C1D9 /* NativeLineChartView.swift */; };
+		B1C2D3EA2E0307B40044C1D9 /* ChartShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3EB2E0307B40044C1D9 /* ChartShaders.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,8 +35,12 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = mobileportfolio/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* mobileportfolio-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "mobileportfolio-Bridging-Header.h"; path = "mobileportfolio/mobileportfolio-Bridging-Header.h"; sourceTree = "<group>"; };
-		A1B2C3D42E0307B40044C1D9 /* NativeCardViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NativeCardViewManager.h; path = mobileportfolio/NativeCardViewManager.h; sourceTree = "<group>"; };
-		A1B2C3D52E0307B40044C1D9 /* NativeCardViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NativeCardViewManager.m; path = mobileportfolio/NativeCardViewManager.m; sourceTree = "<group>"; };
+		A1B2C3D42E0307B40044C1D9 /* NativeDemoCardViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NativeDemoCardViewManager.h; path = NativeDemoCardViewManager.h; sourceTree = "<group>"; };
+		A1B2C3D52E0307B40044C1D9 /* NativeDemoCardViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NativeDemoCardViewManager.m; path = NativeDemoCardViewManager.m; sourceTree = "<group>"; };
+		B1C2D3E52E0307B40044C1D9 /* NativeLineChartViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NativeLineChartViewManager.m; path = NativeLineChartViewManager.m; sourceTree = "<group>"; };
+		B1C2D3E72E0307B40044C1D9 /* NativeLineChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NativeLineChartViewManager.swift; path = NativeLineChartViewManager.swift; sourceTree = "<group>"; };
+		B1C2D3E92E0307B40044C1D9 /* NativeLineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NativeLineChartView.swift; path = NativeLineChartView.swift; sourceTree = "<group>"; };
+		B1C2D3EB2E0307B40044C1D9 /* ChartShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; name = ChartShaders.metal; path = ChartShaders.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,8 +59,8 @@
 			isa = PBXGroup;
 			children = (
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
-				A1B2C3D42E0307B40044C1D9 /* NativeCardViewManager.h */,
-				A1B2C3D52E0307B40044C1D9 /* NativeCardViewManager.m */,
+				A1B2C3D43E0307B40044C1D9 /* NativeDemoCard */,
+				B1C2D3EC2E0307B40044C1D9 /* NativeLineChart */,
 				F11748442D0722820044C1D9 /* mobileportfolio-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -118,6 +126,28 @@
 			);
 			name = Pods;
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		A1B2C3D43E0307B40044C1D9 /* NativeDemoCard */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D42E0307B40044C1D9 /* NativeDemoCardViewManager.h */,
+				A1B2C3D52E0307B40044C1D9 /* NativeDemoCardViewManager.m */,
+			);
+			name = NativeDemoCard;
+			path = mobileportfolio/NativeDemoCard;
+			sourceTree = "<group>";
+		};
+		B1C2D3EC2E0307B40044C1D9 /* NativeLineChart */ = {
+			isa = PBXGroup;
+			children = (
+				B1C2D3E52E0307B40044C1D9 /* NativeLineChartViewManager.m */,
+				B1C2D3E72E0307B40044C1D9 /* NativeLineChartViewManager.swift */,
+				B1C2D3E92E0307B40044C1D9 /* NativeLineChartView.swift */,
+				B1C2D3EB2E0307B40044C1D9 /* ChartShaders.metal */,
+			);
+			name = NativeLineChart;
+			path = mobileportfolio/NativeLineChart;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -331,7 +361,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				A1B2C3D62E0307B40044C1D9 /* NativeCardViewManager.m in Sources */,
+				A1B2C3D62E0307B40044C1D9 /* NativeDemoCardViewManager.m in Sources */,
+				B1C2D3E42E0307B40044C1D9 /* NativeLineChartViewManager.m in Sources */,
+				B1C2D3E62E0307B40044C1D9 /* NativeLineChartViewManager.swift in Sources */,
+				B1C2D3E82E0307B40044C1D9 /* NativeLineChartView.swift in Sources */,
+				B1C2D3EA2E0307B40044C1D9 /* ChartShaders.metal in Sources */,
 				21CCF3A165B4C7F5E4A57441 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -61,7 +61,7 @@
 1. **Presentation Layer**
    - Web app: `apps/web` (Angular-based financial analytics console)
    - Mobile apps: `apps/mobile`, `apps/mobile-portfolio` (React Native clients; mobile-portfolio uses Expo)
-   - **Native UI (mobile-portfolio)**: Custom native view **NativeCard** (iOS: `RCTViewManager` + Objective-C view; Android: `SimpleViewManager` + Kotlin view), exposed to RN via `requireNativeComponent`. Code: `ios/mobileportfolio/NativeCardViewManager.*`, `android/.../NativeCardView*.kt`, `NativeCardPackage.kt`, `src/components/NativeCard.tsx`.
+   - **Native UI (mobile-portfolio)**: **NativeDemoCard** (demo native card; iOS/Android view managers) and **NativeLineChart** (portfolio/values line chart; Metal on iOS, OpenGL ES on Android; light theme, grid, touch crosshair/tooltip, scroll lock via `onInteractionStart`/`onInteractionEnd`). Code: `ios/mobileportfolio/NativeDemoCard/`, `ios/mobileportfolio/NativeLineChart/`, `android/.../view/`, `src/components/native/NativeDemoCard.tsx`, `NativeLineChart.tsx`.
    - UI component library: `packages/ui`
    - Data visualization: Chart.js, ng2-charts, chartjs-chart-financial, react-native-chart-kit, react-native-wagmi-charts
 
@@ -98,7 +98,7 @@
 
 - Provide investors and business users access to portfolio and key metrics from mobile devices.
 - Share core domain models and utilities with the web console (e.g. `packages/ui`, `packages/utils`).
-- **apps/mobile-portfolio** includes a custom native view (**NativeCard**) for iOS and Android, implemented with React Native view managers (no Expo Modules); used on the dashboard for a native card strip.
+- **apps/mobile-portfolio** includes native views: **NativeDemoCard** (demo native card on dashboard) and **NativeLineChart** (portfolio/values line chart; Metal/OpenGL ES, light theme, axis labels, touch crosshair and tooltip, optional scroll lock when touching the chart).
 
 ### 数据架构图 (Data Architecture)
 
@@ -186,9 +186,9 @@
    - TypeScript 5 (type safety)
 
 2. **Mobile native (apps/mobile-portfolio)**
-   - iOS: Xcode, CocoaPods, Objective-C (`NativeCardViewManager`, `NativeCardView`)
-   - Android: Gradle, Kotlin (`NativeCardView`, `NativeCardViewManager`, `NativeCardPackage`)
-   - Bridge: `requireNativeComponent("NativeCard")` in JS
+   - iOS: Xcode, CocoaPods, Objective-C/Swift (NativeDemoCard, NativeLineChart with Metal/MTKView)
+   - Android: Gradle, Kotlin (NativeDemoCardView, NativeLineChartView, NativeViewsPackage; OpenGL ES 3 for chart)
+   - Bridge: `requireNativeComponent("NativeDemoCard")`, `requireNativeComponent("NativeLineChart")` in JS
 
 3. **UI frameworks and components**
    - Radix UI（无样式组件原语）
@@ -200,6 +200,7 @@
    - chartjs-chart-financial (web financial/candlestick)
    - react-native-chart-kit (mobile lightweight charts)
    - react-native-wagmi-charts (mobile professional stock charts)
+   - NativeLineChart (mobile-portfolio native: Metal on iOS, OpenGL ES on Android; light theme, touch interaction)
 
 5. **Utilities**
    - Form and validation (e.g. React Hook Form, Zod)
@@ -392,6 +393,6 @@
 
 ---
 
-**文档版本**: 1.1.0  
-**最后更新**: 2024  
+**文档版本**: 1.2.0  
+**最后更新**: 2025  
 **维护者**: FinPulse 开发团队

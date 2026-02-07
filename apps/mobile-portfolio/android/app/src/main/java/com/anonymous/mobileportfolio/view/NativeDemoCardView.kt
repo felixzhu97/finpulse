@@ -1,11 +1,11 @@
-package com.anonymous.mobileportfolio
+package com.anonymous.mobileportfolio.view
 
 import android.content.Context
 import android.graphics.Typeface
 import android.widget.LinearLayout
 import android.widget.TextView
 
-class NativeCardView(context: Context) : LinearLayout(context) {
+class NativeDemoCardView(context: Context) : LinearLayout(context) {
   private val label = TextView(context).apply {
     setTextColor(0xFF000000.toInt())
     textSize = 16f
@@ -20,6 +20,6 @@ class NativeCardView(context: Context) : LinearLayout(context) {
   }
 
   fun setTitle(title: String) {
-    label.text = if (title.isEmpty()) "Native Card (Android)" else title
+    label.text = if (title.isEmpty()) "Native Demo Card (Android)" else title
   }
 }

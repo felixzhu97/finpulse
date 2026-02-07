@@ -100,13 +100,18 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
     component "Expo 54" as Expo
     component "React Native 0.81" as RN
     component "react-native-wagmi-charts" as RNWagmi
-    component "NativeCard (native view)" as NativeCardTech {
-        component "iOS RCTViewManager" as NativeCardIOSTech
-        component "Android SimpleViewManager" as NativeCardAndroidTech
+    component "NativeDemoCard (demo card)" as NativeDemoCardTech {
+        component "iOS RCTViewManager" as NativeDemoCardIOSTech
+        component "Android SimpleViewManager" as NativeDemoCardAndroidTech
+    }
+    component "NativeLineChart (line chart)" as NativeLineChartTech {
+        component "iOS Metal (MTKView)" as NativeLineChartIOSTech
+        component "Android OpenGL ES 3" as NativeLineChartAndroidTech
     }
     note right of Expo: Expo SDK\nMetro, prebuild\niOS/Android
     note right of RN: React Native core\nrequireNativeComponent\nView managers
-    note right of NativeCardTech: apps/mobile-portfolio\nCustom native UI
+    note right of NativeDemoCardTech: apps/mobile-portfolio\nDemo native card
+    note right of NativeLineChartTech: Light theme, grid\nTouch crosshair/tooltip\nScroll lock
 }
 
 package "构建工具链" <<Build>> {
@@ -268,9 +273,12 @@ PNPM --> Expo
 ' Mobile (React Native / Expo) 关系
 React --> RN
 Expo --> RN
-RN --> NativeCardTech
-NativeCardTech --> NativeCardIOSTech
-NativeCardTech --> NativeCardAndroidTech
+RN --> NativeDemoCardTech
+NativeDemoCardTech --> NativeDemoCardIOSTech
+NativeDemoCardTech --> NativeDemoCardAndroidTech
+RN --> NativeLineChartTech
+NativeLineChartTech --> NativeLineChartIOSTech
+NativeLineChartTech --> NativeLineChartAndroidTech
 RN --> RNWagmi
 
 ' AWS SDK关系
