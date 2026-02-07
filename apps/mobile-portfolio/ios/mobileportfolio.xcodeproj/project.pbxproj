@@ -11,14 +11,14 @@
 		21CCF3A165B4C7F5E4A57441 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791AE892EE02334B2542C4AD /* ExpoModulesProvider.swift */; };
 		27CEAD1C11822712D9BEE726 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9676CC8D5258CC9EF2C9A18E /* PrivacyInfo.xcprivacy */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		EC41811ED6CCD1139A309E53 /* libPods-mobileportfolio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C06262AC2361DE170D99B9F8 /* libPods-mobileportfolio.a */; };
-		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 		A1B2C3D62E0307B40044C1D9 /* NativeDemoCardViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D52E0307B40044C1D9 /* NativeDemoCardViewManager.m */; };
 		B1C2D3E42E0307B40044C1D9 /* NativeLineChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E52E0307B40044C1D9 /* NativeLineChartViewManager.m */; };
 		B1C2D3E62E0307B40044C1D9 /* NativeLineChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E72E0307B40044C1D9 /* NativeLineChartViewManager.swift */; };
 		B1C2D3E82E0307B40044C1D9 /* NativeLineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E92E0307B40044C1D9 /* NativeLineChartView.swift */; };
 		B1C2D3EA2E0307B40044C1D9 /* ChartShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3EB2E0307B40044C1D9 /* ChartShaders.metal */; };
+		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		EC41811ED6CCD1139A309E53 /* libPods-mobileportfolio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C06262AC2361DE170D99B9F8 /* libPods-mobileportfolio.a */; };
+		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,19 +28,19 @@
 		2411B4102198302FF7E98B20 /* Pods-mobileportfolio.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mobileportfolio.release.xcconfig"; path = "Target Support Files/Pods-mobileportfolio/Pods-mobileportfolio.release.xcconfig"; sourceTree = "<group>"; };
 		6B5F2E0CE6B8BCF3A9C403D0 /* Pods-mobileportfolio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mobileportfolio.debug.xcconfig"; path = "Target Support Files/Pods-mobileportfolio/Pods-mobileportfolio.debug.xcconfig"; sourceTree = "<group>"; };
 		791AE892EE02334B2542C4AD /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-mobileportfolio/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		9676CC8D5258CC9EF2C9A18E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = mobileportfolio/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		9676CC8D5258CC9EF2C9A18E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = mobileportfolio/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A1B2C3D42E0307B40044C1D9 /* NativeDemoCardViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NativeDemoCardViewManager.h; sourceTree = "<group>"; };
+		A1B2C3D52E0307B40044C1D9 /* NativeDemoCardViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeDemoCardViewManager.m; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = mobileportfolio/SplashScreen.storyboard; sourceTree = "<group>"; };
+		B1C2D3E52E0307B40044C1D9 /* NativeLineChartViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeLineChartViewManager.m; sourceTree = "<group>"; };
+		B1C2D3E72E0307B40044C1D9 /* NativeLineChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLineChartViewManager.swift; sourceTree = "<group>"; };
+		B1C2D3E92E0307B40044C1D9 /* NativeLineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLineChartView.swift; sourceTree = "<group>"; };
+		B1C2D3EB2E0307B40044C1D9 /* ChartShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ChartShaders.metal; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		C06262AC2361DE170D99B9F8 /* libPods-mobileportfolio.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-mobileportfolio.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = mobileportfolio/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* mobileportfolio-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "mobileportfolio-Bridging-Header.h"; path = "mobileportfolio/mobileportfolio-Bridging-Header.h"; sourceTree = "<group>"; };
-		A1B2C3D42E0307B40044C1D9 /* NativeDemoCardViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NativeDemoCardViewManager.h; path = NativeDemoCardViewManager.h; sourceTree = "<group>"; };
-		A1B2C3D52E0307B40044C1D9 /* NativeDemoCardViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NativeDemoCardViewManager.m; path = NativeDemoCardViewManager.m; sourceTree = "<group>"; };
-		B1C2D3E52E0307B40044C1D9 /* NativeLineChartViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NativeLineChartViewManager.m; path = NativeLineChartViewManager.m; sourceTree = "<group>"; };
-		B1C2D3E72E0307B40044C1D9 /* NativeLineChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NativeLineChartViewManager.swift; path = NativeLineChartViewManager.swift; sourceTree = "<group>"; };
-		B1C2D3E92E0307B40044C1D9 /* NativeLineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NativeLineChartView.swift; path = NativeLineChartView.swift; sourceTree = "<group>"; };
-		B1C2D3EB2E0307B40044C1D9 /* ChartShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; name = ChartShaders.metal; path = ChartShaders.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,16 +118,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B8AD70004C9E5256A0B498E0 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				6B5F2E0CE6B8BCF3A9C403D0 /* Pods-mobileportfolio.debug.xcconfig */,
-				2411B4102198302FF7E98B20 /* Pods-mobileportfolio.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		A1B2C3D43E0307B40044C1D9 /* NativeDemoCard */ = {
 			isa = PBXGroup;
 			children = (
@@ -148,6 +138,15 @@
 			);
 			name = NativeLineChart;
 			path = mobileportfolio/NativeLineChart;
+			sourceTree = "<group>";
+		};
+		B8AD70004C9E5256A0B498E0 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				6B5F2E0CE6B8BCF3A9C403D0 /* Pods-mobileportfolio.debug.xcconfig */,
+				2411B4102198302FF7E98B20 /* Pods-mobileportfolio.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -381,6 +380,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = mobileportfolio/mobileportfolio.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z44FDY898W;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -417,6 +417,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = mobileportfolio/mobileportfolio.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z44FDY898W;
 				INFOPLIST_FILE = mobileportfolio/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -1,29 +1,25 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-node_modules
+# Dependencies
+node_modules/
 /.pnp
 .pnp.js
 .yarn/install-state.gz
 .pnpm-store
-
-# monorepo workspace node_modules
 apps/*/node_modules
 packages/*/node_modules
 
-# testing
+# Testing
 /coverage
 *.lcov
 
-# next.js
+# Next.js
 .next/
 out/
-apps/*/.next/
-apps/*/out/
 .next
 out
+apps/*/.next/
+apps/*/out/
 
-# production
+# Build / dist
 build/
 dist/
 apps/*/build/
@@ -31,34 +27,32 @@ apps/*/dist/
 packages/*/build/
 packages/*/dist/
 
-# misc
-.DS_Store
+# Misc
 *.pem
 *.log
 *.tsbuildinfo
 
-# debug
+# Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 lerna-debug.log*
 
-# local env files
+# Env
 .env
 .env*.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# vercel
+# Hosting / deploy
 .vercel
 
-# typescript
-*.tsbuildinfo
+# TypeScript
 next-env.d.ts
 
-# IDE and editors
+# IDE / editors
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -84,26 +78,20 @@ ehthumbs.db
 Thumbs.db
 Desktop.ini
 
-# Temporary files
+# Temp / cache
 *.tmp
 *.temp
 *.cache
 .cache/
-
-# Package manager lock files (optional - uncomment if you don't want to commit them)
-# pnpm-lock.yaml
-# package-lock.json
-# yarn.lock
-
-# Storybook build outputs
-storybook-static
-
-# Turbo
 .turbo
+
+# Storybook
+storybook-static
 
 # Sentry
 .sentryclirc
 
+# Angular
 .angular/
 
 # Python
@@ -114,26 +102,30 @@ __pycache__/
 venv/
 env/
 
-# Expo / React Native (mobile-portfolio, mobile)
+# Expo / React Native
 .expo/
 *.orig.*
 *.jks
 *.keystore
 !**/debug.keystore
 metro-health-check*
+.metro/
 *.apk
 *.aab
 *.ipa
+*.jsbundle
 
-# iOS (Xcode / CocoaPods)
-ios/Pods/
-ios/build/
+# iOS (Xcode / CocoaPods) – monorepo apps
+**/ios/Pods/
+**/ios/build/
+**/ios/DerivedData/
 *.xcuserstate
 *.xcuserdatad/
+**/.xcode.env.local
 
-# Android (Gradle)
-android/build/
-android/.gradle/
-android/app/build/
-android/local.properties
+# Android (Gradle) – monorepo apps
+**/android/build/
+**/android/.gradle/
 **/android/**/build/
+**/android/local.properties
+**/android/.cxx/
