@@ -44,6 +44,8 @@ This list complements, but does not replace, issue tracking in Git platforms.
 - [ ] Add Post-Trade Surveillance (anomaly and pattern detection); feed from Trade Service and Transactions Store.
 - [ ] Introduce NLP and Sentiment service for market/news data; connect to Analytics Engine and Market Data Store.
 - [ ] Define model serving, versioning, and monitoring strategy for production ML models.
+- [ ] **Deep learning**: Add DL-based time-series or risk forecast (e.g. neural net forecast endpoint); document integration points for TensorFlow/PyTorch or managed model serving.
+- [ ] **Large language models**: Add LLM integration for report summarisation, document Q&A, or customer support; wire to Analytics/Reporting and Compliance; document OpenAI/Ollama or self-hosted options.
 - [ ] Keep `docs/domain/finance-system-flows.puml`, `finance-system-architecture.puml`, and `finance-system-domains.puml` in sync when adding or changing AI capabilities; update `docs/architecture/README.md` AI section and this TODO section.
 
 ## Process & Dev Experience

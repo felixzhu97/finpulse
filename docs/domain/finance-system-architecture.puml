@@ -56,6 +56,8 @@ package "Data and Analytics" {
 
 package "AI and ML Services" {
   component "ML Risk and VaR Engine" as MlRiskEngine
+  component "Deep Learning Engine" as DlEngine
+  component "LLM Service" as LlmService
   component "Document and Identity AI" as DocumentAI
   component "Fraud and Anomaly Detection" as FraudAI
   component "Post-Trade Surveillance" as SurveillanceAI
@@ -114,9 +116,15 @@ PaymentService --> FraudAI
 OrderService --> MlRiskEngine
 TradeService --> SurveillanceAI
 RiskService --> MlRiskEngine
+RiskService --> DlEngine
 RiskService --> NlpService
+ComplianceService --> LlmService
 AnalyticsEngine --> NlpService
+AnalyticsEngine --> LlmService
 AnalyticsEngine --> ReportingWarehouse
+DlEngine --> RiskMetricsStore
+DlEngine --> MarketDataStore
+LlmService --> ReportingWarehouse
 MlRiskEngine --> RiskMetricsStore
 MlRiskEngine --> MarketDataStore
 FraudAI --> TransactionsStore

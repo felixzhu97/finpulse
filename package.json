@@ -11,6 +11,8 @@
     "generate-seed-data": "node scripts/generate-seed-data.js",
     "generate-ai-seed-data": "node scripts/generate-ai-seed-data.js",
     "generate-ai-seed-data:output": "node scripts/generate-ai-seed-data.js --output",
+    "test:ai-api": "bash scripts/test-ai-api.sh",
+    "test:api": "cd services/portfolio-analytics && (. .venv/bin/activate 2>/dev/null || true; python -m pytest tests -v)",
     "start:backend": "bash scripts/start-backend.sh",
     "build": "pnpm --filter finpulse-web build",
     "start": "pnpm --filter finpulse-web start",

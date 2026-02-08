@@ -46,7 +46,9 @@ partition "Risk and Reporting Flow" {
   :Revalue portfolios and positions;
   :Recalculate risk metrics;
   :ML risk and VaR models;
+  :DL forecast and risk scoring;
   :NLP sentiment and alternative data;
+  :LLM report summarisation;
   :Store aggregates in warehouse;
   :Publish risk and regulatory reports;
   stop

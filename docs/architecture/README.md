@@ -261,10 +261,10 @@
 **目录**: `docs/domain`
 
 **文件**:
-- `finance-system-architecture.puml`: 金融系统综合架构图，按渠道、边缘、核心（按领域分组）、数据与分析、外部系统分层，覆盖系统全貌；含 **AI and ML Services**（ML Risk/VaR、Document/Identity AI、Fraud/Anomaly、Post-Trade Surveillance、NLP/Sentiment）及与核心服务、数据层的集成。
-- `finance-system.puml`: 从渠道、边缘服务、核心金融服务、数据与分析以及外部系统五个层次展示整体金融系统组件和依赖关系。
-- `finance-system-domains.puml`: 从业务领域角度划分客户与账户、投资与交易、支付与资金、风控与合规、数据与洞察五大域，并展示域间依赖；含 **AI and ML** 域（ML Risk/VaR、Document/Identity AI、Fraud/Anomaly、Surveillance/NLP）及与 Risk、KYC、AML、Monitoring、Analytics 的依赖。
-- `finance-system-flows.puml`: Flow view of onboarding, funding, trading, and risk/reporting; includes AI steps (document/identity AI, fraud detection, ML limit validation, post-trade surveillance, ML risk/VaR, NLP/sentiment).
+- `finance-system-architecture.puml`: 综合架构；含 **AI and ML Services**（ML Risk/VaR、**Deep Learning Engine**、**LLM Service**、Document/Identity AI、Fraud/Anomaly、Post-Trade Surveillance、NLP/Sentiment）。
+- `finance-system.puml`: 渠道、边缘、核心、数据与外部系统五层。
+- `finance-system-domains.puml`: 业务领域；含 **AI and ML** 域（ML Risk/VaR、**Deep Learning**、**LLM**、Document/Identity AI、Fraud/Anomaly、Surveillance/NLP）。
+- `finance-system-flows.puml`: 流程视图；含 AI 步骤（含 **DL forecast**、**LLM report summarisation**）。
 
 ### AI and ML Integration
 
@@ -275,9 +275,9 @@ AI/ML is integrated across flows and architecture as follows:
 | Onboarding | KYC | Document and identity AI for verification and scoring |
 | Funding | Payment | Fraud and anomaly detection before settlement |
 | Trading | Order / Post-trade | ML limit and exposure validation; AI post-trade surveillance |
-| Risk & Reporting | Analytics | ML risk and VaR models; NLP sentiment and alternative data |
+| Risk & Reporting | Analytics | ML risk and VaR models; DL forecast and risk scoring; NLP sentiment; LLM report summarisation |
 
-**Architecture**: `finance-system-architecture.puml` defines **AI and ML Services** (ML Risk and VaR Engine, Document and Identity AI, Fraud and Anomaly Detection, Post-Trade Surveillance, NLP and Sentiment Service) consuming from Risk Metrics Store, Market Data Store, Transactions Store and feeding Risk Service, Compliance Service, Customer Service, Order Service, Trade Service, Analytics Engine. Domain view `finance-system-domains.puml` adds AI/ML domains and their dependencies on Risk, KYC, AML, Monitoring, and Analytics.
+**Architecture**: `finance-system-architecture.puml` defines **AI and ML Services** (ML Risk/VaR, **Deep Learning Engine**, **LLM Service**, Document/Identity AI, Fraud/Anomaly, Post-Trade Surveillance, NLP/Sentiment). Domain view `finance-system-domains.puml` adds AI/ML domains (including **Deep Learning** and **LLM**) and their dependencies.
 
 When adding or changing AI capabilities, update the above PlantUML files and the **Artificial Intelligence & ML** section in `docs/TODO.md`.
 

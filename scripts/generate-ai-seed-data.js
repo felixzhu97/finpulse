@@ -8,11 +8,13 @@ const aiSeedPayloads = {
     returns: [-0.012, 0.023, -0.008, 0.015, -0.003, 0.019, -0.011, 0.007, 0.022, -0.005],
     confidence: 0.95,
     method: "historical",
+    portfolio_id: "portfolio-equity-001",
   },
   riskVarParametric: {
     returns: [-0.01, 0.02, -0.005, 0.01, 0.015, -0.008, 0.012, -0.002, 0.018, -0.006],
     confidence: 0.99,
     method: "parametric",
+    portfolio_id: "portfolio-multi-asset",
   },
   fraudCheck: {
     amount: 2500,
@@ -20,6 +22,7 @@ const aiSeedPayloads = {
     hour_of_day: 14,
     day_of_week: 2,
     recent_count_24h: 3,
+    transaction_type: "wire",
   },
   fraudCheckWithSamples: {
     amount: 8500,
@@ -27,6 +30,7 @@ const aiSeedPayloads = {
     hour_of_day: 3,
     day_of_week: 0,
     recent_count_24h: 12,
+    transaction_type: "internal_transfer",
     reference_samples: [
       [100, 10, 1, 2],
       [500, 14, 2, 1],
@@ -48,6 +52,7 @@ const aiSeedPayloads = {
     side: "buy",
     recent_quantities: [100, 150, 200, 180, 220],
     recent_notionals: [19000, 28500, 38000, 34200, 41800],
+    instrument_id: "AAPL",
   },
   surveillanceTradeSell: {
     quantity: 1200,
@@ -55,24 +60,52 @@ const aiSeedPayloads = {
     side: "sell",
     recent_quantities: [200, 300, 250],
     recent_notionals: [84000, 126000, 105000],
+    instrument_id: "MSFT",
   },
   sentiment: {
     text: "Markets rallied strongly today as earnings beat expectations and inflation data came in below forecasts.",
+    source: "news",
   },
   sentimentNegative: {
     text: "Investors fear a sharp downturn amid rising defaults and tightening credit conditions.",
+    source: "research",
   },
   identityScore: {
     document_type: "passport",
     name_on_document: "Jane Smith",
     date_of_birth: "1985-06-20",
     id_number: "P123456789",
+    country_iso: "US",
   },
   identityScoreMinimal: {
     document_type: "id_card",
     name_on_document: "John Doe",
     date_of_birth: null,
     id_number: null,
+    country_iso: "GB",
+  },
+  dlForecast: {
+    values: [100, 102, 98, 105, 103, 107, 104, 110, 108, 112],
+    horizon: 3,
+    series_type: "nav",
+  },
+  llmSummarise: {
+    text: "Pursuant to Article 12, the institution shall report quarterly VaR and stress-test results. Breaches must be notified within 24 hours. Revenue increased 15% YoY; margins expanded. The board approved a share buyback. Management reiterated full-year guidance.",
+    max_sentences: 2,
+    report_type: "regulatory",
+  },
+  ollamaGenerate: {
+    prompt: "As a compliance officer: in one sentence, what is the main obligation in a paragraph that says 'Breaches must be notified within 24 hours'?",
+  },
+  huggingfaceSummarise: {
+    text: "The fund reported record AUM for the quarter. Inflows were driven by institutional mandates. Management raised fee guidance and announced a new ESG product. Risk metrics remained within limits.",
+    max_length: 80,
+    min_length: 20,
+  },
+  tfForecast: {
+    values: [100, 102, 101, 105, 104, 108, 106, 110, 109, 112, 111],
+    horizon: 2,
+    lookback: 5,
   },
 };
 
@@ -87,6 +120,11 @@ const aiEndpoints = [
   { name: "sentiment (negative)", path: "/api/v1/ai/sentiment", payload: aiSeedPayloads.sentimentNegative },
   { name: "identity/score", path: "/api/v1/ai/identity/score", payload: aiSeedPayloads.identityScore },
   { name: "identity/score (minimal)", path: "/api/v1/ai/identity/score", payload: aiSeedPayloads.identityScoreMinimal },
+  { name: "dl/forecast", path: "/api/v1/ai/dl/forecast", payload: aiSeedPayloads.dlForecast },
+  { name: "llm/summarise", path: "/api/v1/ai/llm/summarise", payload: aiSeedPayloads.llmSummarise },
+  { name: "ollama/generate", path: "/api/v1/ai/ollama/generate", payload: aiSeedPayloads.ollamaGenerate },
+  { name: "huggingface/summarise", path: "/api/v1/ai/huggingface/summarise", payload: aiSeedPayloads.huggingfaceSummarise },
+  { name: "tf/forecast", path: "/api/v1/ai/tf/forecast", payload: aiSeedPayloads.tfForecast },
 ];
 
 async function postOne(base, { name, path, payload }) {

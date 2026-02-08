@@ -5,7 +5,7 @@ from app.api.dto import (
   PortfolioDto,
   PortfolioSummaryDto,
 )
-from app.domain.models import Account, Holding, HistoryPoint, Portfolio, PortfolioSummary
+from app.domain.portfolio import Account, Holding, HistoryPoint, Portfolio, PortfolioSummary
 
 
 def map_holding(h: Holding) -> HoldingDto:

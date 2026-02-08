@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
+from app.domain.portfolio.value_objects import HistoryPoint, PortfolioSummary
+
 
 @dataclass
 class Holding:
@@ -29,21 +31,6 @@ class Account:
 
 
 @dataclass
-class PortfolioSummary:
-  total_assets: float
-  total_liabilities: float
-  net_worth: float
-  today_change: float
-  week_change: float
-
-
-@dataclass
-class HistoryPoint:
-  date: str
-  value: float
-
-
-@dataclass
 class Portfolio:
   id: str
   owner_name: str
@@ -51,4 +38,3 @@ class Portfolio:
   accounts: List[Account]
   summary: PortfolioSummary
   history: List[HistoryPoint]
-
