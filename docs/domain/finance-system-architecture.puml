@@ -1,0 +1,113 @@
+@startuml
+skinparam linetype ortho
+
+skinparam component {
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+title Financial System — Comprehensive Architecture
+
+package "Channels" {
+  component "Web App" as WebApp
+  component "Mobile App" as MobileApp
+  component "API Clients" as ApiClients
+}
+
+package "Edge Services" {
+  component "API Gateway" as ApiGateway
+  component "Auth Service" as AuthService
+  component "Session Service" as SessionService
+  component "Rate Limiter" as RateLimiter
+}
+
+package "Core Finance Services" {
+  package "Customer & Accounts" {
+    component "Customer Service" as CustomerService
+    component "Account Service" as AccountService
+  }
+  package "Investing & Trading" {
+    component "Portfolio Service" as PortfolioService
+    component "Order Service" as OrderService
+    component "Trade Service" as TradeService
+  }
+  package "Payments & Treasury" {
+    component "Payment Service" as PaymentService
+    component "Settlement Service" as SettlementService
+  }
+  package "Risk & Compliance" {
+    component "Risk Service" as RiskService
+    component "Pricing Service" as PricingService
+    component "Compliance Service" as ComplianceService
+  }
+}
+
+package "Data and Analytics" {
+  component "Positions Store" as PositionsStore
+  component "Transactions Store" as TransactionsStore
+  component "Reference Data Store" as ReferenceDataStore
+  component "Market Data Store" as MarketDataStore
+  component "Risk Metrics Store" as RiskMetricsStore
+  component "Reporting Warehouse" as ReportingWarehouse
+  component "Analytics Engine" as AnalyticsEngine
+  component "Portfolio Store (PostgreSQL)" as PortfolioStore
+  component "Portfolio Events (Kafka)" as PortfolioEvents
+}
+
+package "Backend Services" {
+  component "Portfolio Analytics API" as PortfolioAnalyticsAPI
+}
+
+package "External Systems" {
+  component "Banking Core" as BankingCore
+  component "Exchange Connectivity" as ExchangeConnectivity
+  component "Custody Service" as CustodyService
+  component "Payment Networks" as PaymentNetworks
+  component "Market Data Feeds" as MarketDataFeeds
+  component "KYC Providers" as KycProviders
+  component "AML Screening" as AmlScreening
+}
+
+WebApp --> ApiGateway
+MobileApp --> ApiGateway
+ApiClients --> ApiGateway
+MobileApp --> PortfolioAnalyticsAPI
+PortfolioAnalyticsAPI --> PortfolioStore
+PortfolioAnalyticsAPI --> PortfolioEvents
+
+ApiGateway --> RateLimiter
+ApiGateway --> AuthService
+AuthService --> SessionService
+
+ApiGateway --> AccountService
+ApiGateway --> PortfolioService
+ApiGateway --> OrderService
+ApiGateway --> PaymentService
+
+CustomerService --> AccountService
+PortfolioService --> PositionsStore
+PortfolioService --> MarketDataStore
+OrderService --> TradeService
+OrderService --> RiskService
+OrderService --> PricingService
+TradeService --> PositionsStore
+TradeService --> TransactionsStore
+PaymentService --> SettlementService
+PaymentService --> PaymentNetworks
+SettlementService --> BankingCore
+SettlementService --> CustodyService
+RiskService --> RiskMetricsStore
+RiskService --> AnalyticsEngine
+ComplianceService --> AmlScreening
+ComplianceService --> KycProviders
+AnalyticsEngine --> ReportingWarehouse
+ReportingWarehouse --> PositionsStore
+ReportingWarehouse --> TransactionsStore
+ReportingWarehouse --> MarketDataStore
+MarketDataFeeds --> MarketDataStore
+ExchangeConnectivity --> TradeService
+ExchangeConnectivity --> OrderService
+AccountService --> ReferenceDataStore
+CustomerService --> ReferenceDataStore
+
+@enduml

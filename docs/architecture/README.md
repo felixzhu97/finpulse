@@ -10,7 +10,7 @@
 2. [应用架构图](#应用架构图-application-architecture)
 3. [数据架构图](#数据架构图-data-architecture)
 4. [技术架构图](#技术架构图-technology-architecture)
-5. 领域视角下的金融系统图（`docs/architecture/domain` 目录）
+5. 领域视角下的金融系统图（`docs/domain` 目录）
 
 ## 🎯 架构概述
 
@@ -77,6 +77,7 @@
    - 状态管理（前端状态容器、上下文）
 
 4. **外部服务层 (External Services)**
+   - **Portfolio Analytics API**: FastAPI, GET /api/v1/portfolio, POST /api/v1/seed; PostgreSQL; Kafka (portfolio.events)
    - Vercel Analytics
    - 市场数据 API
    - 存储服务
@@ -98,6 +99,7 @@
 
 - Provide investors and business users access to portfolio and key metrics from mobile devices.
 - Share core domain models and utilities with the web console (e.g. `packages/ui`, `packages/utils`).
+- **apps/mobile-portfolio** connects to **Portfolio Analytics API** (http://localhost:8800) for portfolio data; no in-app mock. Run `pnpm run start:backend` then `pnpm dev:mobile-portfolio`.
 - **apps/mobile-portfolio** includes native views: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart) with theme (light/dark), tooltips, x-axis labels, and horizontal drag-to-scroll.
 
 ### 数据架构图 (Data Architecture)
@@ -171,6 +173,7 @@
 - 市场数据 → Spark 批处理 → 风险指标计算
 - 交易数据 → Flink 流处理 → 实时告警
 - 投资组合数据 → HDFS 存储 → 历史数据分析
+- **Portfolio Analytics**: 投资组合 → PostgreSQL (portfolio 表) 持久化；POST /api/v1/seed 写入；GET /api/v1/portfolio 读取；seed 时发布 portfolio.seeded 事件到 Kafka (portfolio.events)。
 
 ### 技术架构图 (Technology Architecture)
 
@@ -223,7 +226,13 @@
 8. **Infrastructure**
    - CDN, object storage
 
-9. **Big data stack**
+9. **Portfolio Analytics Backend**
+   - FastAPI (services/portfolio-analytics), uvicorn, port 8800
+   - PostgreSQL (portfolio persistence, host port 5433, Docker)
+   - Apache Kafka (portfolio.events, port 9092, Docker)
+   - One-click start: `pnpm run start:backend` (Docker + API + seed)
+
+10. **Big data stack**
    - Java 17+（JVM 运行时）
    - Spring Boot 3.2.0（应用框架）
    - Maven 3.6+（构建工具）
@@ -249,9 +258,10 @@
 
 ### 金融系统领域视图 (Finance System Domain Views)
 
-**目录**: `docs/architecture/domain`
+**目录**: `docs/domain`
 
 **文件**:
+- `finance-system-architecture.puml`: 金融系统综合架构图，按渠道、边缘、核心（按领域分组）、数据与分析、外部系统分层，覆盖系统全貌。
 - `finance-system.puml`: 从渠道、边缘服务、核心金融服务、数据与分析以及外部系统五个层次展示整体金融系统组件和依赖关系。
 - `finance-system-domains.puml`: 从业务领域角度划分客户与账户、投资与交易、支付与资金、风控与合规、数据与洞察五大域，并展示域间依赖。
 - `finance-system-flows.puml`: 以流程视图展示开户、入金、交易以及风险和报表的端到端核心业务流。
@@ -280,9 +290,10 @@
    plantuml application-architecture.puml
    plantuml data-architecture.puml
    plantuml technology-architecture.puml
-   plantuml domain/finance-system.puml
-   plantuml domain/finance-system-domains.puml
-   plantuml domain/finance-system-flows.puml
+   plantuml ../domain/finance-system-architecture.puml
+   plantuml ../domain/finance-system.puml
+   plantuml ../domain/finance-system-domains.puml
+   plantuml ../domain/finance-system-flows.puml
    
    # 生成 SVG 图片（推荐，矢量图）
    plantuml -tsvg business-architecture.puml

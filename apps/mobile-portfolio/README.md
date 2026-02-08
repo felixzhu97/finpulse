@@ -39,4 +39,14 @@ pnpm run ios
 pnpm run android
 ```
 
-Expo Go has limited support for native modules. Portfolio data is currently mocked; connect to real APIs when the backend is available.
+Expo Go has limited support for native modules.
+
+## Backend
+
+The app connects only to the backend; there is no in-app mock data.
+
+1. Start PostgreSQL and Kafka: `cd services/portfolio-analytics && docker compose up -d`.
+2. Start the backend from repo root: `pnpm dev:api` (portfolio-analytics on `http://localhost:8800`; uses `DATABASE_URL` and `KAFKA_BOOTSTRAP_SERVERS` if set).
+3. Generate seed data in the database: `pnpm generate-seed-data` (POSTs seed to the backend; backend must be running).
+4. The app expects `GET /api/v1/portfolio`. Override with `EXPO_PUBLIC_PORTFOLIO_API_URL` if needed.
+5. Pull-to-refresh on the dashboard clears the cache and refetches from the backend.

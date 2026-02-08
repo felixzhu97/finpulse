@@ -1,5 +1,10 @@
-import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import {
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import {
   NativeLineChart,
@@ -15,6 +20,7 @@ import {
   getPortfolio,
   getAssetAllocationByAccountType,
   getPortfolioHistory,
+  invalidatePortfolioCache,
 } from "@/src/services/portfolioService";
 import { MetricCard } from "@/src/components/MetricCard";
 import { AssetAllocationChart } from "@/src/components/AssetAllocationChart";
@@ -33,6 +39,8 @@ export default function DashboardScreen() {
   >([]);
   const [history, setHistory] = useState<PortfolioHistoryPoint[]>([]);
   const [chartScrollLock, setChartScrollLock] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const base = Date.now() - 5 * 24 * 60 * 60 * 1000;
 
@@ -97,34 +105,43 @@ export default function DashboardScreen() {
       ? lineData.reduce((a, b) => a + b, 0) / lineData.length
       : 102;
 
+  const load = useCallback(async () => {
+    const p = await getPortfolio();
+    const a = await getAssetAllocationByAccountType();
+    const h = await getPortfolioHistory();
+    setPortfolio(p);
+    setAllocation(a);
+    setHistory(h);
+    setLoaded(true);
+  }, []);
+
   useEffect(() => {
     let active = true;
-
-    const load = async () => {
-      const p = await getPortfolio();
-      const a = await getAssetAllocationByAccountType();
-      const h = await getPortfolioHistory();
-
-      if (!active) {
-        return;
-      }
-
-      setPortfolio(p);
-      setAllocation(a);
-      setHistory(h);
+    const run = async () => {
+      await load();
+      if (!active) return;
     };
-
-    load();
-
+    run();
     return () => {
       active = false;
     };
-  }, []);
+  }, [load]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    invalidatePortfolioCache();
+    await load();
+    setRefreshing(false);
+  }, [load]);
 
   if (!portfolio) {
     return (
       <View style={styles.centered}>
-        <Text>Loading portfolio...</Text>
+        <Text>
+          {loaded
+            ? "Unable to load portfolio. Start backend (pnpm dev:api), then run pnpm generate-seed-data to seed the database."
+            : "Loading portfolio..."}
+        </Text>
       </View>
     );
   }
@@ -134,6 +151,9 @@ export default function DashboardScreen() {
       style={styles.screen}
       contentContainerStyle={styles.content}
       scrollEnabled={!chartScrollLock}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <PortfolioSummary portfolio={portfolio} />
       <Text style={styles.sectionTitle}>Native demo card (iOS/Android view)</Text>

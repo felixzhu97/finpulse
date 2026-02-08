@@ -203,6 +203,23 @@ package "大数据存储实体 (Big Data Storage Entities)" {
     end note
 }
 
+package "Portfolio Analytics Storage" {
+    component "PostgreSQL (portfolio)" as PostgresPortfolio <<DataEntity>>
+    component "Kafka (portfolio.events)" as KafkaPortfolioEvents <<DataFlow>>
+
+    note right of PostgresPortfolio
+        <b>Schema</b>
+        - portfolio (id TEXT PK, data JSONB)
+        - Seed via POST /api/v1/seed
+        - GET /api/v1/portfolio reads from DB
+    end note
+    note right of KafkaPortfolioEvents
+        <b>Events</b>
+        - type: portfolio.seeded
+        - portfolio_id, payload (full portfolio JSON)
+    end note
+}
+
 package "AWS存储数据实体" {
     component "S3对象数据" as S3ObjectData <<DataEntity>>
     component "DynamoDB表数据" as DynamoDBTableData <<DataEntity>>
@@ -269,6 +286,10 @@ package "数据关系" {
     ' 估值数据关系
     AssetData "1" --> "N" ValuationData : 估值结果
     MarketData "1" --> "N" ValuationData : 估值输入
+
+    ' Portfolio Analytics storage
+    PortfolioData "1" --> "0..1" PostgresPortfolio : persisted (portfolio-analytics)
+    PostgresPortfolio "1" --> "0..N" KafkaPortfolioEvents : emits events
 
     ' AWS存储关系
     PortfolioData "1" --> "0..N" S3ObjectData : 附件存储

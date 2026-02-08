@@ -236,6 +236,14 @@ package "外部服务层 (External Services)" <<External>> {
         component "金融数据API" as FinanceAPI
     }
 
+    component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
+        component "FastAPI app" as FastAPIApp
+        component "GET /api/v1/portfolio" as PortfolioGet
+        component "POST /api/v1/seed" as PortfolioSeed
+        component "PostgreSQL" as PostgresDB
+        component "Kafka (portfolio.events)" as KafkaTopic
+    }
+
     component "大数据服务层 (Big Data Service Layer)" as BigDataServiceLayer {
         component "Java Spring Boot服务" as SpringBootService {
             component "SparkService" as SparkService
@@ -286,6 +294,11 @@ NLOC --> NativeChartsAndroid
 ExpoRN --> SharedChartLogic
 NativeCharts --> SharedChartLogic
 MobilePortfolio --> RNCharts
+MobilePortfolio --> PortfolioAnalyticsAPI
+FastAPIApp --> PortfolioGet
+FastAPIApp --> PortfolioSeed
+FastAPIApp --> PostgresDB
+FastAPIApp --> KafkaTopic
 
 ' 展示层内部关系
 NextApp --> AppRouter

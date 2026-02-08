@@ -1,11 +1,7 @@
-const express = require("express");
-const cors = require("cors");
+const baseUrl =
+  process.env.PORTFOLIO_API_URL || process.env.EXPO_PUBLIC_PORTFOLIO_API_URL || "http://localhost:8800";
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-const demoPortfolio = {
+const seedPortfolio = {
   id: "demo-portfolio",
   ownerName: "Demo User",
   baseCurrency: "USD",
@@ -25,9 +21,9 @@ const demoPortfolio = {
           quantity: 150,
           price: 190,
           costBasis: 160,
-          marketValue: 150 * 190,
-          profit: 150 * (190 - 160),
-          profitRate: (190 - 160) / 160,
+          marketValue: 28500,
+          profit: 4500,
+          profitRate: 0.1875,
           assetClass: "equity",
           riskLevel: "medium",
         },
@@ -38,9 +34,9 @@ const demoPortfolio = {
           quantity: 80,
           price: 420,
           costBasis: 350,
-          marketValue: 80 * 420,
-          profit: 80 * (420 - 350),
-          profitRate: (420 - 350) / 350,
+          marketValue: 33600,
+          profit: 5600,
+          profitRate: 0.2,
           assetClass: "equity",
           riskLevel: "medium",
         },
@@ -80,10 +76,10 @@ const demoPortfolio = {
     },
   ],
   summary: {
-    totalAssets: 125000 + 30000,
+    totalAssets: 155000,
     totalLiabilities: 3500,
-    netWorth: 125000 + 30000 - 3500,
-    todayChange: 1200 + 5,
+    netWorth: 151500,
+    todayChange: 1205,
     weekChange: 3200,
   },
   history: [
@@ -97,12 +93,23 @@ const demoPortfolio = {
   ],
 };
 
-app.get("/api/v1/portfolio", (req, res) => {
-  res.json(demoPortfolio);
-});
+async function main() {
+  const url = `${baseUrl.replace(/\/$/, "")}/api/v1/seed`;
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(seedPortfolio),
+    });
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error(`Seed failed: ${res.status} ${t}`);
+    }
+    console.log("Seed data written to database via", url);
+  } catch (e) {
+    console.error(e.message || e);
+    process.exit(1);
+  }
+}
 
-const port = 8080;
-app.listen(port, () => {
-  console.log(`portfolio-api listening on http://localhost:${port}`);
-});
-
+main();

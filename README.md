@@ -77,7 +77,10 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 ### Backend Services
 
-- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`)
+- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800
+- **PostgreSQL** - Portfolio persistence (Docker, host port 5433)
+- **Apache Kafka** - Event messaging for portfolio events (Docker, port 9092)
+- **One-click start** - `pnpm run start:backend` (Docker + API + seed)
 
 ### UI & Visualization
 
@@ -108,7 +111,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 - **apps/web** - Angular-based financial analytics web console.
 - **apps/mobile** - React Native demo mobile app.
 - **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; includes native views **NativeDemoCard** and six native charts: **NativeLineChart** (line+area, crosshair/tooltip), **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Charts support configurable theme (light/dark), tooltips, x-axis labels, and horizontal drag-to-scroll via shared `useScrollableChart` and `ScrollableChartContainer`.
-- **services/portfolio-analytics** - Python FastAPI backend using DDD to serve portfolio analytics.
+- **services/portfolio-analytics** - Python FastAPI backend (DDD); PostgreSQL for persistence; Kafka for portfolio events; one-click start via `scripts/start-backend.sh`.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
 
@@ -125,6 +128,7 @@ Benefits of this architecture:
 - Node.js 18+
 - pnpm 10.6.0+ (required, project uses pnpm workspaces)
 - Python 3.10+ (for backend FastAPI service)
+- Docker (for PostgreSQL and Kafka when using `pnpm run start:backend`)
 
 ### Install Dependencies
 
@@ -166,18 +170,26 @@ Native UI: `ios/mobileportfolio/` (NativeDemoCard, NativeLineChart, NativeCandle
 
 ### Backend service (Python FastAPI)
 
+**One-click start (from repo root):**
+
+```bash
+pnpm run start:backend
+```
+
+This starts Docker (PostgreSQL + Kafka), the portfolio-analytics API at `http://127.0.0.1:8800`, and seeds the database. Logs: `tail -f /tmp/portfolio-api.log`.
+
+**Manual setup:**
+
 ```bash
 cd services/portfolio-analytics
+docker compose up -d
 python -m venv .venv
 source .venv/bin/activate  # On Windows use .venv\Scripts\activate
 pip install -r requirements.txt
-
-uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8800 --reload
 ```
 
-The mobile portfolio app will call:
-
-- `GET http://localhost:8080/api/v1/portfolio`
+From repo root: `pnpm dev:api` runs the API (requires venv and Docker). Then run `pnpm generate-seed-data` to seed. The mobile portfolio app uses `http://localhost:8800` by default (`GET /api/v1/portfolio`). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data.
 
 ### Build Production Version
 
@@ -264,8 +276,11 @@ fintech-project/
 │   ├── web/                      # Angular financial analytics web app
 │   ├── mobile/                   # React Native mobile demo app
 │   └── mobile-portfolio/         # React Native portfolio overview mobile app
+├── scripts/
+│   ├── start-backend.sh         # One-click: Docker (Postgres + Kafka) + API + seed
+│   └── generate-seed-data.js    # POST seed to API (run after backend is up)
 ├── services/
-│   └── portfolio-analytics/      # Python FastAPI portfolio analytics service (DDD)
+│   └── portfolio-analytics/    # FastAPI, PostgreSQL, Kafka (DDD)
 ├── packages/
 │   ├── ui/                       # UI component library (@fintech/ui)
 │   └── utils/                    # Utility function library (@fintech/utils)

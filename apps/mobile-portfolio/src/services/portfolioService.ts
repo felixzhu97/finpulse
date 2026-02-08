@@ -4,16 +4,14 @@ import type {
   Portfolio,
   PortfolioHistoryPoint,
 } from "../types/portfolio";
-import { demoPortfolio } from "../mocks/portfolioData";
+import { getPortfolioApiBaseUrl } from "../config/api";
 
-const API_BASE_URL = "http://localhost:8080/api/v1";
-
-async function fetchPortfolio(): Promise<Portfolio | null> {
+async function fetchFromApi(): Promise<Portfolio | null> {
+  const base = getPortfolioApiBaseUrl();
+  const url = `${base}/api/v1/portfolio`;
   try {
-    const response = await fetch(`${API_BASE_URL}/portfolio`);
-    if (!response.ok) {
-      return null;
-    }
+    const response = await fetch(url);
+    if (!response.ok) return null;
     const data = (await response.json()) as Portfolio;
     return data;
   } catch {
@@ -23,27 +21,28 @@ async function fetchPortfolio(): Promise<Portfolio | null> {
 
 let cachedPortfolio: Portfolio | null = null;
 
-export async function getPortfolio(): Promise<Portfolio> {
-  if (cachedPortfolio) {
-    return cachedPortfolio;
-  }
-  const fromApi = await fetchPortfolio();
+export function invalidatePortfolioCache(): void {
+  cachedPortfolio = null;
+}
+
+export async function getPortfolio(): Promise<Portfolio | null> {
+  if (cachedPortfolio) return cachedPortfolio;
+  const fromApi = await fetchFromApi();
   if (fromApi) {
     cachedPortfolio = fromApi;
     return fromApi;
   }
-  cachedPortfolio = demoPortfolio;
-  return demoPortfolio;
+  return null;
 }
 
 export async function getAccounts(): Promise<Account[]> {
   const portfolio = await getPortfolio();
-  return portfolio.accounts;
+  return portfolio?.accounts ?? [];
 }
 
 export async function getAccountById(id: string): Promise<Account | undefined> {
   const portfolio = await getPortfolio();
-  return portfolio.accounts.find((account) => account.id === id);
+  return portfolio?.accounts.find((account) => account.id === id);
 }
 
 export async function getHoldingsByAccount(id: string): Promise<Holding[]> {
@@ -58,6 +57,7 @@ export async function getAssetAllocationByAccountType(): Promise<
   }[]
 > {
   const portfolio = await getPortfolio();
+  if (!portfolio) return [];
   const grouped = new Map<Account["type"], number>();
 
   portfolio.accounts.forEach((account) => {
@@ -73,7 +73,7 @@ export async function getAssetAllocationByAccountType(): Promise<
 
 export async function getPortfolioHistory(): Promise<PortfolioHistoryPoint[]> {
   const portfolio = await getPortfolio();
-  return portfolio.history;
+  return portfolio?.history ?? [];
 }
 
 export async function getRiskSummary(): Promise<{
@@ -81,6 +81,7 @@ export async function getRiskSummary(): Promise<{
   topHoldingsConcentration: number;
 }> {
   const portfolio = await getPortfolio();
+  if (!portfolio) return { highRatio: 0, topHoldingsConcentration: 0 };
   const allHoldings: Holding[] = portfolio.accounts.flatMap(
     (account) => account.holdings,
   );

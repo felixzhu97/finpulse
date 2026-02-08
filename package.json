@@ -7,15 +7,16 @@
     "dev": "pnpm --filter finpulse-web dev",
     "dev:mobile": "pnpm --filter finpulse-mobile start",
     "dev:mobile-portfolio": "pnpm --filter mobile-portfolio start",
-    "dev:portfolio-analytics": "pnpm --filter portfolio-analytics start",
     "dev:api": "cd services/portfolio-analytics && . .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8800 --reload",
+    "generate-seed-data": "node scripts/generate-seed-data.js",
+    "start:backend": "bash scripts/start-backend.sh",
     "build": "pnpm --filter finpulse-web build",
     "start": "pnpm --filter finpulse-web start",
     "start:web": "pnpm --filter finpulse-web start",
     "start:mobile": "pnpm --filter finpulse-mobile start",
-    "start:mobile-portfolio": "pnpm --filter mobile-portfolio start",
-    "start:mobile-portfolio-android": "pnpm --filter mobile-portfolio android",
-    "start:mobile-portfolio-ios": "pnpm --filter mobile-portfolio ios",
+    "start:mobile-portfolio": "cd apps/mobile-portfolio && npx expo start",
+    "start:mobile-portfolio-android": "cd apps/mobile-portfolio && npx expo run:android",
+    "start:mobile-portfolio-ios": "cd apps/mobile-portfolio && pnpm run ios",
     "lint": "pnpm --filter finpulse-web lint"
   }
 }

@@ -1,4 +1,5 @@
-from typing import List
+import json
+from typing import Any, List, Optional
 
 from app.domain.models import (
   Account,
@@ -7,6 +8,72 @@ from app.domain.models import (
   Portfolio,
   PortfolioSummary,
 )
+from app import db
+from app import messaging
+
+
+def _portfolio_from_raw(raw: dict) -> Optional[Portfolio]:
+  try:
+    accounts: List[Account] = []
+    for a in raw["accounts"]:
+      holdings = [
+        Holding(
+          id=h["id"],
+          symbol=h["symbol"],
+          name=h["name"],
+          quantity=float(h["quantity"]),
+          price=float(h["price"]),
+          cost_basis=float(h["costBasis"]),
+          market_value=float(h["marketValue"]),
+          profit=float(h["profit"]),
+          profit_rate=float(h["profitRate"]),
+          asset_class=h["assetClass"],
+          risk_level=h["riskLevel"],
+        )
+        for h in a["holdings"]
+      ]
+      accounts.append(
+        Account(
+          id=a["id"],
+          name=a["name"],
+          type=a["type"],
+          currency=a["currency"],
+          balance=float(a["balance"]),
+          today_change=float(a["todayChange"]),
+          holdings=holdings,
+        )
+      )
+    summary = PortfolioSummary(
+      total_assets=float(raw["summary"]["totalAssets"]),
+      total_liabilities=float(raw["summary"]["totalLiabilities"]),
+      net_worth=float(raw["summary"]["netWorth"]),
+      today_change=float(raw["summary"]["todayChange"]),
+      week_change=float(raw["summary"]["weekChange"]),
+    )
+    history = [
+      HistoryPoint(h["date"], float(h["value"])) for h in raw["history"]
+    ]
+    return Portfolio(
+      id=raw["id"],
+      owner_name=raw["ownerName"],
+      base_currency=raw["baseCurrency"],
+      accounts=accounts,
+      summary=summary,
+      history=history,
+    )
+  except (KeyError, TypeError):
+    return None
+
+
+def _load_from_db() -> Optional[Portfolio]:
+  data = db.load_portfolio_json()
+  if not data:
+    return None
+  try:
+    raw = json.loads(data)
+    return _portfolio_from_raw(raw)
+  except (json.JSONDecodeError, TypeError):
+    return None
 
 
 def get_demo_portfolio() -> Portfolio:
@@ -116,4 +183,20 @@ def get_demo_portfolio() -> Portfolio:
     summary=summary,
     history=history,
   )
+
+
+def get_portfolio() -> Portfolio:
+  from_db = _load_from_db()
+  return from_db if from_db is not None else get_demo_portfolio()
+
+
+def seed_portfolio(payload: Any) -> bool:
+  if not isinstance(payload, dict):
+    return False
+  if _portfolio_from_raw(payload) is None:
+    return False
+  portfolio_id = payload.get("id", "demo-portfolio")
+  db.save_portfolio_json(portfolio_id, payload)
+  messaging.publish_portfolio_event("portfolio.seeded", portfolio_id, payload)
+  return True
 

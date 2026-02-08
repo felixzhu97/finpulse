@@ -102,6 +102,9 @@ __pycache__/
 venv/
 env/
 
+# Portfolio analytics (SQLite superseded by PostgreSQL)
+services/portfolio-analytics/portfolio.db
+
 # Expo / React Native
 .expo/
 *.orig.*
