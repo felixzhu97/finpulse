@@ -1,50 +1,39 @@
-# Welcome to your Expo app 👋
+# FinPulse Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+E-commerce mobile app for product browsing, categories, cart, and profile management. Part of the fintech-project monorepo.
 
-## Get started
+## Tech Stack
 
-1. Install dependencies
+| Category | Technologies |
+|----------|--------------|
+| Framework | Expo 54, React 19, React Native 0.81 |
+| Routing | expo-router 6 (file-based) |
+| State | Zustand |
+| Styling | Emotion (native + react) |
+| HTTP | Axios |
+| Storage | AsyncStorage |
+| Navigation | React Navigation (bottom-tabs, native) |
+| Testing | Jest, React Native Testing Library |
 
-   ```bash
-   npm install
-   ```
+## Main Screens
 
-2. Start the app
+| Screen | Route | Description |
+|--------|-------|-------------|
+| Home | `/(tabs)/` | Hero carousel, product list, featured items |
+| Categories | `/(tabs)/categories` | Category browsing and filtering |
+| Cart | `/(tabs)/cart` | Shopping cart with quantity controls |
+| Profile | `/(tabs)/profile` | User profile and settings |
+| Product Detail | `/product/[id]` | Product info, image carousel, add to cart |
 
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Getting Started
 
 ```bash
-npm run reset-project
+pnpm install
+pnpm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Then run on iOS simulator, Android emulator, or Expo Go.
 
-## Learn more
+## Environment
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Copy `.env.example` to `.env` and set `EXPO_PUBLIC_API_URL` for the backend API (default: `http://localhost:3001`).

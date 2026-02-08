@@ -21,12 +21,12 @@ This list complements, but does not replace, issue tracking in Git platforms.
 
 ## Mobile Apps (`apps/mobile`, `apps/mobile-portfolio`)
 
-- [ ] Add a `README.md` for each mobile app explaining purpose, tech stack, and main screens.
+- [X] Add a `README.md` for each mobile app explaining purpose, tech stack, and main screens.
 - [ ] Connect `apps/mobile-portfolio` to real backend APIs when available (replace mock portfolio data).
 - [ ] Add basic error and empty states for all portfolio and account screens.
 - [ ] Align visual style of mobile apps with the shared design language used on web.
 - [ ] Introduce simple analytics or logging hooks for key in-app events.
-- [ ] Implement a custom chart render using Metal/Vulkan.
+- [X] Implement a custom chart render using Metal/Vulkan.
 
 ## Shared Packages (`packages/ui`, `packages/utils`, others)
 
