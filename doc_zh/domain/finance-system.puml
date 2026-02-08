@@ -1,0 +1,100 @@
+@startuml
+skinparam linetype ortho
+
+skinparam component {
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+package "渠道" {
+  component "Web 应用" as WebApp
+  component "移动应用" as MobileApp
+  component "API 客户端" as ApiClients
+}
+
+package "边缘服务" {
+  component "API 网关" as ApiGateway
+  component "认证服务" as AuthService
+  component "会话服务" as SessionService
+  component "限流器" as RateLimiter
+}
+
+package "核心金融服务" {
+  component "账户服务" as AccountService
+  component "客户服务" as CustomerService
+  component "投资组合服务" as PortfolioService
+  component "订单服务" as OrderService
+  component "交易服务" as TradeService
+  component "支付服务" as PaymentService
+  component "结算服务" as SettlementService
+  component "风险服务" as RiskService
+  component "定价服务" as PricingService
+  component "合规服务" as ComplianceService
+}
+
+package "数据与分析" {
+  component "持仓存储" as PositionsStore
+  component "交易存储" as TransactionsStore
+  component "参考数据存储" as ReferenceDataStore
+  component "市场数据存储" as MarketDataStore
+  component "风险指标存储" as RiskMetricsStore
+  component "报表仓库" as ReportingWarehouse
+  component "分析引擎" as AnalyticsEngine
+}
+
+package "外部系统" {
+  component "银行核心" as BankingCore
+  component "交易所连接" as ExchangeConnectivity
+  component "托管服务" as CustodyService
+  component "支付网络" as PaymentNetworks
+  component "市场数据源" as MarketDataFeeds
+  component "KYC 服务商" as KycProviders
+  component "AML 筛查" as AmlScreening
+}
+
+WebApp --> ApiGateway
+MobileApp --> ApiGateway
+ApiClients --> ApiGateway
+
+ApiGateway --> RateLimiter
+ApiGateway --> AuthService
+AuthService --> SessionService
+
+ApiGateway --> AccountService
+ApiGateway --> PortfolioService
+ApiGateway --> OrderService
+ApiGateway --> PaymentService
+
+CustomerService --> AccountService
+PortfolioService --> PositionsStore
+PortfolioService --> MarketDataStore
+
+OrderService --> TradeService
+OrderService --> RiskService
+OrderService --> PricingService
+TradeService --> PositionsStore
+TradeService --> TransactionsStore
+
+PaymentService --> SettlementService
+PaymentService --> PaymentNetworks
+SettlementService --> BankingCore
+SettlementService --> CustodyService
+
+RiskService --> RiskMetricsStore
+RiskService --> AnalyticsEngine
+ComplianceService --> AmlScreening
+ComplianceService --> KycProviders
+
+AnalyticsEngine --> ReportingWarehouse
+ReportingWarehouse --> PositionsStore
+ReportingWarehouse --> TransactionsStore
+ReportingWarehouse --> MarketDataStore
+
+MarketDataFeeds --> MarketDataStore
+ExchangeConnectivity --> TradeService
+ExchangeConnectivity --> OrderService
+
+AccountService --> ReferenceDataStore
+CustomerService --> ReferenceDataStore
+
+@enduml

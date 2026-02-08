@@ -1,4 +1,4 @@
-@startuml 业务架构图
+@startuml business-architecture
 !define BUSINESS_ACTOR #E8F4F8
 !define BUSINESS_PROCESS #FFF4E6
 !define BUSINESS_SERVICE #E8F5E9
@@ -13,188 +13,182 @@ skinparam component {
     ArrowColor #333333
 }
 
-title TOGAF 业务架构 - FinPulse 金融科技平台
+title TOGAF Business Architecture - FinPulse Fintech Platform
 
-package "业务参与者层" {
-    component "投资者" as Investor <<Actor>>
-    component "平台管理员" as Admin <<Actor>>
+package "Business Actors" {
+    component "Investor" as Investor <<Actor>>
+    component "Platform Admin" as Admin <<Actor>>
 
     note right of Investor
-        <b>主要业务参与者</b>
-        - 个人投资者
-        - 机构投资者
-        - 投资顾问
+        <b>Primary actors</b>
+        - Individual investors
+        - Institutional investors
+        - Investment advisors
     end note
 
     note right of Admin
-        <b>平台管理角色</b>
-        - 系统维护
-        - 内容管理
-        - 用户支持
+        <b>Platform management</b>
+        - System maintenance
+        - Content management
+        - User support
     end note
 }
 
-package "核心业务功能域" {
-    component "投资组合管理" as PortfolioMgmt <<Process>>
-    component "市场分析" as MarketAnalysis <<Process>>
-    component "风险管理" as RiskMgmt <<Process>>
-    component "交易管理" as TransactionMgmt <<Process>>
-    component "资产管理" as AssetMgmt <<Process>>
-    component "观察列表管理" as WatchListMgmt <<Process>>
-    component "债券分析" as BondAnalysis <<Process>>
-    component "期权定价" as OptionsPricing <<Process>>
-    component "组合优化" as PortfolioOptimization <<Process>>
-    component "统计分析" as StatisticalAnalysis <<Process>>
-    component "技术指标分析" as TechnicalIndicators <<Process>>
-    component "估值分析" as ValuationAnalysis <<Process>>
-    component "数据可视化" as DataVisualization <<Process>>
-    component "大数据分析" as BigDataAnalytics <<Process>>
+package "Core Business Domains" {
+    component "Portfolio Management" as PortfolioMgmt <<Process>>
+    component "Market Analysis" as MarketAnalysis <<Process>>
+    component "Risk Management" as RiskMgmt <<Process>>
+    component "Transaction Management" as TransactionMgmt <<Process>>
+    component "Asset Management" as AssetMgmt <<Process>>
+    component "Watchlist Management" as WatchListMgmt <<Process>>
+    component "Bond Analysis" as BondAnalysis <<Process>>
+    component "Options Pricing" as OptionsPricing <<Process>>
+    component "Portfolio Optimization" as PortfolioOptimization <<Process>>
+    component "Statistical Analysis" as StatisticalAnalysis <<Process>>
+    component "Technical Indicators" as TechnicalIndicators <<Process>>
+    component "Valuation Analysis" as ValuationAnalysis <<Process>>
+    component "Data Visualization" as DataVisualization <<Process>>
+    component "Big Data Analytics" as BigDataAnalytics <<Process>>
 
     note right of PortfolioMgmt
-        <b>业务功能</b>
-        - 资产净值监控
-        - 收益统计
-        - 持仓管理
-        - 资产配置优化
+        <b>Capabilities</b>
+        - NAV monitoring
+        - Return statistics
+        - Position management
+        - Allocation optimization
     end note
 
     note right of MarketAnalysis
-        <b>业务功能</b>
-        - 市场趋势分析
-        - 实时行情展示
-        - 市场动态跟踪
-        - 行情预警
+        <b>Capabilities</b>
+        - Market trend analysis
+        - Real-time quotes
+        - Market tracking
+        - Price alerts
     end note
 
     note right of RiskMgmt
-        <b>业务功能</b>
-        - 风险指标评估
-        - 风险分布分析
-        - 风险预警机制
-        - 风险报告生成
+        <b>Capabilities</b>
+        - Risk metrics
+        - Risk distribution
+        - Risk alerts
+        - Risk reporting
     end note
 
     note right of BondAnalysis
-        <b>业务功能</b>
-        - 债券收益率计算(YTM)
-        - 久期分析(Macaulay/Modified)
-        - 凸度计算
-        - 债券估值定价
+        <b>Capabilities</b>
+        - Yield (YTM)
+        - Duration (Macaulay/Modified)
+        - Convexity
+        - Bond valuation
     end note
 
     note right of OptionsPricing
-        <b>业务功能</b>
-        - Black-Scholes定价
-        - 二叉树定价模型
-        - Greeks计算(Delta/Gamma/Theta/Vega/Rho)
-        - 隐含波动率计算
+        <b>Capabilities</b>
+        - Black-Scholes
+        - Binomial model
+        - Greeks (Delta/Gamma/Theta/Vega/Rho)
+        - Implied volatility
     end note
 
     note right of PortfolioOptimization
-        <b>业务功能</b>
-        - 马科维茨优化
-        - 有效前沿计算
-        - 最大夏普比率组合
-        - 权重约束优化
+        <b>Capabilities</b>
+        - Markowitz optimization
+        - Efficient frontier
+        - Max Sharpe ratio
+        - Weight constraints
     end note
 
     note right of StatisticalAnalysis
-        <b>业务功能</b>
-        - 相关性分析
-        - CAPM模型
-        - Fama-French模型
-        - 回归分析
+        <b>Capabilities</b>
+        - Correlation
+        - CAPM
+        - Fama-French
+        - Regression
     end note
 
     note right of TechnicalIndicators
-        <b>业务功能</b>
-        - 移动平均线(MA/EMA)
-        - 动量指标(RSI/MACD)
-        - 波动率指标
-        - 成交量指标
+        <b>Capabilities</b>
+        - Moving averages (MA/EMA)
+        - Momentum (RSI/MACD)
+        - Volatility
+        - Volume indicators
     end note
 
     note right of ValuationAnalysis
-        <b>业务功能</b>
-        - DCF估值模型
-        - 相对估值法
-        - 股息折现模型(DDM)
-        - 估值报告生成
+        <b>Capabilities</b>
+        - DCF
+        - Relative valuation
+        - DDM
+        - Valuation reports
     end note
 
     note right of DataVisualization
-        <b>业务功能</b>
-        - K线图展示
-        - 趋势图表
-        - 热力图分析
-        - 雷达图对比
-        - 仪表盘展示
+        <b>Capabilities</b>
+        - Candlestick charts
+        - Trend charts
+        - Heatmaps
+        - Radar/dashboard
     end note
 
     note right of BigDataAnalytics
-        <b>业务功能</b>
-        - Spark批处理分析
-        - Flink流处理分析
-        - Hadoop数据存储与管理
-        - 大规模数据处理
-        - 实时数据流分析
+        <b>Capabilities</b>
+        - Spark batch
+        - Flink streaming
+        - Hadoop storage
+        - Large-scale processing
+        - Real-time streams
     end note
 }
 
-package "业务服务层" {
-    component "投资组合服务" as PortfolioService <<Service>>
-    component "市场数据服务" as MarketService <<Service>>
-    component "风险分析服务" as RiskService <<Service>>
-    component "交易服务" as TransactionService <<Service>>
-    component "金融计算服务" as CalculationService <<Service>>
-    component "数据可视化服务" as VisualizationService <<Service>>
-    component "云基础设施服务" as CloudService <<Service>>
-    component "大数据服务" as BigDataService <<Service>>
+package "Business Services" {
+    component "Portfolio Service" as PortfolioService <<Service>>
+    component "Market Data Service" as MarketService <<Service>>
+    component "Risk Analysis Service" as RiskService <<Service>>
+    component "Transaction Service" as TransactionService <<Service>>
+    component "Calculation Service" as CalculationService <<Service>>
+    component "Visualization Service" as VisualizationService <<Service>>
+    component "Cloud Service" as CloudService <<Service>>
+    component "Big Data Service" as BigDataService <<Service>>
 
     note right of PortfolioService
-        提供投资组合相关的
-        业务服务能力
+        Portfolio-related
+        business services
     end note
 
     note right of MarketService
-        提供市场数据相关的
-        业务服务能力
+        Market data
+        business services
     end note
 
     note right of CalculationService
-        提供金融计算服务
-        - 收益计算
-        - 风险计算
-        - 格式化工具
+        Financial calculations
+        - Returns
+        - Risk
+        - Formatting
     end note
 
     note right of VisualizationService
-        提供数据可视化服务
-        - 图表渲染
-        - 数据格式化
-        - 主题管理
+        Data visualization
+        - Chart rendering
+        - Formatting
+        - Themes
     end note
 
     note right of CloudService
-        提供AWS云服务
-        - S3对象存储
-        - DynamoDB数据库
-        - Lambda无服务器计算
-        - SQS消息队列
-        - SNS通知服务
-        - API Gateway网关
+        AWS cloud
+        - S3, DynamoDB
+        - Lambda, SQS, SNS
+        - API Gateway
     end note
 
     note right of BigDataService
-        提供大数据服务
-        - Spark会话管理服务
-        - Flink作业管理服务
-        - HDFS文件系统服务
-        - YARN资源管理服务
+        Big data services
+        - Spark session
+        - Flink jobs
+        - HDFS, YARN
     end note
 }
 
-' 业务参与者到业务功能的关联
 Investor --> PortfolioMgmt
 Investor --> MarketAnalysis
 Investor --> RiskMgmt
@@ -216,7 +210,6 @@ Admin --> RiskMgmt
 Admin --> CloudService
 Admin --> BigDataAnalytics
 
-' 业务功能到业务服务的关联
 PortfolioMgmt --> PortfolioService
 AssetMgmt --> PortfolioService
 WatchListMgmt --> PortfolioService
@@ -250,32 +243,31 @@ TransactionService --> CloudService
 CalculationService --> CloudService
 BigDataService --> CloudService
 
-' 业务功能间的价值流
-PortfolioMgmt ..> RiskMgmt : 风险评估
-MarketAnalysis ..> PortfolioMgmt : 投资建议
-AssetMgmt ..> PortfolioMgmt : 配置优化
-TransactionMgmt ..> PortfolioMgmt : 交易更新
-BondAnalysis ..> PortfolioMgmt : 债券持仓分析
-OptionsPricing ..> PortfolioMgmt : 期权持仓分析
-PortfolioOptimization ..> PortfolioMgmt : 优化配置建议
-StatisticalAnalysis ..> PortfolioMgmt : 统计特征分析
-TechnicalIndicators ..> MarketAnalysis : 技术信号
-ValuationAnalysis ..> PortfolioMgmt : 估值结果
-DataVisualization ..> PortfolioMgmt : 可视化展示
-MarketAnalysis ..> BigDataAnalytics : 数据洞察
-TransactionMgmt ..> BigDataAnalytics : 模式识别
-BigDataAnalytics ..> PortfolioMgmt : 数据洞察
-BigDataAnalytics ..> RiskMgmt : 模式识别
-BigDataAnalytics ..> StatisticalAnalysis : 增强分析能力
+PortfolioMgmt ..> RiskMgmt : risk assessment
+MarketAnalysis ..> PortfolioMgmt : investment advice
+AssetMgmt ..> PortfolioMgmt : allocation
+TransactionMgmt ..> PortfolioMgmt : trade updates
+BondAnalysis ..> PortfolioMgmt : bond positions
+OptionsPricing ..> PortfolioMgmt : option positions
+PortfolioOptimization ..> PortfolioMgmt : optimization
+StatisticalAnalysis ..> PortfolioMgmt : statistics
+TechnicalIndicators ..> MarketAnalysis : signals
+ValuationAnalysis ..> PortfolioMgmt : valuation
+DataVisualization ..> PortfolioMgmt : visualization
+MarketAnalysis ..> BigDataAnalytics : insights
+TransactionMgmt ..> BigDataAnalytics : patterns
+BigDataAnalytics ..> PortfolioMgmt : insights
+BigDataAnalytics ..> RiskMgmt : patterns
+BigDataAnalytics ..> StatisticalAnalysis : analytics
 
 legend right
-    |<#E8F4F8> 业务参与者 |
-    |<#FFF4E6> 业务功能 |
-    |<#E8F5E9> 业务服务 |
+    |<#E8F4F8> Business Actors |
+    |<#FFF4E6> Business Domains |
+    |<#E8F5E9> Business Services |
     |
-    <b>关系说明：</b>
-    --> 直接关联
-    ..> 业务流程依赖
+    <b>Relations</b>
+    --> direct link
+    ..> process dependency
 endlegend
 
 @enduml

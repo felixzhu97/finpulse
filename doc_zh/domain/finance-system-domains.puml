@@ -1,0 +1,104 @@
+@startuml
+skinparam linetype ortho
+
+skinparam component {
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+title 金融系统 — 业务领域
+
+package "客户与账户" {
+  component "客户域" as CustomerDomain
+  component "身份域" as IdentityDomain
+  component "账户域" as AccountDomain
+}
+
+package "投资与交易" {
+  component "投资组合域" as PortfolioDomain
+  component "订单域" as OrderDomain
+  component "执行域" as ExecutionDomain
+  component "持仓域" as PositionDomain
+}
+
+package "支付与资金" {
+  component "钱包域" as WalletDomain
+  component "支付域" as PaymentDomain
+  component "结算域" as SettlementDomain
+  component "资金域" as TreasuryDomain
+}
+
+package "风险与合规" {
+  component "风险域" as RiskDomain
+  component "限额管理域" as LimitDomain
+  component "KYC 域" as KycDomain
+  component "AML 域" as AmlDomain
+  component "监控域" as MonitoringDomain
+}
+
+package "数据与洞察" {
+  component "市场数据域" as MarketDataDomain
+  component "参考数据域" as ReferenceDataDomain
+  component "报表域" as ReportingDomain
+  component "分析域" as AnalyticsDomain
+}
+
+package "AI 与 ML" {
+  component "ML 风险与 VaR 域" as MlRiskDomain
+  component "深度学习域" as DlDomain
+  component "LLM 域" as LlmDomain
+  component "文档与身份 AI 域" as DocumentAIDomain
+  component "欺诈与异常域" as FraudAIDomain
+  component "监控与 NLP 域" as SurveillanceNlpDomain
+}
+
+CustomerDomain --> IdentityDomain
+CustomerDomain --> AccountDomain
+AccountDomain --> PositionDomain
+AccountDomain --> WalletDomain
+
+PortfolioDomain --> PositionDomain
+OrderDomain --> ExecutionDomain
+ExecutionDomain --> PositionDomain
+
+WalletDomain --> PaymentDomain
+PaymentDomain --> SettlementDomain
+SettlementDomain --> TreasuryDomain
+
+RiskDomain --> LimitDomain
+RiskDomain --> PositionDomain
+RiskDomain --> MarketDataDomain
+LimitDomain --> OrderDomain
+
+KycDomain --> CustomerDomain
+AmlDomain --> PaymentDomain
+MonitoringDomain --> OrderDomain
+MonitoringDomain --> PaymentDomain
+
+ReportingDomain --> AccountDomain
+ReportingDomain --> PositionDomain
+ReportingDomain --> PaymentDomain
+ReportingDomain --> RiskDomain
+
+AnalyticsDomain --> MarketDataDomain
+AnalyticsDomain --> ReferenceDataDomain
+AnalyticsDomain --> ReportingDomain
+
+RiskDomain --> MlRiskDomain
+KycDomain --> DocumentAIDomain
+AmlDomain --> FraudAIDomain
+MonitoringDomain --> SurveillanceNlpDomain
+AnalyticsDomain --> MlRiskDomain
+AnalyticsDomain --> DlDomain
+AnalyticsDomain --> SurveillanceNlpDomain
+AnalyticsDomain --> LlmDomain
+RiskDomain --> DlDomain
+MlRiskDomain --> MarketDataDomain
+DlDomain --> MarketDataDomain
+SurveillanceNlpDomain --> MarketDataDomain
+LlmDomain --> ReportingDomain
+
+MarketDataDomain --> PortfolioDomain
+ReferenceDataDomain --> AccountDomain
+
+@enduml

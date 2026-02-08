@@ -1,6 +1,7 @@
 # FinPulse | Fintech Analytics Platform
 
-> Professional-grade financial data analysis and portfolio management platform
+> Professional-grade financial data analysis and portfolio management platform  
+> 中文文档：[doc_zh/README.md](doc_zh/README.md)
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/felixzhu97s-projects/fintech-project)
 [![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
@@ -77,10 +78,11 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 ### Backend Services
 
-- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800
+- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. DDD layout; config via `.env` (see `services/portfolio-analytics/.env.example`).
 - **PostgreSQL** - Portfolio persistence (Docker, host port 5433)
 - **Apache Kafka** - Event messaging for portfolio events (Docker, port 9092)
-- **One-click start** - `pnpm run start:backend` (Docker + API + seed)
+- **AI/ML** - Under `/api/v1/ai`: VaR, fraud check, surveillance, sentiment, identity, forecast, summarisation; optional integrations: Ollama, Hugging Face (transformers), TensorFlow (LSTM forecast).
+- **One-click start** - `pnpm run start:backend` (Docker + API + seed). **API tests** - `pnpm run test:api` (pytest; Ollama/HF/TF tests may skip if services unavailable; Hugging Face first run can take 1–3 min).
 
 ### UI & Visualization
 
@@ -111,7 +113,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 - **apps/web** - Angular-based financial analytics web console.
 - **apps/mobile** - React Native demo mobile app.
 - **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; includes native views **NativeDemoCard** and six native charts: **NativeLineChart** (line+area, crosshair/tooltip), **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Charts support configurable theme (light/dark), tooltips, x-axis labels, and horizontal drag-to-scroll via shared `useScrollableChart` and `ScrollableChartContainer`.
-- **services/portfolio-analytics** - Python FastAPI backend (DDD); PostgreSQL for persistence; Kafka for portfolio events; one-click start via `scripts/start-backend.sh`.
+- **services/portfolio-analytics** - Python FastAPI backend (DDD); PostgreSQL; Kafka; AI/ML endpoints (VaR, fraud, surveillance, sentiment, identity, forecast, Ollama, Hugging Face, TensorFlow); config via `.env.example`; one-click start via `scripts/start-backend.sh`; `pnpm run test:api` for API tests.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
 
@@ -182,12 +184,15 @@ This starts Docker (PostgreSQL + Kafka), the portfolio-analytics API at `http://
 
 ```bash
 cd services/portfolio-analytics
+cp .env.example .env   # optional: edit .env for DB, Kafka, Ollama, HF model
 docker compose up -d
 python -m venv .venv
 source .venv/bin/activate  # On Windows use .venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8800 --reload
 ```
+
+Run API tests: `pnpm run test:api` (from repo root) or `pytest tests -v` from `services/portfolio-analytics` with venv active.
 
 From repo root: `pnpm dev:api` runs the API (requires venv and Docker). Then run `pnpm generate-seed-data` to seed. The mobile portfolio app uses `http://localhost:8800` by default (`GET /api/v1/portfolio`). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data.
 

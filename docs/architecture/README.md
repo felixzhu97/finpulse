@@ -1,424 +1,179 @@
-# FinPulse 平台 TOGAF 企业架构文档
+# FinPulse TOGAF Enterprise Architecture
 
-> 基于 TOGAF 框架的 FinPulse 金融科技分析平台企业架构视图
+> FinPulse fintech analytics platform enterprise architecture views based on the TOGAF framework.  
+> 中文文档（含中文版图表）：[doc_zh/architecture/README.md](../../doc_zh/architecture/README.md)
 
-## 📋 目录
+## Contents
 
-本目录包含 FinPulse 平台的四个核心架构域的 PlantUML 架构图：
+This directory contains **English** PlantUML diagrams for the four TOGAF architecture domains. Chinese versions (docs + diagrams) are under `doc_zh/architecture/`.
 
-1. [业务架构图](#业务架构图-business-architecture)
-2. [应用架构图](#应用架构图-application-architecture)
-3. [数据架构图](#数据架构图-data-architecture)
-4. [技术架构图](#技术架构图-technology-architecture)
-5. 领域视角下的金融系统图（`docs/domain` 目录）
+1. [Business Architecture](#business-architecture) — `business-architecture.puml`
+2. [Application Architecture](#application-architecture) — `application-architecture.puml`
+3. [Data Architecture](#data-architecture) — `data-architecture.puml`
+4. [Technology Architecture](#technology-architecture) — `technology-architecture.puml`
+5. Finance system domain views (`docs/domain`; Chinese: `doc_zh/domain/`)
 
-## 🎯 架构概述
+## Architecture Overview
 
-本架构文档遵循 **TOGAF (The Open Group Architecture Framework)** 企业架构框架，从四个维度全面描述 FinPulse 平台的企业架构：
+This document follows **TOGAF (The Open Group Architecture Framework)** and describes FinPulse across four dimensions:
 
-- **业务架构 (Business Architecture)**: 定义业务战略、治理、组织和关键业务流程
-- **应用架构 (Application Architecture)**: 描述用于支持业务的功能应用及其交互
-- **数据架构 (Data Architecture)**: 定义组织的数据资产和数据管理资源的结构
-- **技术架构 (Technology Architecture)**: 描述支持应用和数据所需的逻辑软件和硬件能力
+- **Business Architecture**: Business strategy, governance, organization, and key processes
+- **Application Architecture**: Applications that support the business and their interactions
+- **Data Architecture**: Data assets and data management structures
+- **Technology Architecture**: Logical software and hardware capabilities supporting applications and data
 
-## 📊 架构图说明
+## Diagram Reference
 
-### 业务架构图 (Business Architecture)
+### Business Architecture
 
-**文件**: `business-architecture.puml`
+**File**: `business-architecture.puml`
 
-**描述**: 展示 FinPulse 平台的业务架构，包括业务参与者、核心业务功能域和业务服务层。
+**Description**: Business architecture including actors, core business domains, and business services.
 
-**主要内容**:
-- **业务参与者层**: 投资者、平台管理员等角色
-- **核心业务功能域**:
-  - 投资组合管理
-  - 市场分析
-  - 风险管理
-  - 交易管理
-  - 资产管理
-  - 观察列表管理
-  - 大数据分析（Spark 批处理、Flink 流处理、Hadoop 数据存储）
-- **业务服务层**: 提供各业务功能的服务能力
-  - 大数据服务（Spark 会话管理、Flink 作业管理、HDFS 文件系统、YARN 资源管理）
+**Contents**:
+- **Actors**: Investors, platform administrators
+- **Core domains**: Portfolio management, market analysis, risk management, trading, asset management, watchlist; big data (Spark batch, Flink streaming, Hadoop storage)
+- **Business services**: Big data services (Spark session, Flink jobs, HDFS, YARN)
 
-**业务价值流**:
-- 投资组合管理 → 风险管理（风险评估）
-- 市场分析 → 投资组合管理（投资建议）
-- 资产管理 → 投资组合管理（配置优化）
-- 交易管理 → 投资组合管理（交易更新）
-- 市场数据 → 大数据分析 → 投资组合管理（数据洞察）
-- 交易记录 → 大数据分析 → 风险管理（模式识别）
-- 大数据分析 → 统计分析（增强分析能力）
+**Value flows**: Portfolio → Risk (assessment); Market → Portfolio (advice); Assets → Portfolio (allocation); Trading → Portfolio (updates); Market/trading data → Big data → Portfolio/Risk (insights).
 
 ### Application Architecture
 
 **File**: `application-architecture.puml`
 
-**Description**: Application architecture of the FinPulse platform: layered application components and their interactions.
+**Description**: Layered application components and their interactions.
 
 **Layers**:
-1. **Presentation Layer**
-   - Web app: `apps/web` (Angular-based financial analytics console)
-   - Mobile apps: `apps/mobile`, `apps/mobile-portfolio` (React Native clients; mobile-portfolio uses Expo)
-   - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts—**NativeLineChart** (line+area, crosshair/tooltip), **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart**. Metal (iOS) / OpenGL ES (Android); configurable theme (light/dark), tooltips, x-axis labels, horizontal drag-to-scroll. Shared logic: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Code: `ios/mobileportfolio/*Chart/`, `android/.../view/`, `src/components/native/`.
-   - UI component library: `packages/ui`
-   - Data visualization: Chart.js, ng2-charts, chartjs-chart-financial, react-native-chart-kit, react-native-wagmi-charts
+1. **Presentation**
+   - Web: `apps/web` (Angular financial analytics console)
+   - Mobile: `apps/mobile`, `apps/mobile-portfolio` (React Native; mobile-portfolio uses Expo)
+   - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart). Metal (iOS) / OpenGL ES (Android); theme (light/dark), tooltips, x-axis, drag-to-scroll. Shared: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Code: `ios/mobileportfolio/*Chart/`, `android/.../view/`, `src/components/native/`.
+   - UI library: `packages/ui`
+   - Charts: Chart.js, ng2-charts, chartjs-chart-financial, react-native-chart-kit, react-native-wagmi-charts
 
-2. **业务逻辑层 (Business Layer)**
-   - 投资组合模块
-   - 市场数据模块
-   - 交易模块
-   - 风险管理模块
-   - 用户模块
+2. **Business Layer**
+   - Portfolio, market data, transaction, risk, user modules
 
-3. **数据访问层 (Data Access Layer)**
-   - 数据服务（DAO、缓存）
-   - 状态管理（前端状态容器、上下文）
+3. **Data Access**
+   - Data services (DAO, cache), state management
 
-4. **外部服务层 (External Services)**
-   - **Portfolio Analytics API**: FastAPI, GET /api/v1/portfolio, POST /api/v1/seed; PostgreSQL; Kafka (portfolio.events)
-   - Vercel Analytics
-   - 市场数据 API
-   - 存储服务
-   - 大数据服务层（Java Spring Boot 服务）
-     - SparkService（SparkSession 管理、SQL 执行、DataFrame 操作）
-     - FlinkService（StreamExecutionEnvironment、Table API、作业提交）
-     - HadoopService（HDFS 操作、YARN 管理、MapReduce）
+4. **External Services**
+   - **Portfolio Analytics API**: FastAPI (DDD). REST: GET /api/v1/portfolio, POST /api/v1/seed. AI/ML: /api/v1/ai (risk/var, fraud/check, surveillance/trade, sentiment, identity/score, dl/forecast, llm/summarise, ollama/generate, huggingface/summarise, tf/forecast). PostgreSQL; Kafka (portfolio.events). Config: .env (.env.example). Tests: pytest (pnpm run test:api).
+   - Vercel Analytics, market data API, storage, big data service layer (Java Spring Boot: SparkService, FlinkService, HadoopService)
 
-**API 接口**:
-- 投资组合 API
-- 市场数据 API
-- 交易 API
-- 风险分析 API
-- Spark API
-- Flink API
-- Hadoop API
+**API surfaces**: Portfolio API (GET /portfolio, POST /seed); AI/ML API (VaR, fraud, surveillance, sentiment, identity, forecast, summarisation, Ollama, Hugging Face, TensorFlow); market, transaction, risk, Spark, Flink, Hadoop APIs.
 
 #### Mobile Applications
 
-- Provide investors and business users access to portfolio and key metrics from mobile devices.
-- Share core domain models and utilities with the web console (e.g. `packages/ui`, `packages/utils`).
-- **apps/mobile-portfolio** connects to **Portfolio Analytics API** (http://localhost:8800) for portfolio data; no in-app mock. Run `pnpm run start:backend` then `pnpm dev:mobile-portfolio`.
-- **apps/mobile-portfolio** includes native views: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart) with theme (light/dark), tooltips, x-axis labels, and horizontal drag-to-scroll.
+- **apps/mobile-portfolio** uses **Portfolio Analytics API** (http://localhost:8800). Run `pnpm run start:backend` then `pnpm dev:mobile-portfolio`. Includes NativeDemoCard and six native charts with theme, tooltips, x-axis, drag-to-scroll.
 
-### 数据架构图 (Data Architecture)
+### Data Architecture
 
-**文件**: `data-architecture.puml`
+**File**: `data-architecture.puml`
 
-**描述**: 展示 FinPulse 平台的数据架构，定义核心数据实体及其关系。
+**Description**: Core data entities and relationships.
 
-**核心数据实体**:
-1. **投资组合 (Portfolio)**
-   - 包含资产净值、收益统计等核心信息
-   - 关联多个资产和风险指标
+**Entities**: Portfolio, Asset, Transaction, Market Data, Watch List, Risk Metrics, User Preferences, User; Spark/Flink/Hadoop data entities.
 
-2. **资产 (Asset)**
-   - 表示投资组合中的具体资产
-   - 包含持仓数量、价格、市值等信息
+**Relationships**: User ↔ Portfolio (1:n); Portfolio ↔ Asset (1:n); Portfolio ↔ Risk (1:1); User ↔ Transaction (1:n); Asset ↔ Market Data (1:n).
 
-3. **交易记录 (Transaction)**
-   - 记录所有交易操作
-   - 关联用户、投资组合和资产
+**Data flows**: Market → asset prices; Transactions → portfolio; Portfolio + market → risk metrics; **Portfolio Analytics**: portfolio → PostgreSQL (portfolio table); POST /seed writes; GET /portfolio reads; seed publishes portfolio.seeded to Kafka (portfolio.events).
 
-4. **市场数据 (Market Data)**
-   - 实时和历史市场数据
-   - 包含价格、成交量、涨跌幅等信息
+### Technology Architecture
 
-5. **观察列表 (Watch List)**
-   - 用户自选资产列表
-   - 支持价格提醒功能
+**File**: `technology-architecture.puml`
 
-6. **风险指标 (Risk Metrics)**
-   - 投资组合风险评估指标
-   - 包含波动率、夏普比率、VaR 等
+**Description**: Technology stack, build tools, and deployment.
 
-7. **用户偏好 (User Preferences)**
-   - 用户个性化设置
-   - 主题、语言、通知等配置
+**Stack**: Front-end (Angular, React Native, Expo, React 19, TypeScript 5); mobile native (iOS Metal, Android OpenGL ES; shared chart logic); UI (Radix UI, Tailwind, Lucide); visualization (Chart.js, ng2-charts, chartjs-chart-financial, react-native-wagmi-charts, native charts); utilities (React Hook Form, Zod, date-fns, themes); build (Angular/TS, Maven, Java, Spring Boot); deployment (Vercel, Git, Java JAR/containers, REST); **Portfolio Analytics Backend** (FastAPI, uvicorn, port 8800; PostgreSQL 5433, Kafka 9092; AI/ML: Ollama, Hugging Face, TensorFlow, scipy/statsmodels/sumy; python-dotenv, pytest); big data (Java 17+, Spring Boot 3.2, Maven, Spark 3.5, Flink 1.19, Hadoop 3.3).
 
-8. **用户 (User)**
-   - 平台用户信息
-   - 关联多个业务实体
-
-9. **Spark 数据实体 (Spark Data Entity)**
-   - SparkSession 数据
-   - DataFrame/Dataset 数据
-   - SQL 查询结果
-   - 批处理作业数据
-
-10. **Flink 数据实体 (Flink Data Entity)**
-    - DataStream 数据
-    - Table 数据
-    - 流处理作业状态
-    - 检查点数据
-
-11. **Hadoop 数据实体 (Hadoop Data Entity)**
-    - HDFS 文件数据
-    - YARN 应用数据
-    - MapReduce 作业数据
-    - 集群指标数据
-
-**数据关系**:
-- 用户 → 投资组合（一对多）
-- 投资组合 → 资产（一对多）
-- 投资组合 → 风险指标（一对一）
-- 用户 → 交易记录（一对多）
-- 资产 → 市场数据（一对多）
-
-**数据流向**:
-- 市场数据 → 资产价格更新
-- 交易记录 → 投资组合更新
-- 投资组合 + 市场数据 → 风险指标计算
-- 市场数据 → Spark 批处理 → 风险指标计算
-- 交易数据 → Flink 流处理 → 实时告警
-- 投资组合数据 → HDFS 存储 → 历史数据分析
-- **Portfolio Analytics**: 投资组合 → PostgreSQL (portfolio 表) 持久化；POST /api/v1/seed 写入；GET /api/v1/portfolio 读取；seed 时发布 portfolio.seeded 事件到 Kafka (portfolio.events)。
-
-### 技术架构图 (Technology Architecture)
-
-**文件**: `technology-architecture.puml`
-
-**描述**: 展示 FinPulse 平台的技术架构，包括技术栈、构建工具和部署平台。
-
-**Technology stack**:
-1. **Front-end**
-   - Angular (financial analytics web console)
-   - React Native + Expo (mobile apps)
-   - React 19 (UI library)
-   - TypeScript 5 (type safety)
-
-2. **Mobile native (apps/mobile-portfolio)**
-   - iOS: Xcode, CocoaPods, Objective-C/Swift (NativeDemoCard; NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart with Metal/MTKView)
-   - Android: Gradle, Kotlin (same views in `view/`, NativeViewsPackage; OpenGL ES 3 for charts)
-   - Bridge: `requireNativeComponent` for each view; shared JS: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`
-
-3. **UI frameworks and components**
-   - Radix UI（无样式组件原语）
-   - Tailwind CSS / 自定义样式
-   - Lucide React（图标库）
-
-4. **Data visualization**
-   - Chart.js + ng2-charts (web)
-   - chartjs-chart-financial (web financial/candlestick)
-   - react-native-chart-kit (mobile lightweight charts)
-   - react-native-wagmi-charts (mobile professional stock charts)
-   - Native charts (mobile-portfolio): NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart (Metal/OpenGL ES; theme light/dark, tooltips, drag-to-scroll)
-
-5. **Utilities**
-   - Form and validation (e.g. React Hook Form, Zod)
-   - Date handling, theme and style utilities
-
-6. **Build and tooling**
-   - 前端构建系统（Angular CLI、相关打包工具）
-   - TypeScript 编译器
-   - ESLint
-   - Maven 构建系统
-   - Java 编译器
-   - Spring Boot 打包工具
-
-7. **Deployment**
-   - Vercel (web hosting)
-   - Git integration
-   - Java service deployment (JAR or containerized)
-   - REST API endpoints
-
-8. **Infrastructure**
-   - CDN, object storage
-
-9. **Portfolio Analytics Backend**
-   - FastAPI (services/portfolio-analytics), uvicorn, port 8800
-   - PostgreSQL (portfolio persistence, host port 5433, Docker)
-   - Apache Kafka (portfolio.events, port 9092, Docker)
-   - One-click start: `pnpm run start:backend` (Docker + API + seed)
-
-10. **Big data stack**
-   - Java 17+（JVM 运行时）
-   - Spring Boot 3.2.0（应用框架）
-   - Maven 3.6+（构建工具）
-   - Apache Spark 3.5.0（批处理引擎）
-   - Apache Flink 1.19.0（流处理引擎）
-   - Apache Hadoop 3.3.6（分布式存储与计算）
-
-**技术标准**:
-- **开发规范**: TypeScript 严格模式、ESLint 代码规范、组件化开发
-- **性能标准**: 关键页面加载性能可观测并持续优化
-- **安全标准**: HTTPS 强制、CSP、XSS 防护、数据验证
-- **可访问性标准**: 参考 WCAG 2.1 AA 级、键盘导航、ARIA 标签
+**Standards**: Development (TypeScript, ESLint, componentization); performance; security (HTTPS, CSP, XSS, validation); accessibility (WCAG 2.1 AA).
 
 ### Architecture TODO Alignment
 
-为了保持架构文档与实现的一致性，FinPulse 在技术和应用架构层面引入了统一的 TODO 视图：
+- High-level tasks in `docs/TODO.md`. When changing architecture, update: PlantUML (`*.puml`), this README, and `docs/TODO.md`.
 
-- 高层跨系统任务集中记录在 `docs/TODO.md` 中（架构、Web、移动、Big Data、共享包等）。
-- 每次重要架构调整时，需要同步更新：
-  - PlantUML 架构图（如本目录下的 `*.puml` 文件）。
-  - 本文件 `docs/architecture/README.md` 中的相关章节。
-  - `docs/TODO.md` 中对应的任务条目（新增、更新或关闭）。
+### Finance System Domain Views
 
-### 金融系统领域视图 (Finance System Domain Views)
+**Directory**: `docs/domain` (English). Chinese: `doc_zh/domain/`.
 
-**目录**: `docs/domain`
-
-**文件**:
-- `finance-system-architecture.puml`: 综合架构；含 **AI and ML Services**（ML Risk/VaR、**Deep Learning Engine**、**LLM Service**、Document/Identity AI、Fraud/Anomaly、Post-Trade Surveillance、NLP/Sentiment）。
-- `finance-system.puml`: 渠道、边缘、核心、数据与外部系统五层。
-- `finance-system-domains.puml`: 业务领域；含 **AI and ML** 域（ML Risk/VaR、**Deep Learning**、**LLM**、Document/Identity AI、Fraud/Anomaly、Surveillance/NLP）。
-- `finance-system-flows.puml`: 流程视图；含 AI 步骤（含 **DL forecast**、**LLM report summarisation**）。
+**Files**: `finance-system-architecture.puml` (includes AI and ML Services); `finance-system.puml` (channels, edge, core, data, external); `finance-system-domains.puml` (domains including AI/ML); `finance-system-flows.puml` (flows including DL forecast, LLM summarisation).
 
 ### AI and ML Integration
 
-AI/ML is integrated across flows and architecture as follows:
+| Area        | Flow / Component | Role                                                                 |
+|------------|-------------------|----------------------------------------------------------------------|
+| Onboarding | KYC               | Document and identity AI                                             |
+| Funding    | Payment            | Fraud and anomaly detection                                          |
+| Trading    | Order / Post-trade | ML limits; AI post-trade surveillance                                |
+| Risk & Reporting | Analytics      | ML VaR; DL forecast; NLP sentiment; LLM summarisation                |
 
-| Area | Flow / Component | Role |
-|------|------------------|------|
-| Onboarding | KYC | Document and identity AI for verification and scoring |
-| Funding | Payment | Fraud and anomaly detection before settlement |
-| Trading | Order / Post-trade | ML limit and exposure validation; AI post-trade surveillance |
-| Risk & Reporting | Analytics | ML risk and VaR models; DL forecast and risk scoring; NLP sentiment; LLM report summarisation |
+Update PlantUML and **Artificial Intelligence & ML** in `docs/TODO.md` when adding or changing AI capabilities.
 
-**Architecture**: `finance-system-architecture.puml` defines **AI and ML Services** (ML Risk/VaR, **Deep Learning Engine**, **LLM Service**, Document/Identity AI, Fraud/Anomaly, Post-Trade Surveillance, NLP/Sentiment). Domain view `finance-system-domains.puml` adds AI/ML domains (including **Deep Learning** and **LLM**) and their dependencies.
+## How to View Diagrams
 
-When adding or changing AI capabilities, update the above PlantUML files and the **Artificial Intelligence & ML** section in `docs/TODO.md`.
+Diagrams are in **PlantUML** (`.puml`).
 
-## 🛠️ 如何使用
+### Option 1: PlantUML CLI
 
-### 查看架构图
+```bash
+npm install -g @plantuml/plantuml
+# or: brew install plantuml
 
-这些架构图使用 **PlantUML** 格式编写，可以通过以下方式查看：
-
-#### 方式 1: 使用 PlantUML 工具
-
-1. 安装 PlantUML:
-   ```bash
-   # 使用 npm 安装
-   npm install -g @plantuml/plantuml
-   
-   # 或使用 Homebrew (macOS)
-   brew install plantuml
-   ```
-
-2. 生成图片:
-   ```bash
-   # 生成 PNG 图片
-   plantuml business-architecture.puml
-   plantuml application-architecture.puml
-   plantuml data-architecture.puml
-   plantuml technology-architecture.puml
-   plantuml ../domain/finance-system-architecture.puml
-   plantuml ../domain/finance-system.puml
-   plantuml ../domain/finance-system-domains.puml
-   plantuml ../domain/finance-system-flows.puml
-   
-   # 生成 SVG 图片（推荐，矢量图）
-   plantuml -tsvg business-architecture.puml
-   ```
-
-#### 方式 2: 使用在线工具
-
-1. 访问 [PlantUML 在线服务器](http://www.plantuml.com/plantuml/uml/)
-2. 复制 `.puml` 文件内容
-3. 粘贴到在线编辑器中查看
-
-#### 方式 3: IDE 插件
-
-许多 IDE 支持 PlantUML 插件，可以在编辑器中直接预览：
-- **VS Code**: PlantUML 插件
-- **IntelliJ IDEA**: PlantUML integration 插件
-- **Atom**: plantuml-viewer 插件
-
-#### 方式 4: VS Code 插件推荐
-
-安装 VS Code 插件 "PlantUML" 后，可以：
-- 在编辑器中直接预览图表
-- 使用快捷键 `Alt+D` 预览
-- 导出为 PNG/SVG 格式
-
-### 编辑架构图
-
-1. 使用文本编辑器打开 `.puml` 文件
-2. 按照 PlantUML 语法修改
-3. 保存后重新生成图片查看效果
-
-## 📚 架构关系说明
-
-四个架构域之间的关系：
-
-```
-业务架构
-  ↓ (驱动)
-应用架构
-  ↓ (实现)
-数据架构
-  ↓ (支撑)
-技术架构
+plantuml business-architecture.puml
+plantuml application-architecture.puml
+plantuml data-architecture.puml
+plantuml technology-architecture.puml
+plantuml -tsvg *.puml
 ```
 
-- **业务架构** 定义了平台要实现的业务目标和流程
-- **应用架构** 将业务需求转化为具体的应用组件和功能
-- **数据架构** 定义了支持业务和应用所需的数据结构和关系
-- **技术架构** 提供了实现应用和数据管理的技术基础
+### Option 2: Online
 
-## 🔄 架构演进
+- [PlantUML online](http://www.plantuml.com/plantuml/uml/) — paste `.puml` content.
 
-本架构文档会随着项目的发展持续更新：
+### Option 3: IDE
 
-- **版本控制**: 所有架构图文件纳入 Git 版本控制
-- **变更记录**: 重大架构变更应在架构图中添加注释说明
-- **定期审查**: 建议每个发布周期审查一次架构图，确保与代码实现一致
+- VS Code: PlantUML extension (e.g. Alt+D to preview)
+- IntelliJ: PlantUML integration
 
-## 📖 参考资源
+## Architecture Relationships
 
-- [TOGAF 9.2 标准](https://www.opengroup.org/togaf)
-- [PlantUML 官方文档](https://plantuml.com/)
-- [Next.js 文档](https://nextjs.org/docs)
-- [React 文档](https://react.dev/)
-- [TypeScript 文档](https://www.typescriptlang.org/docs/)
+```
+Business Architecture
+  ↓ (drives)
+Application Architecture
+  ↓ (implements)
+Data Architecture
+  ↓ (supports)
+Technology Architecture
+```
 
-## 📝 架构决策记录
+## Evolution
 
-### ADR-001: 采用 Next.js 作为前端框架
+- Diagrams are under Git. Document significant changes in diagram comments. Review periodically against implementation.
 
-**决策**: 使用 Next.js 16 作为主要前端框架
+## References
 
-**理由**:
-- 支持 SSR 和 SSG，提升首屏加载性能
-- 内置路由系统，简化页面管理
-- 良好的 TypeScript 支持
-- 与 Vercel 平台深度集成，部署简便
+- [TOGAF 9.2](https://www.opengroup.org/togaf)
+- [PlantUML](https://plantuml.com/)
+- [Next.js](https://nextjs.org/docs) · [React](https://react.dev/) · [TypeScript](https://www.typescriptlang.org/docs/)
 
-**影响**: 所有前端应用基于 Next.js 构建
+## Architecture Decision Records
 
-### ADR-002: 使用 PlantUML 作为架构图格式
+### ADR-001: Next.js as front-end framework
 
-**决策**: 采用 PlantUML 格式描述架构
+**Decision**: Next.js 16 as primary front-end. **Rationale**: SSR/SSG, routing, TypeScript, Vercel integration. **Impact**: Front-end built on Next.js.
 
-**理由**:
-- 文本格式，易于版本控制
-- 支持多种图表类型
-- 可以生成高质量的图片
-- 开源工具，使用广泛
+### ADR-002: PlantUML for architecture diagrams
 
-**影响**: 所有架构文档使用 `.puml` 格式
+**Decision**: PlantUML for architecture. **Rationale**: Version-control friendly, multiple diagram types, widely used. **Impact**: All architecture docs use `.puml`.
 
-### ADR-003: Hybrid Architecture for Big Data Integration
+### ADR-003: Hybrid architecture for big data
 
-**决策**: 使用 Java Spring Boot 进行原生大数据库集成
-
-**理由**:
-- 直接访问 Spark/Flink/Hadoop API，无需通过第三方服务
-- REST API 为 TypeScript 客户端提供统一接口
-- 语言适配：Java 适合大数据生态，TypeScript 适合前端开发
-- 关注点分离：大数据处理逻辑与前端业务逻辑解耦
-- 技术栈选择：使用各语言生态中最成熟的工具
-
-**影响**:
-- 采用混合架构：TypeScript 前端 + （可选的）Java 后端服务
-- 通过 REST API 进行跨语言通信（如有需要时引入）
-- 大数据相关能力可以通过外部服务或后续扩展提供
+**Decision**: Java Spring Boot for native Spark/Flink/Hadoop integration. **Rationale**: Direct API access, REST for TS clients, separation of concerns. **Impact**: Optional TypeScript front-end + Java backend; REST for cross-language communication.
 
 ---
 
-**文档版本**: 1.2.0  
-**最后更新**: 2025  
-**维护者**: FinPulse 开发团队
+**Version**: 1.2.0  
+**Last updated**: 2025  
+**Maintained by**: FinPulse team

@@ -1,0 +1,57 @@
+@startuml
+skinparam linetype ortho
+
+skinparam rectangle {
+  BorderColor #333333
+}
+
+title 核心金融流程
+
+partition "入驻流程" {
+  start
+  :采集客户数据;
+  :执行 KYC 检查;
+  :AI 文档核验与身份评分;
+  :创建客户档案;
+  :开立账户与钱包;
+  stop
+}
+
+partition "资金流程" {
+  start
+  :接收入金请求;
+  :校验支付方式;
+  :AI 欺诈与异常检测;
+  :向支付网络发起支付;
+  :贷记钱包与账户;
+  stop
+}
+
+partition "交易流程" {
+  start
+  :从渠道接收订单;
+  :校验限额与风险;
+  :ML 限额与敞口校验;
+  :订单路由至交易场所;
+  :接收成交回报;
+  :更新持仓与交易;
+  :触发成交后检查;
+  :AI 成交后监控与异常告警;
+  stop
+}
+
+partition "风险与报表流程" {
+  start
+  :接入市场与参考数据;
+  :重估投资组合与持仓;
+  :重算风险指标;
+  :ML 风险与 VaR 模型;
+  :DL 预测与风险评分;
+  :NLP 情感与另类数据;
+  :LLM 报告摘要;
+  :写入汇总至仓库;
+  :发布风险与监管报表;
+  stop
+}
+
+@enduml

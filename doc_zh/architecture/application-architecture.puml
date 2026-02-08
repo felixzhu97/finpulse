@@ -1,4 +1,4 @@
-@startuml application-architecture
+@startuml application-architecture-zh
 !define PRESENTATION_LAYER #E3F2FD
 !define BUSINESS_LAYER #F3E5F5
 !define DATA_LAYER #E8F5E9
@@ -15,36 +15,36 @@ skinparam component {
     ArrowColor #333333
 }
 
-title TOGAF Application Architecture - FinPulse Fintech Platform
+title TOGAF 应用架构 - FinPulse 金融科技平台
 
-package "Presentation Layer" <<Presentation>> {
+package "展示层 (Presentation Layer)" <<Presentation>> {
     component "apps/web" as WebApp {
-        component "Next.js 16 App" as NextApp {
+        component "Next.js 16应用" as NextApp {
             component "App Router" as AppRouter
             component "Server Components" as ServerComponents
             component "API Routes" as APIRoutes
-            component "Layout" as Layout
-            component "Theme Provider" as ThemeProvider
+            component "布局组件" as Layout
+            component "主题提供者" as ThemeProvider
         }
     }
 
     component "@fintech/ui" as UIComponent {
-        component "Base UI" as BaseUI
-        component "Radix UI Primitives" as RadixPrimitives
+        component "基础UI组件" as BaseUI
+        component "Radix UI原语" as RadixPrimitives
     }
 
     component "@fintech/finance-charts" as FinanceCharts {
-        component "Candlestick" as CandlestickChart
-        component "Line Chart" as LineChart
-        component "Area Chart" as AreaChart
-        component "Volume Chart" as VolumeChart
-        component "Heatmap" as HeatmapChart
-        component "Gauge" as GaugeChart
-        component "Radar Chart" as RadarChart
-        component "Waterfall" as WaterfallChart
+        component "K线图" as CandlestickChart
+        component "折线图" as LineChart
+        component "面积图" as AreaChart
+        component "成交量图" as VolumeChart
+        component "热力图" as HeatmapChart
+        component "仪表盘图" as GaugeChart
+        component "雷达图" as RadarChart
+        component "瀑布图" as WaterfallChart
     }
 
-    component "Chart Libraries" as ChartLibraries {
+    component "数据可视化库" as ChartLibraries {
         component "Recharts" as Recharts
         component "Lightweight Charts" as LightweightCharts
         component "Chart.js" as ChartJS
@@ -52,9 +52,9 @@ package "Presentation Layer" <<Presentation>> {
         component "React Sparklines" as Sparklines
     }
 
-    component "Form Management" as FormMgmt {
+    component "表单管理" as FormMgmt {
         component "ReactHookForm" as FormLibrary
-        component "Zod Validator" as Validator
+        component "Zod验证器" as Validator
     }
 
     component "apps/mobile-portfolio" as MobilePortfolio {
@@ -82,83 +82,83 @@ package "Presentation Layer" <<Presentation>> {
     }
 }
 
-package "Business Layer" <<Business>> {
-    package "Finance Calculation Packages" {
+package "业务逻辑层 (Business Layer)" <<Business>> {
+    package "金融计算包组" {
         component "@fintech/calculations" as CalculationsPkg {
-            component "Portfolio Calc" as PortfolioCalc
-            component "Returns Calc" as ReturnsCalc
-            component "Risk Calc" as RiskCalc
-            component "Formatters" as Formatters
+            component "投资组合计算" as PortfolioCalc
+            component "收益计算" as ReturnsCalc
+            component "风险计算" as RiskCalc
+            component "格式化工具" as Formatters
         }
 
         component "@fintech/bond-calculations" as BondCalcPkg {
-            component "Yield (YTM)" as YieldCalc
-            component "Duration" as DurationCalc
-            component "Convexity" as ConvexityCalc
-            component "Bond Valuation" as BondValuation
+            component "收益率计算(YTM)" as YieldCalc
+            component "久期计算" as DurationCalc
+            component "凸度计算" as ConvexityCalc
+            component "债券估值" as BondValuation
         }
 
         component "@fintech/options-pricing" as OptionsPkg {
             component "Black-Scholes" as BlackScholes
-            component "Binomial" as Binomial
-            component "Greeks" as Greeks
-            component "Implied Vol" as ImpliedVol
+            component "二叉树模型" as Binomial
+            component "Greeks计算" as Greeks
+            component "隐含波动率" as ImpliedVol
         }
 
         component "@fintech/portfolio-optimization" as PortfolioOptPkg {
-            component "Markowitz" as Markowitz
-            component "Efficient Frontier" as EfficientFrontier
-            component "Constraints" as Constraints
-            component "Sharpe Ratio" as SharpeRatio
+            component "马科维茨优化" as Markowitz
+            component "有效前沿" as EfficientFrontier
+            component "权重约束" as Constraints
+            component "夏普比率" as SharpeRatio
         }
 
         component "@fintech/statistical-analysis" as StatisticalPkg {
-            component "Correlation" as Correlation
-            component "CAPM" as CAPM
+            component "相关性分析" as Correlation
+            component "CAPM模型" as CAPM
             component "Fama-French" as FamaFrench
-            component "Regression" as Regression
+            component "回归分析" as Regression
         }
 
         component "@fintech/technical-indicators" as TechnicalPkg {
-            component "Moving Averages" as MovingAverages
-            component "Momentum" as Momentum
-            component "Volatility" as Volatility
-            component "Volume" as Volume
+            component "移动平均" as MovingAverages
+            component "动量指标" as Momentum
+            component "波动率指标" as Volatility
+            component "成交量指标" as Volume
         }
 
         component "@fintech/valuation" as ValuationPkg {
-            component "DCF" as DCF
-            component "Relative Valuation" as RelativeValuation
-            component "DDM" as DDM
+            component "DCF估值" as DCF
+            component "相对估值" as RelativeValuation
+            component "DDM模型" as DDM
         }
     }
 
-    package "Infrastructure Packages" {
+    package "基础设施包组" {
         component "@fintech/aws" as AWSPkg {
-            component "S3 Client" as S3Client
-            component "DynamoDB Client" as DynamoDBClient
-            component "Lambda Client" as LambdaClient
-            component "SQS Client" as SQSClient
-            component "SNS Client" as SNSClient
-            component "API Gateway Client" as APIGatewayClient
-            component "AWS Config" as AWSConfig
+            component "S3客户端" as S3Client
+            component "DynamoDB客户端" as DynamoDBClient
+            component "Lambda客户端" as LambdaClient
+            component "SQS客户端" as SQSClient
+            component "SNS客户端" as SNSClient
+            component "API Gateway客户端" as APIGatewayClient
+            component "AWS配置" as AWSConfig
         }
 
         component "@fintech/performance" as PerformancePkg {
-            component "Debounce" as Debounce
-            component "Throttle" as Throttle
-            component "Lazy" as Lazy
-            component "Memoize" as Memoize
-            component "Performance Monitor" as PerformanceMonitor
+            component "防抖" as Debounce
+            component "节流" as Throttle
+            component "懒加载" as Lazy
+            component "记忆化" as Memoize
+            component "性能监控" as PerformanceMonitor
         }
 
         component "@fintech/test-utils" as TestUtilsPkg {
-            component "Test Utils" as TestUtils
-            component "Mock Data" as MockData
+            component "测试工具" as TestUtils
+            component "Mock数据" as MockData
         }
 
         component "@fintech/utils" as UtilsPkg {
-            component "Utils" as Utils
+            component "工具函数" as Utils
         }
 
         component "@fintech/bigdata" as BigDataPkg {
@@ -166,74 +166,74 @@ package "Business Layer" <<Business>> {
             component "FlinkClient" as FlinkClient
             component "HDFSClient" as HDFSClient
             component "YARNClient" as YARNClient
-            component "HTTP Client" as HttpClient
+            component "HTTP客户端" as HttpClient
         }
     }
 
-    package "Application Modules" {
-        component "Portfolio Module" as PortfolioModule {
-            component "Portfolio Controller" as PortfolioController
-            component "Asset Service" as AssetService
+    package "应用业务模块" {
+        component "投资组合模块" as PortfolioModule {
+            component "投资组合控制器" as PortfolioController
+            component "资产配置服务" as AssetService
         }
 
-        component "Market Module" as MarketModule {
-            component "Market Controller" as MarketController
-            component "Trend Service" as TrendService
+        component "市场数据模块" as MarketModule {
+            component "市场数据控制器" as MarketController
+            component "趋势分析服务" as TrendService
         }
 
-        component "Transaction Module" as TransactionModule {
-            component "Transaction Controller" as TransactionController
-            component "Transaction Service" as TransactionService
+        component "交易模块" as TransactionModule {
+            component "交易控制器" as TransactionController
+            component "交易记录服务" as TransactionService
         }
 
-        component "Risk Module" as RiskModule {
-            component "Risk Controller" as RiskController
-            component "Risk Service" as RiskService
+        component "风险管理模块" as RiskModule {
+            component "风险控制器" as RiskController
+            component "风险分析服务" as RiskService
         }
 
-        component "User Module" as UserModule {
-            component "User Controller" as UserController
-            component "Preference Service" as PreferenceService
+        component "用户模块" as UserModule {
+            component "用户控制器" as UserController
+            component "偏好管理服务" as PreferenceService
         }
-    }
-}
-
-package "Data Access Layer" <<Data>> {
-    component "AWS Data Service" as AWSDataService {
-        component "DynamoDB DAO" as DynamoDBDAO
-        component "S3 Storage" as S3Storage
-        component "Cache" as Cache
-    }
-
-    component "State Management" as StateMgmt {
-        component "React State" as ReactState
-        component "Context" as Context
-        component "Server State" as ServerState
-    }
-
-    component "DAO" as DAO {
-        component "Portfolio DAO" as PortfolioDAO
-        component "Market DAO" as MarketDAO
-        component "Transaction DAO" as TransactionDAO
     }
 }
 
-package "External Services" <<External>> {
-    component "AWS Cloud" as AWSServices {
-        component "Lambda" as LambdaService
-        component "SQS" as SQSService
-        component "SNS" as SNSService
+package "数据访问层 (Data Access Layer)" <<Data>> {
+    component "AWS数据服务" as AWSDataService {
+        component "DynamoDB数据访问" as DynamoDBDAO
+        component "S3对象存储" as S3Storage
+        component "数据缓存" as Cache
+    }
+
+    component "状态管理" as StateMgmt {
+        component "React状态" as ReactState
+        component "上下文管理" as Context
+        component "服务器状态" as ServerState
+    }
+
+    component "数据访问对象" as DAO {
+        component "投资组合DAO" as PortfolioDAO
+        component "市场数据DAO" as MarketDAO
+        component "交易记录DAO" as TransactionDAO
+    }
+}
+
+package "外部服务层 (External Services)" <<External>> {
+    component "AWS云服务" as AWSServices {
+        component "Lambda函数" as LambdaService
+        component "SQS队列" as SQSService
+        component "SNS通知" as SNSService
         component "API Gateway" as APIGatewayService
     }
 
-    component "Vercel" as VercelServices {
+    component "Vercel服务" as VercelServices {
         component "Vercel Analytics" as Analytics
-        component "Vercel Platform" as VercelPlatform
+        component "Vercel部署平台" as VercelPlatform
     }
 
-    component "Third-party APIs" as ThirdPartyAPI {
-        component "Market Data API" as MarketAPI
-        component "Finance API" as FinanceAPI
+    component "第三方API" as ThirdPartyAPI {
+        component "市场数据API" as MarketAPI
+        component "金融数据API" as FinanceAPI
     }
 
     component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
@@ -249,8 +249,8 @@ package "External Services" <<External>> {
         component "Kafka (portfolio.events)" as KafkaTopic
     }
 
-    component "Big Data Service Layer" as BigDataServiceLayer {
-        component "Java Spring Boot" as SpringBootService {
+    component "大数据服务层 (Big Data Service Layer)" as BigDataServiceLayer {
+        component "Java Spring Boot服务" as SpringBootService {
             component "SparkService" as SparkService
             component "FlinkService" as FlinkService
             component "HadoopService" as HadoopService
@@ -258,16 +258,17 @@ package "External Services" <<External>> {
             component "FlinkController" as FlinkController
             component "HadoopController" as HadoopController
         }
-        component "Spark Lib" as SparkLib
-        component "Flink Lib" as FlinkLib
-        component "Hadoop Lib" as HadoopLib
+        component "Spark库" as SparkLib
+        component "Flink库" as FlinkLib
+        component "Hadoop库" as HadoopLib
     }
 }
 
-interface "Portfolio API" as PortfolioAPI
-interface "Market Data API" as MarketDataAPI
-interface "Transaction API" as TransactionAPI
-interface "Risk API" as RiskAPI
+' API 接口定义
+interface "投资组合API" as PortfolioAPI
+interface "市场数据API" as MarketDataAPI
+interface "交易API" as TransactionAPI
+interface "风险分析API" as RiskAPI
 interface "Spark API" as SparkAPI
 interface "Flink API" as FlinkAPI
 interface "Hadoop API" as HadoopAPI
@@ -422,10 +423,10 @@ SpringBootService ..> FlinkAPI : implements
 SpringBootService ..> HadoopAPI : implements
 
 legend right
-    |<#E3F2FD> Presentation | UI and interaction
-    |<#F3E5F5> Business Layer | Core business
-    |<#E8F5E9> Data Access | Data management
-    |<#FFF3E0> External | Third-party services
+    |<#E3F2FD> 展示层 | 用户界面和交互
+    |<#F3E5F5> 业务逻辑层 | 核心业务功能
+    |<#E8F5E9> 数据访问层 | 数据管理和访问
+    |<#FFF3E0> 外部服务 | 第三方服务和API
 endlegend
 
 @enduml

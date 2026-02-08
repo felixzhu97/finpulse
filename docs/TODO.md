@@ -3,6 +3,8 @@
 High-level TODO list for the entire `fintech-project` monorepo.
 This list complements, but does not replace, issue tracking in Git platforms.
 
+Chinese version: [doc_zh/TODO.md](../doc_zh/TODO.md).
+
 ## Architecture & Documentation
 
 - [ ] Align all PlantUML diagrams under `docs/architecture` with the current codebase structure.
