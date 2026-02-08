@@ -2,6 +2,11 @@
 
 Bridge components for views implemented in native code (iOS / Android). **NativeDemoCard** (demo card), **NativeLineChart** (line + area chart), and five dedicated chart components that support horizontal scrolling for historical data.
 
+- **Theme**: All chart components accept a `theme` prop (`'light' | 'dark'`; default `'light'`).
+- **Tooltips**: Scrollable charts use the same crosshair and tooltip behavior as NativeLineChart; implementation in `chartTooltip.tsx`.
+- **Horizontal scroll**: Drag on the chart or x-axis labels to scroll; driven by `useScrollableChart` and wrapped in `ScrollableChartContainer`.
+- **Shared logic**: `useScrollableChart` (scroll state, content width, touch handlers), `ScrollableChartContainer` (ScrollView + x-axis labels), `chartTooltip.tsx` (tooltip UI and crosshair).
+
 ## NativeDemoCard
 
 Demo native card view with a `title` prop.

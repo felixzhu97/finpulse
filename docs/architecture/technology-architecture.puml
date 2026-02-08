@@ -104,14 +104,19 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
         component "iOS RCTViewManager" as NativeDemoCardIOSTech
         component "Android SimpleViewManager" as NativeDemoCardAndroidTech
     }
-    component "NativeLineChart (line chart)" as NativeLineChartTech {
-        component "iOS Metal (MTKView)" as NativeLineChartIOSTech
-        component "Android OpenGL ES 3" as NativeLineChartAndroidTech
+    component "Native Charts" as NativeChartsTech {
+        component "iOS Metal (MTKView)" as NativeChartsIOSTech
+        component "Android OpenGL ES 3" as NativeChartsAndroidTech
+    }
+    component "Shared chart logic" as SharedChartLogicTech {
+        component "useScrollableChart" as UseScrollableChartTech
+        component "ScrollableChartContainer" as ScrollableChartContainerTech
+        component "chartTooltip" as ChartTooltipTech
     }
     note right of Expo: Expo SDK\nMetro, prebuild\niOS/Android
     note right of RN: React Native core\nrequireNativeComponent\nView managers
     note right of NativeDemoCardTech: apps/mobile-portfolio\nDemo native card
-    note right of NativeLineChartTech: Light theme, grid\nTouch crosshair/tooltip\nScroll lock
+    note right of NativeChartsTech: LineChart, CandleChart\nAmericanLineChart, BaselineChart\nHistogramChart, LineOnlyChart\nTheme light/dark, tooltips\nx-axis, drag-to-scroll
 }
 
 package "构建工具链" <<Build>> {
@@ -276,9 +281,11 @@ Expo --> RN
 RN --> NativeDemoCardTech
 NativeDemoCardTech --> NativeDemoCardIOSTech
 NativeDemoCardTech --> NativeDemoCardAndroidTech
-RN --> NativeLineChartTech
-NativeLineChartTech --> NativeLineChartIOSTech
-NativeLineChartTech --> NativeLineChartAndroidTech
+RN --> NativeChartsTech
+NativeChartsTech --> NativeChartsIOSTech
+NativeChartsTech --> NativeChartsAndroidTech
+RN --> SharedChartLogicTech
+NativeChartsTech --> SharedChartLogicTech
 RN --> RNWagmi
 
 ' AWS SDK关系

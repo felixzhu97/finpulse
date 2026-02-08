@@ -63,9 +63,20 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
             component "iOS RCTViewManager" as NativeDemoCardIOS
             component "Android SimpleViewManager" as NativeDemoCardAndroid
         }
-        component "NativeLineChart (portfolio line chart)" as NativeLineChart {
-            component "iOS Metal (MTKView)" as NativeLineChartIOS
-            component "Android OpenGL ES 3" as NativeLineChartAndroid
+        component "Native Charts" as NativeCharts {
+            component "NativeLineChart" as NLC
+            component "NativeCandleChart" as NCC
+            component "NativeAmericanLineChart" as NALC
+            component "NativeBaselineChart" as NBC
+            component "NativeHistogramChart" as NHC
+            component "NativeLineOnlyChart" as NLOC
+            component "iOS Metal (MTKView)" as NativeChartsIOS
+            component "Android OpenGL ES 3" as NativeChartsAndroid
+        }
+        component "Shared chart logic" as SharedChartLogic {
+            component "useScrollableChart" as UseScrollableChart
+            component "ScrollableChartContainer" as ScrollableChartContainer
+            component "chartTooltip" as ChartTooltip
         }
         component "react-native-wagmi-charts" as RNCharts
     }
@@ -253,9 +264,27 @@ interface "Hadoop API" as HadoopAPI
 ExpoRN --> NativeDemoCard
 NativeDemoCard --> NativeDemoCardIOS
 NativeDemoCard --> NativeDemoCardAndroid
-ExpoRN --> NativeLineChart
-NativeLineChart --> NativeLineChartIOS
-NativeLineChart --> NativeLineChartAndroid
+ExpoRN --> NativeCharts
+NativeCharts --> NLC
+NativeCharts --> NCC
+NativeCharts --> NALC
+NativeCharts --> NBC
+NativeCharts --> NHC
+NativeCharts --> NLOC
+NLC --> NativeChartsIOS
+NLC --> NativeChartsAndroid
+NCC --> NativeChartsIOS
+NCC --> NativeChartsAndroid
+NALC --> NativeChartsIOS
+NALC --> NativeChartsAndroid
+NBC --> NativeChartsIOS
+NBC --> NativeChartsAndroid
+NHC --> NativeChartsIOS
+NHC --> NativeChartsAndroid
+NLOC --> NativeChartsIOS
+NLOC --> NativeChartsAndroid
+ExpoRN --> SharedChartLogic
+NativeCharts --> SharedChartLogic
 MobilePortfolio --> RNCharts
 
 ' 展示层内部关系

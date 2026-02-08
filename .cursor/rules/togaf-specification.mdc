@@ -33,7 +33,7 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - Business components: portfolio overview, market trends, asset allocation, risk analysis, transaction records, etc.
 - Application services: portfolio service, market data service, risk analysis service, reporting service
 - Back-end services: `services/portfolio-analytics` (FastAPI-based portfolio analytics with DDD layering)
-- **Mobile native UI**: `apps/mobile-portfolio` includes a custom native view (**NativeCard**) implemented with React Native’s `RCTViewManager` (iOS) and `SimpleViewManager` (Android), exposed to JS via `requireNativeComponent`. Native code lives in the app: `ios/mobileportfolio/NativeCardViewManager.*`, `android/.../NativeCardView*.kt`, `NativeCardPackage.kt`; JS wrapper in `src/components/NativeCard.tsx`.
+- **Mobile native UI**: `apps/mobile-portfolio` includes (**NativeDemoCard** and six charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart**) via RCTViewManager (iOS) and SimpleViewManager (Android). Charts support theme (light/dark), tooltips, x-axis labels, horizontal drag-to-scroll; shared logic: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Native: `ios/mobileportfolio/*Chart/`, `android/.../view/`; JS: `src/components/native/`.
 
 **Document location**: `docs/architecture/application-architecture.puml`
 
@@ -41,7 +41,7 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 
 - `apps/web/` – Financial analytics web console
 - `apps/mobile/` – Mobile demo app
-- `apps/mobile-portfolio/` – Portfolio mobile app (Expo + RN, with NativeCard native view)
+- `apps/mobile-portfolio/` – Portfolio mobile app (Expo + RN, with NativeDemoCard and six native chart views)
 - `packages/ui/` – UI component library
 - `packages/utils/` – Utility library
 - `services/portfolio-analytics/` – Portfolio analytics and data aggregation service layer
@@ -76,7 +76,7 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - Application: Monorepo, TypeScript, pnpm Workspaces
 - Frameworks: Angular, React, Expo, Radix UI, FastAPI
 - Visualization: Chart.js, ng2-charts, chartjs-chart-financial (web); react-native-chart-kit, react-native-wagmi-charts (mobile)
-- **Native mobile**: iOS (Xcode, CocoaPods, Objective-C/Swift), Android (Gradle, Kotlin); custom native views (e.g. NativeCard) via RCTViewManager / SimpleViewManager
+- **Native mobile**: iOS (Xcode, CocoaPods, Objective-C/Swift), Android (Gradle, Kotlin); NativeDemoCard and six chart views (Metal/OpenGL ES) via RCTViewManager / SimpleViewManager; shared scroll/tooltip logic in useScrollableChart, ScrollableChartContainer
 - Build: Angular CLI, TypeScript compiler, ESLint, Python tooling
 - Runtime: Node.js, Python
 - Deployment: Vercel, Python/FastAPI hosting
@@ -209,7 +209,7 @@ docs/architecture/
 **Application architecture** →
 
 - `apps/web/` – Web console
-- `apps/mobile/`, `apps/mobile-portfolio/` – Mobile apps (mobile-portfolio includes NativeCard native view)
+- `apps/mobile/`, `apps/mobile-portfolio/` – Mobile apps (mobile-portfolio includes NativeDemoCard and six native chart views)
 - `packages/ui/` – UI component layer
 - `packages/utils/` – Utility layer
 - `services/portfolio-analytics/` – Portfolio analytics service (FastAPI + DDD)
@@ -222,7 +222,7 @@ docs/architecture/
 **Technology architecture** →
 
 - Root config: `package.json`, `pnpm-workspace.yaml`, `tsconfig.json`, `vercel.json`
-- Front-end: `apps/web/`, `apps/mobile/`, `apps/mobile-portfolio/` (native views in iOS/Android)
+- Front-end: `apps/web/`, `apps/mobile/`, `apps/mobile-portfolio/` (native chart views + useScrollableChart/ScrollableChartContainer in iOS/Android)
 - Back-end: `services/portfolio-analytics/` (FastAPI)
 
 ## Governance Rules

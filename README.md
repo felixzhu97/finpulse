@@ -107,7 +107,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 
 - **apps/web** - Angular-based financial analytics web console.
 - **apps/mobile** - React Native demo mobile app.
-- **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; includes native views **NativeDemoCard** (demo card) and **NativeLineChart** (Metal/OpenGL ES line chart) with touch interaction and scroll lock.
+- **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; includes native views **NativeDemoCard** and six native charts: **NativeLineChart** (line+area, crosshair/tooltip), **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Charts support configurable theme (light/dark), tooltips, x-axis labels, and horizontal drag-to-scroll via shared `useScrollableChart` and `ScrollableChartContainer`.
 - **services/portfolio-analytics** - Python FastAPI backend using DDD to serve portfolio analytics.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
@@ -162,7 +162,7 @@ pnpm --filter mobile-portfolio ios
 pnpm --filter mobile-portfolio android
 ```
 
-Native UI: `ios/mobileportfolio/NativeDemoCard/`, `ios/mobileportfolio/NativeLineChart/` (Metal for chart); `android/.../view/` (NativeDemoCardView, NativeLineChartView, NativeViewsPackage). JS wrappers: `src/components/native/NativeDemoCard.tsx`, `NativeLineChart.tsx`.
+Native UI: `ios/mobileportfolio/` (NativeDemoCard, NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart); `android/.../view/` (same views + NativeViewsPackage). JS: `src/components/native/` (wrappers, `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`).
 
 ### Backend service (Python FastAPI)
 
@@ -282,7 +282,7 @@ fintech-project/
 Angular-based financial analytics web console. Uses `chart.js`/`ng2-charts` for performance charts and `chartjs-chart-financial` for candlestick stock charts. Depends on `@fintech/ui` and `@fintech/utils`.
 
 #### `apps/mobile-portfolio`
-Expo + React Native app for portfolio overview, net worth trend, asset allocation, and stock charts. Native views: **NativeDemoCard** (demo native card; RCTViewManager / SimpleViewManager) and **NativeLineChart** (portfolio/values line chart; Metal on iOS, OpenGL ES on Android—light theme, grid, touch crosshair and tooltip, scroll lock via `onInteractionStart` / `onInteractionEnd`). Exposed via `requireNativeComponent`; wrappers in `src/components/native/`.
+Expo + React Native app for portfolio overview, net worth trend, asset allocation, and stock charts. Native views: **NativeDemoCard** and six charts—**NativeLineChart** (line+area, crosshair/tooltip), **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart**. Charts use Metal (iOS) / OpenGL ES (Android), support `theme` (light/dark), tooltips, x-axis labels, and horizontal drag-to-scroll; shared logic in `useScrollableChart`, `ScrollableChartContainer`, and `chartTooltip`. Wrappers in `src/components/native/`.
 
 #### `packages/ui`
 Shared UI component library, a collection of components built on Radix UI and Tailwind CSS. Can be reused across multiple applications.

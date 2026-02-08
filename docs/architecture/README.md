@@ -61,7 +61,7 @@
 1. **Presentation Layer**
    - Web app: `apps/web` (Angular-based financial analytics console)
    - Mobile apps: `apps/mobile`, `apps/mobile-portfolio` (React Native clients; mobile-portfolio uses Expo)
-   - **Native UI (mobile-portfolio)**: **NativeDemoCard** (demo native card; iOS/Android view managers) and **NativeLineChart** (portfolio/values line chart; Metal on iOS, OpenGL ES on Android; light theme, grid, touch crosshair/tooltip, scroll lock via `onInteractionStart`/`onInteractionEnd`). Code: `ios/mobileportfolio/NativeDemoCard/`, `ios/mobileportfolio/NativeLineChart/`, `android/.../view/`, `src/components/native/NativeDemoCard.tsx`, `NativeLineChart.tsx`.
+   - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts—**NativeLineChart** (line+area, crosshair/tooltip), **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart**. Metal (iOS) / OpenGL ES (Android); configurable theme (light/dark), tooltips, x-axis labels, horizontal drag-to-scroll. Shared logic: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Code: `ios/mobileportfolio/*Chart/`, `android/.../view/`, `src/components/native/`.
    - UI component library: `packages/ui`
    - Data visualization: Chart.js, ng2-charts, chartjs-chart-financial, react-native-chart-kit, react-native-wagmi-charts
 
@@ -98,7 +98,7 @@
 
 - Provide investors and business users access to portfolio and key metrics from mobile devices.
 - Share core domain models and utilities with the web console (e.g. `packages/ui`, `packages/utils`).
-- **apps/mobile-portfolio** includes native views: **NativeDemoCard** (demo native card on dashboard) and **NativeLineChart** (portfolio/values line chart; Metal/OpenGL ES, light theme, axis labels, touch crosshair and tooltip, optional scroll lock when touching the chart).
+- **apps/mobile-portfolio** includes native views: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart) with theme (light/dark), tooltips, x-axis labels, and horizontal drag-to-scroll.
 
 ### 数据架构图 (Data Architecture)
 
@@ -186,9 +186,9 @@
    - TypeScript 5 (type safety)
 
 2. **Mobile native (apps/mobile-portfolio)**
-   - iOS: Xcode, CocoaPods, Objective-C/Swift (NativeDemoCard, NativeLineChart with Metal/MTKView)
-   - Android: Gradle, Kotlin (NativeDemoCardView, NativeLineChartView, NativeViewsPackage; OpenGL ES 3 for chart)
-   - Bridge: `requireNativeComponent("NativeDemoCard")`, `requireNativeComponent("NativeLineChart")` in JS
+   - iOS: Xcode, CocoaPods, Objective-C/Swift (NativeDemoCard; NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart with Metal/MTKView)
+   - Android: Gradle, Kotlin (same views in `view/`, NativeViewsPackage; OpenGL ES 3 for charts)
+   - Bridge: `requireNativeComponent` for each view; shared JS: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`
 
 3. **UI frameworks and components**
    - Radix UI（无样式组件原语）
@@ -200,7 +200,7 @@
    - chartjs-chart-financial (web financial/candlestick)
    - react-native-chart-kit (mobile lightweight charts)
    - react-native-wagmi-charts (mobile professional stock charts)
-   - NativeLineChart (mobile-portfolio native: Metal on iOS, OpenGL ES on Android; light theme, touch interaction)
+   - Native charts (mobile-portfolio): NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart (Metal/OpenGL ES; theme light/dark, tooltips, drag-to-scroll)
 
 5. **Utilities**
    - Form and validation (e.g. React Hook Form, Zod)
