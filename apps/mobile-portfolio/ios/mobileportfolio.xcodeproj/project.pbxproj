@@ -17,6 +17,21 @@
 		B1C2D3E82E0307B40044C1D9 /* NativeLineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E92E0307B40044C1D9 /* NativeLineChartView.swift */; };
 		B1C2D3EA2E0307B40044C1D9 /* ChartShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3EB2E0307B40044C1D9 /* ChartShaders.metal */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		C1D4E5F63E0408C50044C2EA /* NativeCandleChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C1D4E5F73E0408C50044C2EA /* NativeCandleChartViewManager.m */; };
+		C1D4E5F83E0408C50044C2EA /* NativeCandleChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D4E5F93E0408C50044C2EA /* NativeCandleChartViewManager.swift */; };
+		C1D4E5FA3E0408C50044C2EA /* NativeCandleChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D4E5FB3E0408C50044C2EA /* NativeCandleChartView.swift */; };
+		D2E5F6A74F0519D60055D3FB /* NativeAmericanLineChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D2E5F6A84F0519D60055D3FB /* NativeAmericanLineChartViewManager.m */; };
+		D2E5F6A94F0519D60055D3FB /* NativeAmericanLineChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E5F6AA4F0519D60055D3FB /* NativeAmericanLineChartViewManager.swift */; };
+		D2E5F6AB4F0519D60055D3FB /* NativeAmericanLineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E5F6AC4F0519D60055D3FB /* NativeAmericanLineChartView.swift */; };
+		E3F6A7B85F0620E70066E4FC /* NativeBaselineChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E3F6A7B95F0620E70066E4FC /* NativeBaselineChartViewManager.m */; };
+		E3F6A7BA5F0620E70066E4FC /* NativeBaselineChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F6A7BB5F0620E70066E4FC /* NativeBaselineChartViewManager.swift */; };
+		E3F6A7BC5F0620E70066E4FC /* NativeBaselineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F6A7BD5F0620E70066E4FC /* NativeBaselineChartView.swift */; };
+		F4A7B8C96F0731F80077F50D /* NativeHistogramChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F4A7B8CA6F0731F80077F50D /* NativeHistogramChartViewManager.m */; };
+		F4A7B8CB6F0731F80077F50D /* NativeHistogramChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A7B8CC6F0731F80077F50D /* NativeHistogramChartViewManager.swift */; };
+		F4A7B8CD6F0731F80077F50D /* NativeHistogramChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A7B8CE6F0731F80077F50D /* NativeHistogramChartView.swift */; };
+		A5B8C9DA7F0842090088060E /* NativeLineOnlyChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B8C9DB7F0842090088060E /* NativeLineOnlyChartViewManager.m */; };
+		A5B8C9DC7F0842090088060E /* NativeLineOnlyChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5B8C9DD7F0842090088060E /* NativeLineOnlyChartViewManager.swift */; };
+		A5B8C9DE7F0842090088060E /* NativeLineOnlyChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5B8C9DF7F0842090088060E /* NativeLineOnlyChartView.swift */; };
 		EC41811ED6CCD1139A309E53 /* libPods-mobileportfolio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C06262AC2361DE170D99B9F8 /* libPods-mobileportfolio.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -41,6 +56,21 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = mobileportfolio/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* mobileportfolio-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "mobileportfolio-Bridging-Header.h"; path = "mobileportfolio/mobileportfolio-Bridging-Header.h"; sourceTree = "<group>"; };
+		C1D4E5F73E0408C50044C2EA /* NativeCandleChartViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeCandleChartViewManager.m; sourceTree = "<group>"; };
+		C1D4E5F93E0408C50044C2EA /* NativeCandleChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCandleChartViewManager.swift; sourceTree = "<group>"; };
+		C1D4E5FB3E0408C50044C2EA /* NativeCandleChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCandleChartView.swift; sourceTree = "<group>"; };
+		D2E5F6A84F0519D60055D3FB /* NativeAmericanLineChartViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeAmericanLineChartViewManager.m; sourceTree = "<group>"; };
+		D2E5F6AA4F0519D60055D3FB /* NativeAmericanLineChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAmericanLineChartViewManager.swift; sourceTree = "<group>"; };
+		D2E5F6AC4F0519D60055D3FB /* NativeAmericanLineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAmericanLineChartView.swift; sourceTree = "<group>"; };
+		E3F6A7B95F0620E70066E4FC /* NativeBaselineChartViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeBaselineChartViewManager.m; sourceTree = "<group>"; };
+		E3F6A7BB5F0620E70066E4FC /* NativeBaselineChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeBaselineChartViewManager.swift; sourceTree = "<group>"; };
+		E3F6A7BD5F0620E70066E4FC /* NativeBaselineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeBaselineChartView.swift; sourceTree = "<group>"; };
+		F4A7B8CA6F0731F80077F50D /* NativeHistogramChartViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeHistogramChartViewManager.m; sourceTree = "<group>"; };
+		F4A7B8CC6F0731F80077F50D /* NativeHistogramChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeHistogramChartViewManager.swift; sourceTree = "<group>"; };
+		F4A7B8CE6F0731F80077F50D /* NativeHistogramChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeHistogramChartView.swift; sourceTree = "<group>"; };
+		A5B8C9DB7F0842090088060E /* NativeLineOnlyChartViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeLineOnlyChartViewManager.m; sourceTree = "<group>"; };
+		A5B8C9DD7F0842090088060E /* NativeLineOnlyChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLineOnlyChartViewManager.swift; sourceTree = "<group>"; };
+		A5B8C9DF7F0842090088060E /* NativeLineOnlyChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLineOnlyChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +91,11 @@
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
 				A1B2C3D43E0307B40044C1D9 /* NativeDemoCard */,
 				B1C2D3EC2E0307B40044C1D9 /* NativeLineChart */,
+				C1D4E5FC3E0408C50044C2EA /* NativeCandleChart */,
+				D2E5F6AD4F0519D60055D3FB /* NativeAmericanLineChart */,
+				E3F6A7BE5F0620E70066E4FC /* NativeBaselineChart */,
+				F4A7B8CF6F0731F80077F50D /* NativeHistogramChart */,
+				A5B8C9E07F0842090088060E /* NativeLineOnlyChart */,
 				F11748442D0722820044C1D9 /* mobileportfolio-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -138,6 +173,61 @@
 			);
 			name = NativeLineChart;
 			path = mobileportfolio/NativeLineChart;
+			sourceTree = "<group>";
+		};
+		C1D4E5FC3E0408C50044C2EA /* NativeCandleChart */ = {
+			isa = PBXGroup;
+			children = (
+				C1D4E5F73E0408C50044C2EA /* NativeCandleChartViewManager.m */,
+				C1D4E5F93E0408C50044C2EA /* NativeCandleChartViewManager.swift */,
+				C1D4E5FB3E0408C50044C2EA /* NativeCandleChartView.swift */,
+			);
+			name = NativeCandleChart;
+			path = mobileportfolio/NativeCandleChart;
+			sourceTree = "<group>";
+		};
+		D2E5F6AD4F0519D60055D3FB /* NativeAmericanLineChart */ = {
+			isa = PBXGroup;
+			children = (
+				D2E5F6A84F0519D60055D3FB /* NativeAmericanLineChartViewManager.m */,
+				D2E5F6AA4F0519D60055D3FB /* NativeAmericanLineChartViewManager.swift */,
+				D2E5F6AC4F0519D60055D3FB /* NativeAmericanLineChartView.swift */,
+			);
+			name = NativeAmericanLineChart;
+			path = mobileportfolio/NativeAmericanLineChart;
+			sourceTree = "<group>";
+		};
+		E3F6A7BE5F0620E70066E4FC /* NativeBaselineChart */ = {
+			isa = PBXGroup;
+			children = (
+				E3F6A7B95F0620E70066E4FC /* NativeBaselineChartViewManager.m */,
+				E3F6A7BB5F0620E70066E4FC /* NativeBaselineChartViewManager.swift */,
+				E3F6A7BD5F0620E70066E4FC /* NativeBaselineChartView.swift */,
+			);
+			name = NativeBaselineChart;
+			path = mobileportfolio/NativeBaselineChart;
+			sourceTree = "<group>";
+		};
+		F4A7B8CF6F0731F80077F50D /* NativeHistogramChart */ = {
+			isa = PBXGroup;
+			children = (
+				F4A7B8CA6F0731F80077F50D /* NativeHistogramChartViewManager.m */,
+				F4A7B8CC6F0731F80077F50D /* NativeHistogramChartViewManager.swift */,
+				F4A7B8CE6F0731F80077F50D /* NativeHistogramChartView.swift */,
+			);
+			name = NativeHistogramChart;
+			path = mobileportfolio/NativeHistogramChart;
+			sourceTree = "<group>";
+		};
+		A5B8C9E07F0842090088060E /* NativeLineOnlyChart */ = {
+			isa = PBXGroup;
+			children = (
+				A5B8C9DB7F0842090088060E /* NativeLineOnlyChartViewManager.m */,
+				A5B8C9DD7F0842090088060E /* NativeLineOnlyChartViewManager.swift */,
+				A5B8C9DF7F0842090088060E /* NativeLineOnlyChartView.swift */,
+			);
+			name = NativeLineOnlyChart;
+			path = mobileportfolio/NativeLineOnlyChart;
 			sourceTree = "<group>";
 		};
 		B8AD70004C9E5256A0B498E0 /* Pods */ = {
@@ -365,6 +455,21 @@
 				B1C2D3E62E0307B40044C1D9 /* NativeLineChartViewManager.swift in Sources */,
 				B1C2D3E82E0307B40044C1D9 /* NativeLineChartView.swift in Sources */,
 				B1C2D3EA2E0307B40044C1D9 /* ChartShaders.metal in Sources */,
+				C1D4E5F63E0408C50044C2EA /* NativeCandleChartViewManager.m in Sources */,
+				C1D4E5F83E0408C50044C2EA /* NativeCandleChartViewManager.swift in Sources */,
+				C1D4E5FA3E0408C50044C2EA /* NativeCandleChartView.swift in Sources */,
+				D2E5F6A74F0519D60055D3FB /* NativeAmericanLineChartViewManager.m in Sources */,
+				D2E5F6A94F0519D60055D3FB /* NativeAmericanLineChartViewManager.swift in Sources */,
+				D2E5F6AB4F0519D60055D3FB /* NativeAmericanLineChartView.swift in Sources */,
+				E3F6A7B85F0620E70066E4FC /* NativeBaselineChartViewManager.m in Sources */,
+				E3F6A7BA5F0620E70066E4FC /* NativeBaselineChartViewManager.swift in Sources */,
+				E3F6A7BC5F0620E70066E4FC /* NativeBaselineChartView.swift in Sources */,
+				F4A7B8C96F0731F80077F50D /* NativeHistogramChartViewManager.m in Sources */,
+				F4A7B8CB6F0731F80077F50D /* NativeHistogramChartViewManager.swift in Sources */,
+				F4A7B8CD6F0731F80077F50D /* NativeHistogramChartView.swift in Sources */,
+				A5B8C9DA7F0842090088060E /* NativeLineOnlyChartViewManager.m in Sources */,
+				A5B8C9DC7F0842090088060E /* NativeLineOnlyChartViewManager.swift in Sources */,
+				A5B8C9DE7F0842090088060E /* NativeLineOnlyChartView.swift in Sources */,
 				21CCF3A165B4C7F5E4A57441 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

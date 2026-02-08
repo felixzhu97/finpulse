@@ -1,36 +1,71 @@
 # Native UI components
 
-Bridge components for views implemented in native code (iOS / Android). Names reflect feature: **NativeDemoCard** (demo card), **NativeLineChart** (portfolio/values line chart).
+Bridge components for views implemented in native code (iOS / Android). **NativeDemoCard** (demo card), **NativeLineChart** (line + area chart), and five dedicated chart components that support horizontal scrolling for historical data.
 
 ## NativeDemoCard
 
-Demo native card view with a `title` prop. Used to show a sample of custom native UI on the dashboard.
+Demo native card view with a `title` prop.
 
-- **iOS**: `NativeDemoCard/` (NativeDemoCardViewManager.h, .m; NativeDemoCardView); exported as `NativeDemoCard`.
-- **Android**: `NativeDemoCardView.kt`, `NativeDemoCardViewManager.kt`, `NativeViewsPackage`; `getName() = "NativeDemoCard"`.
+- **iOS**: `NativeDemoCard/`; **Android**: `NativeDemoCardView.kt`, `NativeDemoCardViewManager.kt`; `getName() = "NativeDemoCard"`.
 
 ## NativeLineChart
 
-Portfolio/values line chart (light background, grid, red line with gradient fill) rendered on the GPU. Touch shows crosshair and tooltip; optional scroll lock while interacting.
+Line chart with area fill (grid, red line + gradient). Touch: crosshair and tooltip; optional scroll lock.
 
-- **iOS**: `NativeLineChart/` (NativeLineChartView.swift, NativeLineChartViewManager.swift, .m, ChartShaders.metal); exported as `NativeLineChart`.
-- **Android**: `NativeLineChartView.kt`, `NativeLineChartViewManager.kt`; `getName() = "NativeLineChart"`.
-- **Web**: Placeholder view (no native GPU).
+- **iOS**: `NativeLineChart/` (NativeLineChartView.swift, ChartShaders.metal); **Android**: `NativeLineChartView.kt`; `getName() = "NativeLineChart"`.
+- **Props**: `data`, `timestamps?`, `showAxisLabels?`, `onPointSelect?`, `onInteractionStart?`, `onInteractionEnd?`.
 
-**Props**: `data`, `timestamps?`, `showAxisLabels?`, `onPointSelect?`, `onInteractionStart?`, `onInteractionEnd?`, plus `ViewProps`.
+## NativeCandleChart
 
-**Usage**
+K-line (candlestick) chart. **Data**: flat array `[open, high, low, close, ...]` per candle. Wraps in horizontal `ScrollView` when content width exceeds view for historical scroll.
+
+- **iOS**: `NativeCandleChart/`; **Android**: `NativeCandleChartView.kt`; `getName() = "NativeCandleChart"`.
+- **Props**: `data` (flat OHLC).
+
+## NativeAmericanLineChart
+
+American-style OHLC (open-close segment + high-low wick). Same `data` format as NativeCandleChart. Horizontal scroll when data is long.
+
+- **iOS**: `NativeAmericanLineChart/`; **Android**: `NativeAmericanLineChartView.kt`; `getName() = "NativeAmericanLineChart"`.
+
+## NativeBaselineChart
+
+Line chart with fill above/below a baseline (green above, red below). Horizontal scroll for long series.
+
+- **iOS**: `NativeBaselineChart/`; **Android**: `NativeBaselineChartView.kt`; `getName() = "NativeBaselineChart"`.
+- **Props**: `data`, `baselineValue?` (default: average of data).
+
+## NativeHistogramChart
+
+Vertical bar chart. **Props**: `data`. Horizontal scroll when many bars.
+
+- **iOS**: `NativeHistogramChart/`; **Android**: `NativeHistogramChartView.kt`; `getName() = "NativeHistogramChart"`.
+
+## NativeLineOnlyChart
+
+Line only (no fill). **Props**: `data`. Horizontal scroll for long series.
+
+- **iOS**: `NativeLineOnlyChart/`; **Android**: `NativeLineOnlyChartView.kt`; `getName() = "NativeLineOnlyChart"`.
+
+## Usage
 
 ```tsx
-import { NativeLineChart, NativeDemoCard } from "@/src/components/native";
+import {
+  NativeLineChart,
+  NativeCandleChart,
+  NativeAmericanLineChart,
+  NativeBaselineChart,
+  NativeHistogramChart,
+  NativeLineOnlyChart,
+} from "@/src/components/native";
 
-<NativeDemoCard title="Demo card" style={{ height: 80 }} />
+const lineData = [100, 102, 101, 105, 103, 108];
+const ohlcData = [102, 105, 101, 103, 103, 104, 100, 102];
 
-<NativeLineChart
-  data={[100, 102, 101, 105, 103, 108]}
-  timestamps={[...]}
-  style={{ height: 200 }}
-  onInteractionStart={() => setScrollLock(true)}
-  onInteractionEnd={() => setScrollLock(false)}
-/>
+<NativeLineChart data={lineData} timestamps={[...]} style={{ height: 200 }} />
+<NativeCandleChart data={ohlcData} style={{ height: 200 }} />
+<NativeAmericanLineChart data={ohlcData} style={{ height: 200 }} />
+<NativeBaselineChart data={lineData} baselineValue={102} style={{ height: 200 }} />
+<NativeHistogramChart data={lineData} style={{ height: 200 }} />
+<NativeLineOnlyChart data={lineData} style={{ height: 200 }} />
 ```

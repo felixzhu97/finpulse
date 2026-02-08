@@ -2,11 +2,11 @@ import Metal
 import MetalKit
 import UIKit
 
-private func themeColors(_ dark: Bool) -> (clear: MTLClearColor, line: (Float, Float, Float, Float), fillTop: (Float, Float, Float, Float), fillBottom: (Float, Float, Float, Float), grid: (Float, Float, Float, Float)) {
+private func lineOnlyTheme(_ dark: Bool) -> (clear: MTLClearColor, line: (Float, Float, Float, Float), grid: (Float, Float, Float, Float)) {
     if dark {
-        return (MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1), (1, 0.25, 0.25, 1), (1, 0.25, 0.25, 0.4), (1, 0.25, 0.25, 0), (0.22, 0.22, 0.26, 1))
+        return (MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1), (1, 0.25, 0.25, 1), (0.22, 0.22, 0.26, 1))
     }
-    return (MTLClearColor(red: 0.97, green: 0.97, blue: 0.98, alpha: 1), (1, 0.2, 0.2, 1), (1, 0.2, 0.2, 0.35), (1, 0.2, 0.2, 0), (0.85, 0.85, 0.88, 1))
+    return (MTLClearColor(red: 0.97, green: 0.97, blue: 0.98, alpha: 1), (0.2, 0.4, 0.9, 1), (0.85, 0.85, 0.88, 1))
 }
 
 private let strideFloats = 8
@@ -29,28 +29,24 @@ private func smoothPoints(_ pts: [(Float, Float)]) -> [(Float, Float)] {
         let p3 = i + 2 < n ? pts[i + 2] : pts[i + 1]
         for s in 0..<smoothSteps {
             let t = Float(s) / Float(smoothSteps)
-            let x = catmullRom(p0.0, p1.0, p2.0, p3.0, t: t)
-            let y = catmullRom(p0.1, p1.1, p2.1, p3.1, t: t)
-            out.append((x, y))
+            out.append((catmullRom(p0.0, p1.0, p2.0, p3.0, t: t), catmullRom(p0.1, p1.1, p2.1, p3.1, t: t)))
         }
     }
     out.append(pts.last!)
     return out
 }
 
-private final class ChartBuffers {
+private final class LineOnlyBuffers {
     var line: MTLBuffer?
-    var fill: MTLBuffer?
     var lineCount = 0
-    var fillCount = 0
 
-    func update(values: [Double], device: MTLDevice, colors: (line: (Float, Float, Float, Float), fillTop: (Float, Float, Float, Float), fillBottom: (Float, Float, Float, Float))) {
+    func update(values: [Double], device: MTLDevice, lineColor: (Float, Float, Float, Float)) {
         guard values.count >= 2 else {
             lineCount = 0
-            fillCount = 0
             return
         }
-        let minVal = values.min() ?? 0, maxVal = values.max() ?? 1
+        let minVal = values.min() ?? 0
+        let maxVal = values.max() ?? 1
         let scale = (maxVal - minVal) > 0 ? 1.0 / (maxVal - minVal) : 1.0
         let n = values.count
         var raw: [(Float, Float)] = []
@@ -61,28 +57,23 @@ private final class ChartBuffers {
         }
         let pts = smoothPoints(raw)
         var lineVerts: [Float] = []
-        var fillVerts: [Float] = []
         for (x, y) in pts {
-            lineVerts.append(contentsOf: [x, y, 0, 0, colors.line.0, colors.line.1, colors.line.2, colors.line.3])
-            fillVerts.append(contentsOf: [x, y, 0, 0, colors.fillTop.0, colors.fillTop.1, colors.fillTop.2, colors.fillTop.3])
-            fillVerts.append(contentsOf: [x, -1.0, 0, 0, colors.fillBottom.0, colors.fillBottom.1, colors.fillBottom.2, colors.fillBottom.3])
+            lineVerts.append(contentsOf: [x, y, 0, 0, lineColor.0, lineColor.1, lineColor.2, lineColor.3])
         }
         lineCount = pts.count
-        fillCount = fillVerts.count / strideFloats
         line = device.makeBuffer(bytes: lineVerts, length: lineVerts.count * MemoryLayout<Float>.stride, options: .storageModeShared)
-        fill = device.makeBuffer(bytes: fillVerts, length: fillVerts.count * MemoryLayout<Float>.stride, options: .storageModeShared)
     }
 }
 
-@objc(NativeLineChartView)
-public class NativeLineChartView: UIView {
+@objc(NativeLineOnlyChartView)
+public class NativeLineOnlyChartView: UIView {
     private var metalView: MTKView?
     private var device: MTLDevice?
     private var commandQueue: MTLCommandQueue?
     private var pipeline: MTLRenderPipelineState?
     private var gridBuffer: MTLBuffer?
     private var gridCount = 0
-    private let buffers = ChartBuffers()
+    private let buffers = LineOnlyBuffers()
 
     @objc public var data: NSArray? {
         didSet { updateBuffers() }
@@ -91,10 +82,7 @@ public class NativeLineChartView: UIView {
     @objc public var theme: NSString? {
         didSet {
             applyTheme()
-            if let d = device {
-                buildGrid(device: d)
-                updateBuffers()
-            }
+            if let d = device { buildGrid(device: d); updateBuffers() }
         }
     }
 
@@ -115,7 +103,7 @@ public class NativeLineChartView: UIView {
         let view = MTKView(frame: bounds, device: device)
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.delegate = self
-        applyTheme()
+        view.clearColor = lineOnlyTheme((theme as String?) == "dark").clear
         view.isPaused = true
         view.enableSetNeedsDisplay = true
         addSubview(view)
@@ -125,9 +113,7 @@ public class NativeLineChartView: UIView {
     }
 
     private func applyTheme() {
-        let dark = (theme as String?) == "dark"
-        let colors = themeColors(dark)
-        metalView?.clearColor = colors.clear
+        metalView?.clearColor = lineOnlyTheme((theme as String?) == "dark").clear
     }
 
     private func makePipeline(device: MTLDevice, pixelFormat: MTLPixelFormat) -> MTLRenderPipelineState? {
@@ -145,8 +131,7 @@ public class NativeLineChartView: UIView {
     }
 
     private func buildGrid(device: MTLDevice) {
-        let dark = (theme as String?) == "dark"
-        let grid = themeColors(dark).grid
+        let grid = lineOnlyTheme((theme as String?) == "dark").grid
         var verts: [Float] = []
         for i in 1..<5 {
             let y = Float(i) / 5.0 * 2.0 - 1.0
@@ -160,13 +145,11 @@ public class NativeLineChartView: UIView {
     private func updateBuffers() {
         guard let arr = data as? [NSNumber], !arr.isEmpty, let device = device else {
             buffers.lineCount = 0
-            buffers.fillCount = 0
             metalView?.setNeedsDisplay()
             return
         }
-        let dark = (theme as String?) == "dark"
-        let colors = themeColors(dark)
-        buffers.update(values: arr.map { $0.doubleValue }, device: device, colors: (colors.line, colors.fillTop, colors.fillBottom))
+        let t = lineOnlyTheme((theme as String?) == "dark")
+        buffers.update(values: arr.map { $0.doubleValue }, device: device, lineColor: t.line)
         metalView?.setNeedsDisplay()
     }
 
@@ -176,7 +159,7 @@ public class NativeLineChartView: UIView {
     }
 }
 
-extension NativeLineChartView: MTKViewDelegate {
+extension NativeLineOnlyChartView: MTKViewDelegate {
     public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {}
 
     public func draw(in view: MTKView) {
@@ -189,10 +172,6 @@ extension NativeLineChartView: MTKViewDelegate {
         if let grid = gridBuffer, gridCount > 0 {
             encoder.setVertexBuffer(grid, offset: 0, index: 0)
             encoder.drawPrimitives(type: .line, vertexStart: 0, vertexCount: gridCount)
-        }
-        if let fill = buffers.fill, buffers.fillCount >= 2 {
-            encoder.setVertexBuffer(fill, offset: 0, index: 0)
-            encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: buffers.fillCount)
         }
         if buffers.lineCount >= 2, let line = buffers.line {
             encoder.setVertexBuffer(line, offset: 0, index: 0)

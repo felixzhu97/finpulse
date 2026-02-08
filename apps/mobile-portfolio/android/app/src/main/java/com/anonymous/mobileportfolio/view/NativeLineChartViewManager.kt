@@ -27,4 +27,9 @@ class NativeLineChartViewManager(reactContext: ReactApplicationContext) :
         }
         view.setChartData(arr)
     }
+
+    @ReactProp(name = "theme")
+    fun setTheme(view: NativeLineChartView, theme: String?) {
+        view.setTheme(theme)
+    }
 }

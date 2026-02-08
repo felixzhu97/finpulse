@@ -1,9 +1,9 @@
 #import <React/RCTViewManager.h>
-#import <React/RCTBridgeModule.h>
 
-@interface RCT_EXTERN_MODULE(NativeLineChart, RCTViewManager)
+@interface RCT_EXTERN_MODULE(NativeBaselineChart, RCTViewManager)
 
 RCT_EXPORT_VIEW_PROPERTY(data, NSArray)
+RCT_EXPORT_VIEW_PROPERTY(baselineValue, NSNumber)
 RCT_EXPORT_VIEW_PROPERTY(theme, NSString)
 
 @end

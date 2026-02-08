@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { NativeLineChart, NativeDemoCard } from "@/src/components/native";
+import {
+  NativeLineChart,
+  NativeDemoCard,
+  NativeCandleChart,
+  NativeAmericanLineChart,
+  NativeBaselineChart,
+  NativeHistogramChart,
+  NativeLineOnlyChart,
+} from "@/src/components/native";
 import { PortfolioSummary } from "@/src/components/PortfolioSummary";
 import {
   getPortfolio,
@@ -74,6 +82,21 @@ export default function DashboardScreen() {
     },
   ];
 
+  const lineData =
+    history.length > 0
+      ? history.map((p) => p.value)
+      : stockLinePoints.map((p) => p.value);
+  const ohlcData = stockCandlePoints.flatMap((c) => [
+    c.open,
+    c.high,
+    c.low,
+    c.close,
+  ]);
+  const baselineVal =
+    lineData.length > 0
+      ? lineData.reduce((a, b) => a + b, 0) / lineData.length
+      : 102;
+
   useEffect(() => {
     let active = true;
 
@@ -132,15 +155,46 @@ export default function DashboardScreen() {
             value: item.value,
           }))}
         />
-        <Text style={[styles.subsectionTitle, styles.subsectionTitleSpaced]}>Native line chart (Metal / OpenGL ES)</Text>
-        <NativeLineChart
-          data={history.length > 0 ? history.map((p) => p.value) : stockLinePoints.map((p) => p.value)}
-          timestamps={history.length > 0 ? history.map((p) => new Date(p.date).getTime()) : stockLinePoints.map((p) => p.timestamp)}
-          style={styles.nativeChart}
-          onInteractionStart={() => setChartScrollLock(true)}
-          onInteractionEnd={() => setChartScrollLock(false)}
-        />
-        <Text style={[styles.subsectionTitle, styles.subsectionTitleSpaced]}>Sample professional stock chart</Text>
+        <View style={styles.chartDarkCard}>
+          <Text style={styles.chartDarkCardTitle}>
+            Native line chart (Metal / OpenGL ES)
+          </Text>
+          <NativeLineChart
+            data={lineData}
+            timestamps={
+              history.length > 0
+                ? history.map((p) => new Date(p.date).getTime())
+                : stockLinePoints.map((p) => p.timestamp)
+            }
+            style={styles.nativeChart}
+            
+            onInteractionStart={() => setChartScrollLock(true)}
+            onInteractionEnd={() => setChartScrollLock(false)}
+          />
+        </View>
+        <View style={styles.chartDarkCard}>
+          <Text style={styles.chartDarkCardTitle}>
+            Native charts (scroll horizontally for history)
+          </Text>
+          <Text style={styles.chartDarkLabel}>K-line (Candlestick)</Text>
+          <NativeCandleChart data={ohlcData}  style={styles.nativeChart} />
+          <Text style={styles.chartDarkLabel}>Line</Text>
+          <NativeLineOnlyChart data={lineData}  style={styles.nativeChart} />
+          <Text style={styles.chartDarkLabel}>American line (OHLC)</Text>
+          <NativeAmericanLineChart data={ohlcData}  style={styles.nativeChart} />
+          <Text style={styles.chartDarkLabel}>Baseline</Text>
+          <NativeBaselineChart
+            data={lineData}
+            baselineValue={baselineVal}
+            
+            style={styles.nativeChart}
+          />
+          <Text style={styles.chartDarkLabel}>Histogram</Text>
+          <NativeHistogramChart data={lineData}  style={styles.nativeChart} />
+        </View>
+        <Text style={[styles.subsectionTitle, styles.subsectionTitleSpaced]}>
+          Sample professional stock chart
+        </Text>
         <ProfessionalStockChart
           linePoints={stockLinePoints}
           candlePoints={stockCandlePoints}
@@ -189,6 +243,33 @@ const styles = StyleSheet.create({
   },
   subsectionTitleSpaced: {
     marginTop: 12,
+  },
+  chartLabel: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#6b7280",
+    marginTop: 8,
+    marginBottom: 2,
+  },
+  chartCard: {
+    backgroundColor: "#000",
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 12,
+    overflow: "hidden",
+  },
+  chartCardTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.9)",
+    marginBottom: 8,
+  },
+  chartDarkLabel: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "rgba(255,255,255,0.7)",
+    marginTop: 8,
+    marginBottom: 2,
   },
   nativeChart: {
     height: 200,

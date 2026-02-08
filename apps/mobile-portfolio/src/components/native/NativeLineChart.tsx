@@ -21,6 +21,7 @@ export type NativeLineChartProps = {
   onPointSelect?: (point: PointSelectPayload) => void;
   timestamps?: number[];
   showAxisLabels?: boolean;
+  theme?: "light" | "dark";
   onInteractionStart?: () => void;
   onInteractionEnd?: () => void;
 } & ViewProps;
@@ -46,7 +47,10 @@ const Y_LABELS = 4;
 const X_LABELS = 5;
 
 export function NativeLineChart(props: NativeLineChartProps) {
-  const { data = [], onPointSelect, timestamps, showAxisLabels = true, onInteractionStart, onInteractionEnd, style, ...rest } = props;
+  const { data = [], onPointSelect, timestamps, showAxisLabels = true, theme = "light", onInteractionStart, onInteractionEnd, style, ...rest } = props;
+  const isDark = theme === "dark";
+  const axisColor = isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.55)";
+  const crosshairColor = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)";
   const [layoutWidth, setLayoutWidth] = useState(0);
   const [layoutHeight, setLayoutHeight] = useState(0);
   const [selected, setSelected] = useState<{ index: number; value: number; x: number; ts?: number } | null>(null);
@@ -115,7 +119,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
 
   return (
     <View style={[styles.container, style]} onLayout={onLayout}>
-      <NativeView data={data} style={StyleSheet.absoluteFill} {...rest} />
+      <NativeView data={data} theme={theme} style={StyleSheet.absoluteFill} {...rest} />
       {showAxisLabels && data.length >= 2 && layoutHeight > 0 && layoutWidth > 0 && (
         <>
           <View style={styles.yAxis} pointerEvents="none">
@@ -125,7 +129,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
                 style={[
                   styles.axisLabel,
                   styles.yLabel,
-                  { top: 8 + (i / (Y_LABELS - 1)) * (layoutHeight - 24) },
+                  { top: 8 + (i / (Y_LABELS - 1)) * (layoutHeight - 24), color: axisColor },
                 ]}
               >
                 {formatValue(val)}
@@ -137,7 +141,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
               const x = data.length > 1 ? (idx / (data.length - 1)) * layoutWidth : layoutWidth / 2;
               const left = Math.max(0, Math.min(layoutWidth - 24, x - 12));
               return (
-                <Text key={i} style={[styles.axisLabel, { left }]}>
+                <Text key={i} style={[styles.axisLabel, { left, color: axisColor }]}>
                   {timestamps != null && timestamps[idx] != null
                     ? new Date(timestamps[idx]).toLocaleDateString(undefined, { month: "numeric", day: "numeric" })
                     : String(idx + 1)}
@@ -153,7 +157,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
       >
         {selected !== null && (
           <>
-            <View style={[styles.crosshair, { left: selected.x }]} />
+            <View style={[styles.crosshair, { left: selected.x, backgroundColor: crosshairColor }]} />
             <View style={[styles.tooltip, { left: Math.max(8, Math.min(layoutWidth - 8, selected.x - 40)) }]}>
               <Text style={styles.tooltipValue}>{formatValue(selected.value)}</Text>
               {selected.ts != null && <Text style={styles.tooltipTime}>{formatTimestamp(selected.ts)}</Text>}

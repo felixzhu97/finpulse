@@ -9,7 +9,12 @@ class NativeViewsPackage : ReactPackage {
   override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
     return listOf(
       NativeDemoCardViewManager(reactContext),
-      NativeLineChartViewManager(reactContext)
+      NativeLineChartViewManager(reactContext),
+      NativeCandleChartViewManager(reactContext),
+      NativeAmericanLineChartViewManager(reactContext),
+      NativeBaselineChartViewManager(reactContext),
+      NativeHistogramChartViewManager(reactContext),
+      NativeLineOnlyChartViewManager(reactContext)
     )
   }
 
