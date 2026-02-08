@@ -41,6 +41,13 @@ package "Data and Insights" {
   component "Analytics Domain" as AnalyticsDomain
 }
 
+package "AI and ML" {
+  component "ML Risk and VaR Domain" as MlRiskDomain
+  component "Document and Identity AI Domain" as DocumentAIDomain
+  component "Fraud and Anomaly Domain" as FraudAIDomain
+  component "Surveillance and NLP Domain" as SurveillanceNlpDomain
+}
+
 CustomerDomain --> IdentityDomain
 CustomerDomain --> AccountDomain
 AccountDomain --> PositionDomain
@@ -72,6 +79,15 @@ ReportingDomain --> RiskDomain
 AnalyticsDomain --> MarketDataDomain
 AnalyticsDomain --> ReferenceDataDomain
 AnalyticsDomain --> ReportingDomain
+
+RiskDomain --> MlRiskDomain
+KycDomain --> DocumentAIDomain
+AmlDomain --> FraudAIDomain
+MonitoringDomain --> SurveillanceNlpDomain
+AnalyticsDomain --> MlRiskDomain
+AnalyticsDomain --> SurveillanceNlpDomain
+MlRiskDomain --> MarketDataDomain
+SurveillanceNlpDomain --> MarketDataDomain
 
 MarketDataDomain --> PortfolioDomain
 ReferenceDataDomain --> AccountDomain

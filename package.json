@@ -9,6 +9,8 @@
     "dev:mobile-portfolio": "pnpm --filter mobile-portfolio start",
     "dev:api": "cd services/portfolio-analytics && . .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8800 --reload",
     "generate-seed-data": "node scripts/generate-seed-data.js",
+    "generate-ai-seed-data": "node scripts/generate-ai-seed-data.js",
+    "generate-ai-seed-data:output": "node scripts/generate-ai-seed-data.js --output",
     "start:backend": "bash scripts/start-backend.sh",
     "build": "pnpm --filter finpulse-web build",
     "start": "pnpm --filter finpulse-web start",

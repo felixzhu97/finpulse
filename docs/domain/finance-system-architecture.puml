@@ -54,6 +54,14 @@ package "Data and Analytics" {
   component "Portfolio Events (Kafka)" as PortfolioEvents
 }
 
+package "AI and ML Services" {
+  component "ML Risk and VaR Engine" as MlRiskEngine
+  component "Document and Identity AI" as DocumentAI
+  component "Fraud and Anomaly Detection" as FraudAI
+  component "Post-Trade Surveillance" as SurveillanceAI
+  component "NLP and Sentiment Service" as NlpService
+}
+
 package "Backend Services" {
   component "Portfolio Analytics API" as PortfolioAnalyticsAPI
 }
@@ -100,7 +108,20 @@ RiskService --> RiskMetricsStore
 RiskService --> AnalyticsEngine
 ComplianceService --> AmlScreening
 ComplianceService --> KycProviders
+ComplianceService --> DocumentAI
+CustomerService --> DocumentAI
+PaymentService --> FraudAI
+OrderService --> MlRiskEngine
+TradeService --> SurveillanceAI
+RiskService --> MlRiskEngine
+RiskService --> NlpService
+AnalyticsEngine --> NlpService
 AnalyticsEngine --> ReportingWarehouse
+MlRiskEngine --> RiskMetricsStore
+MlRiskEngine --> MarketDataStore
+FraudAI --> TransactionsStore
+SurveillanceAI --> TransactionsStore
+NlpService --> MarketDataStore
 ReportingWarehouse --> PositionsStore
 ReportingWarehouse --> TransactionsStore
 ReportingWarehouse --> MarketDataStore

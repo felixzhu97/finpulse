@@ -2,9 +2,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.mappers import map_portfolio
+from app.api.ai_router import router as ai_router
 from app.application.services import get_portfolio, seed_portfolio
 
 app = FastAPI(title="Portfolio Analytics API")
+app.include_router(ai_router)
 
 app.add_middleware(
   CORSMiddleware,

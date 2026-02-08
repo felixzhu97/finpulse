@@ -11,6 +11,7 @@ partition "Onboarding Flow" {
   start
   :Collect customer data;
   :Run KYC checks;
+  :AI document verification and identity scoring;
   :Create customer profile;
   :Open accounts and wallet;
   stop
@@ -20,6 +21,7 @@ partition "Funding Flow" {
   start
   :Receive funding request;
   :Validate payment method;
+  :AI fraud and anomaly detection;
   :Send payment to payment network;
   :Credit wallet and accounts;
   stop
@@ -29,10 +31,12 @@ partition "Trading Flow" {
   start
   :Capture order from channel;
   :Validate limits and risk;
+  :ML limit and exposure validation;
   :Route order to venue;
   :Receive execution report;
   :Update positions and transactions;
   :Trigger post trade checks;
+  :AI post-trade surveillance and anomaly alert;
   stop
 }
 
@@ -41,6 +45,8 @@ partition "Risk and Reporting Flow" {
   :Ingest market and reference data;
   :Revalue portfolios and positions;
   :Recalculate risk metrics;
+  :ML risk and VaR models;
+  :NLP sentiment and alternative data;
   :Store aggregates in warehouse;
   :Publish risk and regulatory reports;
   stop
