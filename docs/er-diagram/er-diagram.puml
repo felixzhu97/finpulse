@@ -1,0 +1,155 @@
+@startuml er-diagram
+skinparam linetype ortho
+
+title Fintech System - Entity Relationship Diagram
+
+package "Core" {
+  entity "Customer" as Customer {
+    * customer_id : UUID
+    --
+    * name : text
+    email : text
+    kyc_status : text
+    created_at : datetime
+  }
+
+  entity "Account" as Account {
+    * account_id : UUID
+    --
+    * customer_id : UUID
+    account_type : text
+    currency : text
+    status : text
+    opened_at : datetime
+  }
+
+  entity "Portfolio" as Portfolio {
+    * portfolio_id : UUID
+    --
+    * account_id : UUID
+    name : text
+    base_currency : text
+    created_at : datetime
+  }
+}
+
+package "Reference and positions" {
+  entity "Instrument" as Instrument {
+    * instrument_id : UUID
+    --
+    symbol : text
+    name : text
+    asset_class : text
+    currency : text
+    exchange : text
+  }
+
+  entity "Position" as Position {
+    * position_id : UUID
+    --
+    * portfolio_id : UUID
+    * instrument_id : UUID
+    quantity : decimal
+    cost_basis : decimal
+    as_of_date : date
+  }
+}
+
+package "Trading" {
+  entity "Order" as Order {
+    * order_id : UUID
+    --
+    * account_id : UUID
+    * instrument_id : UUID
+    side : text
+    quantity : decimal
+    order_type : text
+    status : text
+    created_at : datetime
+  }
+
+  entity "Trade" as Trade {
+    * trade_id : UUID
+    --
+    * order_id : UUID
+    quantity : decimal
+    price : decimal
+    fee : decimal
+    executed_at : datetime
+  }
+}
+
+package "Payments and settlement" {
+  entity "Transaction" as Transaction {
+    * transaction_id : UUID
+    --
+    * account_id : UUID
+    type : text
+    amount : decimal
+    currency : text
+    status : text
+    created_at : datetime
+  }
+
+  entity "Payment" as Payment {
+    * payment_id : UUID
+    --
+    * account_id : UUID
+    counterparty : text
+    amount : decimal
+    currency : text
+    status : text
+    created_at : datetime
+  }
+
+  entity "Settlement" as Settlement {
+    * settlement_id : UUID
+    --
+    * trade_id : UUID
+    * payment_id : UUID
+    status : text
+    settled_at : datetime
+  }
+}
+
+package "Market and risk" {
+  entity "MarketData" as MarketData {
+    * data_id : UUID
+    --
+    * instrument_id : UUID
+    timestamp : datetime
+    open : decimal
+    high : decimal
+    low : decimal
+    close : decimal
+    volume : decimal
+  }
+
+  entity "RiskMetrics" as RiskMetrics {
+    * metric_id : UUID
+    --
+    * portfolio_id : UUID
+    as_of_date : date
+    volatility : decimal
+    sharpe_ratio : decimal
+    var : decimal
+    beta : decimal
+  }
+}
+
+Customer ||--o{ Account : holds
+Account ||--o{ Portfolio : owns
+Portfolio ||--o{ Position : contains
+Instrument ||--o{ Position : held as
+Account ||--o{ Order : places
+Instrument ||--o{ Order : ordered
+Order ||--o{ Trade : executes
+Instrument ||--o{ Trade : traded
+Account ||--o{ Transaction : has
+Account ||--o{ Payment : makes
+Trade ||--o| Settlement : settles
+Payment ||--o{ Settlement : funds
+Instrument ||--o{ MarketData : has
+Portfolio ||--o{ RiskMetrics : assessed by
+
+@enduml

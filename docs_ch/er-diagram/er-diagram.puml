@@ -1,0 +1,155 @@
+@startuml er-diagram
+skinparam linetype ortho
+
+title 金融科技系统 - 实体关系图
+
+package "核心" {
+  entity "客户" as Customer {
+    * customer_id : UUID
+    --
+    * name : text
+    email : text
+    kyc_status : text
+    created_at : datetime
+  }
+
+  entity "账户" as Account {
+    * account_id : UUID
+    --
+    * customer_id : UUID
+    account_type : text
+    currency : text
+    status : text
+    opened_at : datetime
+  }
+
+  entity "组合" as Portfolio {
+    * portfolio_id : UUID
+    --
+    * account_id : UUID
+    name : text
+    base_currency : text
+    created_at : datetime
+  }
+}
+
+package "标的与持仓" {
+  entity "标的" as Instrument {
+    * instrument_id : UUID
+    --
+    symbol : text
+    name : text
+    asset_class : text
+    currency : text
+    exchange : text
+  }
+
+  entity "持仓" as Position {
+    * position_id : UUID
+    --
+    * portfolio_id : UUID
+    * instrument_id : UUID
+    quantity : decimal
+    cost_basis : decimal
+    as_of_date : date
+  }
+}
+
+package "交易" {
+  entity "订单" as Order {
+    * order_id : UUID
+    --
+    * account_id : UUID
+    * instrument_id : UUID
+    side : text
+    quantity : decimal
+    order_type : text
+    status : text
+    created_at : datetime
+  }
+
+  entity "成交" as Trade {
+    * trade_id : UUID
+    --
+    * order_id : UUID
+    quantity : decimal
+    price : decimal
+    fee : decimal
+    executed_at : datetime
+  }
+}
+
+package "支付与结算" {
+  entity "资金流水" as Transaction {
+    * transaction_id : UUID
+    --
+    * account_id : UUID
+    type : text
+    amount : decimal
+    currency : text
+    status : text
+    created_at : datetime
+  }
+
+  entity "支付" as Payment {
+    * payment_id : UUID
+    --
+    * account_id : UUID
+    counterparty : text
+    amount : decimal
+    currency : text
+    status : text
+    created_at : datetime
+  }
+
+  entity "结算" as Settlement {
+    * settlement_id : UUID
+    --
+    * trade_id : UUID
+    * payment_id : UUID
+    status : text
+    settled_at : datetime
+  }
+}
+
+package "行情与风险" {
+  entity "行情数据" as MarketData {
+    * data_id : UUID
+    --
+    * instrument_id : UUID
+    timestamp : datetime
+    open : decimal
+    high : decimal
+    low : decimal
+    close : decimal
+    volume : decimal
+  }
+
+  entity "风险指标" as RiskMetrics {
+    * metric_id : UUID
+    --
+    * portfolio_id : UUID
+    as_of_date : date
+    volatility : decimal
+    sharpe_ratio : decimal
+    var : decimal
+    beta : decimal
+  }
+}
+
+Customer ||--o{ Account : 拥有
+Account ||--o{ Portfolio : 拥有
+Portfolio ||--o{ Position : 包含
+Instrument ||--o{ Position : 持仓为
+Account ||--o{ Order : 下单
+Instrument ||--o{ Order : 被下单
+Order ||--o{ Trade : 执行
+Instrument ||--o{ Trade : 成交标的
+Account ||--o{ Transaction : 具有
+Account ||--o{ Payment : 发起
+Trade ||--o| Settlement : 结算
+Payment ||--o{ Settlement : 资金
+Instrument ||--o{ MarketData : 具有
+Portfolio ||--o{ RiskMetrics : 评估
+
+@enduml
