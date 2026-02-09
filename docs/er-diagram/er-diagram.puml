@@ -13,6 +13,16 @@ package "Core" {
     created_at : datetime
   }
 
+  entity "UserPreference" as UserPreference {
+    * preference_id : UUID
+    --
+    * customer_id : UUID
+    theme : text
+    language : text
+    notifications_enabled : boolean
+    updated_at : datetime
+  }
+
   entity "Account" as Account {
     * account_id : UUID
     --
@@ -52,6 +62,56 @@ package "Reference and positions" {
     quantity : decimal
     cost_basis : decimal
     as_of_date : date
+  }
+
+  entity "Watchlist" as Watchlist {
+    * watchlist_id : UUID
+    --
+    * customer_id : UUID
+    name : text
+    created_at : datetime
+  }
+
+  entity "WatchlistItem" as WatchlistItem {
+    * watchlist_item_id : UUID
+    --
+    * watchlist_id : UUID
+    * instrument_id : UUID
+    added_at : datetime
+  }
+}
+
+package "Instrument extensions" {
+  entity "Bond" as Bond {
+    * bond_id : UUID
+    --
+    * instrument_id : UUID
+    face_value : decimal
+    coupon_rate : decimal
+    ytm : decimal
+    duration : decimal
+    convexity : decimal
+    maturity_years : decimal
+    frequency : integer
+  }
+
+  entity "Option" as Option {
+    * option_id : UUID
+    --
+    * instrument_id : UUID
+    * underlying_instrument_id : UUID
+    strike : decimal
+    expiry : datetime
+    option_type : text
+    risk_free_rate : decimal
+    volatility : decimal
+    bs_price : decimal
+    delta : decimal
+    gamma : decimal
+    theta : decimal
+    vega : decimal
+    rho : decimal
+    implied_volatility : decimal
   }
 }
 
@@ -123,6 +183,20 @@ package "Market and risk" {
     low : decimal
     close : decimal
     volume : decimal
+    change_pct : decimal
+  }
+
+  entity "TechnicalIndicator" as TechnicalIndicator {
+    * indicator_id : UUID
+    --
+    * instrument_id : UUID
+    * data_id : UUID
+    ma : decimal
+    ema : decimal
+    rsi : decimal
+    macd : decimal
+    volatility : decimal
+    volume_metric : decimal
   }
 
   entity "RiskMetrics" as RiskMetrics {
@@ -130,6 +204,7 @@ package "Market and risk" {
     --
     * portfolio_id : UUID
     as_of_date : date
+    risk_level : text
     volatility : decimal
     sharpe_ratio : decimal
     var : decimal
@@ -137,10 +212,59 @@ package "Market and risk" {
   }
 }
 
+package "Analytics and valuation" {
+  entity "PortfolioOptimization" as PortfolioOptimization {
+    * optimization_id : UUID
+    --
+    * portfolio_id : UUID
+    as_of_date : date
+    weights_json : text
+    expected_return : decimal
+    variance : decimal
+    sharpe_ratio : decimal
+    efficient_frontier_json : text
+    constraints_json : text
+  }
+
+  entity "Statistical" as Statistical {
+    * stat_id : UUID
+    --
+    * instrument_id_1 : UUID
+    * instrument_id_2 : UUID
+    as_of_date : date
+    correlation : decimal
+    beta : decimal
+    alpha : decimal
+    fama_french_factors : text
+    regression_coefs : text
+  }
+
+  entity "Valuation" as Valuation {
+    * valuation_id : UUID
+    --
+    * instrument_id : UUID
+    as_of_date : date
+    method : text
+    ev : decimal
+    equity_value : decimal
+    target_price : decimal
+    multiples : decimal
+    discount_rate : decimal
+    growth_rate : decimal
+  }
+}
+
+Customer ||--|| UserPreference : has
 Customer ||--o{ Account : holds
 Account ||--o{ Portfolio : owns
 Portfolio ||--o{ Position : contains
 Instrument ||--o{ Position : held as
+Customer ||--o{ Watchlist : creates
+Watchlist ||--o{ WatchlistItem : contains
+Instrument ||--o{ WatchlistItem : listed in
+Instrument ||--o| Bond : bond details
+Instrument ||--o| Option : option details
+Option }o--|| Instrument : underlying
 Account ||--o{ Order : places
 Instrument ||--o{ Order : ordered
 Order ||--o{ Trade : executes
@@ -150,6 +274,13 @@ Account ||--o{ Payment : makes
 Trade ||--o| Settlement : settles
 Payment ||--o{ Settlement : funds
 Instrument ||--o{ MarketData : has
+MarketData ||--o{ TechnicalIndicator : computes
+Instrument ||--o{ TechnicalIndicator : for
 Portfolio ||--o{ RiskMetrics : assessed by
+Portfolio ||--o| PortfolioOptimization : optimized
+Instrument ||--o{ Statistical : asset1
+Instrument ||--o{ Statistical : asset2
+Instrument ||--o{ Valuation : valuation result
+MarketData ||--o{ Valuation : valuation input
 
 @enduml

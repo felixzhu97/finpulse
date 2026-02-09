@@ -13,6 +13,16 @@ package "核心" {
     created_at : datetime
   }
 
+  entity "用户偏好" as UserPreference {
+    * preference_id : UUID
+    --
+    * customer_id : UUID
+    theme : text
+    language : text
+    notifications_enabled : boolean
+    updated_at : datetime
+  }
+
   entity "账户" as Account {
     * account_id : UUID
     --
@@ -52,6 +62,56 @@ package "标的与持仓" {
     quantity : decimal
     cost_basis : decimal
     as_of_date : date
+  }
+
+  entity "观察列表" as Watchlist {
+    * watchlist_id : UUID
+    --
+    * customer_id : UUID
+    name : text
+    created_at : datetime
+  }
+
+  entity "观察项" as WatchlistItem {
+    * watchlist_item_id : UUID
+    --
+    * watchlist_id : UUID
+    * instrument_id : UUID
+    added_at : datetime
+  }
+}
+
+package "标的扩展" {
+  entity "债券" as Bond {
+    * bond_id : UUID
+    --
+    * instrument_id : UUID
+    face_value : decimal
+    coupon_rate : decimal
+    ytm : decimal
+    duration : decimal
+    convexity : decimal
+    maturity_years : decimal
+    frequency : integer
+  }
+
+  entity "期权" as Option {
+    * option_id : UUID
+    --
+    * instrument_id : UUID
+    * underlying_instrument_id : UUID
+    strike : decimal
+    expiry : datetime
+    option_type : text
+    risk_free_rate : decimal
+    volatility : decimal
+    bs_price : decimal
+    delta : decimal
+    gamma : decimal
+    theta : decimal
+    vega : decimal
+    rho : decimal
+    implied_volatility : decimal
   }
 }
 
@@ -123,6 +183,20 @@ package "行情与风险" {
     low : decimal
     close : decimal
     volume : decimal
+    change_pct : decimal
+  }
+
+  entity "技术指标" as TechnicalIndicator {
+    * indicator_id : UUID
+    --
+    * instrument_id : UUID
+    * data_id : UUID
+    ma : decimal
+    ema : decimal
+    rsi : decimal
+    macd : decimal
+    volatility : decimal
+    volume_metric : decimal
   }
 
   entity "风险指标" as RiskMetrics {
@@ -130,6 +204,7 @@ package "行情与风险" {
     --
     * portfolio_id : UUID
     as_of_date : date
+    risk_level : text
     volatility : decimal
     sharpe_ratio : decimal
     var : decimal
@@ -137,10 +212,59 @@ package "行情与风险" {
   }
 }
 
+package "分析与估值" {
+  entity "组合优化" as PortfolioOptimization {
+    * optimization_id : UUID
+    --
+    * portfolio_id : UUID
+    as_of_date : date
+    weights_json : text
+    expected_return : decimal
+    variance : decimal
+    sharpe_ratio : decimal
+    efficient_frontier_json : text
+    constraints_json : text
+  }
+
+  entity "统计" as Statistical {
+    * stat_id : UUID
+    --
+    * instrument_id_1 : UUID
+    * instrument_id_2 : UUID
+    as_of_date : date
+    correlation : decimal
+    beta : decimal
+    alpha : decimal
+    fama_french_factors : text
+    regression_coefs : text
+  }
+
+  entity "估值" as Valuation {
+    * valuation_id : UUID
+    --
+    * instrument_id : UUID
+    as_of_date : date
+    method : text
+    ev : decimal
+    equity_value : decimal
+    target_price : decimal
+    multiples : decimal
+    discount_rate : decimal
+    growth_rate : decimal
+  }
+}
+
+Customer ||--|| UserPreference : 拥有
 Customer ||--o{ Account : 拥有
 Account ||--o{ Portfolio : 拥有
 Portfolio ||--o{ Position : 包含
 Instrument ||--o{ Position : 持仓为
+Customer ||--o{ Watchlist : 创建
+Watchlist ||--o{ WatchlistItem : 包含
+Instrument ||--o{ WatchlistItem : 被关注
+Instrument ||--o| Bond : 债券属性
+Instrument ||--o| Option : 期权属性
+Option }o--|| Instrument : 标的
 Account ||--o{ Order : 下单
 Instrument ||--o{ Order : 被下单
 Order ||--o{ Trade : 执行
@@ -150,6 +274,13 @@ Account ||--o{ Payment : 发起
 Trade ||--o| Settlement : 结算
 Payment ||--o{ Settlement : 资金
 Instrument ||--o{ MarketData : 具有
+MarketData ||--o{ TechnicalIndicator : 计算
+Instrument ||--o{ TechnicalIndicator : 标的
 Portfolio ||--o{ RiskMetrics : 评估
+Portfolio ||--o| PortfolioOptimization : 优化
+Instrument ||--o{ Statistical : 资产1
+Instrument ||--o{ Statistical : 资产2
+Instrument ||--o{ Valuation : 估值结果
+MarketData ||--o{ Valuation : 估值输入
 
 @enduml
