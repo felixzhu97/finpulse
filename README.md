@@ -213,19 +213,17 @@ The platform supports real-time market data for the mobile portfolio app using K
 Quick local setup for real-time quotes:
 
 ```bash
-# 1) Start Kafka (from repo root)
+# 1) Start Kafka and mock quote producer (from repo root; keeps running in foreground)
 pnpm run start:kafka
 
-# 2) Start backend API
+# 2) In another terminal: start backend API
 pnpm run dev:api
 
-# 3) Start mock quote producer (in another terminal)
-cd services/portfolio-analytics
-python3 scripts/mock_realtime_quotes.py
-
-# 4) Start mobile portfolio (development build with native charts)
+# 3) Start mobile portfolio (development build with native charts)
 pnpm run start:mobile-portfolio-ios
 ```
+
+`start:kafka` starts Docker (Kafka + Zookeeper), waits for Kafka to be ready, then runs the mock real-time quotes script. Use Ctrl+C to stop the mock producer; Kafka containers keep running until you run `docker compose down` in `services/portfolio-analytics`.
 
 ### Build Production Version
 

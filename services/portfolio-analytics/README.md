@@ -121,5 +121,6 @@ If the test skips, it now prints the backend error (e.g. connection error, OOM).
 - **Real-time market data**
 
   - Upstream producers (mock script, external provider, or Flink streaming jobs) publish enriched quotes to `market.quotes.enriched`.
+  - From repo root, `pnpm run start:kafka` starts Kafka (Docker) and the mock quote producer (`scripts/mock_realtime_quotes.py`) in one command.
   - `KafkaMarketDataProvider` consumes this topic and keeps an in-memory cache of the latest quote per symbol.
   - `MarketDataService` powers both `GET /api/v1/quotes` and `WebSocket /ws/quotes` for mobile and web clients.
