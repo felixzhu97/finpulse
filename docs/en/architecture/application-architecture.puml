@@ -119,13 +119,17 @@ package "External Services" <<External>> {
         component "FastAPI app (DDD)" as FastAPIApp
         component "GET /api/v1/portfolio" as PortfolioGet
         component "POST /api/v1/seed" as PortfolioSeed
+      component "GET /api/v1/quotes" as QuotesGet
+      component "WebSocket /ws/quotes" as QuotesWS
+      component "MarketDataService + KafkaMarketDataProvider" as MarketDataServiceComponent
         component "AI/ML /api/v1/ai" as AIMLAPI {
             component "VaR, fraud, surveillance" as AIML1
             component "sentiment, identity, forecast" as AIML2
             component "Ollama, Hugging Face, TF" as AIML3
         }
         component "PostgreSQL" as PostgresDB
-        component "Kafka (portfolio.events)" as KafkaTopic
+      component "Kafka (portfolio.events)" as KafkaTopic
+      component "Kafka (market.quotes.enriched)" as KafkaQuotesTopic
     }
 
 }
@@ -162,11 +166,16 @@ ExpoRN --> SharedChartLogic
 NativeCharts --> SharedChartLogic
 MobilePortfolio --> RNCharts
 MobilePortfolio --> PortfolioAnalyticsAPI
+MobilePortfolio --> QuotesWS
 FastAPIApp --> PortfolioGet
 FastAPIApp --> PortfolioSeed
+FastAPIApp --> QuotesGet
+FastAPIApp --> QuotesWS
 FastAPIApp --> AIMLAPI
 FastAPIApp --> PostgresDB
 FastAPIApp --> KafkaTopic
+FastAPIApp --> MarketDataServiceComponent
+MarketDataServiceComponent --> KafkaQuotesTopic
 
 AngularApp --> AppRouter
 AngularApp --> Components

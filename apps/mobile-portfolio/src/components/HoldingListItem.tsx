@@ -3,6 +3,10 @@ import type { Holding } from "../types/portfolio";
 
 interface HoldingListItemProps {
   holding: Holding;
+  displayPrice?: number;
+  displayMarketValue?: number;
+  displayProfit?: number;
+  displayProfitRate?: number;
 }
 
 function formatCurrency(value: number, currency: string) {
@@ -36,8 +40,18 @@ function formatPercent(value: number) {
   return "0.00%";
 }
 
-export function HoldingListItem({ holding }: HoldingListItemProps) {
-  const isPositive = holding.profit >= 0;
+export function HoldingListItem({
+  holding,
+  displayPrice,
+  displayMarketValue,
+  displayProfit,
+  displayProfitRate,
+}: HoldingListItemProps) {
+  const price = displayPrice ?? holding.price;
+  const marketValue = displayMarketValue ?? holding.marketValue;
+  const profit = displayProfit ?? holding.profit;
+  const profitRate = displayProfitRate ?? holding.profitRate;
+  const isPositive = profit >= 0;
 
   return (
     <View style={styles.row}>
@@ -48,16 +62,19 @@ export function HoldingListItem({ holding }: HoldingListItemProps) {
         <Text numberOfLines={1} style={styles.meta}>
           {holding.symbol} · {holding.quantity} shares
         </Text>
+        <Text numberOfLines={1} style={styles.meta}>
+          Price {formatCurrency(price, "USD")}
+        </Text>
       </View>
       <View style={styles.right}>
         <Text numberOfLines={1} style={styles.value}>
-          {formatCurrency(holding.marketValue, "USD")}
+          {formatCurrency(marketValue, "USD")}
         </Text>
         <Text
           numberOfLines={1}
           style={[styles.change, { color: isPositive ? "#16a34a" : "#b91c1c" }]}
         >
-          {formatSigned(holding.profit)} · {formatPercent(holding.profitRate)}
+          {formatSigned(profit)} · {formatPercent(profitRate)}
         </Text>
       </View>
     </View>
@@ -103,3 +120,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
+

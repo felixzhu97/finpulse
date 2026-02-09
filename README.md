@@ -80,7 +80,7 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 - **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. DDD layout; config via `.env` (see `services/portfolio-analytics/.env.example`).
 - **PostgreSQL** - Portfolio persistence (Docker, host port 5433)
-- **Apache Kafka** - Event messaging for portfolio events (Docker, port 9092)
+- **Apache Kafka** - Event messaging for portfolio events and real-time market data (Docker, port 9092)
 - **AI/ML** - Under `/api/v1/ai`: VaR, fraud check, surveillance, sentiment, identity, forecast, summarisation; optional integrations: Ollama, Hugging Face (transformers), TensorFlow (LSTM forecast).
 - **One-click start** - `pnpm run start:backend` (Docker + API + seed). **API tests** - `pnpm run test:api` (pytest; Ollama/HF/TF tests may skip if services unavailable; Hugging Face first run can take 1–3 min).
 
@@ -170,7 +170,7 @@ pnpm --filter mobile-portfolio android
 
 Native UI: `ios/mobileportfolio/` (NativeDemoCard, NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart); `android/.../view/` (same views + NativeViewsPackage). JS: `src/components/native/` (wrappers, `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`).
 
-### Backend service (Python FastAPI)
+### Backend service (Python FastAPI + Kafka/Flink-ready market data)
 
 **One-click start (from repo root):**
 
@@ -195,6 +195,37 @@ uvicorn app.main:app --host 0.0.0.0 --port 8800 --reload
 Run API tests: `pnpm run test:api` (from repo root) or `pytest tests -v` from `services/portfolio-analytics` with venv active.
 
 From repo root: `pnpm dev:api` runs the API (requires venv and Docker). Then run `pnpm generate-seed-data` to seed. The mobile portfolio app uses `http://localhost:8800` by default (`GET /api/v1/portfolio`). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data.
+
+### Real-time market data (Kafka + WebSocket)
+
+The platform supports real-time market data for the mobile portfolio app using Kafka and a WebSocket endpoint:
+
+- **Market data pipeline**
+  - Upstream provider or mock script publishes quotes to Kafka topic `market.quotes.enriched` (keyed by symbol).
+  - Backend `KafkaMarketDataProvider` consumes this topic and stores the latest quotes in memory.
+  - `MarketDataService` exposes these quotes via:
+    - `GET /api/v1/quotes?symbols=AAPL,MSFT`
+    - WebSocket `/ws/quotes` (`{"type":"subscribe","symbols":["AAPL","MSFT"]}` → `{"type":"snapshot","quotes":{...}}`).
+- **Mobile integration**
+  - `apps/mobile-portfolio` uses `EXPO_PUBLIC_PORTFOLIO_API_URL` (e.g. `http://192.168.3.160:8800`) and a `useRealtimeQuotes` hook.
+  - A shared `quoteSocket` client opens a WebSocket connection to `/ws/quotes` and drives real-time rendering in the account detail screen.
+
+Quick local setup for real-time quotes:
+
+```bash
+# 1) Start Kafka (from repo root)
+pnpm run start:kafka
+
+# 2) Start backend API
+pnpm run dev:api
+
+# 3) Start mock quote producer (in another terminal)
+cd services/portfolio-analytics
+python3 scripts/mock_realtime_quotes.py
+
+# 4) Start mobile portfolio (development build with native charts)
+pnpm run start:mobile-portfolio-ios
+```
 
 ### Build Production Version
 

@@ -40,6 +40,7 @@ Chinese version: [docs_ch/TODO.md](../docs_ch/TODO.md).
 - [ ] Introduce database migrations (e.g. Alembic); keep schema versioned and aligned with `docs/er-diagram`.
 - [ ] Document PostgreSQL backup and restore; consider retention and point-in-time recovery.
 - [ ] Document Kafka topic and consumer contract for portfolio events.
+- [ ] Document Kafka topics and consumer contracts for real-time market data (e.g. `market.quotes.enriched`) and how Flink jobs and the Portfolio Analytics backend consume them.
 
 ## Monitoring & Observability
 

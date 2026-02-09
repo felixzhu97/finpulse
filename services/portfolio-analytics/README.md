@@ -20,7 +20,9 @@ docker compose up -d
 Default connection:
 
 - **PostgreSQL:** `postgresql://postgres:postgres@127.0.0.1:5433/portfolio` (host port 5433 to avoid conflict with a local Postgres on 5432)
-- **Kafka:** `localhost:9092`. Topic: `portfolio.events` (created on first produce).
+- **Kafka:** `localhost:9092`. Topics:
+  - `portfolio.events` – portfolio seed events (created on first produce)
+  - `market.quotes.enriched` – enriched real-time market quotes (symbol-keyed, produced by external provider or Flink jobs)
 
 Override with env: `DATABASE_URL`, `KAFKA_BOOTSTRAP_SERVERS`, `KAFKA_PORTFOLIO_TOPIC`. An example config is in `.env.example` (copy to `.env` and source it, or set vars in your shell).
 
@@ -44,6 +46,8 @@ From repo root: `pnpm dev:api` (ensure Postgres and Kafka are up and env is set 
 
 - `GET /api/v1/portfolio` – returns the portfolio from PostgreSQL (or in-memory demo if DB is empty).
 - `POST /api/v1/seed` – accepts a portfolio JSON body, stores it in PostgreSQL, and publishes a `portfolio.seeded` event to Kafka.
+- `GET /api/v1/quotes?symbols=...` – returns the latest real-time quotes for the requested symbols, backed by Kafka topic `market.quotes.enriched`.
+- `WebSocket /ws/quotes` – accepts `{"type":"subscribe","symbols":["AAPL","MSFT"]}` or `"update"` messages and pushes `{"type":"snapshot","quotes":{...}}` snapshots using the same quote structure as the HTTP endpoint.
 
 ### AI and ML (framework and endpoints)
 
@@ -104,10 +108,18 @@ If the test skips, it now prints the backend error (e.g. connection error, OOM).
 
 ### Messaging
 
-On seed, the service produces a message to `portfolio.events` with payload:
+- **Portfolio events**
 
-- `type`: `portfolio.seeded`
-- `portfolio_id`: portfolio id
-- `payload`: full portfolio JSON
+  On seed, the service produces a message to `portfolio.events` with payload:
 
-Consumers can subscribe to this topic for analytics or downstream processing.
+  - `type`: `portfolio.seeded`
+  - `portfolio_id`: portfolio id
+  - `payload`: full portfolio JSON
+
+  Consumers can subscribe to this topic for analytics or downstream processing.
+
+- **Real-time market data**
+
+  - Upstream producers (mock script, external provider, or Flink streaming jobs) publish enriched quotes to `market.quotes.enriched`.
+  - `KafkaMarketDataProvider` consumes this topic and keeps an in-memory cache of the latest quote per symbol.
+  - `MarketDataService` powers both `GET /api/v1/quotes` and `WebSocket /ws/quotes` for mobile and web clients.

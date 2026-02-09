@@ -1,9 +1,10 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAccountById, getHoldingsByAccount } from "@/src/services/portfolioService";
 import { HoldingListItem } from "@/src/components/HoldingListItem";
+import { useRealtimeQuotes } from "@/src/hooks/useRealtimeQuotes";
 import type { Account, Holding } from "@/src/types/portfolio";
 
 export default function AccountDetailScreen() {
@@ -43,6 +44,39 @@ export default function AccountDetailScreen() {
     };
   }, [accountId]);
 
+  const symbols = useMemo(
+    () => Array.from(new Set(holdings.map((item) => item.symbol))),
+    [holdings],
+  );
+
+  const { quotes, status } = useRealtimeQuotes(symbols);
+
+  const data = useMemo(() => {
+    return holdings.map((holding) => {
+      const quote = quotes[holding.symbol.toUpperCase()];
+      if (!quote) {
+        return {
+          holding,
+          displayPrice: holding.price,
+          displayMarketValue: holding.marketValue,
+          displayProfit: holding.profit,
+          displayProfitRate: holding.profitRate,
+        };
+      }
+      const price = quote.price;
+      const marketValue = holding.quantity * price;
+      const profit = marketValue - holding.costBasis;
+      const profitRate = holding.costBasis ? profit / holding.costBasis : 0;
+      return {
+        holding,
+        displayPrice: price,
+        displayMarketValue: marketValue,
+        displayProfit: profit,
+        displayProfitRate: profitRate,
+      };
+    });
+  }, [holdings, quotes]);
+
   if (!accountId) {
     return (
       <SafeAreaView style={styles.centered}>
@@ -68,7 +102,7 @@ export default function AccountDetailScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <View style={styles.screen}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={styles.backHitSlop}>
           <Text style={styles.backText}>Back</Text>
@@ -76,12 +110,23 @@ export default function AccountDetailScreen() {
         <Text numberOfLines={1} style={styles.title}>
           {account.name}
         </Text>
+        <Text style={styles.status}>
+          {status === "open" ? "Live" : status === "connecting" ? "Connecting" : "Offline"}
+        </Text>
       </View>
       <View style={styles.content}>
         <FlatList
-          data={holdings}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <HoldingListItem holding={item} />}
+          data={data}
+          keyExtractor={(item) => item.holding.id}
+          renderItem={({ item }) => (
+            <HoldingListItem
+              holding={item.holding}
+              displayPrice={item.displayPrice}
+              displayMarketValue={item.displayMarketValue}
+              displayProfit={item.displayProfit}
+              displayProfitRate={item.displayProfitRate}
+            />
+          )}
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text>No holdings in this account.</Text>
@@ -89,7 +134,7 @@ export default function AccountDetailScreen() {
           }
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -125,6 +170,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#111827",
   },
+  status: {
+    fontSize: 12,
+    color: "#6b7280",
+  },
   content: {
     flex: 1,
     paddingHorizontal: 16,
@@ -136,3 +185,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+

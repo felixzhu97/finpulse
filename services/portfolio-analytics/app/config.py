@@ -16,6 +16,10 @@ KAFKA_PORTFOLIO_TOPIC = os.environ.get(
   "KAFKA_PORTFOLIO_TOPIC",
   "portfolio.events",
 )
+KAFKA_QUOTES_ENRICHED_TOPIC = os.environ.get(
+  "KAFKA_QUOTES_ENRICHED_TOPIC",
+  "market.quotes.enriched",
+)
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
 OLLAMA_DEFAULT_MODEL = os.environ.get("OLLAMA_DEFAULT_MODEL", "llama2")

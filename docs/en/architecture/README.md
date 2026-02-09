@@ -47,7 +47,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 1. **Presentation**
    - Web: `apps/web` (Angular 21 financial analytics console; Chart.js, ng2-charts, chartjs-chart-financial, ag-grid; @fintech/ui, @fintech/utils)
    - Mobile: `apps/mobile`, `apps/mobile-portfolio` (React Native; mobile-portfolio uses Expo)
-   - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart). Metal (iOS) / OpenGL ES (Android); theme (light/dark), tooltips, x-axis, drag-to-scroll. Shared: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Code: `ios/mobileportfolio/*Chart/`, `android/.../view/`, `src/components/native/`.
+   - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart). Metal (iOS) / OpenGL ES (Android); theme (light/dark), tooltips, x-axis, drag-to-scroll. Shared: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Code: `ios/mobileportfolio/*Chart/`, `android/.../view/`, `src/components/native/`. The account detail screen uses a `useRealtimeQuotes` hook to subscribe to WebSocket `/ws/quotes` for real-time holdings updates.
    - UI library: `packages/ui`
    - Charts: Chart.js, ng2-charts, chartjs-chart-financial, react-native-chart-kit, react-native-wagmi-charts
 
@@ -58,14 +58,14 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
    - Data services (DAO, cache), state management
 
 4. **External Services**
-   - **Portfolio Analytics API**: FastAPI (DDD). REST: GET /api/v1/portfolio, POST /api/v1/seed. AI/ML: /api/v1/ai (risk/var, fraud/check, surveillance/trade, sentiment, identity/score, dl/forecast, llm/summarise, ollama/generate, huggingface/summarise, tf/forecast). PostgreSQL; Kafka (portfolio.events). Config: .env (.env.example). Tests: pytest (pnpm run test:api).
-   - Vercel Analytics, market data API, storage, big data service layer (Java Spring Boot: SparkService, FlinkService, HadoopService)
+   - **Portfolio Analytics API**: FastAPI (DDD). REST: GET /api/v1/portfolio, POST /api/v1/seed. Real-time quotes: GET /api/v1/quotes and WebSocket `/ws/quotes` (Kafka-backed, consuming `market.quotes.enriched`). AI/ML: /api/v1/ai (risk/var, fraud/check, surveillance/trade, sentiment, identity/score, dl/forecast, llm/summarise, ollama/generate, huggingface/summarise, tf/forecast). PostgreSQL; Kafka (portfolio.events, market.quotes.enriched). Config: .env (.env.example). Tests: pytest (pnpm run test:api).
+   - Vercel Analytics, external market data API, storage, big data service layer (Java Spring Boot: SparkService, FlinkService, HadoopService)
 
-**API surfaces**: Portfolio API (GET /portfolio, POST /seed); AI/ML API (VaR, fraud, surveillance, sentiment, identity, forecast, summarisation, Ollama, Hugging Face, TensorFlow); market, transaction, risk, Spark, Flink, Hadoop APIs.
+**API surfaces**: Portfolio API (GET /portfolio, POST /seed); real-time quote API (GET /quotes, WebSocket `/ws/quotes`); AI/ML API (VaR, fraud, surveillance, sentiment, identity, forecast, summarisation, Ollama, Hugging Face, TensorFlow); market, transaction, risk, Spark, Flink, Hadoop APIs.
 
 #### Mobile Applications
 
-- **apps/mobile-portfolio** uses **Portfolio Analytics API** (http://localhost:8800). Run `pnpm run start:backend` then `pnpm dev:mobile-portfolio`. Includes NativeDemoCard and six native charts with theme, tooltips, x-axis, drag-to-scroll.
+- **apps/mobile-portfolio** uses **Portfolio Analytics API** (http://localhost:8800). Run `pnpm run start:backend` then `pnpm dev:mobile-portfolio`. Includes NativeDemoCard and six native charts with theme, tooltips, x-axis, drag-to-scroll. For real-time holdings, the app calls `GET /api/v1/portfolio` for initial state and subscribes to WebSocket `/ws/quotes` to stream Kafka-backed market data into the account detail screen.
 
 ### Data Architecture
 
