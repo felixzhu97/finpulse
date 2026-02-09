@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { getAccounts } from "@/src/services/portfolioService";
-import { AccountListItem } from "@/src/components/AccountListItem";
+import { AccountListItem } from "@/src/components/account/AccountListItem";
 import { usePortfolioStore } from "@/src/store/portfolioStore";
 import type { Account } from "@/src/types/portfolio";
 

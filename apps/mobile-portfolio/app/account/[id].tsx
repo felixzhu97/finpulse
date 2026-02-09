@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAccountById, getHoldingsByAccount } from "@/src/services/portfolioService";
-import { HoldingListItem } from "@/src/components/HoldingListItem";
+import { HoldingListItem } from "@/src/components/account/HoldingListItem";
 import { useRealtimeQuotes } from "@/src/hooks/useRealtimeQuotes";
 import type { Account, Holding } from "@/src/types/portfolio";
 

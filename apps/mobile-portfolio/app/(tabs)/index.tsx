@@ -15,17 +15,17 @@ import {
   NativeHistogramChart,
   NativeLineOnlyChart,
 } from "@/src/components/native";
-import { PortfolioSummary } from "@/src/components/PortfolioSummary";
+import { PortfolioSummary } from "@/src/components/portfolio/PortfolioSummary";
 import {
   getPortfolio,
   getAssetAllocationByAccountType,
   getPortfolioHistory,
   invalidatePortfolioCache,
 } from "@/src/services/portfolioService";
-import { MetricCard } from "@/src/components/MetricCard";
-import { AssetAllocationChart } from "@/src/components/AssetAllocationChart";
-import { NetWorthLineChart } from "@/src/components/NetWorthLineChart";
-import { ProfessionalStockChart } from "@/src/components/ProfessionalStockChart";
+import { MetricCard } from "@/src/components/ui/MetricCard";
+import { AssetAllocationChart } from "@/src/components/portfolio/AssetAllocationChart";
+import { NetWorthLineChart } from "@/src/components/portfolio/NetWorthLineChart";
+import { ProfessionalStockChart } from "@/src/components/charts/ProfessionalStockChart";
 import type {
   Account,
   Portfolio,
@@ -175,8 +175,8 @@ export default function DashboardScreen() {
             value: item.value,
           }))}
         />
-        <View style={styles.chartDarkCard}>
-          <Text style={styles.chartDarkCardTitle}>
+        <View style={styles.chartCard}>
+          <Text style={styles.chartCardTitle}>
             Native line chart (Metal / OpenGL ES)
           </Text>
           <NativeLineChart
@@ -192,8 +192,8 @@ export default function DashboardScreen() {
             onInteractionEnd={() => setChartScrollLock(false)}
           />
         </View>
-        <View style={styles.chartDarkCard}>
-          <Text style={styles.chartDarkCardTitle}>
+        <View style={styles.chartCard}>
+          <Text style={styles.chartCardTitle}>
             Native charts (scroll horizontally for history)
           </Text>
           <Text style={styles.chartDarkLabel}>K-line (Candlestick)</Text>

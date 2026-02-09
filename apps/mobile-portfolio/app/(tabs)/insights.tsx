@@ -2,7 +2,7 @@ import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useEffect, useState } from "react";
 import { BarChart } from "react-native-chart-kit";
 import { getRiskSummary } from "@/src/services/portfolioService";
-import { MetricCard } from "@/src/components/MetricCard";
+import { MetricCard } from "@/src/components/ui/MetricCard";
 
 export default function InsightsScreen() {
   const [highRatio, setHighRatio] = useState(0);
@@ -73,6 +73,8 @@ export default function InsightsScreen() {
             width={width}
             height={200}
             fromZero
+            yAxisLabel=""
+            yAxisSuffix="%"
             chartConfig={{
               backgroundGradientFrom: "#ffffff",
               backgroundGradientTo: "#ffffff",

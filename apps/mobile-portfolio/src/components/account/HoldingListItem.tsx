@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import type { Holding } from "../types/portfolio";
+import type { Holding } from "../../types/portfolio";
 
 interface HoldingListItemProps {
   holding: Holding;

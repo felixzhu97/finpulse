@@ -159,6 +159,7 @@ package "Portfolio Analytics Storage" {
         - portfolio (id TEXT PK, data JSONB)
         - Seed via POST /api/v1/seed
         - GET /api/v1/portfolio reads from DB
+        - Mobile portfolio app consumes GET /api/v1/portfolio
     end note
     note right of KafkaPortfolioEvents
         <b>Events</b>
@@ -169,7 +170,7 @@ package "Portfolio Analytics Storage" {
         <b>Events</b>
         - symbol-keyed enriched quotes
         - price, change, changeRate, timestamp
-        - consumed by MarketDataService
+        - consumed by MarketDataService and mobile portfolio WebSocket (/ws/quotes)
     end note
 }
 

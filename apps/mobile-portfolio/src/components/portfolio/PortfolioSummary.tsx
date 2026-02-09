@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
-import type { Portfolio } from "../types/portfolio";
-import { MetricCard } from "./MetricCard";
+import type { Portfolio } from "../../types/portfolio";
+import { MetricCard } from "../ui/MetricCard";
 
 interface PortfolioSummaryProps {
   portfolio: Portfolio;

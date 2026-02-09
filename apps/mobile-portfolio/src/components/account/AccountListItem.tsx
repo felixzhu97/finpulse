@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import type { Account } from "../types/portfolio";
+import type { Account } from "../../types/portfolio";
 
 interface AccountListItemProps {
   account: Account;

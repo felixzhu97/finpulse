@@ -25,6 +25,20 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 | Profile | `/(tabs)/profile` | User profile |
 | Account Detail | `/account/[id]` | Single account details and holdings |
 
+## Project Structure
+
+- `app/`: expo-router routes and screens.
+- `src/components/`: presentational components only, grouped by domain:
+  - `account/`: account and holding list items.
+  - `portfolio/`: portfolio summary and charts.
+  - `ui/`: generic UI such as metric cards.
+  - `charts/`: advanced chart examples.
+  - `native/`: native chart wrappers and scroll/tooltip helpers.
+- `src/services/`: data fetching and caching (e.g. `portfolioService`, `quoteSocket`).
+- `src/hooks/`: reusable hooks (e.g. `useRealtimeQuotes`).
+- `src/store/`: global state with Zustand.
+- `src/types/`: shared TypeScript types used across the app.
+
 ## Getting Started
 
 ```bash

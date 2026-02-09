@@ -10,11 +10,10 @@
     "types": [
       "react",
       "react-native",
-      "jest",
-      "node"
+      "jest"
     ],
     "jsx": "react-native",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "skipLibCheck": true,
     "esModuleInterop": true
   },

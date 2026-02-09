@@ -24,11 +24,9 @@ export function useRealtimeQuotes(symbols: string[]): UseRealtimeQuotesResult {
     const handle = createQuoteSocket({
       symbols: cleanedSymbols,
       onSnapshot: (next) => {
-        console.log("quotes snapshot", next);   // 新增
         setQuotes(next);
       },
       onStatusChange: (next) => {
-        console.log("quotes status", next);     // 新增
         setStatus(next);
       },
     });
