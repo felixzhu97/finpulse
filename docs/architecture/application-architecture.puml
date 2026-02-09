@@ -19,12 +19,11 @@ title TOGAF Application Architecture - FinPulse Fintech Platform
 
 package "Presentation Layer" <<Presentation>> {
     component "apps/web" as WebApp {
-        component "Next.js 16 App" as NextApp {
+        component "Angular 21 App" as AngularApp {
             component "App Router" as AppRouter
-            component "Server Components" as ServerComponents
-            component "API Routes" as APIRoutes
+            component "Components" as Components
+            component "Services" as Services
             component "Layout" as Layout
-            component "Theme Provider" as ThemeProvider
         }
     }
 
@@ -33,28 +32,11 @@ package "Presentation Layer" <<Presentation>> {
         component "Radix UI Primitives" as RadixPrimitives
     }
 
-    component "@fintech/finance-charts" as FinanceCharts {
-        component "Candlestick" as CandlestickChart
-        component "Line Chart" as LineChart
-        component "Area Chart" as AreaChart
-        component "Volume Chart" as VolumeChart
-        component "Heatmap" as HeatmapChart
-        component "Gauge" as GaugeChart
-        component "Radar Chart" as RadarChart
-        component "Waterfall" as WaterfallChart
-    }
-
-    component "Chart Libraries" as ChartLibraries {
-        component "Recharts" as Recharts
-        component "Lightweight Charts" as LightweightCharts
+    component "Chart Libraries (Web)" as ChartLibrariesWeb {
         component "Chart.js" as ChartJS
-        component "D3.js" as D3JS
-        component "React Sparklines" as Sparklines
-    }
-
-    component "Form Management" as FormMgmt {
-        component "ReactHookForm" as FormLibrary
-        component "Zod Validator" as Validator
+        component "ng2-charts" as Ng2Charts
+        component "chartjs-chart-financial" as ChartJSFinancial
+        component "ag-grid-angular" as AgGrid
     }
 
     component "apps/mobile-portfolio" as MobilePortfolio {
@@ -83,94 +65,11 @@ package "Presentation Layer" <<Presentation>> {
 }
 
 package "Business Layer" <<Business>> {
-    package "Finance Calculation Packages" {
-        component "@fintech/calculations" as CalculationsPkg {
-            component "Portfolio Calc" as PortfolioCalc
-            component "Returns Calc" as ReturnsCalc
-            component "Risk Calc" as RiskCalc
-            component "Formatters" as Formatters
-        }
-
-        component "@fintech/bond-calculations" as BondCalcPkg {
-            component "Yield (YTM)" as YieldCalc
-            component "Duration" as DurationCalc
-            component "Convexity" as ConvexityCalc
-            component "Bond Valuation" as BondValuation
-        }
-
-        component "@fintech/options-pricing" as OptionsPkg {
-            component "Black-Scholes" as BlackScholes
-            component "Binomial" as Binomial
-            component "Greeks" as Greeks
-            component "Implied Vol" as ImpliedVol
-        }
-
-        component "@fintech/portfolio-optimization" as PortfolioOptPkg {
-            component "Markowitz" as Markowitz
-            component "Efficient Frontier" as EfficientFrontier
-            component "Constraints" as Constraints
-            component "Sharpe Ratio" as SharpeRatio
-        }
-
-        component "@fintech/statistical-analysis" as StatisticalPkg {
-            component "Correlation" as Correlation
-            component "CAPM" as CAPM
-            component "Fama-French" as FamaFrench
-            component "Regression" as Regression
-        }
-
-        component "@fintech/technical-indicators" as TechnicalPkg {
-            component "Moving Averages" as MovingAverages
-            component "Momentum" as Momentum
-            component "Volatility" as Volatility
-            component "Volume" as Volume
-        }
-
-        component "@fintech/valuation" as ValuationPkg {
-            component "DCF" as DCF
-            component "Relative Valuation" as RelativeValuation
-            component "DDM" as DDM
-        }
+    component "@fintech/utils" as UtilsPkg {
+        component "Utils" as Utils
     }
 
-    package "Infrastructure Packages" {
-        component "@fintech/aws" as AWSPkg {
-            component "S3 Client" as S3Client
-            component "DynamoDB Client" as DynamoDBClient
-            component "Lambda Client" as LambdaClient
-            component "SQS Client" as SQSClient
-            component "SNS Client" as SNSClient
-            component "API Gateway Client" as APIGatewayClient
-            component "AWS Config" as AWSConfig
-        }
-
-        component "@fintech/performance" as PerformancePkg {
-            component "Debounce" as Debounce
-            component "Throttle" as Throttle
-            component "Lazy" as Lazy
-            component "Memoize" as Memoize
-            component "Performance Monitor" as PerformanceMonitor
-        }
-
-        component "@fintech/test-utils" as TestUtilsPkg {
-            component "Test Utils" as TestUtils
-            component "Mock Data" as MockData
-        }
-
-        component "@fintech/utils" as UtilsPkg {
-            component "Utils" as Utils
-        }
-
-        component "@fintech/bigdata" as BigDataPkg {
-            component "SparkClient" as SparkClient
-            component "FlinkClient" as FlinkClient
-            component "HDFSClient" as HDFSClient
-            component "YARNClient" as YARNClient
-            component "HTTP Client" as HttpClient
-        }
-    }
-
-    package "Application Modules" {
+    package "Application Modules (Web)" {
         component "Portfolio Module" as PortfolioModule {
             component "Portfolio Controller" as PortfolioController
             component "Asset Service" as AssetService
@@ -190,42 +89,22 @@ package "Business Layer" <<Business>> {
             component "Risk Controller" as RiskController
             component "Risk Service" as RiskService
         }
-
-        component "User Module" as UserModule {
-            component "User Controller" as UserController
-            component "Preference Service" as PreferenceService
-        }
     }
 }
 
 package "Data Access Layer" <<Data>> {
-    component "AWS Data Service" as AWSDataService {
-        component "DynamoDB DAO" as DynamoDBDAO
-        component "S3 Storage" as S3Storage
-        component "Cache" as Cache
+    component "HTTP Client" as HttpClient {
+        component "Portfolio API Client" as PortfolioAPIClient
+        component "Market Data Client" as MarketDataClient
     }
 
     component "State Management" as StateMgmt {
-        component "React State" as ReactState
-        component "Context" as Context
-        component "Server State" as ServerState
-    }
-
-    component "DAO" as DAO {
-        component "Portfolio DAO" as PortfolioDAO
-        component "Market DAO" as MarketDAO
-        component "Transaction DAO" as TransactionDAO
+        component "Angular Services" as AngularServices
+        component "RxJS" as RxJS
     }
 }
 
 package "External Services" <<External>> {
-    component "AWS Cloud" as AWSServices {
-        component "Lambda" as LambdaService
-        component "SQS" as SQSService
-        component "SNS" as SNSService
-        component "API Gateway" as APIGatewayService
-    }
-
     component "Vercel" as VercelServices {
         component "Vercel Analytics" as Analytics
         component "Vercel Platform" as VercelPlatform
@@ -249,28 +128,12 @@ package "External Services" <<External>> {
         component "Kafka (portfolio.events)" as KafkaTopic
     }
 
-    component "Big Data Service Layer" as BigDataServiceLayer {
-        component "Java Spring Boot" as SpringBootService {
-            component "SparkService" as SparkService
-            component "FlinkService" as FlinkService
-            component "HadoopService" as HadoopService
-            component "SparkController" as SparkController
-            component "FlinkController" as FlinkController
-            component "HadoopController" as HadoopController
-        }
-        component "Spark Lib" as SparkLib
-        component "Flink Lib" as FlinkLib
-        component "Hadoop Lib" as HadoopLib
-    }
 }
 
 interface "Portfolio API" as PortfolioAPI
 interface "Market Data API" as MarketDataAPI
 interface "Transaction API" as TransactionAPI
 interface "Risk API" as RiskAPI
-interface "Spark API" as SparkAPI
-interface "Flink API" as FlinkAPI
-interface "Hadoop API" as HadoopAPI
 
 ' Mobile portfolio native views
 ExpoRN --> NativeDemoCard
@@ -305,121 +168,46 @@ FastAPIApp --> AIMLAPI
 FastAPIApp --> PostgresDB
 FastAPIApp --> KafkaTopic
 
-' 展示层内部关系
-NextApp --> AppRouter
-NextApp --> ServerComponents
-NextApp --> APIRoutes
+AngularApp --> AppRouter
+AngularApp --> Components
+AngularApp --> Services
 AppRouter --> Layout
-Layout --> ThemeProvider
-NextApp --> UIComponent
-NextApp --> FinanceCharts
-NextApp --> FormMgmt
+WebApp --> UIComponent
+WebApp --> ChartLibrariesWeb
 BaseUI --> RadixPrimitives
-FormLibrary --> Validator
+ChartLibrariesWeb --> ChartJS
+ChartLibrariesWeb --> Ng2Charts
+Ng2Charts --> ChartJS
+ChartJSFinancial --> ChartJS
 
-' 图表组件到图表库的依赖
-FinanceCharts --> Recharts
-FinanceCharts --> LightweightCharts
-FinanceCharts --> ChartJS
-FinanceCharts --> D3JS
-FinanceCharts --> Sparklines
-
-' 应用业务模块到计算包的依赖
-PortfolioModule --> CalculationsPkg
-PortfolioModule --> PortfolioOptPkg
-RiskModule --> CalculationsPkg
-RiskModule --> StatisticalPkg
-MarketModule --> TechnicalPkg
-MarketModule --> StatisticalPkg
-PortfolioModule --> ValuationPkg
-
-' 金融计算包组内部关系
-PortfolioCalc --> ReturnsCalc
-PortfolioCalc --> RiskCalc
-Markowitz --> EfficientFrontier
-Markowitz --> Constraints
-BlackScholes --> Greeks
-Binomial --> BlackScholes
-
-' 应用业务模块内部关系
 PortfolioController --> AssetService
 MarketController --> TrendService
 TransactionController --> TransactionService
 RiskController --> RiskService
-UserController --> PreferenceService
 
-' 应用业务模块到基础设施包
-PortfolioModule --> PerformancePkg
-MarketModule --> PerformancePkg
-TransactionModule --> PerformancePkg
-PortfolioModule --> AWSPkg
-MarketModule --> AWSPkg
-TransactionModule --> AWSPkg
-RiskModule --> AWSPkg
-UserModule --> AWSPkg
-PortfolioModule --> BigDataPkg
-MarketModule --> BigDataPkg
-RiskModule --> BigDataPkg
+WebApp --> PortfolioModule
+WebApp --> MarketModule
+WebApp --> TransactionModule
+WebApp --> RiskModule
+PortfolioModule --> UtilsPkg
+MarketModule --> UtilsPkg
+RiskModule --> UtilsPkg
 
-' 大数据客户端到服务层
-BigDataPkg --> SpringBootService
-SparkClient --> HttpClient
-FlinkClient --> HttpClient
-HDFSClient --> HttpClient
-YARNClient --> HttpClient
-
-' 业务逻辑层到数据访问层
-PortfolioModule --> AWSDataService
-MarketModule --> AWSDataService
-TransactionModule --> AWSDataService
-RiskModule --> AWSDataService
-UserModule --> AWSDataService
-PortfolioModule --> DAO
-MarketModule --> DAO
-TransactionModule --> DAO
+PortfolioModule --> HttpClient
+MarketModule --> HttpClient
+TransactionModule --> HttpClient
+RiskModule --> HttpClient
 
 PortfolioModule --> StateMgmt
 MarketModule --> StateMgmt
 TransactionModule --> StateMgmt
 
-' 数据访问层到外部服务
-AWSDataService --> DynamoDBDAO
-AWSDataService --> S3Storage
-DynamoDBDAO --> AWSPkg
-S3Storage --> AWSPkg
-AWSPkg --> LambdaService
-AWSPkg --> SQSService
-AWSPkg --> SNSService
-AWSPkg --> APIGatewayService
+HttpClient --> PortfolioAnalyticsAPI
+HttpClient --> ThirdPartyAPI
+WebApp --> VercelServices
 
-AWSDataService --> MarketAPI
-NextApp --> Analytics
-NextApp --> VercelPlatform
-
-' 大数据服务层内部关系
-SpringBootService --> SparkService
-SpringBootService --> FlinkService
-SpringBootService --> HadoopService
-SparkController --> SparkService
-FlinkController --> FlinkService
-HadoopController --> HadoopService
-SparkService --> SparkLib
-FlinkService --> FlinkLib
-HadoopService --> HadoopLib
-
-' 展示层使用图表
-NextApp --> FinanceCharts
-FinanceCharts --> CalculationsPkg
-FinanceCharts --> TechnicalPkg
-
-' 业务逻辑层实现接口
-PortfolioModule ..> PortfolioAPI : implements
-MarketModule ..> MarketDataAPI : implements
-TransactionModule ..> TransactionAPI : implements
-RiskModule ..> RiskAPI : implements
-SpringBootService ..> SparkAPI : implements
-SpringBootService ..> FlinkAPI : implements
-SpringBootService ..> HadoopAPI : implements
+PortfolioAnalyticsAPI ..> PortfolioAPI : implements
+ThirdPartyAPI ..> MarketDataAPI : consumes
 
 legend right
     |<#E3F2FD> Presentation | UI and interaction

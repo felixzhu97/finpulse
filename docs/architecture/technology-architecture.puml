@@ -17,83 +17,46 @@ skinparam component {
 
 title TOGAF Technology Architecture - FinPulse Fintech Platform
 
-package "Front-end Stack" <<Frontend>> {
-    component "Next.js 16.0.10" as NextJS
-    component "React 19.2.0" as React
-    component "React DOM 19.2.0" as ReactDOM
+package "Web Front-end Stack" <<Frontend>> {
+    component "Angular 21.1" as Angular
     component "TypeScript 5" as TypeScript
     component "Tailwind CSS 4.1.9" as Tailwind
     
-    note right of NextJS
-        <b>Full-stack React</b>
-        - App Router
-        - Server Components
-        - API Routes
-        - SSG/SSR
-        - Code splitting
-        - Image optimization
+    note right of Angular
+        <b>Web application</b>
+        - Angular CLI
+        - Routing
+        - Components, Services
+        - RxJS
     end note
     
-    note right of React: UI library\nComponents, Hooks, Context\nReact 19
-    note right of ReactDOM: DOM render\nSSR support
     note right of TypeScript: Type safety\nStatic check, strict
     note right of Tailwind: Utility-first CSS\nResponsive, PostCSS 4.x
 }
 
 package "UI Framework & Components" <<Frontend>> {
     component "Radix UI" as RadixUI {
-        component "Accordion" as RadixAccordion
-        component "Dialog" as RadixDialog
-        component "Dropdown Menu" as RadixDropdown
-        component "Select" as RadixSelect
-        component "Tabs" as RadixTabs
-        component "Toast" as RadixToast
-        component "Tooltip" as RadixTooltip
-        note right: 20+ unstyled primitives\nAccessibility, keyboard
+        component "Button" as RadixButton
+        component "Card" as RadixCard
+        component "Dropdown" as RadixDropdown
+        component "Input" as RadixInput
+        note right: Unstyled primitives\n@fintech/ui, Accessibility
     }
-    component "Lucide React 0.454.0" as Lucide
-    component "CMDK 1.0.4" as CMDK
-    component "Sonner 1.7.4" as Sonner
-    component "Vaul 1.1.2" as Vaul
+    component "Tailwind CSS" as TailwindUI
+    component "ag-grid-angular 33.0" as AgGrid
     
-    note right of Lucide: Icons 1000+\nSVG, tree-shake
-    note right of CMDK: Command menu\nSearch, keyboard
-    note right of Sonner: Toast\nRadix-based, animations
-    note right of Vaul: Drawer\nMobile, animations
+    note right of TailwindUI: Styling\nResponsive, utility-first
+    note right of AgGrid: Data grid\nTables, sorting, filtering
 }
 
-package "Data Visualization" <<Frontend>> {
-    component "Recharts 2.15.4" as Recharts
-    component "Lightweight Charts 4.2.0" as LightweightCharts
+package "Web Data Visualization" <<Frontend>> {
     component "Chart.js 4.4.3" as ChartJS
-    component "React Chart.js 2 5.2.0" as ReactChartJS
-    component "D3.js 7.9.0" as D3JS
-    component "D3 Scale 4.0.2" as D3Scale
-    component "D3 Color 3.1.0" as D3Color
-    component "React Sparklines 1.7.0" as Sparklines
+    component "ng2-charts 8.0" as Ng2Charts
+    component "chartjs-chart-financial 0.2" as ChartJSFinancial
     
-    note right of Recharts: React charts\nPerformance, trends
-    note right of LightweightCharts: High perf\nTradingView, candlestick
     note right of ChartJS: General charts\nThemes
-    note right of D3JS: Data-driven\nLow-level viz
-}
-
-package "Utilities" <<Frontend>> {
-    component "React Hook Form 7.60.0" as HookForm
-    component "@hookform/resolvers 3.10.0" as HookFormResolvers
-    component "Zod 3.25.76" as Zod
-    component "date-fns 4.1.0" as DateFns
-    component "react-day-picker 9.8.0" as DayPicker
-    component "next-themes 0.4.6" as Themes
-    component "input-otp 1.4.1" as InputOTP
-    component "embla-carousel-react 8.5.1" as EmblaCarousel
-    component "react-resizable-panels 2.1.7" as ResizablePanels
-    
-    note right of HookForm: Forms\nValidation, zero deps
-    note right of HookFormResolvers: Resolvers\nZod, Yup
-    note right of Zod: Validation\nTypeScript, schema
-    note right of DateFns: Dates\nImmutable, i18n
-    note right of Themes: Theme\nDark mode, system
+    note right of Ng2Charts: Angular wrapper\nChart.js bindings
+    note right of ChartJSFinancial: Candlestick\nFinancial charts
 }
 
 package "Mobile (React Native / Expo)" <<Frontend>> {
@@ -120,39 +83,26 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
 }
 
 package "Build Toolchain" <<Build>> {
-    component "Next.js Build" as BuildSystem
+    component "Angular CLI 21" as AngularCLI
     component "TypeScript 5 Compiler" as TSCompiler
     component "PostCSS 8.5" as PostCSS
     component "@tailwindcss/postcss 4.1.9" as TailwindPostCSS
     component "ESLint" as ESLint
-    component "Vite 5.4.11" as Vite
-    component "tw-animate-css 1.3.3" as TwAnimate
-    component "Maven Build" as MavenBuild
-    component "Java Compiler" as JavaCompiler
-    component "Spring Boot Packager" as SpringBootPackager
     
-    note right of BuildSystem: Built-in build\nCode split, SWC
+    note right of AngularCLI: ng build\nCode split, AOT
     note right of TSCompiler: TS compile\nType check, project refs
     note right of PostCSS: CSS\nTailwind, Autoprefixer
-    note right of Vite: Fast build\nStorybook, HMR
-    note right of MavenBuild: Maven\nDeps, lifecycle
-    note right of JavaCompiler: Java\nBytecode, annotations
-    note right of SpringBootPackager: Spring Boot JAR\nEmbedded Tomcat
 }
 
 package "Deployment" <<Deploy>> {
     component "Vercel" as Vercel
-    component "Vercel Analytics 1.3.1" as Analytics
+    component "Vercel Analytics" as Analytics
     component "Git Integration" as GitIntegration
     component "pnpm 10.6.0" as PNPM
-    component "Java Service Deploy" as JavaDeploy
-    component "REST API Endpoints" as RESTEndpoint
     
     note right of Vercel: Hosting\nAuto deploy, CDN, edge
     note right of Analytics: Analytics\nWeb Vitals
     note right of PNPM: Monorepo\nWorkspace, deps
-    note right of JavaDeploy: Java deploy\nJAR, Docker, port 8080
-    note right of RESTEndpoint: REST\nHTTP/HTTPS, JSON
 }
 
 package "Portfolio Analytics Backend" <<Infra>> {
@@ -179,136 +129,47 @@ package "Portfolio Analytics Backend" <<Infra>> {
     note right of AIMLStack: Optional: Ollama, HF, TF\npytest, pytest-timeout
 }
 
-package "AWS SDK" <<Infra>> {
-    component "@aws-sdk/client-s3 3.721.0" as AWSS3
-    component "@aws-sdk/client-dynamodb 3.721.0" as AWSDynamoDB
-    component "@aws-sdk/util-dynamodb 3.721.0" as AWSUtilDynamoDB
-    component "@aws-sdk/client-lambda 3.721.0" as AWSLambda
-    component "@aws-sdk/client-sqs 3.721.0" as AWSSQS
-    component "@aws-sdk/client-sns 3.721.0" as AWSSNS
-    component "@aws-sdk/client-apigatewayv2 3.721.0" as AWSAPIGatewayV2
-    component "@aws-sdk/client-apigatewaymanagementapi 3.721.0" as AWSAPIGatewayMgmt
-    
-    note right of AWSS3: S3对象存储\n文件上传下载\n预签名URL
-    note right of AWSDynamoDB: NoSQL数据库\n键值存储\n查询和扫描
-    note right of AWSLambda: 无服务器计算\n函数调用\n事件驱动
-    note right of AWSSQS: 消息队列\n异步处理\n解耦系统
-    note right of AWSSNS: 通知服务\n发布订阅\n多协议支持
-    note right of AWSAPIGatewayV2: API网关\nHTTP/WebSocket API\n路由管理
-}
-
-package "Big Data Technology Stack" <<Infra>> {
-    component "Java 17+" as Java
-    component "Spring Boot 3.2.0" as SpringBoot
-    component "Maven 3.6+" as Maven
-    component "Apache Spark 3.5.0" as Spark
-    component "Apache Flink 1.19.0" as Flink
-    component "Apache Hadoop 3.3.6" as Hadoop
-    
-    note right of Java: JVM运行时\nJava 17+ LTS\n跨平台支持
-    note right of SpringBoot: 应用框架\nREST API服务\n依赖注入\n自动配置
-    note right of Maven: 构建工具\n依赖管理\n项目构建\n生命周期管理
-    note right of Spark: 批处理引擎\nSpark SQL\nDataFrame API\nMLlib机器学习
-    note right of Flink: 流处理引擎\nDataStream API\nTable API\nCEP复杂事件处理
-    note right of Hadoop: 分布式存储与计算\nHDFS文件系统\nYARN资源管理\nMapReduce计算框架
-}
 
 package "Testing" <<Build>> {
-    component "Vitest 2.1.8" as Vitest
-    component "Storybook 8.3.6" as Storybook
-    component "@storybook/react-vite 8.3.6" as StorybookReactVite
-    component "@storybook/addon-essentials 8.3.6" as StorybookAddons
+    component "pytest" as Pytest
+    component "Jest" as Jest
     
-    note right of Vitest: Unit tests\nFast, Vite
-    note right of Storybook: Components\nVisual, interactive
+    note right of Pytest: Portfolio API tests\nservices/portfolio-analytics
+    note right of Jest: Unit tests\nMobile apps
 }
 
 package "Infrastructure" <<Infra>> {
-    component "AWS S3" as S3Service
-    component "AWS DynamoDB" as DynamoDBService
-    component "AWS Lambda" as LambdaService
-    component "AWS SQS" as SQSService
-    component "AWS SNS" as SNSService
-    component "AWS API Gateway" as APIGatewayService
     component "Vercel CDN" as CDNNode
     component "Edge" as EdgeNode
     component "Domain & SSL" as DomainSSL
 }
 
-' 前端技术栈内部关系
-NextJS --> React
-NextJS --> ReactDOM
-NextJS --> TypeScript
-NextJS --> Tailwind
-React --> ReactDOM
-React --> TypeScript
+Angular --> TypeScript
+Angular --> Tailwind
 
-' UI框架关系
-NextJS --> RadixUI
-NextJS --> Lucide
-NextJS --> CMDK
-NextJS --> Sonner
-NextJS --> Vaul
-RadixUI --> RadixAccordion
-RadixUI --> RadixDialog
-RadixUI --> RadixDropdown
-RadixUI --> RadixSelect
-RadixUI --> RadixTabs
-RadixUI --> RadixToast
-RadixUI --> RadixTooltip
-Sonner --> RadixToast
-RadixUI --> Tailwind
+Angular --> RadixUI
+RadixUI --> TailwindUI
+Angular --> AgGrid
 
-' 数据可视化关系
-NextJS --> Recharts
-NextJS --> LightweightCharts
-NextJS --> ChartJS
-NextJS --> ReactChartJS
-NextJS --> D3JS
-NextJS --> Sparklines
-React --> Recharts
-React --> ReactChartJS
-ReactChartJS --> ChartJS
-D3JS --> D3Scale
-D3JS --> D3Color
+Angular --> ChartJS
+Ng2Charts --> ChartJS
+ChartJSFinancial --> ChartJS
 
-' 工具库关系
-NextJS --> HookForm
-HookForm --> HookFormResolvers
-HookFormResolvers --> Zod
-NextJS --> DateFns
-NextJS --> DayPicker
-DayPicker --> DateFns
-NextJS --> Themes
-NextJS --> InputOTP
-NextJS --> EmblaCarousel
-NextJS --> ResizablePanels
-
-' 构建工具关系
-BuildSystem --> TSCompiler
-BuildSystem --> PostCSS
-BuildSystem --> ESLint
+AngularCLI --> TSCompiler
+AngularCLI --> PostCSS
+AngularCLI --> ESLint
 PostCSS --> TailwindPostCSS
 TailwindPostCSS --> Tailwind
-Tailwind --> TwAnimate
-Vite --> TSCompiler
 
-' Portfolio Analytics Backend
 Uvicorn --> FastAPI
 FastAPI --> PostgreSQL
 FastAPI --> Kafka
 FastAPI --> AIMLStack
-Expo --> FastAPI
-RN --> FastAPI
 
-' Monorepo工具关系
-PNPM --> NextJS
-PNPM --> React
+PNPM --> Angular
 PNPM --> TypeScript
 PNPM --> Expo
 
-' Mobile (React Native / Expo) 关系
-React --> RN
 Expo --> RN
 RN --> NativeDemoCardTech
 NativeDemoCardTech --> NativeDemoCardIOSTech
@@ -320,59 +181,17 @@ RN --> SharedChartLogicTech
 NativeChartsTech --> SharedChartLogicTech
 RN --> RNWagmi
 
-' AWS SDK关系
-AWSS3 --> S3Service
-AWSDynamoDB --> DynamoDBService
-AWSDynamoDB --> AWSUtilDynamoDB
-AWSLambda --> LambdaService
-AWSSQS --> SQSService
-AWSSNS --> SNSService
-AWSAPIGatewayV2 --> APIGatewayService
-AWSAPIGatewayMgmt --> APIGatewayService
-NextJS --> AWSS3
-NextJS --> AWSDynamoDB
-NextJS --> AWSLambda
-NextJS --> AWSSQS
-NextJS --> AWSSNS
-NextJS --> AWSAPIGatewayV2
+RN --> FastAPI
+Angular --> Vercel
 
-' 测试工具关系
-Vitest --> TSCompiler
-Storybook --> StorybookReactVite
-StorybookReactVite --> Vite
-Storybook --> StorybookAddons
-
-' 大数据技术栈关系
-SpringBoot --> Java
-MavenBuild --> JavaCompiler
-SpringBootPackager --> SpringBoot
-SpringBoot --> Spark
-SpringBoot --> Flink
-SpringBoot --> Hadoop
-MavenBuild --> SpringBoot
-JavaCompiler --> Java
-NextJS --> RESTEndpoint
-RESTEndpoint --> SpringBoot
-
-' 部署关系
-BuildSystem --> Vercel
+AngularCLI --> Vercel
 Vercel --> Analytics
 Vercel --> GitIntegration
 Vercel --> DomainSSL
 PNPM --> Vercel
-MavenBuild --> JavaDeploy
-SpringBootPackager --> JavaDeploy
-JavaDeploy --> RESTEndpoint
 
-' 基础设施关系
 Vercel --> CDNNode
 Vercel --> EdgeNode
-APIGatewayService --> LambdaService
-LambdaService --> S3Service
-LambdaService --> DynamoDBService
-LambdaService --> SQSService
-LambdaService --> SNSService
-S3Service --> StorageNode
 
 package "Standards" {
     component "Development" as DevStandard
@@ -410,16 +229,15 @@ legend right
     |<#E3F2FD> Front-end | UI stack
     |<#F3E5F5> Build | Compile and package
     |<#E8F5E9> Deploy | Hosting
-    |<#FFF3E0> Infrastructure | AWS and services
+    |<#FFF3E0> Infrastructure | Services
     |
     <b>Highlights</b>
-    • Next.js 16, TypeScript 5, Radix UI
-    • Recharts / Lightweight Charts / Chart.js / D3
-    • pnpm monorepo, AWS, Vercel
-    • Vitest, Storybook
-    • Big data (Java / Spring Boot / Spark / Flink / Hadoop)
-    • Portfolio Analytics: FastAPI + PostgreSQL + Kafka
-    • One-click: pnpm run start:backend
+    Angular 21, TypeScript 5, Radix UI, Tailwind
+    Chart.js, ng2-charts, chartjs-chart-financial, ag-grid
+    pnpm monorepo, Vercel
+    React Native, Expo, native charts (Metal/OpenGL ES)
+    Portfolio Analytics: FastAPI + PostgreSQL + Kafka
+    One-click: pnpm run start:backend
 endlegend
 
 @enduml

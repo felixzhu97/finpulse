@@ -1,16 +1,16 @@
 # FinPulse | Fintech Analytics Platform
 
 > Professional-grade financial data analysis and portfolio management platform  
-> 中文文档：[doc_zh/README.md](doc_zh/README.md)
+> Chinese documentation: [docs_ch/README.md](docs_ch/README.md)
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/felixzhu97s-projects/fintech-project)
-[![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Angular](https://img.shields.io/badge/Angular-21.1-red?style=for-the-badge&logo=angular)](https://angular.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
 
 ## 📋 Project Overview
 
-FinPulse is a modern fintech analytics platform that provides investors with comprehensive portfolio management, market analysis, and risk management capabilities. Built with Next.js, the platform delivers a smooth user experience and real-time data visualization.
+FinPulse is a modern fintech analytics platform that provides investors with comprehensive portfolio management, market analysis, and risk management capabilities. Built with Angular and React Native, the platform delivers a smooth user experience and real-time data visualization.
 
 ## ✨ Core Features
 
@@ -289,7 +289,10 @@ fintech-project/
 ├── packages/
 │   ├── ui/                       # UI component library (@fintech/ui)
 │   └── utils/                    # Utility function library (@fintech/utils)
-├── docs/                         # Architecture and domain documentation
+├── docs/                         # Architecture, domain, and ER diagram documentation
+│   ├── architecture/             # TOGAF architecture diagrams (PlantUML)
+│   ├── domain/                   # Finance system domain views
+│   └── er-diagram/               # Entity-relationship diagram
 ├── package.json                  # Root package.json (workspaces configuration)
 ├── pnpm-workspace.yaml           # pnpm workspaces configuration
 ├── pnpm-lock.yaml                # Dependency lock file
@@ -310,13 +313,15 @@ Shared UI component library, a collection of components built on Radix UI and Ta
 #### `packages/utils`
 Shared utility function library containing common utility functions (such as `cn` for style merging).
 
+## 📚 Documentation
+
+- **TOGAF Architecture** – `docs/architecture/` – Business, Application, Data, and Technology architecture diagrams (PlantUML)
+- **ER Diagram** – `docs/er-diagram/` – Entity-relationship diagram for the fintech data model
+- **TODO** – `docs/TODO.md` – Cross-cutting TODO list for architecture, web, mobile, and shared packages
+
 ## 🗺️ Roadmap & TODO
 
-High-level tasks and roadmap items for the whole monorepo are tracked in:
-
-- `docs/TODO.md` – cross-cutting TODO list for architecture, web, mobile, big data services, and shared packages.
-
-Before each significant release, review that file together with the architecture documents under `docs/architecture` and update items as work is completed.
+High-level tasks and roadmap items for the whole monorepo are tracked in `docs/TODO.md`. Before each significant release, review that file together with the architecture documents under `docs/architecture` and update items as work is completed.
 
 ## 🎨 Design Features
 
@@ -324,7 +329,7 @@ Before each significant release, review that file together with the architecture
 - **Responsive Layout** - Perfect adaptation to various screen sizes
 - **Dark Theme** - Default dark mode to reduce eye strain
 - **Accessibility** - Follows WCAG standards for good accessibility
-- **Performance Optimization** - Next.js SSR/SSG optimization for fast loading
+- **Performance Optimization** - Angular build optimization and lazy loading for fast loading
 
 ## 📦 Main Component Descriptions
 
@@ -373,8 +378,8 @@ The project is configured for automatic deployment to Vercel. Each push to the m
 Since the project uses a monorepo structure, configuration is required in Vercel:
 
 1. **Root Directory**: `/`
-2. **Build Command**: `pnpm --filter web build`
-3. **Output Directory**: `apps/web/.next`
+2. **Build Command**: `pnpm install && pnpm --filter finpulse-web build --configuration production`
+3. **Output Directory**: `apps/web/dist/web/browser`
 4. **Install Command**: `pnpm install`
 
 ### Manual Deployment

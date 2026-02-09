@@ -1,17 +1,17 @@
 # FinPulse TOGAF Enterprise Architecture
 
 > FinPulse fintech analytics platform enterprise architecture views based on the TOGAF framework.  
-> 中文文档（含中文版图表）：[doc_zh/architecture/README.md](../../doc_zh/architecture/README.md)
+> Chinese documentation: [docs_ch/architecture/README.md](../../docs_ch/architecture/README.md)
 
 ## Contents
 
-This directory contains **English** PlantUML diagrams for the four TOGAF architecture domains. Chinese versions (docs + diagrams) are under `doc_zh/architecture/`.
+This directory contains **English** PlantUML diagrams for the four TOGAF architecture domains. Chinese versions (docs + diagrams) are under `docs_ch/architecture/`.
 
 1. [Business Architecture](#business-architecture) — `business-architecture.puml`
 2. [Application Architecture](#application-architecture) — `application-architecture.puml`
 3. [Data Architecture](#data-architecture) — `data-architecture.puml`
 4. [Technology Architecture](#technology-architecture) — `technology-architecture.puml`
-5. Finance system domain views (`docs/domain`; Chinese: `doc_zh/domain/`)
+5. Finance system domain views (`docs/domain`; Chinese: `docs_ch/domain/`)
 
 ## Architecture Overview
 
@@ -45,7 +45,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 
 **Layers**:
 1. **Presentation**
-   - Web: `apps/web` (Angular financial analytics console)
+   - Web: `apps/web` (Angular 21 financial analytics console; Chart.js, ng2-charts, chartjs-chart-financial, ag-grid; @fintech/ui, @fintech/utils)
    - Mobile: `apps/mobile`, `apps/mobile-portfolio` (React Native; mobile-portfolio uses Expo)
    - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart). Metal (iOS) / OpenGL ES (Android); theme (light/dark), tooltips, x-axis, drag-to-scroll. Shared: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Code: `ios/mobileportfolio/*Chart/`, `android/.../view/`, `src/components/native/`.
    - UI library: `packages/ui`
@@ -95,7 +95,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 
 ### Finance System Domain Views
 
-**Directory**: `docs/domain` (English). Chinese: `doc_zh/domain/`.
+**Directory**: `docs/domain` (English). Chinese: `docs_ch/domain/`.
 
 **Files**: `finance-system-architecture.puml` (includes AI and ML Services); `finance-system.puml` (channels, edge, core, data, external); `finance-system-domains.puml` (domains including AI/ML); `finance-system-flows.puml` (flows including DL forecast, LLM summarisation).
 
@@ -156,13 +156,13 @@ Technology Architecture
 
 - [TOGAF 9.2](https://www.opengroup.org/togaf)
 - [PlantUML](https://plantuml.com/)
-- [Next.js](https://nextjs.org/docs) · [React](https://react.dev/) · [TypeScript](https://www.typescriptlang.org/docs/)
+- [Angular](https://angular.io/docs) · [React](https://react.dev/) · [TypeScript](https://www.typescriptlang.org/docs/)
 
 ## Architecture Decision Records
 
-### ADR-001: Next.js as front-end framework
+### ADR-001: Angular as web front-end framework
 
-**Decision**: Next.js 16 as primary front-end. **Rationale**: SSR/SSG, routing, TypeScript, Vercel integration. **Impact**: Front-end built on Next.js.
+**Decision**: Angular 21 as primary web front-end. **Rationale**: Full-featured framework, TypeScript, routing, component architecture, Vercel deployment. **Impact**: Web application built on Angular.
 
 ### ADR-002: PlantUML for architecture diagrams
 
