@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
 cd services/portfolio-analytics
@@ -27,6 +27,6 @@ for i in $(seq 1 30); do
   curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 --max-time 5 http://127.0.0.1:8800/api/v1/portfolio 2>/dev/null | grep -q 200 && break
   sleep 1
 done
-node scripts/generate-seed-data.js 2>/dev/null || true
+node scripts/seed/generate-seed-data.js 2>/dev/null || true
 
 echo "Backend: http://127.0.0.1:8800  (logs: tail -f /tmp/portfolio-api.log, stop: kill $API_PID)"

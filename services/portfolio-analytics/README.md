@@ -79,7 +79,7 @@ The server exposes an AI/ML layer under `/api/v1/ai` using:
 - **Pytest (no server needed)** – from repo root: `pnpm run test:api`. Runs `tests/test_api_ai.py` and `tests/test_api_portfolio.py` via FastAPI `TestClient` (risk/var, fraud, surveillance, sentiment, identity, dl/forecast, llm/summarise, portfolio get/seed). Ollama/HuggingFace/TF tests pass with 200 and skip if the backend returns an error.
 - **With API running** – `pnpm run generate-ai-seed-data` POSTs sample payloads to all AI endpoints; `pnpm run test:ai-api` runs `scripts/test-ai-api.sh` (curl) for a quick smoke test.
 
-To only write payloads to `scripts/ai-seed-data.json`, run `pnpm run generate-ai-seed-data:output`.
+To only write payloads to `scripts/seed/ai-seed-data.json`, run `pnpm run generate-ai-seed-data:output`.
 
 ### Configuring Ollama
 

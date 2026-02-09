@@ -113,7 +113,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 - **apps/web** - Angular-based financial analytics web console.
 - **apps/mobile** - React Native demo mobile app.
 - **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; includes native views **NativeDemoCard** and six native charts: **NativeLineChart** (line+area, crosshair/tooltip), **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Charts support configurable theme (light/dark), tooltips, x-axis labels, and horizontal drag-to-scroll via shared `useScrollableChart` and `ScrollableChartContainer`.
-- **services/portfolio-analytics** - Python FastAPI backend (DDD); PostgreSQL; Kafka; AI/ML endpoints (VaR, fraud, surveillance, sentiment, identity, forecast, Ollama, Hugging Face, TensorFlow); config via `.env.example`; one-click start via `scripts/start-backend.sh`; `pnpm run test:api` for API tests.
+- **services/portfolio-analytics** - Python FastAPI backend (DDD); PostgreSQL; Kafka; AI/ML endpoints (VaR, fraud, surveillance, sentiment, identity, forecast, Ollama, Hugging Face, TensorFlow); config via `.env.example`; one-click start via `scripts/backend/start-backend.sh`; `pnpm run test:api` for API tests.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
 
@@ -282,8 +282,9 @@ fintech-project/
 │   ├── mobile/                   # React Native mobile demo app
 │   └── mobile-portfolio/         # React Native portfolio overview mobile app
 ├── scripts/
-│   ├── start-backend.sh         # One-click: Docker (Postgres + Kafka) + API + seed
-│   └── generate-seed-data.js    # POST seed to API (run after backend is up)
+│   ├── backend/start-backend.sh # One-click: Docker (Postgres + Kafka) + API + seed
+│   ├── seed/generate-seed-data.js   # POST seed to API (run after backend is up)
+│   └── db/                        # Schema and seed SQL for fintech ER database
 ├── services/
 │   └── portfolio-analytics/    # FastAPI, PostgreSQL, Kafka (DDD)
 ├── packages/

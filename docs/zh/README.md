@@ -202,7 +202,7 @@ pnpm lint
 ```
 fintech-project/
 ├── apps/           # Web / 移动应用
-├── scripts/        # start-backend.sh, generate-seed-data.js
+├── scripts/        # backend/, seed/, db/
 ├── services/
 │   └── portfolio-analytics/   # FastAPI, PostgreSQL, Kafka (DDD)
 ├── packages/       # ui, utils
