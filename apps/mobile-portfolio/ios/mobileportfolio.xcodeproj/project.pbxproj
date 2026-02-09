@@ -32,6 +32,9 @@
 		A5B8C9DA7F0842090088060E /* NativeLineOnlyChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B8C9DB7F0842090088060E /* NativeLineOnlyChartViewManager.m */; };
 		A5B8C9DC7F0842090088060E /* NativeLineOnlyChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5B8C9DD7F0842090088060E /* NativeLineOnlyChartViewManager.swift */; };
 		A5B8C9DE7F0842090088060E /* NativeLineOnlyChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5B8C9DF7F0842090088060E /* NativeLineOnlyChartView.swift */; };
+		B7C9D0EA8F19531A0098071F /* NativeSparklineViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B7C9D0EB8F19531A0098071F /* NativeSparklineViewManager.m */; };
+		B7C9D0EC8F19531A0098071F /* NativeSparklineViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C9D0ED8F19531A0098071F /* NativeSparklineViewManager.swift */; };
+		B7C9D0EE8F19531A0098071F /* NativeSparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C9D0EF8F19531A0098071F /* NativeSparklineView.swift */; };
 		EC41811ED6CCD1139A309E53 /* libPods-mobileportfolio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C06262AC2361DE170D99B9F8 /* libPods-mobileportfolio.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -71,6 +74,9 @@
 		A5B8C9DB7F0842090088060E /* NativeLineOnlyChartViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeLineOnlyChartViewManager.m; sourceTree = "<group>"; };
 		A5B8C9DD7F0842090088060E /* NativeLineOnlyChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLineOnlyChartViewManager.swift; sourceTree = "<group>"; };
 		A5B8C9DF7F0842090088060E /* NativeLineOnlyChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLineOnlyChartView.swift; sourceTree = "<group>"; };
+		B7C9D0EB8F19531A0098071F /* NativeSparklineViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeSparklineViewManager.m; sourceTree = "<group>"; };
+		B7C9D0ED8F19531A0098071F /* NativeSparklineViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSparklineViewManager.swift; sourceTree = "<group>"; };
+		B7C9D0EF8F19531A0098071F /* NativeSparklineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSparklineView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +102,7 @@
 				E3F6A7BE5F0620E70066E4FC /* NativeBaselineChart */,
 				F4A7B8CF6F0731F80077F50D /* NativeHistogramChart */,
 				A5B8C9E07F0842090088060E /* NativeLineOnlyChart */,
+				B7C9D0F08F19531A0098071F /* NativeSparkline */,
 				F11748442D0722820044C1D9 /* mobileportfolio-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -228,6 +235,17 @@
 			);
 			name = NativeLineOnlyChart;
 			path = mobileportfolio/NativeLineOnlyChart;
+			sourceTree = "<group>";
+		};
+		B7C9D0F08F19531A0098071F /* NativeSparkline */ = {
+			isa = PBXGroup;
+			children = (
+				B7C9D0EB8F19531A0098071F /* NativeSparklineViewManager.m */,
+				B7C9D0ED8F19531A0098071F /* NativeSparklineViewManager.swift */,
+				B7C9D0EF8F19531A0098071F /* NativeSparklineView.swift */,
+			);
+			name = NativeSparkline;
+			path = mobileportfolio/NativeSparkline;
 			sourceTree = "<group>";
 		};
 		B8AD70004C9E5256A0B498E0 /* Pods */ = {
@@ -470,6 +488,9 @@
 				A5B8C9DA7F0842090088060E /* NativeLineOnlyChartViewManager.m in Sources */,
 				A5B8C9DC7F0842090088060E /* NativeLineOnlyChartViewManager.swift in Sources */,
 				A5B8C9DE7F0842090088060E /* NativeLineOnlyChartView.swift in Sources */,
+				B7C9D0EA8F19531A0098071F /* NativeSparklineViewManager.m in Sources */,
+				B7C9D0EC8F19531A0098071F /* NativeSparklineViewManager.swift in Sources */,
+				B7C9D0EE8F19531A0098071F /* NativeSparklineView.swift in Sources */,
 				21CCF3A165B4C7F5E4A57441 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

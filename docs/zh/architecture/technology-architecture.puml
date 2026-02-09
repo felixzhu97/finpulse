@@ -158,7 +158,10 @@ package "部署平台" <<Deploy>> {
 package "Portfolio Analytics Backend" <<Infra>> {
     component "FastAPI" as FastAPI
     component "uvicorn" as Uvicorn
-    component "PostgreSQL" as PostgreSQL
+    component "SQLAlchemy 2.0 + asyncpg" as SQLAlchemyAsync
+    component "Alembic" as Alembic
+    component "TimescaleDB (PostgreSQL)" as TimescaleDB
+    component "Redis" as Redis
     component "Apache Kafka" as Kafka
     component "AI/ML stack" as AIMLStack {
         component "Ollama (LLM)" as OllamaTech
@@ -174,7 +177,9 @@ package "Portfolio Analytics Backend" <<Infra>> {
         ollama, huggingface, tf)
         DDD, python-dotenv (.env), port 8800
     end note
-    note right of PostgreSQL: Portfolio persistence\nhost port 5433\nJSONB portfolio table
+    note right of TimescaleDB: Portfolio metadata (JSONB)\nportfolio_history hypertable\nhost port 5433
+    note right of Redis: History cache\nport 6379, TTL 300s
+    note right of SQLAlchemyAsync: Async ORM\nasyncpg driver
     note right of Kafka: portfolio.events topic\nportfolio.seeded events
     note right of AIMLStack: Optional: Ollama, HF, TF\npytest, pytest-timeout
 }
@@ -295,7 +300,10 @@ Vite --> TSCompiler
 
 ' Portfolio Analytics Backend
 Uvicorn --> FastAPI
-FastAPI --> PostgreSQL
+FastAPI --> SQLAlchemyAsync
+FastAPI --> Alembic
+SQLAlchemyAsync --> TimescaleDB
+FastAPI --> Redis
 FastAPI --> Kafka
 FastAPI --> AIMLStack
 Expo --> FastAPI
@@ -435,7 +443,7 @@ legend right
     • 大数据技术栈 (Java/Spring Boot/Spark/Flink/Hadoop)
     • 混合架构 (TypeScript + Java)
     • REST API服务 (Spring Boot)
-    • Portfolio Analytics: FastAPI + PostgreSQL + Kafka
+    • Portfolio Analytics: FastAPI + TimescaleDB + Redis + Kafka
     • One-click start: pnpm run start:backend
 endlegend
 

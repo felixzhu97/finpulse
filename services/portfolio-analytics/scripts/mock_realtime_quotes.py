@@ -13,8 +13,22 @@ def main() -> None:
 
   producer = Producer({"bootstrap.servers": bootstrap})
 
-  symbols = ["AAPL", "MSFT"]
-  state = {"AAPL": 190.0, "MSFT": 420.0}
+  symbols = [
+    "AAPL", "TSLA", "GOOG", "META", "MSFT", "AMZN",
+    "9988.HK", "0700.HK", "3690.HK", "1810.HK",
+  ]
+  state = {
+    "AAPL": 273.34,
+    "TSLA": 419.29,
+    "GOOG": 325.71,
+    "META": 668.60,
+    "MSFT": 411.71,
+    "AMZN": 209.72,
+    "9988.HK": 157.90,
+    "0700.HK": 560.00,
+    "3690.HK": 91.05,
+    "1810.HK": 35.20,
+  }
 
   try:
     while True:

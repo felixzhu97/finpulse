@@ -12,3 +12,5 @@ export { NativeHistogramChart } from "./NativeHistogramChart";
 export type { NativeHistogramChartProps } from "./NativeHistogramChart";
 export { NativeLineOnlyChart } from "./NativeLineOnlyChart";
 export type { NativeLineOnlyChartProps } from "./NativeLineOnlyChart";
+export { NativeSparkline } from "./NativeSparkline";
+export type { NativeSparklineProps } from "./NativeSparkline";

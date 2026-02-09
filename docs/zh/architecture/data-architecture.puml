@@ -204,14 +204,21 @@ package "大数据存储实体 (Big Data Storage Entities)" {
 }
 
 package "Portfolio Analytics Storage" {
-    component "PostgreSQL (portfolio)" as PostgresPortfolio <<DataEntity>>
+    component "TimescaleDB (PostgreSQL)" as TimescaleDB <<DataEntity>>
+    component "Redis (cache)" as RedisCache <<DataEntity>>
     component "Kafka (portfolio.events)" as KafkaPortfolioEvents <<DataFlow>>
 
-    note right of PostgresPortfolio
-        <b>Schema</b>
-        - portfolio (id TEXT PK, data JSONB)
+    note right of TimescaleDB
+        <b>Schema (Alembic)</b>
+        - portfolio (id PK, data JSONB)
+        - portfolio_history hypertable
+        - SQLAlchemy 2.0 + asyncpg
         - Seed via POST /api/v1/seed
-        - GET /api/v1/portfolio reads from DB
+    end note
+    note right of RedisCache
+        <b>Cache</b>
+        - portfolio:history:{id}:{days}d
+        - TTL 300s
     end note
     note right of KafkaPortfolioEvents
         <b>Events</b>
@@ -288,8 +295,9 @@ package "数据关系" {
     MarketData "1" --> "N" ValuationData : 估值输入
 
     ' Portfolio Analytics storage
-    PortfolioData "1" --> "0..1" PostgresPortfolio : persisted (portfolio-analytics)
-    PostgresPortfolio "1" --> "0..N" KafkaPortfolioEvents : emits events
+    PortfolioData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
+    TimescaleDB "1" --> "0..1" RedisCache : caches history
+    TimescaleDB "1" --> "0..N" KafkaPortfolioEvents : emits events
 
     ' AWS存储关系
     PortfolioData "1" --> "0..N" S3ObjectData : 附件存储

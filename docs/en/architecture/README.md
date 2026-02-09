@@ -47,7 +47,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 1. **Presentation**
    - Web: `apps/web` (Angular 21 financial analytics console; Chart.js, ng2-charts, chartjs-chart-financial, ag-grid; @fintech/ui, @fintech/utils)
    - Mobile: `apps/mobile`, `apps/mobile-portfolio` (React Native; mobile-portfolio uses Expo)
-   - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart). Metal (iOS) / OpenGL ES (Android); theme (light/dark), tooltips, x-axis, drag-to-scroll. Shared: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Code: `ios/mobileportfolio/*Chart/`, `android/.../view/`, `src/components/native/`. The account detail screen uses a `useRealtimeQuotes` hook to subscribe to WebSocket `/ws/quotes` for real-time holdings updates.
+   - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart); **NativeSparkline** for stock list. Metal (iOS) / OpenGL ES (Android); theme (light/dark), tooltips, x-axis, drag-to-scroll. Shared: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Code: `ios/mobileportfolio/*Chart/`, `android/.../view/`, `src/components/native/`. **Stocks screen**: `StockListItem`, `useRealtimeQuotes`, `usePerSymbolHistory`; WebSocket `/ws/quotes` for real-time prices; per-stock sparklines from accumulated quote history.
    - UI library: `packages/ui`
    - Charts: Chart.js, ng2-charts, chartjs-chart-financial, react-native-chart-kit, react-native-wagmi-charts
 
@@ -58,14 +58,14 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
    - Data services (DAO, cache), state management
 
 4. **External Services**
-   - **Portfolio Analytics API**: FastAPI (DDD). REST: GET /api/v1/portfolio, POST /api/v1/seed. Real-time quotes: GET /api/v1/quotes and WebSocket `/ws/quotes` (Kafka-backed, consuming `market.quotes.enriched`). AI/ML: /api/v1/ai (risk/var, fraud/check, surveillance/trade, sentiment, identity/score, dl/forecast, llm/summarise, ollama/generate, huggingface/summarise, tf/forecast). PostgreSQL; Kafka (portfolio.events, market.quotes.enriched). Config: .env (.env.example). Tests: pytest (pnpm run test:api).
+   - **Portfolio Analytics API**: FastAPI (DDD). REST: GET /api/v1/portfolio, POST /api/v1/seed. Real-time quotes: GET /api/v1/quotes and WebSocket `/ws/quotes` (Kafka-backed). AI/ML: /api/v1/ai (VaR, fraud, surveillance, sentiment, identity, forecast, summarisation, Ollama, Hugging Face, TF). **SQLAlchemy 2.0 + asyncpg**; **Alembic** migrations; **TimescaleDB** (portfolio metadata + history hypertable); **Redis** (history cache); Kafka (portfolio.events, market.quotes.enriched). Config: .env. Tests: pytest (pnpm run test:api).
    - Vercel Analytics, external market data API, storage, big data service layer (Java Spring Boot: SparkService, FlinkService, HadoopService)
 
 **API surfaces**: Portfolio API (GET /portfolio, POST /seed); real-time quote API (GET /quotes, WebSocket `/ws/quotes`); AI/ML API (VaR, fraud, surveillance, sentiment, identity, forecast, summarisation, Ollama, Hugging Face, TensorFlow); market, transaction, risk, Spark, Flink, Hadoop APIs.
 
 #### Mobile Applications
 
-- **apps/mobile-portfolio** uses **Portfolio Analytics API** (http://localhost:8800). Run `pnpm run start:backend` then `pnpm dev:mobile-portfolio`. Includes NativeDemoCard and six native charts with theme, tooltips, x-axis, drag-to-scroll. For real-time holdings, the app calls `GET /api/v1/portfolio` for initial state and subscribes to WebSocket `/ws/quotes` to stream Kafka-backed market data into the account detail screen.
+- **apps/mobile-portfolio** uses **Portfolio Analytics API** (http://localhost:8800). Run `pnpm run start:backend` then `pnpm dev:mobile-portfolio`. Stocks screen shows a flat list of holdings with real-time prices and per-stock sparklines (NativeSparkline, usePerSymbolHistory); WebSocket `/ws/quotes` streams Kafka-backed market data.
 
 ### Data Architecture
 
@@ -77,7 +77,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 
 **Relationships**: User ↔ Portfolio (1:n); Portfolio ↔ Asset (1:n); Portfolio ↔ Risk (1:1); User ↔ Transaction (1:n); Asset ↔ Market Data (1:n).
 
-**Data flows**: Market → asset prices; Transactions → portfolio; Portfolio + market → risk metrics; **Portfolio Analytics**: portfolio → PostgreSQL (portfolio table); POST /seed writes; GET /portfolio reads; seed publishes portfolio.seeded to Kafka (portfolio.events).
+**Data flows**: Market → asset prices; Transactions → portfolio; Portfolio + market → risk metrics; **Portfolio Analytics**: portfolio → TimescaleDB (portfolio table + portfolio_history hypertable); Redis caches history; POST /seed writes; GET /portfolio reads; seed publishes portfolio.seeded to Kafka (portfolio.events).
 
 ### Technology Architecture
 
@@ -85,7 +85,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 
 **Description**: Technology stack, build tools, and deployment.
 
-**Stack**: Front-end (Angular, React Native, Expo, React 19, TypeScript 5); mobile native (iOS Metal, Android OpenGL ES; shared chart logic); UI (Radix UI, Tailwind, Lucide); visualization (Chart.js, ng2-charts, chartjs-chart-financial, react-native-wagmi-charts, native charts); utilities (React Hook Form, Zod, date-fns, themes); build (Angular/TS, Maven, Java, Spring Boot); deployment (Vercel, Git, Java JAR/containers, REST); **Portfolio Analytics Backend** (FastAPI, uvicorn, port 8800; PostgreSQL 5433, Kafka 9092; AI/ML: Ollama, Hugging Face, TensorFlow, scipy/statsmodels/sumy; python-dotenv, pytest); big data (Java 17+, Spring Boot 3.2, Maven, Spark 3.5, Flink 1.19, Hadoop 3.3).
+**Stack**: Front-end (Angular, React Native, Expo, React 19, TypeScript 5); mobile native (iOS Metal, Android OpenGL ES; shared chart logic); UI (Radix UI, Tailwind, Lucide); visualization (Chart.js, ng2-charts, chartjs-chart-financial, react-native-wagmi-charts, native charts); utilities (React Hook Form, Zod, date-fns, themes); build (Angular/TS, Maven, Java, Spring Boot); deployment (Vercel, Git, Java JAR/containers, REST); **Portfolio Analytics Backend** (FastAPI, uvicorn, port 8800; SQLAlchemy 2.0 + asyncpg, Alembic; TimescaleDB 5433, Redis 6379, Kafka 9092; AI/ML: Ollama, Hugging Face, TensorFlow, scipy/statsmodels/sumy; python-dotenv, pytest); big data (Java 17+, Spring Boot 3.2, Maven, Spark 3.5, Flink 1.19, Hadoop 3.3).
 
 **Standards**: Development (TypeScript, ESLint, componentization); performance; security (HTTPS, CSP, XSS, validation); accessibility (WCAG 2.1 AA).
 

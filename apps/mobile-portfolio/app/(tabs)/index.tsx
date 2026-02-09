@@ -139,7 +139,7 @@ export default function DashboardScreen() {
       <View style={styles.centered}>
         <Text>
           {loaded
-            ? "Unable to load portfolio. Start backend (pnpm dev:api), then run pnpm generate-seed-data to seed the database."
+            ? "Unable to load portfolio. Run pnpm run start:backend to start API and seed data."
             : "Loading portfolio..."}
         </Text>
       </View>

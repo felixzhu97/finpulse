@@ -14,7 +14,8 @@ class NativeViewsPackage : ReactPackage {
       NativeAmericanLineChartViewManager(reactContext),
       NativeBaselineChartViewManager(reactContext),
       NativeHistogramChartViewManager(reactContext),
-      NativeLineOnlyChartViewManager(reactContext)
+      NativeLineOnlyChartViewManager(reactContext),
+      NativeSparklineViewManager(reactContext)
     )
   }
 

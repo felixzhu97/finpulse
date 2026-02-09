@@ -1,69 +1,54 @@
 import { StyleSheet, Text, View } from "react-native";
-import type { Account } from "../../types/portfolio";
+import type { Holding } from "../../types/portfolio";
 import { Sparkline } from "../ui/Sparkline";
 
-interface AccountListItemProps {
-  account: Account;
+interface StockListItemProps {
+  holding: Holding;
+  price: number;
+  change: number;
   historyValues?: number[];
 }
 
-function formatBalance(value: number) {
+function formatPrice(value: number) {
   return value.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
   });
 }
 
 function formatSigned(value: number) {
   const formatted = value.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
   });
   if (value > 0) return `+${formatted}`;
-  if (value < 0) return `${formatted}`;
+  if (value < 0) return formatted;
   return "0";
 }
 
-function getAccountTypeLabel(type: Account["type"]) {
-  switch (type) {
-    case "brokerage":
-      return "Brokerage";
-    case "saving":
-      return "Saving";
-    case "checking":
-      return "Checking";
-    case "creditCard":
-      return "Credit card";
-    case "cash":
-      return "Cash";
-    default:
-      return "Account";
-  }
-}
-
-export function AccountListItem({ account, historyValues }: AccountListItemProps) {
-  const isUp = account.todayChange > 0;
-  const isDown = account.todayChange < 0;
+export function StockListItem({ holding, price, change, historyValues }: StockListItemProps) {
+  const isUp = change > 0;
+  const isDown = change < 0;
   const trend = isUp ? "up" : isDown ? "down" : "flat";
   const badgeBg = isUp ? "#ef4444" : isDown ? "#22c55e" : "#374151";
 
   return (
     <View style={styles.row}>
       <View style={styles.left}>
-        <Text style={styles.code} numberOfLines={1}>
-          {account.name}
+        <Text style={styles.symbol} numberOfLines={1}>
+          {holding.symbol}
         </Text>
-        <Text style={styles.subtitle} numberOfLines={1}>
-          {getAccountTypeLabel(account.type)}
+        <Text style={styles.name} numberOfLines={1}>
+          {holding.name}
         </Text>
       </View>
       <View style={styles.sparkline}>
         <Sparkline data={historyValues} trend={trend} width={60} height={32} />
       </View>
       <View style={styles.right}>
-        <Text style={styles.price}>{formatBalance(account.balance)}</Text>
+        <Text style={styles.price}>{formatPrice(price)}</Text>
         <View style={[styles.badge, { backgroundColor: badgeBg }]}>
-          <Text style={styles.badgeText}>{formatSigned(account.todayChange)}</Text>
+          <Text style={styles.badgeText}>{formatSigned(change)}</Text>
         </View>
       </View>
     </View>
@@ -83,12 +68,12 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
-  code: {
+  symbol: {
     fontSize: 17,
     fontWeight: "600",
     color: "#fff",
   },
-  subtitle: {
+  name: {
     fontSize: 13,
     color: "#9ca3af",
     marginTop: 2,
@@ -107,14 +92,14 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
     marginTop: 4,
   },
   badgeText: {
     fontSize: 13,
-    fontWeight: "500",
+    fontWeight: "600",
     color: "#fff",
   },
 });

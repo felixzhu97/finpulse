@@ -1,13 +1,29 @@
-from typing import Dict, List
+from contextlib import asynccontextmanager
+from typing import Annotated, Dict, List
 
-from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.mappers import map_portfolio
 from app.api.ai_router import router as ai_router
-from app.container import market_data_service, portfolio_service
+from app.application.portfolio_service import PortfolioApplicationService
+from app.container import market_data_service
+from app.dependencies import get_portfolio_service
 
-app = FastAPI(title="Portfolio Analytics API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        from alembic import command
+        from alembic.config import Config
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+    except Exception:
+        pass
+    yield
+
+
+app = FastAPI(title="Portfolio Analytics API", lifespan=lifespan)
 app.include_router(ai_router)
 
 app.add_middleware(
@@ -20,9 +36,10 @@ app.add_middleware(
 
 
 @app.get("/api/v1/portfolio")
-def portfolio_get():
-  svc = portfolio_service()
-  portfolio = svc.get_portfolio()
+async def portfolio_get(
+  svc: Annotated[PortfolioApplicationService, Depends(get_portfolio_service)],
+):
+  portfolio = await svc.get_portfolio()
   return map_portfolio(portfolio)
 
 
@@ -48,9 +65,12 @@ def quotes_get(symbols: str = Query(...)):
 
 
 @app.post("/api/v1/seed")
-def portfolio_seed(payload: dict):
-  svc = portfolio_service()
-  if not svc.seed_portfolio(payload):
+async def portfolio_seed(
+  payload: dict,
+  svc: Annotated[PortfolioApplicationService, Depends(get_portfolio_service)],
+):
+  ok = await svc.seed_portfolio(payload)
+  if not ok:
     raise HTTPException(status_code=400, detail="Invalid portfolio payload")
   return {"ok": True}
 

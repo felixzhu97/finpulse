@@ -1,17 +1,17 @@
 ## Portfolio Analytics (Python FastAPI)
 
-Backend service providing portfolio analytics for the mobile and web clients. It uses **PostgreSQL** for persistence and **Kafka** for messaging (portfolio events). The codebase is structured using **Domain-Driven Design (DDD)**.
+Backend service providing portfolio analytics for the mobile and web clients. It uses **TimescaleDB** (PostgreSQL extension) for time-series portfolio history, **Redis** for caching, **PostgreSQL** for portfolio metadata, and **Kafka** for messaging. The codebase is structured using **Domain-Driven Design (DDD)**.
 
 ### DDD layout
 
 - **Domain** (`app/domain/`): **Portfolio** – entities (Portfolio, Account, Holding), value objects (PortfolioSummary, HistoryPoint), repository interface `IPortfolioRepository`. **Analytics** – value objects for results, domain services for business rules (e.g. `fraud_recommendation`, `surveillance_alert_type`, `identity_kyc_tier`, `var_interpretation`).
 - **Application** (`app/application/`): **PortfolioApplicationService** – get/seed portfolio; **AnalyticsApplicationService** – VaR, fraud, surveillance, sentiment, identity, forecast, summarisation, Ollama, Hugging Face, TensorFlow. Application services orchestrate domain and infrastructure.
-- **Infrastructure** (`app/infrastructure/`): **Persistence** – `PortfolioRepository` (implements `IPortfolioRepository` via `app.db`). **Messaging** – `EventPublisher` (Kafka). **Analytics** – providers (RiskVarProvider, FraudDetectorProvider, SurveillanceProvider, SentimentProvider, IdentityProvider, ForecastProvider, SummarisationProvider) and clients (Ollama, Hugging Face, TensorFlow).
+- **Infrastructure** (`app/infrastructure/`): **Persistence** – SQLAlchemy 2.0 + asyncpg; `PortfolioRepository`, `PortfolioHistoryRepository` (TimescaleDB + Redis cache). **Messaging** – `EventPublisher` (Kafka). **Analytics** – providers and clients (Ollama, Hugging Face, TensorFlow).
 - **API** (`app/api/`): HTTP handlers and DTOs; depend on application services only. Composition root: `app/container.py` builds repository, publisher, and application services.
 
 ### Infrastructure (runtime)
 
-Start PostgreSQL and Kafka locally (from this directory):
+Start TimescaleDB, Redis, and Kafka locally (from this directory):
 
 ```bash
 docker compose up -d
@@ -19,12 +19,13 @@ docker compose up -d
 
 Default connection:
 
-- **PostgreSQL:** `postgresql://postgres:postgres@127.0.0.1:5433/portfolio` (host port 5433 to avoid conflict with a local Postgres on 5432)
+- **TimescaleDB (PostgreSQL):** `postgresql://postgres:postgres@127.0.0.1:5433/portfolio` – portfolio metadata in JSONB; portfolio history in hypertable `portfolio_history`
+- **Redis:** `redis://127.0.0.1:6379/0` – cache for portfolio history (TTL 300s)
 - **Kafka:** `localhost:9092`. Topics:
   - `portfolio.events` – portfolio seed events (created on first produce)
   - `market.quotes.enriched` – enriched real-time market quotes (symbol-keyed, produced by external provider or Flink jobs)
 
-Override with env: `DATABASE_URL`, `KAFKA_BOOTSTRAP_SERVERS`, `KAFKA_PORTFOLIO_TOPIC`. An example config is in `.env.example` (copy to `.env` and source it, or set vars in your shell).
+Override with env: `DATABASE_URL`, `REDIS_URL`, `HISTORY_CACHE_TTL_SECONDS`, `KAFKA_BOOTSTRAP_SERVERS`, `KAFKA_PORTFOLIO_TOPIC`. An example config is in `.env.example` (copy to `.env` and source it, or set vars in your shell).
 
 ### Run the API
 
@@ -37,10 +38,22 @@ pip install -r requirements.txt
 export DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5433/portfolio
 export KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092
 
+alembic upgrade head   # Run migrations (also runs automatically on startup)
 uvicorn app.main:app --host 0.0.0.0 --port 8800 --reload
 ```
 
-From repo root: `pnpm dev:api` (ensure Postgres and Kafka are up and env is set if needed).
+From repo root: `pnpm dev:api` (ensure TimescaleDB, Redis, Kafka are up and env is set if needed).
+
+### Alembic
+
+Schema and migrations are managed by Alembic. Config: `alembic.ini`. Migrations: `alembic/versions/`.
+
+```bash
+alembic upgrade head    # Apply migrations
+alembic revision -m "..."  # Create new migration
+alembic downgrade -1    # Rollback one revision
+alembic current        # Show current revision
+```
 
 ### API
 

@@ -20,22 +20,21 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 | Screen | Route | Description |
 |--------|-------|-------------|
 | Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native chart demos |
-| Accounts | `/(tabs)/accounts` | Account list and balances |
+| Stocks | `/(tabs)/accounts` | Stock list with real-time prices, per-stock sparklines, account summaries |
 | Insights | `/(tabs)/insights` | Portfolio insights and analytics |
 | Profile | `/(tabs)/profile` | User profile |
-| Account Detail | `/account/[id]` | Single account details and holdings |
 
 ## Project Structure
 
 - `app/`: expo-router routes and screens.
 - `src/components/`: presentational components only, grouped by domain:
-  - `account/`: account and holding list items.
+  - `account/`: StockListItem, AccountListItem.
   - `portfolio/`: portfolio summary and charts.
   - `ui/`: generic UI such as metric cards.
   - `charts/`: advanced chart examples.
   - `native/`: native chart wrappers and scroll/tooltip helpers.
 - `src/services/`: data fetching and caching (e.g. `portfolioService`, `quoteSocket`).
-- `src/hooks/`: reusable hooks (e.g. `useRealtimeQuotes`).
+- `src/hooks/`: reusable hooks (e.g. `useRealtimeQuotes`, `usePerSymbolHistory`).
 - `src/store/`: global state with Zustand.
 - `src/types/`: shared TypeScript types used across the app.
 
@@ -59,17 +58,15 @@ Expo Go has limited support for native modules.
 
 The app connects only to the backend; there is no in-app mock data.
 
-1. Start PostgreSQL and Kafka: `cd services/portfolio-analytics && docker compose up -d`.
-2. Or from repo root: `pnpm run start:kafka` to start Kafka and Zookeeper.
-3. Start the backend from repo root: `pnpm dev:api` (portfolio-analytics on `http://localhost:8800`; uses `DATABASE_URL` and `KAFKA_BOOTSTRAP_SERVERS` if set).
-4. Generate seed data in the database: `pnpm generate-seed-data` (POSTs seed to the backend; backend must be running).
-5. The app expects `GET /api/v1/portfolio` for initial state and uses `GET /api/v1/quotes` + WebSocket `/ws/quotes` for real-time prices. Override the base URL with `EXPO_PUBLIC_PORTFOLIO_API_URL` in `.env` if needed (e.g. `http://192.168.3.160:8800` when using a simulator or device).
-6. Pull-to-refresh on the dashboard clears the cache and refetches from the backend.
+1. From repo root: `pnpm run start:backend` (Docker + TimescaleDB + Redis + Kafka + API + seed + mock quote producer).
+2. Or separately: `pnpm run start:kafka` for Kafka and mock quotes only.
+3. The app expects `GET /api/v1/portfolio` for initial state and WebSocket `/ws/quotes` for real-time prices. Override the base URL with `EXPO_PUBLIC_PORTFOLIO_API_URL` in `.env` if needed (e.g. `http://192.168.x.x:8800` when using a simulator or device).
+4. Pull-to-refresh on the dashboard clears the cache and refetches from the backend.
 
-### Real-time quotes
+### Real-time quotes and sparklines
 
-The account detail screen subscribes to real-time quotes for all holdings in the selected account:
+The Stocks screen displays holdings and account summaries with live data:
 
-- A hook `useRealtimeQuotes` opens a WebSocket connection to `/ws/quotes`, subscribes to the account's symbols, and listens for `snapshot` messages.
-- A shared `quoteSocket` client keeps the connection alive and resends subscribe messages periodically so the backend can push updated quotes backed by Kafka (`market.quotes.enriched`).
-- UI components (`HoldingListItem`) combine static holding data with live quotes to compute and render current price, market value, and profit/loss in real time.
+- `useRealtimeQuotes` opens a WebSocket connection to `/ws/quotes`, subscribes to symbols, and listens for `snapshot` messages.
+- `usePerSymbolHistory` accumulates per-symbol price history from quote snapshots for sparkline display.
+- `StockListItem` shows each stock with NativeSparkline (per-stock history from real-time data), current price, and daily change.

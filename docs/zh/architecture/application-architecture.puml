@@ -59,6 +59,12 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
 
     component "apps/mobile-portfolio" as MobilePortfolio {
         component "Expo + React Native" as ExpoRN
+        component "Stocks 屏幕" as StocksScreen {
+            component "StockListItem" as StockListItem
+            component "NativeSparkline" as NativeSparkline
+            component "useRealtimeQuotes" as UseRealtimeQuotes
+            component "usePerSymbolHistory" as UsePerSymbolHistory
+        }
         component "NativeDemoCard (demo native card)" as NativeDemoCard {
             component "iOS RCTViewManager" as NativeDemoCardIOS
             component "Android SimpleViewManager" as NativeDemoCardAndroid
@@ -245,7 +251,9 @@ package "外部服务层 (External Services)" <<External>> {
             component "sentiment, identity, forecast" as AIML2
             component "Ollama, Hugging Face, TF" as AIML3
         }
-        component "PostgreSQL" as PostgresDB
+        component "SQLAlchemy 2.0 + asyncpg + Alembic" as SQLAlchemyStack
+        component "TimescaleDB (portfolio + history)" as TimescaleDB
+        component "Redis (history cache)" as RedisDB
         component "Kafka (portfolio.events)" as KafkaTopic
     }
 
@@ -274,6 +282,11 @@ interface "Flink API" as FlinkAPI
 interface "Hadoop API" as HadoopAPI
 
 ' Mobile portfolio native views
+ExpoRN --> StocksScreen
+StocksScreen --> StockListItem
+StockListItem --> NativeSparkline
+StocksScreen --> UseRealtimeQuotes
+StocksScreen --> UsePerSymbolHistory
 ExpoRN --> NativeDemoCard
 NativeDemoCard --> NativeDemoCardIOS
 NativeDemoCard --> NativeDemoCardAndroid
@@ -303,7 +316,9 @@ MobilePortfolio --> PortfolioAnalyticsAPI
 FastAPIApp --> PortfolioGet
 FastAPIApp --> PortfolioSeed
 FastAPIApp --> AIMLAPI
-FastAPIApp --> PostgresDB
+FastAPIApp --> SQLAlchemyStack
+SQLAlchemyStack --> TimescaleDB
+FastAPIApp --> RedisDB
 FastAPIApp --> KafkaTopic
 
 ' 展示层内部关系

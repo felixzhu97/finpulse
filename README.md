@@ -78,8 +78,9 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 ### Backend Services
 
-- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. DDD layout; config via `.env` (see `services/portfolio-analytics/.env.example`).
-- **PostgreSQL** - Portfolio persistence (Docker, host port 5433)
+- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. DDD layout; SQLAlchemy 2.0 + asyncpg; Alembic migrations; config via `.env` (see `services/portfolio-analytics/.env.example`).
+- **TimescaleDB (PostgreSQL)** - Portfolio metadata (JSONB) and time-series history (hypertable); Docker, host port 5433
+- **Redis** - Cache for portfolio history (Docker, port 6379)
 - **Apache Kafka** - Event messaging for portfolio events and real-time market data (Docker, port 9092)
 - **AI/ML** - Under `/api/v1/ai`: VaR, fraud check, surveillance, sentiment, identity, forecast, summarisation; optional integrations: Ollama, Hugging Face (transformers), TensorFlow (LSTM forecast).
 - **One-click start** - `pnpm run start:backend` (Docker + API + seed). **API tests** - `pnpm run test:api` (pytest; Ollama/HF/TF tests may skip if services unavailable; Hugging Face first run can take 1–3 min).
@@ -112,7 +113,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 
 - **apps/web** - Angular-based financial analytics web console.
 - **apps/mobile** - React Native demo mobile app.
-- **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; includes native views **NativeDemoCard** and six native charts: **NativeLineChart** (line+area, crosshair/tooltip), **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Charts support configurable theme (light/dark), tooltips, x-axis labels, and horizontal drag-to-scroll via shared `useScrollableChart` and `ScrollableChartContainer`.
+- **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; **Stocks** screen with real-time prices and per-stock sparklines (NativeSparkline, usePerSymbolHistory); native views **NativeDemoCard** and six native charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Charts support configurable theme (light/dark), tooltips, x-axis labels, and horizontal drag-to-scroll via shared `useScrollableChart` and `ScrollableChartContainer`.
 - **services/portfolio-analytics** - Python FastAPI backend (DDD); PostgreSQL; Kafka; AI/ML endpoints (VaR, fraud, surveillance, sentiment, identity, forecast, Ollama, Hugging Face, TensorFlow); config via `.env.example`; one-click start via `scripts/backend/start-backend.sh`; `pnpm run test:api` for API tests.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.

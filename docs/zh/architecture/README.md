@@ -44,16 +44,16 @@
 **描述**：分层应用组件及其交互。
 
 **层次**：
-1. **展示层**：Web（`apps/web`，Angular）、移动（`apps/mobile`、`apps/mobile-portfolio`，React Native，Expo）；**Native UI（mobile-portfolio）**：**NativeDemoCard** 及六类原生图表。Metal（iOS）/ OpenGL ES（Android）；主题、提示、X 轴、拖拽滚动。共享逻辑：`useScrollableChart`、`ScrollableChartContainer`、`chartTooltip`。UI 库：`packages/ui`；图表：Chart.js、ng2-charts、chartjs-chart-financial、react-native-chart-kit、react-native-wagmi-charts。
+1. **展示层**：Web（`apps/web`，Angular）、移动（`apps/mobile`、`apps/mobile-portfolio`，React Native，Expo）；**Native UI（mobile-portfolio）**：**NativeDemoCard** 及六类原生图表；**NativeSparkline** 用于股票列表。Metal（iOS）/ OpenGL ES（Android）；主题、提示、X 轴、拖拽滚动。共享逻辑：`useScrollableChart`、`ScrollableChartContainer`、`chartTooltip`。**Stocks 屏幕**：`StockListItem`、`useRealtimeQuotes`、`usePerSymbolHistory`；WebSocket `/ws/quotes` 实时行情；基于累积行情的每股票 sparkline。UI 库：`packages/ui`；图表：Chart.js、ng2-charts、chartjs-chart-financial、react-native-chart-kit、react-native-wagmi-charts。
 2. **业务逻辑层**：投资组合、市场数据、交易、风险管理、用户模块
 3. **数据访问层**：数据服务（DAO、缓存）、状态管理
-4. **外部服务层**：**Portfolio Analytics API**（FastAPI，DDD；REST；AI/ML /api/v1/ai；PostgreSQL；Kafka）；Vercel Analytics、市场数据 API、存储、大数据服务层（Java Spring Boot）
+4. **外部服务层**：**Portfolio Analytics API**（FastAPI，DDD；REST；AI/ML /api/v1/ai；SQLAlchemy 2.0 + asyncpg，Alembic；TimescaleDB，Redis；Kafka）；Vercel Analytics、市场数据 API、存储、大数据服务层（Java Spring Boot）
 
 **API 接口**：投资组合 API；AI/ML API（VaR、欺诈检测、交易监控、情感分析、身份评分、预测、摘要、Ollama、Hugging Face、TensorFlow）；市场、交易、风险、Spark、Flink、Hadoop API。
 
 #### 移动应用
 
-- **apps/mobile-portfolio** 连接 **Portfolio Analytics API**（http://localhost:8800）。先执行 `pnpm run start:backend`，再执行 `pnpm dev:mobile-portfolio`。
+- **apps/mobile-portfolio** 连接 **Portfolio Analytics API**（http://localhost:8800）。执行 `pnpm run start:backend` 后运行 `pnpm dev:mobile-portfolio`。Stocks 屏幕展示股票列表，含实时价格与每股票 sparkline（NativeSparkline、usePerSymbolHistory）；WebSocket `/ws/quotes` 推送 Kafka 行情。
 
 ### 数据架构图 (Data Architecture)
 
@@ -65,7 +65,7 @@
 
 **数据关系**：用户 ↔ 投资组合（一对多）；投资组合 ↔ 资产（一对多）；投资组合 ↔ 风险指标（一对一）；用户 ↔ 交易记录（一对多）；资产 ↔ 市场数据（一对多）。
 
-**数据流向**：**Portfolio Analytics**：投资组合 → PostgreSQL（portfolio 表）持久化；POST /api/v1/seed 写入；GET /api/v1/portfolio 读取；seed 时向 Kafka（portfolio.events）发布 portfolio.seeded 事件。
+**数据流向**：**Portfolio Analytics**：投资组合 → TimescaleDB（portfolio 表 + portfolio_history hypertable）持久化；Redis 缓存历史；POST /api/v1/seed 写入；GET /api/v1/portfolio 读取；seed 时向 Kafka（portfolio.events）发布 portfolio.seeded 事件。
 
 ### 技术架构图 (Technology Architecture)
 
@@ -73,7 +73,7 @@
 
 **描述**：技术栈、构建工具与部署平台。
 
-**技术栈**：前端（Angular、React Native、Expo、React 19、TypeScript 5）；移动原生（iOS Metal、Android OpenGL ES）；UI（Radix UI、Tailwind、Lucide）；可视化（Chart.js、ng2-charts、chartjs-chart-financial、react-native-wagmi-charts、原生图表）；工具（React Hook Form、Zod、date-fns、主题）；构建（Angular/TS、Maven、Java、Spring Boot）；部署（Vercel、Git、Java JAR/容器、REST）；**Portfolio Analytics 后端**（FastAPI、uvicorn、端口 8800；PostgreSQL 5433、Kafka 9092；AI/ML：Ollama、Hugging Face、TensorFlow、scipy/statsmodels/sumy；python-dotenv、pytest）；大数据（Java 17+、Spring Boot 3.2、Maven、Spark 3.5、Flink 1.19、Hadoop 3.3）。
+**技术栈**：前端（Angular、React Native、Expo、React 19、TypeScript 5）；移动原生（iOS Metal、Android OpenGL ES）；UI（Radix UI、Tailwind、Lucide）；可视化（Chart.js、ng2-charts、chartjs-chart-financial、react-native-wagmi-charts、原生图表）；工具（React Hook Form、Zod、date-fns、主题）；构建（Angular/TS、Maven、Java、Spring Boot）；部署（Vercel、Git、Java JAR/容器、REST）；**Portfolio Analytics 后端**（FastAPI、uvicorn、端口 8800；SQLAlchemy 2.0 + asyncpg、Alembic；TimescaleDB 5433、Redis 6379、Kafka 9092；AI/ML：Ollama、Hugging Face、TensorFlow、scipy/statsmodels/sumy；python-dotenv、pytest）；大数据（Java 17+、Spring Boot 3.2、Maven、Spark 3.5、Flink 1.19、Hadoop 3.3）。
 
 **技术标准**：开发规范（TypeScript、ESLint、组件化）；性能；安全（HTTPS、CSP、XSS、数据验证）；无障碍（WCAG 2.1 AA）。
 

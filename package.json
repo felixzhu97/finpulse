@@ -5,23 +5,12 @@
   "packageManager": "pnpm@10.6.0",
   "scripts": {
     "dev": "pnpm --filter finpulse-web dev",
-    "dev:mobile": "pnpm --filter finpulse-mobile start",
     "dev:mobile-portfolio": "pnpm --filter mobile-portfolio start",
-    "dev:api": "cd services/portfolio-analytics && . .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8800 --reload",
-    "start:kafka": "cd services/portfolio-analytics && docker compose up kafka zookeeper -d && sleep 5 && (. .venv/bin/activate 2>/dev/null || true; python scripts/mock_realtime_quotes.py)",
-    "generate-seed-data": "node scripts/seed/generate-seed-data.js",
-    "generate-ai-seed-data": "node scripts/seed/generate-ai-seed-data.js",
-    "generate-ai-seed-data:output": "node scripts/seed/generate-ai-seed-data.js --output",
-    "test:ai-api": "bash scripts/test-ai-api.sh",
-    "test:api": "cd services/portfolio-analytics && (. .venv/bin/activate 2>/dev/null || true; python -m pytest tests -v)",
     "start:backend": "bash scripts/backend/start-backend.sh",
+    "start:kafka": "cd services/portfolio-analytics && docker compose up kafka zookeeper -d && sleep 5 && (. .venv/bin/activate 2>/dev/null || true; python scripts/mock_realtime_quotes.py)",
     "build": "pnpm --filter finpulse-web build",
     "start": "pnpm --filter finpulse-web start",
-    "start:web": "pnpm --filter finpulse-web start",
-    "start:mobile": "pnpm --filter finpulse-mobile start",
-    "start:mobile-portfolio": "cd apps/mobile-portfolio && npx expo start",
-    "start:mobile-portfolio-android": "cd apps/mobile-portfolio && npx expo run:android",
-    "start:mobile-portfolio-ios": "cd apps/mobile-portfolio && pnpm run ios",
+    "test:api": "cd services/portfolio-analytics && (. .venv/bin/activate 2>/dev/null || true; python -m pytest tests -v)",
     "lint": "pnpm --filter finpulse-web lint"
   }
 }

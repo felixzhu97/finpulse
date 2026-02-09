@@ -41,6 +41,12 @@ package "Presentation Layer" <<Presentation>> {
 
     component "apps/mobile-portfolio" as MobilePortfolio {
         component "Expo + React Native" as ExpoRN
+        component "Stocks screen" as StocksScreen {
+            component "StockListItem" as StockListItem
+            component "NativeSparkline" as NativeSparkline
+            component "useRealtimeQuotes" as UseRealtimeQuotes
+            component "usePerSymbolHistory" as UsePerSymbolHistory
+        }
         component "NativeDemoCard (demo native card)" as NativeDemoCard {
             component "iOS RCTViewManager" as NativeDemoCardIOS
             component "Android SimpleViewManager" as NativeDemoCardAndroid
@@ -119,17 +125,19 @@ package "External Services" <<External>> {
         component "FastAPI app (DDD)" as FastAPIApp
         component "GET /api/v1/portfolio" as PortfolioGet
         component "POST /api/v1/seed" as PortfolioSeed
-      component "GET /api/v1/quotes" as QuotesGet
-      component "WebSocket /ws/quotes" as QuotesWS
-      component "MarketDataService + KafkaMarketDataProvider" as MarketDataServiceComponent
+        component "GET /api/v1/quotes" as QuotesGet
+        component "WebSocket /ws/quotes" as QuotesWS
+        component "MarketDataService + KafkaMarketDataProvider" as MarketDataServiceComponent
         component "AI/ML /api/v1/ai" as AIMLAPI {
             component "VaR, fraud, surveillance" as AIML1
             component "sentiment, identity, forecast" as AIML2
             component "Ollama, Hugging Face, TF" as AIML3
         }
-        component "PostgreSQL" as PostgresDB
-      component "Kafka (portfolio.events)" as KafkaTopic
-      component "Kafka (market.quotes.enriched)" as KafkaQuotesTopic
+        component "SQLAlchemy 2.0 + asyncpg + Alembic" as SQLAlchemyStack
+        component "TimescaleDB (portfolio + history)" as TimescaleDB
+        component "Redis (history cache)" as RedisDB
+        component "Kafka (portfolio.events)" as KafkaTopic
+        component "Kafka (market.quotes.enriched)" as KafkaQuotesTopic
     }
 
 }
@@ -140,6 +148,11 @@ interface "Transaction API" as TransactionAPI
 interface "Risk API" as RiskAPI
 
 ' Mobile portfolio native views
+ExpoRN --> StocksScreen
+StocksScreen --> StockListItem
+StockListItem --> NativeSparkline
+StocksScreen --> UseRealtimeQuotes
+StocksScreen --> UsePerSymbolHistory
 ExpoRN --> NativeDemoCard
 NativeDemoCard --> NativeDemoCardIOS
 NativeDemoCard --> NativeDemoCardAndroid
@@ -172,7 +185,9 @@ FastAPIApp --> PortfolioSeed
 FastAPIApp --> QuotesGet
 FastAPIApp --> QuotesWS
 FastAPIApp --> AIMLAPI
-FastAPIApp --> PostgresDB
+FastAPIApp --> SQLAlchemyStack
+SQLAlchemyStack --> TimescaleDB
+FastAPIApp --> RedisDB
 FastAPIApp --> KafkaTopic
 FastAPIApp --> MarketDataServiceComponent
 MarketDataServiceComponent --> KafkaQuotesTopic

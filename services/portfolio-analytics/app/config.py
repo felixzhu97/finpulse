@@ -21,6 +21,9 @@ KAFKA_QUOTES_ENRICHED_TOPIC = os.environ.get(
   "market.quotes.enriched",
 )
 
+REDIS_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")
+HISTORY_CACHE_TTL_SECONDS = int(os.environ.get("HISTORY_CACHE_TTL_SECONDS", "300"))
+
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
 OLLAMA_DEFAULT_MODEL = os.environ.get("OLLAMA_DEFAULT_MODEL", "llama2")
 HF_SUMMARISATION_MODEL = os.environ.get("HF_SUMMARISATION_MODEL", "sshleifer/distilbart-cnn-12-6")

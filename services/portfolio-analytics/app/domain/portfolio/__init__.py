@@ -1,6 +1,6 @@
 from app.domain.portfolio.entities import Account, Holding, Portfolio
 from app.domain.portfolio.value_objects import HistoryPoint, PortfolioSummary
-from app.domain.portfolio.repository import IPortfolioRepository
+from app.domain.portfolio.repository import IPortfolioRepository, IPortfolioHistoryRepository
 
 __all__ = [
   "Portfolio",
@@ -9,4 +9,5 @@ __all__ = [
   "PortfolioSummary",
   "HistoryPoint",
   "IPortfolioRepository",
+  "IPortfolioHistoryRepository",
 ]

@@ -32,8 +32,8 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - UI component libraries: `@fintech/ui`, `@fintech/utils`
 - Business components: portfolio overview, market trends, asset allocation, risk analysis, transaction records, etc.
 - Application services: portfolio service, market data service, risk analysis service, reporting service
-- Back-end services: `services/portfolio-analytics` (FastAPI-based portfolio analytics with DDD layering)
-- **Mobile native UI**: `apps/mobile-portfolio` includes (**NativeDemoCard** and six charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart**) via RCTViewManager (iOS) and SimpleViewManager (Android). Charts support theme (light/dark), tooltips, x-axis labels, horizontal drag-to-scroll; shared logic: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Native: `ios/mobileportfolio/*Chart/`, `android/.../view/`; JS: `src/components/native/`.
+- Back-end services: `services/portfolio-analytics` (FastAPI + DDD; SQLAlchemy 2.0, asyncpg, Alembic; TimescaleDB, Redis, Kafka)
+- **Mobile native UI**: `apps/mobile-portfolio` includes **Stocks** screen (StockListItem, NativeSparkline, useRealtimeQuotes, usePerSymbolHistory) for real-time stock list; **NativeDemoCard** and six charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** via RCTViewManager (iOS) and SimpleViewManager (Android). Charts support theme (light/dark), tooltips, x-axis labels, horizontal drag-to-scroll; shared logic: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Native: `ios/mobileportfolio/*Chart/`, `android/.../view/`; JS: `src/components/native/`.
 
 **Document location**: `docs/architecture/application-architecture.puml`
 
@@ -41,10 +41,10 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 
 - `apps/web/` – Financial analytics web console
 - `apps/mobile/` – Mobile demo app
-- `apps/mobile-portfolio/` – Portfolio mobile app (Expo + RN, with NativeDemoCard and six native chart views)
+- `apps/mobile-portfolio/` – Portfolio mobile app (Expo + RN; Stocks screen with NativeSparkline; NativeDemoCard and six native chart views)
 - `packages/ui/` – UI component library
 - `packages/utils/` – Utility library
-- `services/portfolio-analytics/` – Portfolio analytics and data aggregation service layer
+- `services/portfolio-analytics/` – Portfolio analytics and data aggregation (SQLAlchemy 2.0, asyncpg, Alembic, TimescaleDB, Redis, Kafka)
 
 ### Data Architecture
 
@@ -212,7 +212,7 @@ docs/architecture/
 - `apps/mobile/`, `apps/mobile-portfolio/` – Mobile apps (mobile-portfolio includes NativeDemoCard and six native chart views)
 - `packages/ui/` – UI component layer
 - `packages/utils/` – Utility layer
-- `services/portfolio-analytics/` – Portfolio analytics service (FastAPI + DDD)
+- `services/portfolio-analytics/` – Portfolio analytics (FastAPI + DDD; SQLAlchemy, asyncpg, Alembic; TimescaleDB, Redis, Kafka)
 
 **Data architecture** →
 
@@ -223,7 +223,7 @@ docs/architecture/
 
 - Root config: `package.json`, `pnpm-workspace.yaml`, `tsconfig.json`, `vercel.json`
 - Front-end: `apps/web/`, `apps/mobile/`, `apps/mobile-portfolio/` (native chart views + useScrollableChart/ScrollableChartContainer in iOS/Android)
-- Back-end: `services/portfolio-analytics/` (FastAPI)
+- Back-end: `services/portfolio-analytics/` (FastAPI; SQLAlchemy, asyncpg, Alembic; TimescaleDB, Redis)
 
 ## Governance Rules
 

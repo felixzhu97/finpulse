@@ -108,7 +108,10 @@ package "Deployment" <<Deploy>> {
 package "Portfolio Analytics Backend" <<Infra>> {
     component "FastAPI" as FastAPI
     component "uvicorn" as Uvicorn
-    component "PostgreSQL" as PostgreSQL
+    component "SQLAlchemy 2.0 + asyncpg" as SQLAlchemyAsync
+    component "Alembic" as Alembic
+    component "TimescaleDB (PostgreSQL)" as TimescaleDB
+    component "Redis" as Redis
     component "Apache Kafka" as Kafka
     component "Market data services" as MarketDataInfra {
         component "GET /api/v1/quotes" as QuotesHTTPInfra
@@ -130,7 +133,9 @@ package "Portfolio Analytics Backend" <<Infra>> {
         ollama, huggingface, tf)
         DDD, python-dotenv (.env), port 8800
     end note
-    note right of PostgreSQL: Portfolio persistence\nhost port 5433\nJSONB portfolio table
+    note right of TimescaleDB: Portfolio metadata (JSONB)\nportfolio_history hypertable\nhost port 5433
+    note right of Redis: History cache\nport 6379, TTL 300s
+    note right of SQLAlchemyAsync: Async ORM\nasyncpg driver
     note right of Kafka: portfolio.events topic\nportfolio.seeded events\nmarket.quotes.enriched topic\nreal-time quotes
     note right of AIMLStack: Optional: Ollama, HF, TF\npytest, pytest-timeout
 }
@@ -168,7 +173,10 @@ PostCSS --> TailwindPostCSS
 TailwindPostCSS --> Tailwind
 
 Uvicorn --> FastAPI
-FastAPI --> PostgreSQL
+FastAPI --> SQLAlchemyAsync
+FastAPI --> Alembic
+SQLAlchemyAsync --> TimescaleDB
+FastAPI --> Redis
 FastAPI --> Kafka
 FastAPI --> AIMLStack
 FastAPI --> MarketDataInfra

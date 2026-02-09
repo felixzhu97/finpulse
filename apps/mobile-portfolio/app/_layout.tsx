@@ -39,13 +39,6 @@ export default function RootLayout() {
           <Stack initialRouteName="(tabs)">
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
-            <Stack.Screen
-              name="account/[id]"
-              options={{
-                headerShown: false,
-                presentation: "card",
-              }}
-            />
           </Stack>
         </SafeAreaView>
       </GestureHandlerRootView>

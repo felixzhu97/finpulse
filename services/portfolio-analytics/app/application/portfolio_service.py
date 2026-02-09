@@ -79,16 +79,16 @@ class PortfolioApplicationService:
     self._repo = repository
     self._publisher = event_publisher
 
-  def get_portfolio(self, portfolio_id: str = "demo-portfolio") -> Portfolio:
-    portfolio = self._repo.get(portfolio_id)
+  async def get_portfolio(self, portfolio_id: str = "demo-portfolio") -> Portfolio:
+    portfolio = await self._repo.get(portfolio_id)
     return portfolio if portfolio is not None else _demo_portfolio()
 
-  def seed_portfolio(self, payload: Any) -> bool:
+  async def seed_portfolio(self, payload: Any) -> bool:
     if not isinstance(payload, dict):
       return False
     if _portfolio_from_raw(payload) is None:
       return False
     portfolio_id = payload.get("id", "demo-portfolio")
-    self._repo.save(portfolio_id, payload)
+    await self._repo.save(portfolio_id, payload)
     self._publisher.publish_portfolio_event("portfolio.seeded", portfolio_id, payload)
     return True
