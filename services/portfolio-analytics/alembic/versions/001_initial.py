@@ -19,7 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.execute("CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE")
     op.create_table(
-        "portfolio",
+        "portfolio_legacy",
         sa.Column("id", sa.Text(), nullable=False),
         sa.Column("data", sa.JSON(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
@@ -43,4 +43,4 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_index("idx_portfolio_history_portfolio_time", table_name="portfolio_history")
     op.drop_table("portfolio_history")
-    op.drop_table("portfolio")
+    op.drop_table("portfolio_legacy")

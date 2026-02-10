@@ -1,0 +1,20 @@
+@startuml c4-system-context-zh
+!define RELATIVE_INCLUDE 1
+!include ../../c4-lib/C4-PlantUML/C4_Context.puml
+
+title FinPulse 金融科技平台 - 系统上下文图
+
+Person(investor, "投资者", "投资组合管理、市场分析、风险评估")
+Person(admin, "平台管理员", "系统配置与分析")
+
+System(finpulse, "FinPulse", "金融科技分析平台：投资组合、市场趋势、风险分析与报表")
+
+System_Ext(market_api, "市场数据 API", "第三方市场数据与行情")
+System_Ext(vercel, "Vercel", "Web 应用托管与分析")
+
+Rel(investor, finpulse, "使用", "浏览器 / 移动端")
+Rel(admin, finpulse, "管理", "浏览器")
+Rel(finpulse, market_api, "获取市场数据", "REST / WebSocket")
+Rel(finpulse, vercel, "部署 Web 应用", "Vercel 平台")
+
+@enduml

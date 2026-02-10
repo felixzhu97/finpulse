@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 from typing import Any, Optional
 
+from app.application.event_ports import IEventPublisherPort
 from app.domain.portfolio import (
-  Portfolio,
-  Account,
-  Holding,
-  PortfolioSummary,
-  HistoryPoint,
-  IPortfolioRepository,
+    Account,
+    Holding,
+    HistoryPoint,
+    IPortfolioRepository,
+    Portfolio,
+    PortfolioSummary,
 )
 
 
@@ -75,20 +78,20 @@ def _portfolio_from_raw(raw: dict) -> Optional[Portfolio]:
 
 
 class PortfolioApplicationService:
-  def __init__(self, repository: IPortfolioRepository, event_publisher: Any):
-    self._repo = repository
-    self._publisher = event_publisher
+    def __init__(self, repository: IPortfolioRepository, event_publisher: IEventPublisherPort):
+        self._repo = repository
+        self._publisher = event_publisher
 
-  async def get_portfolio(self, portfolio_id: str = "demo-portfolio") -> Portfolio:
-    portfolio = await self._repo.get(portfolio_id)
-    return portfolio if portfolio is not None else _demo_portfolio()
+    async def get_portfolio(self, portfolio_id: str = "demo-portfolio") -> Portfolio:
+        portfolio = await self._repo.get(portfolio_id)
+        return portfolio if portfolio is not None else _demo_portfolio()
 
-  async def seed_portfolio(self, payload: Any) -> bool:
-    if not isinstance(payload, dict):
-      return False
-    if _portfolio_from_raw(payload) is None:
-      return False
-    portfolio_id = payload.get("id", "demo-portfolio")
-    await self._repo.save(portfolio_id, payload)
-    self._publisher.publish_portfolio_event("portfolio.seeded", portfolio_id, payload)
-    return True
+    async def seed_portfolio(self, payload: Any) -> bool:
+        if not isinstance(payload, dict):
+            return False
+        if _portfolio_from_raw(payload) is None:
+            return False
+        portfolio_id = payload.get("id", "demo-portfolio")
+        await self._repo.save(portfolio_id, payload)
+        self._publisher.publish_portfolio_event("portfolio.seeded", portfolio_id, payload)
+        return True

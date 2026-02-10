@@ -10,7 +10,12 @@ export type QuoteSnapshot = Record<
   }
 >;
 
-export type QuoteConnectionStatus = "idle" | "connecting" | "open" | "closed" | "error";
+export type QuoteConnectionStatus =
+  | "idle"
+  | "connecting"
+  | "open"
+  | "closed"
+  | "error";
 
 export interface QuoteSocketOptions {
   symbols: string[];
@@ -33,101 +38,105 @@ function toWebSocketUrl(httpUrl: string): string {
   return httpUrl;
 }
 
-export function createQuoteSocket(options: QuoteSocketOptions): QuoteSocketHandle {
-  let symbols = Array.from(new Set(options.symbols.map((s) => s.toUpperCase())));
-  let socket: WebSocket | null = null;
-  let closed = false;
-  let reconnectDelay = 1000;
-  let timer: ReturnType<typeof setInterval> | null = null;
+export class QuoteSocket implements QuoteSocketHandle {
+  private symbols: string[];
+  private socket: WebSocket | null = null;
+  private closed = false;
+  private reconnectDelay = 1000;
+  private timer: ReturnType<typeof setInterval> | null = null;
 
-  const notifyStatus = (status: QuoteConnectionStatus) => {
-    if (options.onStatusChange) {
-      options.onStatusChange(status);
+  constructor(private readonly options: QuoteSocketOptions) {
+    this.symbols = Array.from(
+      new Set(options.symbols.map((s) => s.toUpperCase())),
+    );
+    this.connect();
+  }
+
+  updateSymbols(next: string[]): void {
+    this.symbols = Array.from(new Set(next.map((s) => s.toUpperCase())));
+    this.sendSubscribe();
+  }
+
+  close(): void {
+    this.closed = true;
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
     }
-  };
+    if (this.socket) {
+      this.socket.close();
+      this.socket = null;
+    }
+  }
 
-  const sendSubscribe = () => {
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
+  private notifyStatus(status: QuoteConnectionStatus): void {
+    if (this.options.onStatusChange) {
+      this.options.onStatusChange(status);
+    }
+  }
+
+  private sendSubscribe(): void {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       return;
     }
-    socket.send(
+    this.socket.send(
       JSON.stringify({
         type: "subscribe",
-        symbols,
+        symbols: this.symbols,
       }),
     );
-  };
+  }
 
-  const connect = () => {
-    if (closed) {
-      return;
-    }
-    notifyStatus("connecting");
+  private connect(): void {
+    if (this.closed) return;
+    this.notifyStatus("connecting");
     const base = getPortfolioApiBaseUrl();
     const wsUrl = toWebSocketUrl(base) + "/ws/quotes";
-    socket = new WebSocket(wsUrl);
+    this.socket = new WebSocket(wsUrl);
 
-    socket.onopen = () => {
-      reconnectDelay = 1000;
-      notifyStatus("open");
-      sendSubscribe();
-      if (timer) {
-        clearInterval(timer);
-      }
-      timer = setInterval(() => {
-        sendSubscribe();
-      }, 1000);
+    this.socket.onopen = () => {
+      this.reconnectDelay = 1000;
+      this.notifyStatus("open");
+      this.sendSubscribe();
+      if (this.timer) clearInterval(this.timer);
+      this.timer = setInterval(() => this.sendSubscribe(), 1000);
     };
 
-    socket.onmessage = (event) => {
+    this.socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data && data.type === "snapshot" && data.quotes && typeof data.quotes === "object") {
-          options.onSnapshot(data.quotes as QuoteSnapshot);
+        if (
+          data &&
+          data.type === "snapshot" &&
+          data.quotes &&
+          typeof data.quotes === "object"
+        ) {
+          this.options.onSnapshot(data.quotes as QuoteSnapshot);
         }
       } catch {
       }
     };
 
-    socket.onerror = () => {
-      notifyStatus("error");
+    this.socket.onerror = () => {
+      this.notifyStatus("error");
     };
 
-    socket.onclose = () => {
-      notifyStatus("closed");
-      socket = null;
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
+    this.socket.onclose = () => {
+      this.notifyStatus("closed");
+      this.socket = null;
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
       }
-      if (closed) {
-        return;
-      }
+      if (this.closed) return;
       setTimeout(() => {
-        reconnectDelay = Math.min(reconnectDelay * 2, 10000);
-        connect();
-      }, reconnectDelay);
+        this.reconnectDelay = Math.min(this.reconnectDelay * 2, 10000);
+        this.connect();
+      }, this.reconnectDelay);
     };
-  };
-
-  connect();
-
-  return {
-    updateSymbols(next: string[]) {
-      symbols = Array.from(new Set(next.map((s) => s.toUpperCase())));
-      sendSubscribe();
-    },
-    close() {
-      closed = true;
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
-      }
-      if (socket) {
-        socket.close();
-        socket = null;
-      }
-    },
-  };
+  }
 }
 
+export function createQuoteSocket(options: QuoteSocketOptions): QuoteSocketHandle {
+  return new QuoteSocket(options);
+}

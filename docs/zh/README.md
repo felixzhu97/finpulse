@@ -216,7 +216,7 @@ fintech-project/
 ## 路线图与 TODO
 
 - 中文 TODO：[doc_zh/TODO.md](TODO.md)
-- 英文 TODO：`docs/TODO.md`。重要发布前请与 `docs/architecture` 及本目录架构文档一起审阅并更新。
+- 英文 TODO：`docs/TODO.md`。重要发布前请与 `docs/zh/togaf`、`docs/zh/c4` 及本目录架构文档一起审阅并更新。
 
 ## 设计特点
 

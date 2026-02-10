@@ -1,0 +1,43 @@
+@startuml c4-components-zh
+!define RELATIVE_INCLUDE 1
+!include ../../c4-lib/C4-PlantUML/C4_Component.puml
+
+title 投资组合分析 API - 组件图
+
+Container_Boundary(portfolio_api, "投资组合分析 API") {
+    Component(portfolio_router, "投资组合路由", "FastAPI", "REST: GET /portfolio, POST /seed")
+    Component(quotes_router, "行情路由", "FastAPI", "REST: GET /quotes, WebSocket /ws/quotes")
+    Component(ai_router, "AI 路由", "FastAPI", "REST: /api/v1/ai - VaR、欺诈、情感、预测")
+
+    Component(portfolio_svc, "投资组合服务", "Python", "投资组合 CRUD 与聚合")
+    Component(analytics_svc, "分析服务", "Python", "风险分析与 AI 编排")
+    Component(market_data_svc, "市场数据服务", "Python", "实时行情、Kafka 提供方")
+
+    Component(portfolio_repo, "投资组合仓储", "SQLAlchemy", "TimescaleDB 持久化")
+    Component(history_repo, "投资组合历史仓储", "SQLAlchemy", "历史超表访问")
+    Component(kafka_provider, "Kafka 提供方", "Python", "消费 market.quotes.enriched")
+    Component(event_publisher, "事件发布者", "Python", "发布 portfolio.events")
+
+    Component(ai_providers, "AI 提供方", "Python", "Ollama、Hugging Face、TF；VaR、欺诈、情感")
+}
+
+ContainerDb(timescale, "TimescaleDB", "PostgreSQL", "投资组合与历史")
+ContainerDb(redis_db, "Redis", "内存", "历史缓存")
+ContainerQueue(kafka, "Kafka", "事件流", "portfolio.events, market.quotes.enriched")
+
+Rel(portfolio_router, portfolio_svc, "调用", "Async")
+Rel(quotes_router, market_data_svc, "调用", "Async / WebSocket")
+Rel(ai_router, analytics_svc, "调用", "Async")
+Rel(portfolio_svc, portfolio_repo, "使用", "")
+Rel(portfolio_svc, event_publisher, "发布", "")
+Rel(analytics_svc, ai_providers, "委托", "")
+Rel(analytics_svc, history_repo, "使用", "")
+Rel(market_data_svc, kafka_provider, "消费", "")
+Rel(market_data_svc, history_repo, "使用", "")
+Rel(portfolio_repo, timescale, "SQL", "asyncpg")
+Rel(history_repo, timescale, "SQL", "asyncpg")
+Rel(history_repo, redis_db, "缓存", "")
+Rel(kafka_provider, kafka, "消费", "")
+Rel(event_publisher, kafka, "发布", "")
+
+@enduml

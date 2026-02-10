@@ -2,12 +2,12 @@
 
 Backend service providing portfolio analytics for the mobile and web clients. It uses **TimescaleDB** (PostgreSQL extension) for time-series portfolio history, **Redis** for caching, **PostgreSQL** for portfolio metadata, and **Kafka** for messaging. The codebase is structured using **Domain-Driven Design (DDD)**.
 
-### DDD layout
+### Layout
 
-- **Domain** (`app/domain/`): **Portfolio** – entities (Portfolio, Account, Holding), value objects (PortfolioSummary, HistoryPoint), repository interface `IPortfolioRepository`. **Analytics** – value objects for results, domain services for business rules (e.g. `fraud_recommendation`, `surveillance_alert_type`, `identity_kyc_tier`, `var_interpretation`).
-- **Application** (`app/application/`): **PortfolioApplicationService** – get/seed portfolio; **AnalyticsApplicationService** – VaR, fraud, surveillance, sentiment, identity, forecast, summarisation, Ollama, Hugging Face, TensorFlow. Application services orchestrate domain and infrastructure.
-- **Infrastructure** (`app/infrastructure/`): **Persistence** – SQLAlchemy 2.0 + asyncpg; `PortfolioRepository`, `PortfolioHistoryRepository` (TimescaleDB + Redis cache). **Messaging** – `EventPublisher` (Kafka). **Analytics** – providers and clients (Ollama, Hugging Face, TensorFlow).
-- **API** (`app/api/`): HTTP handlers and DTOs; depend on application services only. Composition root: `app/container.py` builds repository, publisher, and application services.
+- **Core – Domain** (`src/core/domain/`): Entities, value objects, domain services, events, exceptions. No framework or outer-layer dependencies.
+- **Core – Application** (`src/core/application/`): Use cases and ports (repository, service, message-broker interfaces). Depends only on domain.
+- **Infrastructure** (`src/infrastructure/`): Database (ORM, repositories, session), external services (analytics, market data), message brokers (Kafka). Implements application ports.
+- **API** (`src/api/`): HTTP endpoints, schemas, and dependency injection. Composition root wires ports to infrastructure; entrypoint is `main.py` (project root).
 
 ### Infrastructure (runtime)
 
@@ -29,20 +29,33 @@ Override with env: `DATABASE_URL`, `REDIS_URL`, `HISTORY_CACHE_TTL_SECONDS`, `KA
 
 ### Run the API
 
+**All commands must be run from the project root** (`fintech-project`), not from `docs/` or other subdirs.
+
+**Option A – One command (from project root):**
+
+```bash
+pnpm run start:backend
+```
+
+This starts Docker (Postgres, Redis, Kafka), creates/uses `.venv` in `services/portfolio-analytics`, runs migrations, and starts the API on port 8800.
+
+**Option B – Step by step (from project root):**
+
 ```bash
 cd services/portfolio-analytics
-python -m venv .venv
-source .venv/bin/activate   # On Windows: .venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
 export DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5433/portfolio
 export KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092
 
-alembic upgrade head   # Run migrations (also runs automatically on startup)
-uvicorn app.main:app --host 0.0.0.0 --port 8800 --reload
+# Start DB/Kafka first (from project root: docker compose -f services/portfolio-analytics/docker-compose.yml up -d)
+.venv/bin/alembic upgrade head
+.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8800 --reload
 ```
 
-From repo root: `pnpm dev:api` (ensure TimescaleDB, Redis, Kafka are up and env is set if needed).
+Use `.venv/bin/alembic` and `.venv/bin/uvicorn` so the project’s virtualenv is used; otherwise `alembic`/`uvicorn` may not be found. Run from `services/portfolio-analytics` so `main` and `src` are on the Python path.
 
 ### Alembic
 

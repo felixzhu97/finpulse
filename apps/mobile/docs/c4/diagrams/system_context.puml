@@ -1,12 +1,12 @@
 @startuml
 !include ../lib/C4_Context.puml
 
-title React Native应用系统上下文
+title Mobile Portfolio App - System Context
 
-Person(user, "移动用户", "使用笑话生成功能")
-System(joke_app, "笑话生成App", "React Native应用")
-System_Ext(joke_api, "笑话API", "外部API服务")
+Person(investor, "Investor", "Portfolio and market analysis")
+System(mobile_portfolio, "Mobile Portfolio", "Expo + React Native portfolio app")
+System_Ext(portfolio_api, "Portfolio Analytics API", "Backend REST and WebSocket API")
 
-Rel(user, joke_app, "使用")
-Rel(joke_app, joke_api, "获取笑话数据")
+Rel(investor, mobile_portfolio, "Uses", "Mobile")
+Rel(mobile_portfolio, portfolio_api, "Fetches portfolio and quotes", "REST / WebSocket")
 @enduml

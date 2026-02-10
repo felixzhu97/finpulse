@@ -1,0 +1,82 @@
+@startuml c4-mobile-portfolio-components
+!include https://cdn.jsdelivr.net/gh/plantuml-stdlib/C4-PlantUML@master/C4_Component.puml
+
+title Mobile Portfolio App - Component Diagram
+
+Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
+    Component(tabs_router, "Tabs Router", "Expo Router", "Dashboard, Accounts, Insights, Profile")
+    Component(dashboard_screen, "Dashboard Screen", "React Native", "Portfolio summary, native charts, net worth, allocation")
+    Component(accounts_screen, "Accounts Screen", "React Native", "Stocks list, real-time quotes, per-stock sparklines")
+    Component(insights_screen, "Insights Screen", "React Native", "Risk metrics, high-risk exposure, concentration")
+    Component(profile_screen, "Profile Screen", "React Native", "User profile")
+
+    Component(portfolio_svc, "PortfolioService", "TypeScript", "Portfolio CRUD, cache, aggregation")
+    Component(quote_socket, "QuoteSocket", "TypeScript", "WebSocket /ws/quotes, subscribe, reconnect")
+    Component(portfolio_store, "Portfolio Store", "Zustand", "Selected account id")
+
+    Component(use_realtime_quotes, "useRealtimeQuotes", "Hook", "Real-time quote subscription")
+    Component(use_per_symbol_history, "usePerSymbolHistory", "Hook", "Per-symbol price history for sparklines")
+
+    Component(portfolio_summary, "PortfolioSummary", "React Native", "Net worth, today change")
+    Component(asset_allocation_chart, "AssetAllocationChart", "React Native", "Pie by account type")
+    Component(net_worth_chart, "NetWorthLineChart", "React Native", "Net worth trend")
+    Component(portfolio_perf_chart, "PortfolioPerformanceChart", "React Native", "Performance chart")
+    Component(account_list_item, "AccountListItem", "React Native", "Account row")
+    Component(stock_list_item, "StockListItem", "React Native", "Holding row, price, sparkline")
+    Component(holding_list_item, "HoldingListItem", "React Native", "Holding row")
+    Component(metric_card, "MetricCard", "React Native", "Label, value, helper")
+    Component(sparkline_ui, "Sparkline", "React Native", "JS sparkline")
+    Component(professional_chart, "ProfessionalStockChart", "React Native", "Line and candle sample")
+
+    Component(native_demo_card, "NativeDemoCard", "Native View", "iOS RCTViewManager / Android SimpleViewManager")
+    Component(native_sparkline, "NativeSparkline", "Native View", "Per-stock sparkline")
+    Component(native_line_chart, "NativeLineChart", "Native View", "Metal / OpenGL ES")
+    Component(native_candle_chart, "NativeCandleChart", "Native View", "Candlestick")
+    Component(native_line_only, "NativeLineOnlyChart", "Native View", "Line only")
+    Component(native_american_line, "NativeAmericanLineChart", "Native View", "OHLC line")
+    Component(native_baseline, "NativeBaselineChart", "Native View", "Baseline")
+    Component(native_histogram, "NativeHistogramChart", "Native View", "Histogram")
+    Component(scrollable_chart_container, "ScrollableChartContainer", "React Native", "Drag-to-scroll wrapper")
+    Component(use_scrollable_chart, "useScrollableChart", "Hook", "Chart scroll state")
+    Component(chart_tooltip, "chartTooltip", "React Native", "Tooltip overlay")
+
+    Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL, base URL")
+}
+
+Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Portfolio, /ws/quotes")
+
+Rel(tabs_router, dashboard_screen, "Routes to", "")
+Rel(tabs_router, accounts_screen, "Routes to", "")
+Rel(tabs_router, insights_screen, "Routes to", "")
+Rel(tabs_router, profile_screen, "Routes to", "")
+
+Rel(dashboard_screen, portfolio_svc, "Calls", "")
+Rel(dashboard_screen, portfolio_summary, "Uses", "")
+Rel(dashboard_screen, asset_allocation_chart, "Uses", "")
+Rel(dashboard_screen, net_worth_chart, "Uses", "")
+Rel(dashboard_screen, native_demo_card, "Uses", "")
+Rel(dashboard_screen, native_line_chart, "Uses", "")
+Rel(dashboard_screen, native_candle_chart, "Uses", "")
+Rel(dashboard_screen, professional_chart, "Uses", "")
+Rel(dashboard_screen, portfolio_store, "Reads", "")
+
+Rel(accounts_screen, portfolio_svc, "Calls", "")
+Rel(accounts_screen, use_realtime_quotes, "Uses", "")
+Rel(accounts_screen, use_per_symbol_history, "Uses", "")
+Rel(accounts_screen, stock_list_item, "Uses", "")
+Rel(accounts_screen, account_list_item, "Uses", "")
+Rel(accounts_screen, portfolio_store, "Reads", "")
+
+Rel(insights_screen, portfolio_svc, "Calls", "getRiskSummary")
+Rel(insights_screen, metric_card, "Uses", "")
+
+Rel(use_realtime_quotes, quote_socket, "Creates", "")
+Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
+Rel(portfolio_svc, api_config, "Uses", "Base URL")
+Rel(portfolio_svc, portfolio_api, "HTTP", "REST /api/v1/portfolio")
+
+Rel(stock_list_item, native_sparkline, "Uses", "")
+Rel(use_scrollable_chart, scrollable_chart_container, "Used by", "")
+Rel(native_line_chart, chart_tooltip, "Uses", "")
+
+@enduml

@@ -1,0 +1,83 @@
+@startuml c4-mobile-portfolio-components-zh
+!define RELATIVE_INCLUDE 1
+!include ../../c4-lib/C4-PlantUML/C4_Component.puml
+
+title 移动端投资组合应用 - 组件图
+
+Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native)") {
+    Component(tabs_router, "标签路由", "Expo Router", "仪表盘、账户、洞察、个人")
+    Component(dashboard_screen, "仪表盘屏幕", "React Native", "组合摘要、原生图表、净资产、资产配置")
+    Component(accounts_screen, "账户屏幕", "React Native", "股票列表、实时行情、每股迷你图")
+    Component(insights_screen, "洞察屏幕", "React Native", "风险指标、高风险暴露、集中度")
+    Component(profile_screen, "个人屏幕", "React Native", "用户资料")
+
+    Component(portfolio_svc, "PortfolioService", "TypeScript", "组合 CRUD、缓存、聚合")
+    Component(quote_socket, "QuoteSocket", "TypeScript", "WebSocket /ws/quotes、订阅、重连")
+    Component(portfolio_store, "组合 Store", "Zustand", "当前选中账户 id")
+
+    Component(use_realtime_quotes, "useRealtimeQuotes", "Hook", "实时行情订阅")
+    Component(use_per_symbol_history, "usePerSymbolHistory", "Hook", "每标的价格历史用于迷你图")
+
+    Component(portfolio_summary, "PortfolioSummary", "React Native", "净资产、当日变动")
+    Component(asset_allocation_chart, "AssetAllocationChart", "React Native", "按账户类型饼图")
+    Component(net_worth_chart, "NetWorthLineChart", "React Native", "净资产趋势")
+    Component(portfolio_perf_chart, "PortfolioPerformanceChart", "React Native", "业绩图")
+    Component(account_list_item, "AccountListItem", "React Native", "账户行")
+    Component(stock_list_item, "StockListItem", "React Native", "持仓行、价格、迷你图")
+    Component(holding_list_item, "HoldingListItem", "React Native", "持仓行")
+    Component(metric_card, "MetricCard", "React Native", "标签、数值、说明")
+    Component(sparkline_ui, "Sparkline", "React Native", "JS 迷你图")
+    Component(professional_chart, "ProfessionalStockChart", "React Native", "折线/蜡烛示例")
+
+    Component(native_demo_card, "NativeDemoCard", "原生视图", "iOS RCTViewManager / Android SimpleViewManager")
+    Component(native_sparkline, "NativeSparkline", "原生视图", "每股迷你图")
+    Component(native_line_chart, "NativeLineChart", "原生视图", "Metal / OpenGL ES")
+    Component(native_candle_chart, "NativeCandleChart", "原生视图", "K 线")
+    Component(native_line_only, "NativeLineOnlyChart", "原生视图", "仅折线")
+    Component(native_american_line, "NativeAmericanLineChart", "原生视图", "OHLC 线")
+    Component(native_baseline, "NativeBaselineChart", "原生视图", "基线")
+    Component(native_histogram, "NativeHistogramChart", "原生视图", "直方图")
+    Component(scrollable_chart_container, "ScrollableChartContainer", "React Native", "拖拽滚动容器")
+    Component(use_scrollable_chart, "useScrollableChart", "Hook", "图表滚动状态")
+    Component(chart_tooltip, "chartTooltip", "React Native", "提示浮层")
+
+    Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL、Base URL")
+}
+
+Container_Ext(portfolio_api, "投资组合分析 API", "REST / WebSocket", "组合、/ws/quotes")
+
+Rel(tabs_router, dashboard_screen, "路由到", "")
+Rel(tabs_router, accounts_screen, "路由到", "")
+Rel(tabs_router, insights_screen, "路由到", "")
+Rel(tabs_router, profile_screen, "路由到", "")
+
+Rel(dashboard_screen, portfolio_svc, "调用", "")
+Rel(dashboard_screen, portfolio_summary, "使用", "")
+Rel(dashboard_screen, asset_allocation_chart, "使用", "")
+Rel(dashboard_screen, net_worth_chart, "使用", "")
+Rel(dashboard_screen, native_demo_card, "使用", "")
+Rel(dashboard_screen, native_line_chart, "使用", "")
+Rel(dashboard_screen, native_candle_chart, "使用", "")
+Rel(dashboard_screen, professional_chart, "使用", "")
+Rel(dashboard_screen, portfolio_store, "读取", "")
+
+Rel(accounts_screen, portfolio_svc, "调用", "")
+Rel(accounts_screen, use_realtime_quotes, "使用", "")
+Rel(accounts_screen, use_per_symbol_history, "使用", "")
+Rel(accounts_screen, stock_list_item, "使用", "")
+Rel(accounts_screen, account_list_item, "使用", "")
+Rel(accounts_screen, portfolio_store, "读取", "")
+
+Rel(insights_screen, portfolio_svc, "调用", "getRiskSummary")
+Rel(insights_screen, metric_card, "使用", "")
+
+Rel(use_realtime_quotes, quote_socket, "创建", "")
+Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
+Rel(portfolio_svc, api_config, "使用", "Base URL")
+Rel(portfolio_svc, portfolio_api, "HTTP", "REST /api/v1/portfolio")
+
+Rel(stock_list_item, native_sparkline, "使用", "")
+Rel(use_scrollable_chart, scrollable_chart_container, "被使用", "")
+Rel(native_line_chart, chart_tooltip, "使用", "")
+
+@enduml

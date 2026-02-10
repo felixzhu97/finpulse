@@ -6,8 +6,8 @@
 
 ## 架构与文档
 
-- [ ] 使 `docs/architecture` 下 PlantUML 与代码库一致（apps、services/portfolio-analytics）。
-- [ ] 保持 `docs/architecture/README.md` 与技术栈同步。
+- [ ] 使 `docs/zh/togaf, docs/zh/c4` 下 PlantUML 与代码库一致（apps、services/portfolio-analytics）。
+- [ ] 保持 `docs/zh/togaf/README.md, docs/zh/c4/README.md` 与技术栈同步。
 - [ ] 新增子系统或流程时审阅 `docs/domain` 领域图及 `.cursor/rules/togaf-specification.mdc` 中的 TOGAF 映射。
 
 ## Web 应用（`apps/web`）
@@ -32,7 +32,7 @@
 
 - [ ] 增加健康/就绪探针（如 `/health`、`/ready`），检查 API 及依赖（PostgreSQL、Kafka）。
 - [ ] 保持 OpenAPI 与 `services/portfolio-analytics/README.md` 与 API 路由及环境变量同步。
-- [ ] 明确生产部署方式（Docker、环境配置、扩缩容）并在 README 或 `docs/architecture` 中记录。
+- [ ] 明确生产部署方式（Docker、环境配置、扩缩容）并在 README 或 `docs/zh/togaf, docs/zh/c4` 中记录。
 
 ## 数据库（PostgreSQL、Kafka）
 
@@ -50,14 +50,14 @@
 
 - [ ] 扩展 ML 风险/VaR、欺诈、监控、情感等能力；定义生产 ML 的 serving、版本与监控策略。
 - [ ] 增加或扩展 DL 时间序列/风险预测与 LLM 摘要；记录 TensorFlow/PyTorch 与 OpenAI/Ollama 选项。
-- [ ] 新增或变更 AI 能力时，保持 `docs/domain` 与 `docs/architecture/README.md` AI 小节及本 TODO 一致。
+- [ ] 新增或变更 AI 能力时，保持 `docs/domain` 与 `docs/zh/togaf/README.md, docs/zh/c4/README.md` AI 小节及本 TODO 一致。
 
 ## 流程与开发体验
 
 - [ ] 定义轻量发布检查清单，引用本 TODO 与架构文档。
-- [ ] 重要架构变更时：更新 PlantUML、`docs/architecture/README.md` 及本 `docs/TODO.md`。
+- [ ] 重要架构变更时：更新 PlantUML、`docs/zh/togaf/README.md, docs/zh/c4/README.md` 及本 `docs/TODO.md`。
 - [ ] 为主要应用与服务添加简短的“上手”指南。
 
 ---
 
-**说明**：重大发布前请结合 `docs/architecture` 审阅并更新中英文 TODO。
+**说明**：重大发布前请结合 `docs/zh/togaf, docs/zh/c4` 审阅并更新中英文 TODO。

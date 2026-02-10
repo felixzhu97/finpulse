@@ -524,11 +524,12 @@ Java Spring Boot 服务
 
 ## 参考资源
 
-- [TOGAF 架构文档](../docs/architecture/README.md)
-- [业务架构图](../docs/architecture/business-architecture.puml)
-- [应用架构图](../docs/architecture/application-architecture.puml)
-- [数据架构图](../docs/architecture/data-architecture.puml)
-- [技术架构图](../docs/architecture/technology-architecture.puml)
+- [TOGAF architecture](../docs/en/togaf/README.md)
+- [Business architecture](../docs/en/togaf/business-architecture.puml)
+- [Application architecture](../docs/en/togaf/application-architecture.puml)
+- [Data architecture](../docs/en/togaf/data-architecture.puml)
+- [Technology architecture](../docs/en/togaf/technology-architecture.puml)
+- [C4 model](../docs/en/c4/README.md)
 
 ---
 

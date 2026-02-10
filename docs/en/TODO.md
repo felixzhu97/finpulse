@@ -7,8 +7,8 @@ Chinese version: [docs_ch/TODO.md](../docs_ch/TODO.md).
 
 ## Architecture & Documentation
 
-- [ ] Align PlantUML under `docs/architecture` with the codebase (apps, services/portfolio-analytics).
-- [ ] Keep `docs/architecture/README.md` in sync with the technology stack.
+- [ ] Align PlantUML under `docs/en/togaf, docs/en/c4` with the codebase (apps, services/portfolio-analytics).
+- [ ] Keep `docs/en/togaf/README.md, docs/en/c4/README.md` in sync with the technology stack.
 - [ ] Review domain diagrams in `docs/domain` and TOGAF in `.cursor/rules/togaf-specification.mdc` when adding subsystems or flows.
 
 ## Web App (`apps/web`)
@@ -33,7 +33,7 @@ Chinese version: [docs_ch/TODO.md](../docs_ch/TODO.md).
 
 - [ ] Add health/readiness endpoints (e.g. `/health`, `/ready`) for API and dependencies (PostgreSQL, Kafka).
 - [ ] Keep OpenAPI and `services/portfolio-analytics/README.md` in sync with API routes and env vars.
-- [ ] Define production deployment (Docker, env config, scaling) and document in README or `docs/architecture`.
+- [ ] Define production deployment (Docker, env config, scaling) and document in README or `docs/en/togaf, docs/en/c4`.
 
 ## Database (PostgreSQL, Kafka)
 
@@ -52,10 +52,10 @@ Chinese version: [docs_ch/TODO.md](../docs_ch/TODO.md).
 
 - [ ] Extend ML Risk/VaR, Fraud, Surveillance, and Sentiment; define model serving, versioning, and monitoring for production.
 - [ ] Add or extend DL time-series/risk forecast and LLM summarisation; document TensorFlow/PyTorch and OpenAI/Ollama options.
-- [ ] Keep `docs/domain` and `docs/architecture/README.md` AI section in sync when changing AI capabilities.
+- [ ] Keep `docs/domain` and `docs/en/togaf/README.md, docs/en/c4/README.md` AI section in sync when changing AI capabilities.
 
 ## Process & Dev Experience
 
 - [ ] Define a lightweight release checklist referencing this TODO and architecture docs.
-- [ ] On significant architectural changes: update PlantUML, `docs/architecture/README.md`, and this `docs/TODO.md`.
+- [ ] On significant architectural changes: update PlantUML, `docs/en/togaf/README.md, docs/en/c4/README.md`, and this `docs/TODO.md`.
 - [ ] Add short “getting started” guides for new contributors to each major app and service.

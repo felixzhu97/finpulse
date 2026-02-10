@@ -1,0 +1,67 @@
+@startuml c4-mobile-demo-components
+!include https://cdn.jsdelivr.net/gh/plantuml-stdlib/C4-PlantUML@master/C4_Component.puml
+
+title Mobile Demo App - Component Diagram
+
+Container_Boundary(mobile_demo, "Mobile Demo (React Native)") {
+    Component(tabs_router, "Tabs Router", "Expo Router", "Home, Cart, Categories, Profile")
+    Component(home_screen, "Home Screen", "React Native", "Carousel, recommended products, categories")
+    Component(cart_screen, "Cart Screen", "React Native", "Cart items, quantity, checkout")
+    Component(categories_screen, "Categories Screen", "React Native", "Category list, product grid")
+    Component(profile_screen, "Profile Screen", "React Native", "User profile")
+    Component(product_detail_screen, "Product Detail", "React Native", "Product [id], image carousel, add to cart")
+
+    Component(api_service, "ApiService", "TypeScript", "Axios client, products, product by id")
+    Component(product_service, "ProductService", "TypeScript", "Products, recommended, by category")
+    Component(cart_service, "CartService", "TypeScript", "Cart business logic")
+    Component(product_store, "Product Store", "Zustand", "Products, recommended, loading, fetch")
+    Component(cart_store, "Cart Store", "Zustand", "Cart items, add, remove, quantity")
+    Component(cache_service, "Cache Service", "TypeScript", "MapCacheService, CartCacheService")
+
+    Component(carousel, "Carousel", "React Native", "Hero carousel")
+    Component(product_card, "ProductCard", "React Native", "Product tile")
+    Component(cart_item, "CartItem", "React Native", "Cart row, quantity selector")
+    Component(category_selector, "CategorySelector", "React Native", "Category chips")
+    Component(price_display, "PriceDisplay", "React Native", "Price formatting")
+    Component(quantity_selector, "QuantitySelector", "React Native", "Quantity +/-")
+    Component(product_image_carousel, "ProductImageCarousel", "React Native", "Product images")
+    Component(themed_view, "ThemedView / ThemedText", "React Native", "Theme-aware UI")
+
+    Component(api_constants, "ApiConstants", "TypeScript", "Base URL, endpoints, timeouts")
+    Component(app_config, "App Config", "TypeScript", "apiUrl, env")
+    Component(theme, "Theme", "TypeScript", "Colors, Spacing, Shadow")
+}
+
+Container_Ext(backend_api, "Backend API", "REST", "Products, cart, orders")
+
+Rel(tabs_router, home_screen, "Routes to", "")
+Rel(tabs_router, cart_screen, "Routes to", "")
+Rel(tabs_router, categories_screen, "Routes to", "")
+Rel(tabs_router, profile_screen, "Routes to", "")
+Rel(home_screen, product_detail_screen, "Navigates to", "")
+
+Rel(home_screen, product_store, "Uses", "")
+Rel(home_screen, carousel, "Uses", "")
+Rel(home_screen, product_card, "Uses", "")
+Rel(categories_screen, product_store, "Uses", "")
+Rel(categories_screen, category_selector, "Uses", "")
+Rel(categories_screen, product_card, "Uses", "")
+Rel(cart_screen, cart_store, "Uses", "")
+Rel(cart_screen, cart_item, "Uses", "")
+Rel(product_detail_screen, product_store, "Uses", "fetchProductById")
+Rel(product_detail_screen, cart_store, "Uses", "add to cart")
+Rel(product_detail_screen, product_image_carousel, "Uses", "")
+Rel(product_detail_screen, quantity_selector, "Uses", "")
+
+Rel(product_store, product_service, "Calls", "")
+Rel(product_service, api_service, "Uses", "")
+Rel(product_service, cache_service, "Uses", "")
+Rel(api_service, api_constants, "Uses", "")
+Rel(api_service, backend_api, "HTTP", "REST")
+Rel(cart_store, cache_service, "Uses", "CartCacheService")
+
+Rel(product_card, price_display, "Uses", "")
+Rel(cart_item, quantity_selector, "Uses", "")
+Rel(api_constants, app_config, "Uses", "")
+
+@enduml

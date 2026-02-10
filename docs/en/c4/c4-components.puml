@@ -1,0 +1,43 @@
+@startuml c4-components
+!define RELATIVE_INCLUDE 1
+!include ../../c4-lib/C4-PlantUML/C4_Component.puml
+
+title Portfolio Analytics API - Component Diagram
+
+Container_Boundary(portfolio_api, "Portfolio Analytics API") {
+    Component(portfolio_router, "Portfolio Router", "FastAPI", "REST: GET /portfolio, POST /seed")
+    Component(quotes_router, "Quotes Router", "FastAPI", "REST: GET /quotes, WebSocket /ws/quotes")
+    Component(ai_router, "AI Router", "FastAPI", "REST: /api/v1/ai - VaR, fraud, sentiment, forecast")
+
+    Component(portfolio_svc, "Portfolio Service", "Python", "Portfolio CRUD and aggregation")
+    Component(analytics_svc, "Analytics Service", "Python", "Risk analytics and AI orchestration")
+    Component(market_data_svc, "Market Data Service", "Python", "Real-time quotes, Kafka provider")
+
+    Component(portfolio_repo, "Portfolio Repository", "SQLAlchemy", "TimescaleDB persistence")
+    Component(history_repo, "Portfolio History Repository", "SQLAlchemy", "History hypertable access")
+    Component(kafka_provider, "Kafka Provider", "Python", "Consume market.quotes.enriched")
+    Component(event_publisher, "Event Publisher", "Python", "Publish portfolio.events")
+
+    Component(ai_providers, "AI Providers", "Python", "Ollama, Hugging Face, TF; VaR, fraud, sentiment")
+}
+
+ContainerDb(timescale, "TimescaleDB", "PostgreSQL", "Portfolio and history")
+ContainerDb(redis_db, "Redis", "In-memory", "History cache")
+ContainerQueue(kafka, "Kafka", "Event streaming", "portfolio.events, market.quotes.enriched")
+
+Rel(portfolio_router, portfolio_svc, "Calls", "Async")
+Rel(quotes_router, market_data_svc, "Calls", "Async / WebSocket")
+Rel(ai_router, analytics_svc, "Calls", "Async")
+Rel(portfolio_svc, portfolio_repo, "Uses", "")
+Rel(portfolio_svc, event_publisher, "Publishes", "")
+Rel(analytics_svc, ai_providers, "Delegates", "")
+Rel(analytics_svc, history_repo, "Uses", "")
+Rel(market_data_svc, kafka_provider, "Consumes", "")
+Rel(market_data_svc, history_repo, "Uses", "")
+Rel(portfolio_repo, timescale, "SQL", "asyncpg")
+Rel(history_repo, timescale, "SQL", "asyncpg")
+Rel(history_repo, redis_db, "Cache", "")
+Rel(kafka_provider, kafka, "Consumes", "")
+Rel(event_publisher, kafka, "Publishes", "")
+
+@enduml

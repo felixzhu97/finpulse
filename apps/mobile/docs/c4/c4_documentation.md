@@ -1,35 +1,47 @@
-# React Native 应用 C4 模型文档
+# Mobile Portfolio App - C4 Model
 
-## 1. 系统上下文图
+C4 architecture model for the FinPulse Mobile Portfolio app (Expo + React Native).
 
-![系统上下文图](./diagrams/system_context.puml)
+## 1. System Context
 
-**主要元素：**
+![System Context](./diagrams/system_context.puml)
 
-- 用户：移动用户
-- 系统：笑话生成 App
-- 外部系统：笑话 API
+**Elements**:
+- **Investor**: Portfolio and market analysis user
+- **Mobile Portfolio**: Expo + React Native portfolio app
+- **Portfolio Analytics API**: Backend REST and WebSocket API
 
-## 2. 容器图
+## 2. Container Diagram
 
-![容器图](./diagrams/containers.puml)
+![Containers](./diagrams/containers.puml)
 
-**技术栈：**
+**Stack**:
+- **React Native App**: Expo + RN, Stocks, accounts, insights, profile
+- **Portfolio Service**: TypeScript API client
+- **Quote Socket**: WebSocket real-time quotes
+- **Portfolio Analytics API**: FastAPI backend
 
-- 移动端：React Native
-- 存储：AsyncStorage
+## 3. Component Diagram
 
-## 3. 组件图
+![Components](./diagrams/components.puml)
 
-![组件图](./diagrams/components.puml)
+**Components**:
+- **Stocks Screen**: Stock list with NativeSparkline, useRealtimeQuotes, usePerSymbolHistory
+- **Accounts Screen**: Account overview
+- **Insights Screen**: Portfolio insights
+- **Profile Screen**: User profile
+- **Portfolio Store**: Zustand global state
 
-**核心服务：**
+## Platform-Level C4
 
-- JokeService：笑话生成
-- HistoryService：历史记录管理
+Project-wide C4 diagrams are in `docs/en/c4/`:
+- `c4-system-context.puml` — FinPulse platform context
+- `c4-containers.puml` — Platform containers (Web, Mobile, API, DB)
+- `c4-components.puml` — Portfolio Analytics API components
+- `c4-web-app-components.puml` — Web app components
 
-## 使用说明
+## How to View
 
-1. 确保已安装 PlantUML 插件
-2. 在 VSCode 中打开.puml 文件即可预览
-3. 或使用在线查看器：https://www.plantuml.com/plantuml/uml/
+1. Install PlantUML extension in VSCode
+2. Open `.puml` files to preview
+3. Or use online viewer: https://www.plantuml.com/plantuml/uml/

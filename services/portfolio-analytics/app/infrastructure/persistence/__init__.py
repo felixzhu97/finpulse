@@ -1,4 +1,45 @@
 from app.infrastructure.persistence.portfolio_repository import PortfolioRepository
 from app.infrastructure.persistence.portfolio_history_repository import PortfolioHistoryRepository
+from app.infrastructure.persistence.repository_factories import (
+    account_repo,
+    bond_repo,
+    cash_transaction_repo,
+    customer_repo,
+    instrument_repo,
+    market_data_repo,
+    option_repo,
+    order_repo,
+    payment_repo,
+    portfolio_schema_repo,
+    position_repo,
+    risk_metrics_repo,
+    settlement_repo,
+    trade_repo,
+    user_preference_repo,
+    valuation_repo,
+    watchlist_repo,
+    watchlist_item_repo,
+)
 
-__all__ = ["PortfolioRepository", "PortfolioHistoryRepository"]
+__all__ = [
+    "PortfolioRepository",
+    "PortfolioHistoryRepository",
+    "account_repo",
+    "bond_repo",
+    "cash_transaction_repo",
+    "customer_repo",
+    "instrument_repo",
+    "market_data_repo",
+    "option_repo",
+    "order_repo",
+    "payment_repo",
+    "portfolio_schema_repo",
+    "position_repo",
+    "risk_metrics_repo",
+    "settlement_repo",
+    "trade_repo",
+    "user_preference_repo",
+    "valuation_repo",
+    "watchlist_repo",
+    "watchlist_item_repo",
+]
