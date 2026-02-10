@@ -6,6 +6,7 @@ title 投资组合分析 API - 组件图
 
 Container_Boundary(portfolio_api, "投资组合分析 API") {
     Component(portfolio_router, "投资组合路由", "FastAPI", "REST: GET /portfolio, POST /seed")
+    Component(resource_router, "资源路由", "FastAPI", "REST: /api/v1/*（CRUD 及 POST .../batch 批量创建）")
     Component(quotes_router, "行情路由", "FastAPI", "REST: GET /quotes, WebSocket /ws/quotes")
     Component(ai_router, "AI 路由", "FastAPI", "REST: /api/v1/ai - VaR、欺诈、情感、预测")
 
@@ -26,6 +27,8 @@ ContainerDb(redis_db, "Redis", "内存", "历史缓存")
 ContainerQueue(kafka, "Kafka", "事件流", "portfolio.events, market.quotes.enriched")
 
 Rel(portfolio_router, portfolio_svc, "调用", "Async")
+Rel(resource_router, portfolio_svc, "调用", "Async")
+Rel(resource_router, portfolio_repo, "使用", "通过 DI")
 Rel(quotes_router, market_data_svc, "调用", "Async / WebSocket")
 Rel(ai_router, analytics_svc, "调用", "Async")
 Rel(portfolio_svc, portfolio_repo, "使用", "")

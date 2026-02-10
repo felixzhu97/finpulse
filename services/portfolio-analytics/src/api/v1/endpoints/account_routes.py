@@ -57,6 +57,25 @@ def register(router: APIRouter) -> None:
         created = await repo.add(entity)
         return _to_response(created)
 
+    @router.post("/accounts/batch", response_model=list[AccountResponse], status_code=201)
+    async def create_accounts_batch(
+        body: list[AccountCreate],
+        repo: Annotated[object, Depends(get_account_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = Account(
+                account_id=uuid4(),
+                customer_id=item.customer_id,
+                account_type=item.account_type,
+                currency=item.currency,
+                status=item.status,
+                opened_at=now(),
+            )
+            created = await repo.add(entity)
+            result.append(_to_response(created))
+        return result
+
     @router.put("/accounts/{account_id}", response_model=AccountResponse)
     async def update_account(
         account_id: UUID,

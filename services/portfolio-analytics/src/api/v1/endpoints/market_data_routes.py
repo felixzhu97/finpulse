@@ -60,6 +60,28 @@ def register(router: APIRouter) -> None:
         created = await repo.add(entity)
         return _to_response(created)
 
+    @router.post("/market-data/batch", response_model=list[MarketDataResponse], status_code=201)
+    async def create_market_data_batch(
+        body: list[MarketDataCreate],
+        repo: Annotated[object, Depends(get_market_data_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = MarketData(
+                data_id=uuid4(),
+                instrument_id=item.instrument_id,
+                timestamp=item.timestamp,
+                open=item.open,
+                high=item.high,
+                low=item.low,
+                close=item.close,
+                volume=item.volume,
+                change_pct=item.change_pct,
+            )
+            created = await repo.add(entity)
+            result.append(_to_response(created))
+        return result
+
     @router.put("/market-data/{data_id}", response_model=MarketDataResponse)
     async def update_market_data(
         data_id: UUID,

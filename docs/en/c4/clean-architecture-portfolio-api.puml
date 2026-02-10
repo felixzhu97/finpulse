@@ -1,0 +1,40 @@
+@startuml clean-architecture-portfolio-api
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontSize 11
+
+title Portfolio Analytics API - Clean Architecture Layers
+
+rectangle "**API**\n(src/api/)" as API #E3F2FD {
+  rectangle "dependencies.py\n(composition root)" as DI
+  rectangle "v1/endpoints\nv1/schemas\nv1/mappers" as WEB
+}
+
+rectangle "**Infrastructure**\n(src/infrastructure/)" as INFRA #E8F5E9 {
+  rectangle "database/\nconfig/\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
+}
+
+rectangle "**Application**\n(src/core/application/)" as APP #FFF3E0 {
+  rectangle "use_cases/" as UC
+  rectangle "ports/\n(repositories, services,\nmessage_brokers)" as PORTS
+}
+
+rectangle "**Domain**\n(src/core/domain/)" as DOMAIN #FCE4EC {
+  rectangle "entities/\nvalue_objects/\nevents/\nexceptions/\nservices/" as DOMAIN_IMPL
+}
+
+API -[#2196F3]-> INFRA : wires at runtime
+INFRA -[#4CAF50]-> APP : implements ports
+APP -[#FF9800]-> DOMAIN : depends on
+
+note right of DOMAIN
+  No dependencies
+  on outer layers
+end note
+
+note right of DI
+  Only place that
+  imports infrastructure
+end note
+
+@enduml

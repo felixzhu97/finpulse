@@ -92,6 +92,26 @@ def register(router: APIRouter) -> None:
         created = await repo.add(entity)
         return _cash_transaction_to_response(created)
 
+    @router.post("/cash-transactions/batch", response_model=list[CashTransactionResponse], status_code=201)
+    async def create_cash_transactions_batch(
+        body: list[CashTransactionCreate],
+        repo: Annotated[object, Depends(get_cash_transaction_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = CashTransaction(
+                transaction_id=uuid4(),
+                account_id=item.account_id,
+                type=item.type,
+                amount=item.amount,
+                currency=item.currency,
+                status=item.status,
+                created_at=now(),
+            )
+            created = await repo.add(entity)
+            result.append(_cash_transaction_to_response(created))
+        return result
+
     @router.put("/cash-transactions/{transaction_id}", response_model=CashTransactionResponse)
     async def update_cash_transaction(
         transaction_id: UUID,
@@ -157,6 +177,26 @@ def register(router: APIRouter) -> None:
         created = await repo.add(entity)
         return _payment_to_response(created)
 
+    @router.post("/payments/batch", response_model=list[PaymentResponse], status_code=201)
+    async def create_payments_batch(
+        body: list[PaymentCreate],
+        repo: Annotated[object, Depends(get_payment_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = Payment(
+                payment_id=uuid4(),
+                account_id=item.account_id,
+                counterparty=item.counterparty,
+                amount=item.amount,
+                currency=item.currency,
+                status=item.status,
+                created_at=now(),
+            )
+            created = await repo.add(entity)
+            result.append(_payment_to_response(created))
+        return result
+
     @router.put("/payments/{payment_id}", response_model=PaymentResponse)
     async def update_payment(
         payment_id: UUID,
@@ -219,6 +259,24 @@ def register(router: APIRouter) -> None:
         )
         created = await repo.add(entity)
         return _settlement_to_response(created)
+
+    @router.post("/settlements/batch", response_model=list[SettlementResponse], status_code=201)
+    async def create_settlements_batch(
+        body: list[SettlementCreate],
+        repo: Annotated[object, Depends(get_settlement_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = Settlement(
+                settlement_id=uuid4(),
+                trade_id=item.trade_id,
+                payment_id=item.payment_id,
+                status=item.status,
+                settled_at=item.settled_at,
+            )
+            created = await repo.add(entity)
+            result.append(_settlement_to_response(created))
+        return result
 
     @router.put("/settlements/{settlement_id}", response_model=SettlementResponse)
     async def update_settlement(

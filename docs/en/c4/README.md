@@ -11,9 +11,10 @@ This directory contains **English** C4 PlantUML diagrams.
 1. [System Context](#system-context) — `c4-system-context.puml`
 2. [Containers](#containers) — `c4-containers.puml`
 3. [Portfolio Analytics API Components](#portfolio-analytics-api-components) — `c4-components.puml`
-4. [Web App Components](#web-app-components) — `c4-web-app-components.puml`
-5. [Mobile Portfolio Components](#mobile-portfolio-components) — `c4-mobile-portfolio-components.puml`
-6. [Mobile Demo Components](#mobile-demo-components) — `c4-mobile-demo-components.puml`
+4. [Clean Architecture (Portfolio API)](#clean-architecture-portfolio-api) — `clean-architecture-portfolio-api.puml`
+5. [Web App Components](#web-app-components) — `c4-web-app-components.puml`
+6. [Mobile Portfolio Components](#mobile-portfolio-components) — `c4-mobile-portfolio-components.puml`
+7. [Mobile Demo Components](#mobile-demo-components) — `c4-mobile-demo-components.puml`
 
 ## Diagram Reference
 
@@ -33,7 +34,13 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-components.puml`
 
-**Description**: Portfolio Analytics API internal components (routers, services, repositories, AI providers).
+**Description**: Portfolio Analytics API internal components: Portfolio Router (GET /portfolio, POST /seed), Resource Router (/api/v1/* CRUD and batch create), Quotes Router, AI Router; services (Portfolio, Analytics, Market Data); repositories and Kafka/Redis. The backend follows Clean Architecture (see diagram below and `services/portfolio-analytics/README.md`).
+
+### Clean Architecture (Portfolio API)
+
+**File**: `clean-architecture-portfolio-api.puml`
+
+**Description**: Clean Architecture layers for the Portfolio Analytics API: API (composition root, endpoints, schemas, mappers) → Infrastructure (database, config, external services, message brokers) → Application (use cases, ports) → Domain (entities, value objects, events). Dependency rule: inner layers do not depend on outer layers; only the composition root wires infrastructure to application ports.
 
 ### Web App Components
 
@@ -57,7 +64,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 ```bash
 cd docs/en/c4
-plantuml c4-system-context.puml c4-containers.puml c4-components.puml c4-web-app-components.puml c4-mobile-portfolio-components.puml c4-mobile-demo-components.puml
+plantuml c4-system-context.puml c4-containers.puml c4-components.puml clean-architecture-portfolio-api.puml c4-web-app-components.puml c4-mobile-portfolio-components.puml c4-mobile-demo-components.puml
 plantuml -tsvg *.puml
 ```
 

@@ -71,6 +71,24 @@ def register(router: APIRouter) -> None:
         created = await repo.add(entity)
         return _to_customer_response(created)
 
+    @router.post("/customers/batch", response_model=list[CustomerResponse], status_code=201)
+    async def create_customers_batch(
+        body: list[CustomerCreate],
+        repo: Annotated[object, Depends(get_customer_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = Customer(
+                customer_id=uuid4(),
+                name=item.name,
+                email=item.email,
+                kyc_status=item.kyc_status,
+                created_at=now(),
+            )
+            created = await repo.add(entity)
+            result.append(_to_customer_response(created))
+        return result
+
     @router.put("/customers/{customer_id}", response_model=CustomerResponse)
     async def update_customer(
         customer_id: UUID,
@@ -132,6 +150,25 @@ def register(router: APIRouter) -> None:
         )
         created = await repo.add(entity)
         return _to_user_preference_response(created)
+
+    @router.post("/user-preferences/batch", response_model=list[UserPreferenceResponse], status_code=201)
+    async def create_user_preferences_batch(
+        body: list[UserPreferenceCreate],
+        repo: Annotated[object, Depends(get_user_preference_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = UserPreference(
+                preference_id=uuid4(),
+                customer_id=item.customer_id,
+                theme=item.theme,
+                language=item.language,
+                notifications_enabled=item.notifications_enabled,
+                updated_at=now(),
+            )
+            created = await repo.add(entity)
+            result.append(_to_user_preference_response(created))
+        return result
 
     @router.put("/user-preferences/{preference_id}", response_model=UserPreferenceResponse)
     async def update_user_preference(

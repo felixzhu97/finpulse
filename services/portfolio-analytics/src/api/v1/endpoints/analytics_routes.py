@@ -74,6 +74,27 @@ def register(router: APIRouter) -> None:
         created = await repo.add(entity)
         return _risk_metrics_to_response(created)
 
+    @router.post("/risk-metrics/batch", response_model=list[RiskMetricsResponse], status_code=201)
+    async def create_risk_metrics_batch(
+        body: list[RiskMetricsCreate],
+        repo: Annotated[object, Depends(get_risk_metrics_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = RiskMetrics(
+                metric_id=uuid4(),
+                portfolio_id=item.portfolio_id,
+                as_of_date=item.as_of_date or date.today(),
+                risk_level=item.risk_level,
+                volatility=item.volatility,
+                sharpe_ratio=item.sharpe_ratio,
+                var=item.var,
+                beta=item.beta,
+            )
+            created = await repo.add(entity)
+            result.append(_risk_metrics_to_response(created))
+        return result
+
     @router.put("/risk-metrics/{metric_id}", response_model=RiskMetricsResponse)
     async def update_risk_metrics(
         metric_id: UUID,
@@ -141,6 +162,29 @@ def register(router: APIRouter) -> None:
         )
         created = await repo.add(entity)
         return _valuation_to_response(created)
+
+    @router.post("/valuations/batch", response_model=list[ValuationResponse], status_code=201)
+    async def create_valuations_batch(
+        body: list[ValuationCreate],
+        repo: Annotated[object, Depends(get_valuation_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = Valuation(
+                valuation_id=uuid4(),
+                instrument_id=item.instrument_id,
+                as_of_date=item.as_of_date or date.today(),
+                method=item.method,
+                ev=item.ev,
+                equity_value=item.equity_value,
+                target_price=item.target_price,
+                multiples=item.multiples,
+                discount_rate=item.discount_rate,
+                growth_rate=item.growth_rate,
+            )
+            created = await repo.add(entity)
+            result.append(_valuation_to_response(created))
+        return result
 
     @router.put("/valuations/{valuation_id}", response_model=ValuationResponse)
     async def update_valuation(

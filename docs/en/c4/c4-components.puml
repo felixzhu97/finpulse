@@ -6,6 +6,7 @@ title Portfolio Analytics API - Component Diagram
 
 Container_Boundary(portfolio_api, "Portfolio Analytics API") {
     Component(portfolio_router, "Portfolio Router", "FastAPI", "REST: GET /portfolio, POST /seed")
+    Component(resource_router, "Resource Router", "FastAPI", "REST: /api/v1/* (CRUD + POST .../batch for customers, instruments, orders, etc.)")
     Component(quotes_router, "Quotes Router", "FastAPI", "REST: GET /quotes, WebSocket /ws/quotes")
     Component(ai_router, "AI Router", "FastAPI", "REST: /api/v1/ai - VaR, fraud, sentiment, forecast")
 
@@ -26,6 +27,8 @@ ContainerDb(redis_db, "Redis", "In-memory", "History cache")
 ContainerQueue(kafka, "Kafka", "Event streaming", "portfolio.events, market.quotes.enriched")
 
 Rel(portfolio_router, portfolio_svc, "Calls", "Async")
+Rel(resource_router, portfolio_svc, "Calls", "Async")
+Rel(resource_router, portfolio_repo, "Uses", "via DI")
 Rel(quotes_router, market_data_svc, "Calls", "Async / WebSocket")
 Rel(ai_router, analytics_svc, "Calls", "Async")
 Rel(portfolio_svc, portfolio_repo, "Uses", "")

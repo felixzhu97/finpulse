@@ -72,6 +72,27 @@ def register(router: APIRouter) -> None:
         created = await repo.add(entity)
         return _order_to_response(created)
 
+    @router.post("/orders/batch", response_model=list[OrderResponse], status_code=201)
+    async def create_orders_batch(
+        body: list[OrderCreate],
+        repo: Annotated[object, Depends(get_order_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = Order(
+                order_id=uuid4(),
+                account_id=item.account_id,
+                instrument_id=item.instrument_id,
+                side=item.side,
+                quantity=item.quantity,
+                order_type=item.order_type,
+                status=item.status,
+                created_at=now(),
+            )
+            created = await repo.add(entity)
+            result.append(_order_to_response(created))
+        return result
+
     @router.put("/orders/{order_id}", response_model=OrderResponse)
     async def update_order(
         order_id: UUID,
@@ -136,6 +157,25 @@ def register(router: APIRouter) -> None:
         )
         created = await repo.add(entity)
         return _trade_to_response(created)
+
+    @router.post("/trades/batch", response_model=list[TradeResponse], status_code=201)
+    async def create_trades_batch(
+        body: list[TradeCreate],
+        repo: Annotated[object, Depends(get_trade_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = Trade(
+                trade_id=uuid4(),
+                order_id=item.order_id,
+                quantity=item.quantity,
+                price=item.price,
+                fee=item.fee,
+                executed_at=now(),
+            )
+            created = await repo.add(entity)
+            result.append(_trade_to_response(created))
+        return result
 
     @router.put("/trades/{trade_id}", response_model=TradeResponse)
     async def update_trade(

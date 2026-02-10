@@ -1,0 +1,39 @@
+@startuml clean-architecture-portfolio-api-zh
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontSize 11
+
+title 投资组合分析 API - 整洁架构分层
+
+rectangle "**API**\n(src/api/)" as API #E3F2FD {
+  rectangle "dependencies.py\n(组合根)" as DI
+  rectangle "v1/endpoints\nv1/schemas\nv1/mappers" as WEB
+}
+
+rectangle "**基础设施**\n(src/infrastructure/)" as INFRA #E8F5E9 {
+  rectangle "database/\nconfig/\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
+}
+
+rectangle "**应用层**\n(src/core/application/)" as APP #FFF3E0 {
+  rectangle "use_cases/" as UC
+  rectangle "ports/\n(仓储、服务、消息代理接口)" as PORTS
+}
+
+rectangle "**领域**\n(src/core/domain/)" as DOMAIN #FCE4EC {
+  rectangle "entities/\nvalue_objects/\nevents/\nexceptions/\nservices/" as DOMAIN_IMPL
+}
+
+API -[#2196F3]-> INFRA : 运行时装配
+INFRA -[#4CAF50]-> APP : 实现端口
+APP -[#FF9800]-> DOMAIN : 依赖
+
+note right of DOMAIN
+  不依赖外层
+end note
+
+note right of DI
+  唯一引用
+  infrastructure 的位置
+end note
+
+@enduml

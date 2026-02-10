@@ -95,6 +95,25 @@ def register(router: APIRouter) -> None:
         created = await repo.add(entity)
         return _instrument_to_response(created)
 
+    @router.post("/instruments/batch", response_model=list[InstrumentResponse], status_code=201)
+    async def create_instruments_batch(
+        body: list[InstrumentCreate],
+        repo: Annotated[object, Depends(get_instrument_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = Instrument(
+                instrument_id=uuid4(),
+                symbol=item.symbol,
+                name=item.name,
+                asset_class=item.asset_class,
+                currency=item.currency,
+                exchange=item.exchange,
+            )
+            created = await repo.add(entity)
+            result.append(_instrument_to_response(created))
+        return result
+
     @router.put("/instruments/{instrument_id}", response_model=InstrumentResponse)
     async def update_instrument(
         instrument_id: UUID,
@@ -159,6 +178,28 @@ def register(router: APIRouter) -> None:
         )
         created = await repo.add(entity)
         return _bond_to_response(created)
+
+    @router.post("/bonds/batch", response_model=list[BondResponse], status_code=201)
+    async def create_bonds_batch(
+        body: list[BondCreate],
+        repo: Annotated[object, Depends(get_bond_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = Bond(
+                bond_id=uuid4(),
+                instrument_id=item.instrument_id,
+                face_value=item.face_value,
+                coupon_rate=item.coupon_rate,
+                ytm=item.ytm,
+                duration=item.duration,
+                convexity=item.convexity,
+                maturity_years=item.maturity_years,
+                frequency=item.frequency,
+            )
+            created = await repo.add(entity)
+            result.append(_bond_to_response(created))
+        return result
 
     @router.put("/bonds/{bond_id}", response_model=BondResponse)
     async def update_bond(
@@ -233,6 +274,34 @@ def register(router: APIRouter) -> None:
         )
         created = await repo.add(entity)
         return _option_to_response(created)
+
+    @router.post("/options/batch", response_model=list[OptionResponse], status_code=201)
+    async def create_options_batch(
+        body: list[OptionCreate],
+        repo: Annotated[object, Depends(get_option_repo)] = None,
+    ):
+        result = []
+        for item in body:
+            entity = Option(
+                option_id=uuid4(),
+                instrument_id=item.instrument_id,
+                underlying_instrument_id=item.underlying_instrument_id,
+                strike=item.strike,
+                expiry=item.expiry,
+                option_type=item.option_type,
+                risk_free_rate=item.risk_free_rate,
+                volatility=item.volatility,
+                bs_price=item.bs_price,
+                delta=item.delta,
+                gamma=item.gamma,
+                theta=item.theta,
+                vega=item.vega,
+                rho=item.rho,
+                implied_volatility=item.implied_volatility,
+            )
+            created = await repo.add(entity)
+            result.append(_option_to_response(created))
+        return result
 
     @router.put("/options/{option_id}", response_model=OptionResponse)
     async def update_option(

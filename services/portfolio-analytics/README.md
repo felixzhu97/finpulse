@@ -1,13 +1,40 @@
 ## Portfolio Analytics (Python FastAPI)
 
-Backend service providing portfolio analytics for the mobile and web clients. It uses **TimescaleDB** (PostgreSQL extension) for time-series portfolio history, **Redis** for caching, **PostgreSQL** for portfolio metadata, and **Kafka** for messaging. The codebase is structured using **Domain-Driven Design (DDD)**.
+Backend service providing portfolio analytics for the mobile and web clients. It uses **TimescaleDB** (PostgreSQL extension) for time-series portfolio history, **Redis** for caching, **PostgreSQL** for portfolio metadata, and **Kafka** for messaging. The codebase follows **Clean Architecture**: domain at the centre, application use cases and ports, infrastructure implementing ports, and API as the composition root.
 
-### Layout
+### Clean Architecture (layers)
 
-- **Core – Domain** (`src/core/domain/`): Entities, value objects, domain services, events, exceptions. No framework or outer-layer dependencies.
-- **Core – Application** (`src/core/application/`): Use cases and ports (repository, service, message-broker interfaces). Depends only on domain.
+```
+                    ┌─────────────────────────────────────────┐
+                    │              API (src/api/)               │
+                    │  dependencies.py, v1/endpoints, schemas, │
+                    │  mappers; composition root only imports  │
+                    │  infrastructure here                     │
+                    └───────────────────┬─────────────────────┘
+                                        │
+    ┌───────────────────────────────────┼───────────────────────────────────┐
+    │           Infrastructure (src/infrastructure/)                          │
+    │  database/, config/, external_services/, message_brokers/               │
+    │  Implements application ports                                          │
+    └───────────────────────────────────┬───────────────────────────────────┘
+                                        │
+    ┌───────────────────────────────────┼───────────────────────────────────┐
+    │         Application (src/core/application/)                            │
+    │  use_cases/, ports/ (repositories, services, message_brokers)          │
+    │  Depends only on domain and ports                                       │
+    └───────────────────────────────────┬───────────────────────────────────┘
+                                        │
+    ┌───────────────────────────────────┼───────────────────────────────────┐
+    │             Domain (src/core/domain/)                                   │
+    │  entities/, value_objects/, events/, exceptions/, services/            │
+    │  No outer-layer dependencies                                           │
+    └────────────────────────────────────────────────────────────────────────┘
+```
+
+- **Domain** (`src/core/domain/`): Entities, value objects, domain services, events, exceptions. No framework or outer-layer dependencies.
+- **Application** (`src/core/application/`): Use cases and ports (repository, service, message-broker interfaces). Depends only on domain.
 - **Infrastructure** (`src/infrastructure/`): Database (ORM, repositories, session), external services (analytics, market data), message brokers (Kafka). Implements application ports.
-- **API** (`src/api/`): HTTP endpoints, schemas, and dependency injection. Composition root wires ports to infrastructure; entrypoint is `main.py` (project root).
+- **API** (`src/api/`): HTTP endpoints, schemas, mappers, and dependency injection. Composition root in `dependencies.py` wires ports to infrastructure; entrypoint is `main.py` (project root).
 
 ### Infrastructure (runtime)
 
@@ -70,10 +97,14 @@ alembic current        # Show current revision
 
 ### API
 
+**Portfolio and real-time**
+
 - `GET /api/v1/portfolio` – returns the portfolio from PostgreSQL (or in-memory demo if DB is empty).
 - `POST /api/v1/seed` – accepts a portfolio JSON body, stores it in PostgreSQL, and publishes a `portfolio.seeded` event to Kafka.
 - `GET /api/v1/quotes?symbols=...` – returns the latest real-time quotes for the requested symbols, backed by Kafka topic `market.quotes.enriched`.
 - `WebSocket /ws/quotes` – accepts `{"type":"subscribe","symbols":["AAPL","MSFT"]}` or `"update"` messages and pushes `{"type":"snapshot","quotes":{...}}` snapshots using the same quote structure as the HTTP endpoint.
+
+**REST resources** (under `/api/v1/`): customers, user-preferences, accounts, instruments, portfolios, positions, watchlists, watchlist-items, bonds, options, orders, trades, cash-transactions, payments, settlements, market-data, risk-metrics, valuations. Each resource has list, get-by-id, create, update, delete. **Batch create**: for each resource, `POST /api/v1/<resource>/batch` accepts a JSON array of create payloads and returns an array of created entities (e.g. `POST /api/v1/customers/batch`, `POST /api/v1/instruments/batch`). The seed script (`scripts/seed/generate-seed-data.js`) uses these batch endpoints to minimise the number of HTTP calls during seeding.
 
 ### AI and ML (framework and endpoints)
 
