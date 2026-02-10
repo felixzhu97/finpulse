@@ -11,7 +11,7 @@ export function NativeDemoCard(props: NativeDemoCardProps) {
   if (Platform.OS === "web") {
     return (
       <View {...props} style={[props.style, styles.webFallback]}>
-        <Text style={styles.webText}>{props.title ?? "Native Demo Card (Web fallback)"}</Text>
+        <Text style={styles.webText}>{props.title ?? "Native Demo Card"}</Text>
       </View>
     );
   }

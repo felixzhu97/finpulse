@@ -1,7 +1,7 @@
 # FinPulse 平台 TOGAF 企业架构文档
 
 > 基于 TOGAF 框架的 FinPulse 金融科技分析平台企业架构视图  
-> English: [../../docs/architecture/README.md](../../docs/architecture/README.md)
+> English: [docs/en/architecture/README.md](../../en/architecture/README.md)
 
 本目录为**中文版** TOGAF 架构图与说明。图表文件（`.puml`）均为中文标注。
 
@@ -44,7 +44,7 @@
 **描述**：分层应用组件及其交互。
 
 **层次**：
-1. **展示层**：Web（`apps/web`，Angular）、移动（`apps/mobile`、`apps/mobile-portfolio`，React Native，Expo）；**Native UI（mobile-portfolio）**：**NativeDemoCard** 及六类原生图表；**NativeSparkline** 用于股票列表。Metal（iOS）/ OpenGL ES（Android）；主题、提示、X 轴、拖拽滚动。共享逻辑：`useScrollableChart`、`ScrollableChartContainer`、`chartTooltip`。**Stocks 屏幕**：`StockListItem`、`useRealtimeQuotes`、`usePerSymbolHistory`；WebSocket `/ws/quotes` 实时行情；基于累积行情的每股票 sparkline。UI 库：`packages/ui`；图表：Chart.js、ng2-charts、chartjs-chart-financial、react-native-chart-kit、react-native-wagmi-charts。
+1. **展示层**：Web（`apps/web`，Angular）、移动（`apps/mobile`、`apps/mobile-portfolio`，React Native，Expo）；**Native UI（mobile-portfolio）**：**NativeDemoCard** 及六类原生图表；**NativeSparkline** 用于股票列表。Metal（iOS）/ OpenGL ES（Android）；主题、提示、X 轴、拖拽滚动。**OOP 结构**：**iOS** — `ChartSupport/`（ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes）；各图表目录；NativeSparkline（SparklineTheme、SparklinePoints）；NativeDemoCard。**Android** — `view/chart/`（ChartGl、ChartCurve、各图表 Theme）；`view/sparkline/`、`view/democard/`。共享逻辑：`useScrollableChart`、`ScrollableChartContainer`、`chartTooltip`；`src/components/native/` 包装组件。**Stocks 屏幕**：`StockListItem`、`useRealtimeQuotes`、`usePerSymbolHistory`；WebSocket `/ws/quotes`；每股票 sparkline。UI 库：`packages/ui`；图表：Chart.js、ng2-charts、chartjs-chart-financial、react-native-chart-kit、react-native-wagmi-charts。
 2. **业务逻辑层**：投资组合、市场数据、交易、风险管理、用户模块
 3. **数据访问层**：数据服务（DAO、缓存）、状态管理
 4. **外部服务层**：**Portfolio Analytics API**（FastAPI，DDD；REST；AI/ML /api/v1/ai；SQLAlchemy 2.0 + asyncpg，Alembic；TimescaleDB，Redis；Kafka）；Vercel Analytics、市场数据 API、存储、大数据服务层（Java Spring Boot）
@@ -73,7 +73,7 @@
 
 **描述**：技术栈、构建工具与部署平台。
 
-**技术栈**：前端（Angular、React Native、Expo、React 19、TypeScript 5）；移动原生（iOS Metal、Android OpenGL ES）；UI（Radix UI、Tailwind、Lucide）；可视化（Chart.js、ng2-charts、chartjs-chart-financial、react-native-wagmi-charts、原生图表）；工具（React Hook Form、Zod、date-fns、主题）；构建（Angular/TS、Maven、Java、Spring Boot）；部署（Vercel、Git、Java JAR/容器、REST）；**Portfolio Analytics 后端**（FastAPI、uvicorn、端口 8800；SQLAlchemy 2.0 + asyncpg、Alembic；TimescaleDB 5433、Redis 6379、Kafka 9092；AI/ML：Ollama、Hugging Face、TensorFlow、scipy/statsmodels/sumy；python-dotenv、pytest）；大数据（Java 17+、Spring Boot 3.2、Maven、Spark 3.5、Flink 1.19、Hadoop 3.3）。
+**技术栈**：前端（Angular、React Native、Expo、React 19、TypeScript 5）；移动原生（iOS Metal、Android OpenGL ES；**iOS ChartSupport**：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes；**Android view/chart/**：ChartGl、ChartCurve、各图表 Theme；view/sparkline/、view/democard/）；UI（Radix UI、Tailwind、Lucide）；可视化（Chart.js、ng2-charts、chartjs-chart-financial、react-native-wagmi-charts、原生图表）；工具（React Hook Form、Zod、date-fns、主题）；构建（Angular/TS、Maven、Java、Spring Boot）；部署（Vercel、Git、Java JAR/容器、REST）；**Portfolio Analytics 后端**（FastAPI、uvicorn、端口 8800；SQLAlchemy 2.0 + asyncpg、Alembic；TimescaleDB 5433、Redis 6379、Kafka 9092；AI/ML：Ollama、Hugging Face、TensorFlow、scipy/statsmodels/sumy；python-dotenv、pytest）；大数据（Java 17+、Spring Boot 3.2、Maven、Spark 3.5、Flink 1.19、Hadoop 3.3）。
 
 **技术标准**：开发规范（TypeScript、ESLint、组件化）；性能；安全（HTTPS、CSP、XSS、数据验证）；无障碍（WCAG 2.1 AA）。
 

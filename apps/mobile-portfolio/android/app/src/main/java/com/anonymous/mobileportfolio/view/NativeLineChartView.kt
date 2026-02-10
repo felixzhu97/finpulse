@@ -3,103 +3,21 @@ package com.anonymous.mobileportfolio.view
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
+import com.anonymous.mobileportfolio.view.chart.ChartCurve
+import com.anonymous.mobileportfolio.view.chart.ChartGl
+import com.anonymous.mobileportfolio.view.chart.LineChartThemes
+import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 import android.opengl.GLES30
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.FloatBuffer
-
-private fun lineChartTheme(dark: Boolean): ClearAndColors {
-    return if (dark) ClearAndColors(0f, 0f, 0f, floatArrayOf(1f, 0.25f, 0.25f, 1f), floatArrayOf(1f, 0.25f, 0.25f, 0.4f), floatArrayOf(1f, 0.25f, 0.25f, 0f), floatArrayOf(0.22f, 0.22f, 0.26f, 1f))
-    else ClearAndColors(0.97f, 0.97f, 0.98f, floatArrayOf(0.2f, 0.4f, 0.9f, 1f), floatArrayOf(0.2f, 0.4f, 0.9f, 0.4f), floatArrayOf(0.2f, 0.4f, 0.9f, 0f), floatArrayOf(0.85f, 0.85f, 0.88f, 1f))
-}
-private data class ClearAndColors(val r: Float, val g: Float, val b: Float, val line: FloatArray, val fillTop: FloatArray, val fillBottom: FloatArray, val grid: FloatArray)
-
-private const val FLOATS_PER_VERTEX = 6
-private const val STRIDE_BYTES = 24
-
-private const val SMOOTH_STEPS = 12
-
-private fun putVertex(arr: FloatArray, offset: Int, x: Float, y: Float, color: FloatArray) {
-    arr[offset] = x
-    arr[offset + 1] = y
-    System.arraycopy(color, 0, arr, offset + 2, 4)
-}
-
-private fun catmullRom(p0: Float, p1: Float, p2: Float, p3: Float, t: Float): Float {
-    val t2 = t * t
-    val t3 = t2 * t
-    return 0.5f * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
-}
-
-private fun smoothPoints(xIn: FloatArray, yIn: FloatArray): Pair<FloatArray, FloatArray> {
-    if (xIn.size < 2) return xIn to yIn
-    val out = mutableListOf<Pair<Float, Float>>()
-    val n = xIn.size
-    for (i in 0 until n - 1) {
-        val p0x = if (i > 0) xIn[i - 1] else xIn[i]
-        val p0y = if (i > 0) yIn[i - 1] else yIn[i]
-        val p1x = xIn[i]; val p1y = yIn[i]
-        val p2x = xIn[i + 1]; val p2y = yIn[i + 1]
-        val p3x = if (i + 2 < n) xIn[i + 2] else xIn[i + 1]
-        val p3y = if (i + 2 < n) yIn[i + 2] else yIn[i + 1]
-        for (s in 0 until SMOOTH_STEPS) {
-            val t = s.toFloat() / SMOOTH_STEPS
-            out.add(catmullRom(p0x, p1x, p2x, p3x, t) to catmullRom(p0y, p1y, p2y, p3y, t))
-        }
-    }
-    out.add(xIn.last() to yIn.last())
-    return out.map { it.first }.toFloatArray() to out.map { it.second }.toFloatArray()
-}
-
-private class ChartData {
-    var lineBuffer: FloatBuffer? = null
-    var fillBuffer: FloatBuffer? = null
-    var lineCount = 0
-    var fillCount = 0
-
-    fun setData(values: DoubleArray?, lineColor: FloatArray, fillTop: FloatArray, fillBottom: FloatArray) {
-        if (values == null || values.size < 2) {
-            lineCount = 0
-            fillCount = 0
-            return
-        }
-        val min = values.minOrNull() ?: 0.0
-        val max = values.maxOrNull() ?: 1.0
-        val range = (max - min).coerceAtLeast(1e-9)
-        val n = values.size
-        val xIn = FloatArray(n) { it.toFloat() / (n - 1).coerceAtLeast(1) }
-        val yIn = FloatArray(n) { ((values[it] - min) / range).toFloat() }
-        val (xOut, yOut) = smoothPoints(xIn, yIn)
-        val pts = xOut.size
-        val lineCoords = FloatArray(pts * FLOATS_PER_VERTEX)
-        val fillCoords = FloatArray(pts * 2 * FLOATS_PER_VERTEX)
-        for (i in 0 until pts) {
-            val x = xOut[i]
-            val y = yOut[i]
-            putVertex(lineCoords, i * FLOATS_PER_VERTEX, x, y, lineColor)
-            putVertex(fillCoords, i * 12, x, y, fillTop)
-            putVertex(fillCoords, i * 12 + 6, x, 0f, fillBottom)
-        }
-        lineCount = pts
-        fillCount = pts * 2
-        lineBuffer = toFloatBuffer(lineCoords)
-        fillBuffer = toFloatBuffer(fillCoords)
-    }
-
-    private fun toFloatBuffer(arr: FloatArray): FloatBuffer =
-        ByteBuffer.allocateDirect(arr.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().apply { put(arr); position(0) }
-}
 
 class NativeLineChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
-) : GLSurfaceView(context, attrs, defStyle) {
+) : GLSurfaceView(context, attrs) {
 
     private val renderer = ChartRenderer()
-
     private var lastData: DoubleArray? = null
 
     init {
@@ -121,7 +39,7 @@ class NativeLineChartView @JvmOverloads constructor(
     }
 
     private class ChartRenderer : GLSurfaceView.Renderer {
-        private val chartData = ChartData()
+        private val chartData = LineChartData()
         private var program = 0
         private var posLoc = 0
         private var colorLoc = 0
@@ -130,52 +48,20 @@ class NativeLineChartView @JvmOverloads constructor(
 
         fun setDark(dark: Boolean) {
             isDark = dark
-            rebuildGrid()
-        }
-
-        private fun rebuildGrid() {
-            val t = lineChartTheme(isDark)
-            val arr = FloatArray(8 * FLOATS_PER_VERTEX)
-            for (i in 1..4) {
-                val y = -i / 5f * 2f + 1f
-                putVertex(arr, (i - 1) * 12, -1f, y, t.grid)
-                putVertex(arr, (i - 1) * 12 + 6, 1f, y, t.grid)
-            }
-            gridBuffer = ByteBuffer.allocateDirect(arr.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().apply { put(arr); position(0) }
+            gridBuffer = ChartGl.buildGridBuffer(LineChartThemes.theme(isDark).grid)
         }
 
         fun setData(values: DoubleArray?) {
-            val t = lineChartTheme(isDark)
+            val t = LineChartThemes.theme(isDark)
             chartData.setData(values, t.line, t.fillTop, t.fillBottom)
         }
 
-        private val vertexShader = """
-            #version 300 es
-            in vec2 a_position;
-            in vec4 a_color;
-            out vec4 v_color;
-            void main() {
-                vec2 clip = a_position * 2.0 - 1.0;
-                clip.y = -clip.y;
-                gl_Position = vec4(clip, 0.0, 1.0);
-                v_color = a_color;
-            }
-        """.trimIndent()
-
-        private val fragmentShader = """
-            #version 300 es
-            precision mediump float;
-            in vec4 v_color;
-            out vec4 fragColor;
-            void main() { fragColor = v_color; }
-        """.trimIndent()
-
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-            if (gridBuffer == null) rebuildGrid()
-            program = loadProgram(vertexShader, fragmentShader)
+            if (gridBuffer == null) gridBuffer = ChartGl.buildGridBuffer(LineChartThemes.theme(isDark).grid)
+            program = ChartGl.loadProgram(ChartGl.VERTEX_SHADER, ChartGl.FRAGMENT_SHADER)
             posLoc = GLES30.glGetAttribLocation(program, "a_position")
             colorLoc = GLES30.glGetAttribLocation(program, "a_color")
-            val t = lineChartTheme(isDark)
+            val t = LineChartThemes.theme(isDark)
             GLES30.glClearColor(t.r, t.g, t.b, 1f)
         }
 
@@ -184,50 +70,54 @@ class NativeLineChartView @JvmOverloads constructor(
         }
 
         override fun onDrawFrame(gl: GL10?) {
-            val t = lineChartTheme(isDark)
+            val t = LineChartThemes.theme(isDark)
             GLES30.glClearColor(t.r, t.g, t.b, 1f)
             GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT)
             GLES30.glUseProgram(program)
-            gridBuffer?.let { drawLines(it, 8, 1f) }
-            chartData.fillBuffer?.let { drawTriangles(it, chartData.fillCount) }
-            chartData.lineBuffer?.takeIf { chartData.lineCount >= 2 }?.let { drawLines(it, chartData.lineCount, 2f) }
+            gridBuffer?.let { ChartGl.drawLines(it, 8, 1f, posLoc, colorLoc) }
+            chartData.fillBuffer?.let {
+                ChartGl.bindBuffer(it, posLoc, colorLoc)
+                GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, chartData.fillCount)
+            }
+            chartData.lineBuffer?.takeIf { chartData.lineCount >= 2 }?.let {
+                ChartGl.drawLines(it, chartData.lineCount, 2f, posLoc, colorLoc)
+            }
         }
+    }
+}
 
-        private fun drawLines(buffer: FloatBuffer, count: Int, lineWidth: Float) {
-            GLES30.glLineWidth(lineWidth)
-            bindBuffer(buffer)
-            GLES30.glDrawArrays(GLES30.GL_LINES, 0, count)
-        }
+private class LineChartData {
+    var lineBuffer: FloatBuffer? = null
+    var fillBuffer: FloatBuffer? = null
+    var lineCount = 0
+    var fillCount = 0
 
-        private fun drawTriangles(buffer: FloatBuffer, count: Int) {
-            bindBuffer(buffer)
-            GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, count)
+    fun setData(values: DoubleArray?, lineColor: FloatArray, fillTop: FloatArray, fillBottom: FloatArray) {
+        if (values == null || values.size < 2) {
+            lineCount = 0
+            fillCount = 0
+            return
         }
-
-        private fun bindBuffer(buffer: FloatBuffer) {
-            GLES30.glEnableVertexAttribArray(posLoc)
-            GLES30.glEnableVertexAttribArray(colorLoc)
-            GLES30.glVertexAttribPointer(posLoc, 2, GLES30.GL_FLOAT, false, STRIDE_BYTES, buffer)
-            GLES30.glVertexAttribPointer(colorLoc, 4, GLES30.GL_FLOAT, false, STRIDE_BYTES, buffer.duplicate().apply { position(2) })
+        val min = values.minOrNull() ?: 0.0
+        val max = values.maxOrNull() ?: 1.0
+        val range = (max - min).coerceAtLeast(1e-9)
+        val n = values.size
+        val xIn = FloatArray(n) { it.toFloat() / (n - 1).coerceAtLeast(1) }
+        val yIn = FloatArray(n) { ((values[it] - min) / range).toFloat() }
+        val (xOut, yOut) = ChartCurve.smoothPoints(xIn, yIn)
+        val pts = xOut.size
+        val lineCoords = FloatArray(pts * ChartGl.FLOATS_PER_VERTEX)
+        val fillCoords = FloatArray(pts * 2 * ChartGl.FLOATS_PER_VERTEX)
+        for (i in 0 until pts) {
+            val x = xOut[i]
+            val y = yOut[i]
+            ChartGl.putVertex(lineCoords, i * ChartGl.FLOATS_PER_VERTEX, x, y, lineColor)
+            ChartGl.putVertex(fillCoords, i * 12, x, y, fillTop)
+            ChartGl.putVertex(fillCoords, i * 12 + 6, x, 0f, fillBottom)
         }
-
-        private fun loadProgram(vertexSource: String, fragmentSource: String): Int {
-            val vs = compileShader(GLES30.GL_VERTEX_SHADER, vertexSource)
-            val fs = compileShader(GLES30.GL_FRAGMENT_SHADER, fragmentSource)
-            val prog = GLES30.glCreateProgram()
-            GLES30.glAttachShader(prog, vs)
-            GLES30.glAttachShader(prog, fs)
-            GLES30.glLinkProgram(prog)
-            GLES30.glDeleteShader(vs)
-            GLES30.glDeleteShader(fs)
-            return prog
-        }
-
-        private fun compileShader(type: Int, source: String): Int {
-            val shader = GLES30.glCreateShader(type)
-            GLES30.glShaderSource(shader, source)
-            GLES30.glCompileShader(shader)
-            return shader
-        }
+        lineCount = pts
+        fillCount = pts * 2
+        lineBuffer = ChartGl.toFloatBuffer(lineCoords)
+        fillBuffer = ChartGl.toFloatBuffer(fillCoords)
     }
 }

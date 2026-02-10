@@ -3,36 +3,18 @@ package com.anonymous.mobileportfolio.view
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
+import com.anonymous.mobileportfolio.view.chart.CandleChartThemes
+import com.anonymous.mobileportfolio.view.chart.ChartGl
+import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 import android.opengl.GLES30
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.FloatBuffer
-
-private fun candleTheme(dark: Boolean): CandleThemeColors {
-    return if (dark) CandleThemeColors(0f, 0f, 0f, floatArrayOf(0.22f, 0.22f, 0.26f, 1f), floatArrayOf(0.2f, 0.75f, 0.85f, 1f), floatArrayOf(1f, 0.3f, 0.25f, 1f))
-    else CandleThemeColors(0.97f, 0.97f, 0.98f, floatArrayOf(0.85f, 0.85f, 0.88f, 1f), floatArrayOf(0.2f, 0.6f, 0.85f, 1f), floatArrayOf(0.9f, 0.25f, 0.2f, 1f))
-}
-private data class CandleThemeColors(val r: Float, val g: Float, val b: Float, val grid: FloatArray, val up: FloatArray, val down: FloatArray)
-
-private const val FLOATS_PER_VERTEX = 6
-private const val STRIDE_BYTES = 24
-
-private fun putVertex(arr: FloatArray, offset: Int, x: Float, y: Float, color: FloatArray) {
-    arr[offset] = x
-    arr[offset + 1] = y
-    System.arraycopy(color, 0, arr, offset + 2, 4)
-}
-
-private fun toFloatBuffer(arr: FloatArray): FloatBuffer =
-    ByteBuffer.allocateDirect(arr.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().apply { put(arr); position(0) }
 
 class NativeCandleChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
-) : GLSurfaceView(context, attrs, defStyle) {
+) : GLSurfaceView(context, attrs) {
 
     private var lastData: DoubleArray? = null
     private val renderer = CandleRenderer()
@@ -68,40 +50,8 @@ class NativeCandleChartView @JvmOverloads constructor(
 
         fun setDark(dark: Boolean) {
             isDark = dark
-            rebuildGrid()
+            gridBuffer = ChartGl.buildGridBuffer(CandleChartThemes.theme(isDark).grid)
         }
-
-        private fun rebuildGrid() {
-            val t = candleTheme(isDark)
-            val arr = FloatArray(8 * FLOATS_PER_VERTEX)
-            for (i in 1..4) {
-                val y = -i / 5f * 2f + 1f
-                putVertex(arr, (i - 1) * 12, -1f, y, t.grid)
-                putVertex(arr, (i - 1) * 12 + 6, 1f, y, t.grid)
-            }
-            gridBuffer = toFloatBuffer(arr)
-        }
-
-        private val vertexShader = """
-            #version 300 es
-            in vec2 a_position;
-            in vec4 a_color;
-            out vec4 v_color;
-            void main() {
-                vec2 clip = a_position * 2.0 - 1.0;
-                clip.y = -clip.y;
-                gl_Position = vec4(clip, 0.0, 1.0);
-                v_color = a_color;
-            }
-        """.trimIndent()
-
-        private val fragmentShader = """
-            #version 300 es
-            precision mediump float;
-            in vec4 v_color;
-            out vec4 fragColor;
-            void main() { fragColor = v_color; }
-        """.trimIndent()
 
         fun setData(flatOHLC: DoubleArray?) {
             if (flatOHLC == null || flatOHLC.size < 4) {
@@ -109,7 +59,7 @@ class NativeCandleChartView @JvmOverloads constructor(
                 wicksCount = 0
                 return
             }
-            val t = candleTheme(isDark)
+            val t = CandleChartThemes.theme(isDark)
             val n = flatOHLC.size / 4
             var minH = flatOHLC[1]
             var maxH = flatOHLC[1]
@@ -119,8 +69,8 @@ class NativeCandleChartView @JvmOverloads constructor(
             }
             val range = (maxH - minH).coerceAtLeast(1e-9)
             val barW = (1f / n).coerceAtLeast(0.001f) * 0.6f
-            val bodyVerts = FloatArray(n * 6 * FLOATS_PER_VERTEX)
-            val wickVerts = FloatArray(n * 2 * FLOATS_PER_VERTEX)
+            val bodyVerts = FloatArray(n * 6 * ChartGl.FLOATS_PER_VERTEX)
+            val wickVerts = FloatArray(n * 2 * ChartGl.FLOATS_PER_VERTEX)
             for (i in 0 until n) {
                 val o = flatOHLC[i * 4]
                 val h = flatOHLC[i * 4 + 1]
@@ -135,28 +85,28 @@ class NativeCandleChartView @JvmOverloads constructor(
                 val color = if (c >= o) t.up else t.down
                 val x0 = x - barW / 2
                 val x1 = x + barW / 2
-                val bo = i * 6 * FLOATS_PER_VERTEX
-                putVertex(bodyVerts, bo, x0, yLo, color)
-                putVertex(bodyVerts, bo + 6, x1, yLo, color)
-                putVertex(bodyVerts, bo + 12, x0, yHi, color)
-                putVertex(bodyVerts, bo + 18, x0, yHi, color)
-                putVertex(bodyVerts, bo + 24, x1, yLo, color)
-                putVertex(bodyVerts, bo + 30, x1, yHi, color)
-                putVertex(wickVerts, i * 12, x, yL, color)
-                putVertex(wickVerts, i * 12 + 6, x, yH, color)
+                val bo = i * 6 * ChartGl.FLOATS_PER_VERTEX
+                ChartGl.putVertex(bodyVerts, bo, x0, yLo, color)
+                ChartGl.putVertex(bodyVerts, bo + 6, x1, yLo, color)
+                ChartGl.putVertex(bodyVerts, bo + 12, x0, yHi, color)
+                ChartGl.putVertex(bodyVerts, bo + 18, x0, yHi, color)
+                ChartGl.putVertex(bodyVerts, bo + 24, x1, yLo, color)
+                ChartGl.putVertex(bodyVerts, bo + 30, x1, yHi, color)
+                ChartGl.putVertex(wickVerts, i * 12, x, yL, color)
+                ChartGl.putVertex(wickVerts, i * 12 + 6, x, yH, color)
             }
             bodiesCount = n * 6
             wicksCount = n * 2
-            bodiesBuffer = toFloatBuffer(bodyVerts)
-            wicksBuffer = toFloatBuffer(wickVerts)
+            bodiesBuffer = ChartGl.toFloatBuffer(bodyVerts)
+            wicksBuffer = ChartGl.toFloatBuffer(wickVerts)
         }
 
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-            if (gridBuffer == null) rebuildGrid()
-            program = loadProgram(vertexShader, fragmentShader)
+            if (gridBuffer == null) gridBuffer = ChartGl.buildGridBuffer(CandleChartThemes.theme(isDark).grid)
+            program = ChartGl.loadProgram(ChartGl.VERTEX_SHADER, ChartGl.FRAGMENT_SHADER)
             posLoc = GLES30.glGetAttribLocation(program, "a_position")
             colorLoc = GLES30.glGetAttribLocation(program, "a_color")
-            val t = candleTheme(isDark)
+            val t = CandleChartThemes.theme(isDark)
             GLES30.glClearColor(t.r, t.g, t.b, 1f)
         }
 
@@ -165,38 +115,16 @@ class NativeCandleChartView @JvmOverloads constructor(
         }
 
         override fun onDrawFrame(gl: GL10?) {
-            val t = candleTheme(isDark)
+            val t = CandleChartThemes.theme(isDark)
             GLES30.glClearColor(t.r, t.g, t.b, 1f)
             GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT)
             GLES30.glUseProgram(program)
-            gridBuffer?.let { drawLines(it, 8, 1f) }
-            bodiesBuffer?.let { bindBuffer(it); GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, bodiesCount) }
-            wicksBuffer?.takeIf { wicksCount >= 2 }?.let { drawLines(it, wicksCount, 2f) }
-        }
-
-        private fun drawLines(buffer: FloatBuffer, count: Int, lineWidth: Float) {
-            GLES30.glLineWidth(lineWidth)
-            bindBuffer(buffer)
-            GLES30.glDrawArrays(GLES30.GL_LINES, 0, count)
-        }
-
-        private fun bindBuffer(buffer: FloatBuffer) {
-            GLES30.glEnableVertexAttribArray(posLoc)
-            GLES30.glEnableVertexAttribArray(colorLoc)
-            GLES30.glVertexAttribPointer(posLoc, 2, GLES30.GL_FLOAT, false, STRIDE_BYTES, buffer)
-            GLES30.glVertexAttribPointer(colorLoc, 4, GLES30.GL_FLOAT, false, STRIDE_BYTES, buffer.duplicate().apply { position(2) })
-        }
-
-        private fun loadProgram(vs: String, fs: String): Int {
-            val v = GLES30.glCreateShader(GLES30.GL_VERTEX_SHADER).also { GLES30.glShaderSource(it, vs); GLES30.glCompileShader(it) }
-            val f = GLES30.glCreateShader(GLES30.GL_FRAGMENT_SHADER).also { GLES30.glShaderSource(it, fs); GLES30.glCompileShader(it) }
-            val p = GLES30.glCreateProgram()
-            GLES30.glAttachShader(p, v)
-            GLES30.glAttachShader(p, f)
-            GLES30.glLinkProgram(p)
-            GLES30.glDeleteShader(v)
-            GLES30.glDeleteShader(f)
-            return p
+            gridBuffer?.let { ChartGl.drawLines(it, 8, 1f, posLoc, colorLoc) }
+            bodiesBuffer?.let {
+                ChartGl.bindBuffer(it, posLoc, colorLoc)
+                GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, bodiesCount)
+            }
+            wicksBuffer?.takeIf { wicksCount >= 2 }?.let { ChartGl.drawLines(it, wicksCount, 2f, posLoc, colorLoc) }
         }
     }
 }

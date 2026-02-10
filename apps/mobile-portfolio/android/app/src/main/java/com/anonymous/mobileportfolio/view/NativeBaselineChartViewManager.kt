@@ -23,8 +23,8 @@ class NativeBaselineChartViewManager(reactContext: ReactApplicationContext) :
     }
 
     @ReactProp(name = "baselineValue")
-    fun setBaselineValue(view: NativeBaselineChartView, value: Double?) {
-        view.setBaselineValue(value)
+    fun setBaselineValue(view: NativeBaselineChartView, value: String?) {
+        view.setBaselineValue(value?.toDoubleOrNull())
     }
 
     @ReactProp(name = "theme")

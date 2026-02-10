@@ -54,6 +54,27 @@ pnpm run android
 
 Expo Go has limited support for native modules.
 
+### Android: No device or emulator
+
+From the **repo root**: `pnpm dev:mobile-portfolio:android`. From the app directory: `pnpm run android`. Ensure a device or emulator is running and `ANDROID_HOME` is set (e.g. `~/Library/Android/sdk`).
+
+If you see **"No Android connected device found, and no emulators could be started automatically"**:
+
+1. **Option A – Android emulator (recommended)**  
+   - Install [Android Studio](https://developer.android.com/studio) and the Android SDK.  
+   - Open **Device Manager** (Tools → Device Manager) and **Create Device**. Pick a phone (e.g. Pixel 6), then download a system image (e.g. API 34) and finish.  
+   - Start the emulator from Device Manager (play button), or from CLI:  
+     `$ANDROID_HOME/emulator/emulator -avd <AVD_NAME>`  
+     (List AVDs: `$ANDROID_HOME/emulator/emulator -list-avds`.)  
+   - Then run `pnpm run android` again.
+
+2. **Option B – Physical device**  
+   - Enable **Developer options** and **USB debugging** on the device ([guide](https://developer.android.com/studio/run/device)).  
+   - Connect via USB and accept the debugging prompt.  
+   - Run `adb devices` to confirm the device is listed, then `pnpm run android`.
+
+If you see **"Unable to locate a Java Runtime"**: set `JAVA_HOME` to a JDK 17+ (e.g. Homebrew: `export JAVA_HOME="/opt/homebrew/opt/openjdk@17"`).
+
 ## Backend
 
 The app connects only to the backend; there is no in-app mock data.

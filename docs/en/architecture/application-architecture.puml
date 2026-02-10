@@ -61,6 +61,10 @@ package "Presentation Layer" <<Presentation>> {
             component "iOS Metal (MTKView)" as NativeChartsIOS
             component "Android OpenGL ES 3" as NativeChartsAndroid
         }
+        component "Native chart support (OOP)" as NativeChartSupport {
+            component "iOS ChartSupport" as IOSChartSupport
+            component "Android view/chart/" as AndroidChartPkg
+        }
         component "Shared chart logic" as SharedChartLogic {
             component "useScrollableChart" as UseScrollableChart
             component "ScrollableChartContainer" as ScrollableChartContainer
@@ -157,6 +161,9 @@ ExpoRN --> NativeDemoCard
 NativeDemoCard --> NativeDemoCardIOS
 NativeDemoCard --> NativeDemoCardAndroid
 ExpoRN --> NativeCharts
+NativeCharts --> NativeChartSupport
+NativeChartSupport --> IOSChartSupport
+NativeChartSupport --> AndroidChartPkg
 NativeCharts --> NLC
 NativeCharts --> NCC
 NativeCharts --> NALC

@@ -2,26 +2,13 @@ import Metal
 import MetalKit
 import UIKit
 
-private func americanTheme(_ dark: Bool) -> (clear: MTLClearColor, grid: (Float, Float, Float, Float), up: (Float, Float, Float, Float), down: (Float, Float, Float, Float)) {
-    if dark {
-        return (MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1), (0.22, 0.22, 0.26, 1), (0.2, 0.75, 0.85, 1), (1, 0.3, 0.25, 1))
-    }
-    return (MTLClearColor(red: 0.97, green: 0.97, blue: 0.98, alpha: 1), (0.85, 0.85, 0.88, 1), (0.2, 0.7, 0.6, 1), (1, 0.2, 0.2, 1))
-}
-
-private let strideFloats = 8
-
-private func vert(_ x: Float, _ y: Float, _ c: (Float, Float, Float, Float)) -> [Float] {
-    [x, y, 0, 0, c.0, c.1, c.2, c.3]
-}
-
 private final class AmericanLineBuffers {
     var bodySegments: MTLBuffer?
     var bodyCount = 0
     var wicks: MTLBuffer?
     var wicksCount = 0
 
-    func update(flatOHLC: [Double], device: MTLDevice, upColor: (Float, Float, Float, Float), downColor: (Float, Float, Float, Float)) {
+    func update(flatOHLC: [Double], device: MTLDevice, colors: CandleChartTheme.Colors) {
         let n = flatOHLC.count / 4
         guard n >= 1 else {
             bodyCount = 0
@@ -49,14 +36,14 @@ private final class AmericanLineBuffers {
             let yC = Float((c - minH) * scale) * 2.0 - 1.0
             let yH = Float((h - minH) * scale) * 2.0 - 1.0
             let yL = Float((l - minH) * scale) * 2.0 - 1.0
-            let color: (Float, Float, Float, Float) = c >= o ? upColor : downColor
-            segVerts.append(contentsOf: vert(x - tickW, yO, color))
-            segVerts.append(contentsOf: vert(x + tickW, yC, color))
-            wickVerts.append(contentsOf: vert(x, yL, color))
-            wickVerts.append(contentsOf: vert(x, yH, color))
+            let color: (Float, Float, Float, Float) = c >= o ? colors.up : colors.down
+            segVerts.append(contentsOf: ChartVertex.vertex(x: x - tickW, y: yO, color: color))
+            segVerts.append(contentsOf: ChartVertex.vertex(x: x + tickW, y: yC, color: color))
+            wickVerts.append(contentsOf: ChartVertex.vertex(x: x, y: yL, color: color))
+            wickVerts.append(contentsOf: ChartVertex.vertex(x: x, y: yH, color: color))
         }
-        bodyCount = segVerts.count / strideFloats
-        wicksCount = wickVerts.count / strideFloats
+        bodyCount = segVerts.count / ChartCurve.strideFloats
+        wicksCount = wickVerts.count / ChartCurve.strideFloats
         bodySegments = device.makeBuffer(bytes: segVerts, length: segVerts.count * MemoryLayout<Float>.stride, options: .storageModeShared)
         wicks = device.makeBuffer(bytes: wickVerts, length: wickVerts.count * MemoryLayout<Float>.stride, options: .storageModeShared)
     }
@@ -105,38 +92,19 @@ public class NativeAmericanLineChartView: UIView {
         view.enableSetNeedsDisplay = true
         addSubview(view)
         metalView = view
-        pipeline = makePipeline(device: device, pixelFormat: view.colorPixelFormat)
+        pipeline = ChartPipeline.make(device: device, pixelFormat: view.colorPixelFormat)
         buildGrid(device: device)
     }
 
     private func applyTheme() {
-        metalView?.clearColor = americanTheme((theme as String?) == "dark").clear
-    }
-
-    private func makePipeline(device: MTLDevice, pixelFormat: MTLPixelFormat) -> MTLRenderPipelineState? {
-        let lib = device.makeDefaultLibrary()
-        let desc = MTLRenderPipelineDescriptor()
-        desc.vertexFunction = lib?.makeFunction(name: "chart_vertex")
-        desc.fragmentFunction = lib?.makeFunction(name: "chart_fragment")
-        desc.colorAttachments[0].pixelFormat = pixelFormat
-        desc.colorAttachments[0].isBlendingEnabled = true
-        desc.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
-        desc.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
-        desc.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
-        desc.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
-        return try? device.makeRenderPipelineState(descriptor: desc)
+        metalView?.clearColor = CandleChartTheme.theme(dark: (theme as String?) == "dark").clear
     }
 
     private func buildGrid(device: MTLDevice) {
-        let grid = americanTheme((theme as String?) == "dark").grid
-        var verts: [Float] = []
-        for i in 1..<5 {
-            let y = Float(i) / 5.0 * 2.0 - 1.0
-            verts.append(contentsOf: vert(-1.0, y, grid))
-            verts.append(contentsOf: vert(1.0, y, grid))
-        }
-        gridCount = verts.count / strideFloats
-        gridBuffer = device.makeBuffer(bytes: verts, length: verts.count * MemoryLayout<Float>.stride, options: .storageModeShared)
+        let grid = CandleChartTheme.theme(dark: (theme as String?) == "dark").grid
+        let result = ChartGrid.build(device: device, gridColor: grid)
+        gridBuffer = result.buffer
+        gridCount = result.count
     }
 
     private func updateBuffers() {
@@ -146,8 +114,8 @@ public class NativeAmericanLineChartView: UIView {
             metalView?.setNeedsDisplay()
             return
         }
-        let t = americanTheme((theme as String?) == "dark")
-        buffers.update(flatOHLC: arr.map { $0.doubleValue }, device: device, upColor: t.up, downColor: t.down)
+        let t = CandleChartTheme.theme(dark: (theme as String?) == "dark")
+        buffers.update(flatOHLC: arr.map { $0.doubleValue }, device: device, colors: t)
         metalView?.setNeedsDisplay()
     }
 

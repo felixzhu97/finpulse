@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "pnpm --filter finpulse-web dev",
     "dev:mobile-portfolio": "pnpm --filter mobile-portfolio start",
+    "dev:mobile-portfolio:ios": "pnpm --filter mobile-portfolio ios", 
+    "dev:mobile-portfolio:android": "pnpm --filter mobile-portfolio android",
     "start:backend": "bash scripts/backend/start-backend.sh",
     "start:kafka": "cd services/portfolio-analytics && docker compose up kafka zookeeper -d && sleep 5 && (. .venv/bin/activate 2>/dev/null || true; python scripts/mock_realtime_quotes.py)",
     "build": "pnpm --filter finpulse-web build",

@@ -1,6 +1,7 @@
-package com.anonymous.mobileportfolio.view
+package com.anonymous.mobileportfolio.view.sparkline
 
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
@@ -18,7 +19,7 @@ class NativeSparklineViewManager(reactContext: ReactApplicationContext) :
     }
 
     @ReactProp(name = "data")
-    fun setData(view: NativeSparklineView, data: com.facebook.react.bridge.ReadableArray?) {
+    fun setData(view: NativeSparklineView, data: ReadableArray?) {
         if (data == null) {
             view.dataValues = null
             return

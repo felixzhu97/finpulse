@@ -71,6 +71,10 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
         component "iOS Metal (MTKView)" as NativeChartsIOSTech
         component "Android OpenGL ES 3" as NativeChartsAndroidTech
     }
+    component "Native OOP support" as NativeOOPSupport {
+        component "iOS ChartSupport" as IOSChartSupportTech
+        component "Android view/chart, sparkline, democard" as AndroidPkgsTech
+    }
     component "Shared chart logic" as SharedChartLogicTech {
         component "useScrollableChart" as UseScrollableChartTech
         component "ScrollableChartContainer" as ScrollableChartContainerTech
@@ -80,6 +84,7 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
     note right of RN: React Native core\nrequireNativeComponent\nView managers
     note right of NativeDemoCardTech: apps/mobile-portfolio\nDemo native card
     note right of NativeChartsTech: LineChart, CandleChart\nAmericanLineChart, BaselineChart\nHistogramChart, LineOnlyChart\nTheme light/dark, tooltips\nx-axis, drag-to-scroll
+    note right of NativeOOPSupport: iOS: ChartCurve, ChartVertex,\nChartPipeline, ChartGrid, ChartThemes\nAndroid: ChartGl, ChartCurve,\n*ChartTheme; sparkline/; democard/
 }
 
 package "Build Toolchain" <<Build>> {
@@ -193,6 +198,9 @@ NativeDemoCardTech --> NativeDemoCardAndroidTech
 RN --> NativeChartsTech
 NativeChartsTech --> NativeChartsIOSTech
 NativeChartsTech --> NativeChartsAndroidTech
+NativeChartsTech --> NativeOOPSupport
+NativeOOPSupport --> IOSChartSupportTech
+NativeOOPSupport --> AndroidPkgsTech
 RN --> SharedChartLogicTech
 NativeChartsTech --> SharedChartLogicTech
 RN --> RNWagmi

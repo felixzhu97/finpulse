@@ -35,6 +35,13 @@
 		B7C9D0EA8F19531A0098071F /* NativeSparklineViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B7C9D0EB8F19531A0098071F /* NativeSparklineViewManager.m */; };
 		B7C9D0EC8F19531A0098071F /* NativeSparklineViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C9D0ED8F19531A0098071F /* NativeSparklineViewManager.swift */; };
 		B7C9D0EE8F19531A0098071F /* NativeSparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C9D0EF8F19531A0098071F /* NativeSparklineView.swift */; };
+		B7C9D0F18F19531A0098071F /* SparklineTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C9D0F28F19531A0098071F /* SparklineTheme.swift */; };
+		B7C9D0F38F19531A0098071F /* SparklinePoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C9D0F48F19531A0098071F /* SparklinePoints.swift */; };
+		A7D8E1F12F19542B0099082F /* ChartCurve.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8E1F22F19542B0099082F /* ChartCurve.swift */; };
+		A7D8E1F42F19542B0099082F /* ChartVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8E1F52F19542B0099082F /* ChartVertex.swift */; };
+		A7D8E1F62F19542B0099082F /* ChartPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8E1F72F19542B0099082F /* ChartPipeline.swift */; };
+		A7D8E1F82F19542B0099082F /* ChartGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8E1F92F19542B0099082F /* ChartGrid.swift */; };
+		A7D8E1FA2F19542B0099082F /* ChartThemes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8E1FB2F19542B0099082F /* ChartThemes.swift */; };
 		EC41811ED6CCD1139A309E53 /* libPods-mobileportfolio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C06262AC2361DE170D99B9F8 /* libPods-mobileportfolio.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -77,6 +84,13 @@
 		B7C9D0EB8F19531A0098071F /* NativeSparklineViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeSparklineViewManager.m; sourceTree = "<group>"; };
 		B7C9D0ED8F19531A0098071F /* NativeSparklineViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSparklineViewManager.swift; sourceTree = "<group>"; };
 		B7C9D0EF8F19531A0098071F /* NativeSparklineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSparklineView.swift; sourceTree = "<group>"; };
+		B7C9D0F28F19531A0098071F /* SparklineTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparklineTheme.swift; sourceTree = "<group>"; };
+		B7C9D0F48F19531A0098071F /* SparklinePoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparklinePoints.swift; sourceTree = "<group>"; };
+		A7D8E1F22F19542B0099082F /* ChartCurve.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartCurve.swift; sourceTree = "<group>"; };
+		A7D8E1F52F19542B0099082F /* ChartVertex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartVertex.swift; sourceTree = "<group>"; };
+		A7D8E1F72F19542B0099082F /* ChartPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPipeline.swift; sourceTree = "<group>"; };
+		A7D8E1F92F19542B0099082F /* ChartGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartGrid.swift; sourceTree = "<group>"; };
+		A7D8E1FB2F19542B0099082F /* ChartThemes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartThemes.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +109,7 @@
 			isa = PBXGroup;
 			children = (
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
+				A7D8E1F32F19542B0099082F /* ChartSupport */,
 				A1B2C3D43E0307B40044C1D9 /* NativeDemoCard */,
 				B1C2D3EC2E0307B40044C1D9 /* NativeLineChart */,
 				C1D4E5FC3E0408C50044C2EA /* NativeCandleChart */,
@@ -158,6 +173,19 @@
 				13B07F961A680F5B00A75B9A /* mobileportfolio.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A7D8E1F32F19542B0099082F /* ChartSupport */ = {
+			isa = PBXGroup;
+			children = (
+				A7D8E1F22F19542B0099082F /* ChartCurve.swift */,
+				A7D8E1F52F19542B0099082F /* ChartVertex.swift */,
+				A7D8E1F72F19542B0099082F /* ChartPipeline.swift */,
+				A7D8E1F92F19542B0099082F /* ChartGrid.swift */,
+				A7D8E1FB2F19542B0099082F /* ChartThemes.swift */,
+			);
+			name = ChartSupport;
+			path = mobileportfolio/ChartSupport;
 			sourceTree = "<group>";
 		};
 		A1B2C3D43E0307B40044C1D9 /* NativeDemoCard */ = {
@@ -243,6 +271,8 @@
 				B7C9D0EB8F19531A0098071F /* NativeSparklineViewManager.m */,
 				B7C9D0ED8F19531A0098071F /* NativeSparklineViewManager.swift */,
 				B7C9D0EF8F19531A0098071F /* NativeSparklineView.swift */,
+				B7C9D0F28F19531A0098071F /* SparklineTheme.swift */,
+				B7C9D0F48F19531A0098071F /* SparklinePoints.swift */,
 			);
 			name = NativeSparkline;
 			path = mobileportfolio/NativeSparkline;
@@ -491,6 +521,13 @@
 				B7C9D0EA8F19531A0098071F /* NativeSparklineViewManager.m in Sources */,
 				B7C9D0EC8F19531A0098071F /* NativeSparklineViewManager.swift in Sources */,
 				B7C9D0EE8F19531A0098071F /* NativeSparklineView.swift in Sources */,
+				B7C9D0F18F19531A0098071F /* SparklineTheme.swift in Sources */,
+				B7C9D0F38F19531A0098071F /* SparklinePoints.swift in Sources */,
+				A7D8E1F12F19542B0099082F /* ChartCurve.swift in Sources */,
+				A7D8E1F42F19542B0099082F /* ChartVertex.swift in Sources */,
+				A7D8E1F62F19542B0099082F /* ChartPipeline.swift in Sources */,
+				A7D8E1F82F19542B0099082F /* ChartGrid.swift in Sources */,
+				A7D8E1FA2F19542B0099082F /* ChartThemes.swift in Sources */,
 				21CCF3A165B4C7F5E4A57441 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

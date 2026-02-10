@@ -1,6 +1,6 @@
-import type { ViewProps } from "react-native";
-import { Platform, requireNativeComponent, View, StyleSheet } from "react-native";
 import type { ComponentType } from "react";
+import type { ViewProps } from "react-native";
+import { Platform, requireNativeComponent, StyleSheet, View } from "react-native";
 
 export type NativeSparklineProps = {
   trend?: "up" | "down" | "flat";

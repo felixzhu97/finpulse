@@ -2,26 +2,13 @@ import Metal
 import MetalKit
 import UIKit
 
-private func candleTheme(_ dark: Bool) -> (clear: MTLClearColor, grid: (Float, Float, Float, Float), up: (Float, Float, Float, Float), down: (Float, Float, Float, Float)) {
-    if dark {
-        return (MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1), (0.22, 0.22, 0.26, 1), (0.2, 0.75, 0.85, 1), (1, 0.3, 0.25, 1))
-    }
-    return (MTLClearColor(red: 0.97, green: 0.97, blue: 0.98, alpha: 1), (0.85, 0.85, 0.88, 1), (0.2, 0.7, 0.6, 1), (1, 0.2, 0.2, 1))
-}
-
-private let strideFloats = 8
-
-private func vert(_ x: Float, _ y: Float, _ c: (Float, Float, Float, Float)) -> [Float] {
-    [x, y, 0, 0, c.0, c.1, c.2, c.3]
-}
-
 private final class CandleBuffers {
     var bodies: MTLBuffer?
     var wicks: MTLBuffer?
     var bodiesCount = 0
     var wicksCount = 0
 
-    func update(flatOHLC: [Double], device: MTLDevice, upColor: (Float, Float, Float, Float), downColor: (Float, Float, Float, Float)) {
+    func update(flatOHLC: [Double], device: MTLDevice, colors: CandleChartTheme.Colors) {
         let n = flatOHLC.count / 4
         guard n >= 1 else {
             bodiesCount = 0
@@ -50,18 +37,18 @@ private final class CandleBuffers {
             let yH = Float((h - minH) * scale) * 2.0 - 1.0
             let yL = Float((l - minH) * scale) * 2.0 - 1.0
             let (yLo, yHi) = c >= o ? (yO, yC) : (yC, yO)
-            let color: (Float, Float, Float, Float) = c >= o ? upColor : downColor
-            bodyVerts.append(contentsOf: vert(x - barW/2, yLo, color))
-            bodyVerts.append(contentsOf: vert(x + barW/2, yLo, color))
-            bodyVerts.append(contentsOf: vert(x - barW/2, yHi, color))
-            bodyVerts.append(contentsOf: vert(x - barW/2, yHi, color))
-            bodyVerts.append(contentsOf: vert(x + barW/2, yLo, color))
-            bodyVerts.append(contentsOf: vert(x + barW/2, yHi, color))
-            wickVerts.append(contentsOf: vert(x, yL, color))
-            wickVerts.append(contentsOf: vert(x, yH, color))
+            let color: (Float, Float, Float, Float) = c >= o ? colors.up : colors.down
+            bodyVerts.append(contentsOf: ChartVertex.vertex(x: x - barW/2, y: yLo, color: color))
+            bodyVerts.append(contentsOf: ChartVertex.vertex(x: x + barW/2, y: yLo, color: color))
+            bodyVerts.append(contentsOf: ChartVertex.vertex(x: x - barW/2, y: yHi, color: color))
+            bodyVerts.append(contentsOf: ChartVertex.vertex(x: x - barW/2, y: yHi, color: color))
+            bodyVerts.append(contentsOf: ChartVertex.vertex(x: x + barW/2, y: yLo, color: color))
+            bodyVerts.append(contentsOf: ChartVertex.vertex(x: x + barW/2, y: yHi, color: color))
+            wickVerts.append(contentsOf: ChartVertex.vertex(x: x, y: yL, color: color))
+            wickVerts.append(contentsOf: ChartVertex.vertex(x: x, y: yH, color: color))
         }
-        bodiesCount = bodyVerts.count / strideFloats
-        wicksCount = wickVerts.count / strideFloats
+        bodiesCount = bodyVerts.count / ChartCurve.strideFloats
+        wicksCount = wickVerts.count / ChartCurve.strideFloats
         bodies = device.makeBuffer(bytes: bodyVerts, length: bodyVerts.count * MemoryLayout<Float>.stride, options: .storageModeShared)
         wicks = device.makeBuffer(bytes: wickVerts, length: wickVerts.count * MemoryLayout<Float>.stride, options: .storageModeShared)
     }
@@ -113,39 +100,19 @@ public class NativeCandleChartView: UIView {
         view.enableSetNeedsDisplay = true
         addSubview(view)
         metalView = view
-        pipeline = makePipeline(device: device, pixelFormat: view.colorPixelFormat)
+        pipeline = ChartPipeline.make(device: device, pixelFormat: view.colorPixelFormat)
         buildGrid(device: device)
     }
 
     private func applyTheme() {
-        let t = candleTheme((theme as String?) == "dark")
-        metalView?.clearColor = t.clear
-    }
-
-    private func makePipeline(device: MTLDevice, pixelFormat: MTLPixelFormat) -> MTLRenderPipelineState? {
-        let lib = device.makeDefaultLibrary()
-        let desc = MTLRenderPipelineDescriptor()
-        desc.vertexFunction = lib?.makeFunction(name: "chart_vertex")
-        desc.fragmentFunction = lib?.makeFunction(name: "chart_fragment")
-        desc.colorAttachments[0].pixelFormat = pixelFormat
-        desc.colorAttachments[0].isBlendingEnabled = true
-        desc.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
-        desc.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
-        desc.colorAttachments[0].sourceAlphaBlendFactor = .sourceAlpha
-        desc.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
-        return try? device.makeRenderPipelineState(descriptor: desc)
+        metalView?.clearColor = CandleChartTheme.theme(dark: (theme as String?) == "dark").clear
     }
 
     private func buildGrid(device: MTLDevice) {
-        let grid = candleTheme((theme as String?) == "dark").grid
-        var verts: [Float] = []
-        for i in 1..<5 {
-            let y = Float(i) / 5.0 * 2.0 - 1.0
-            verts.append(contentsOf: vert(-1.0, y, grid))
-            verts.append(contentsOf: vert(1.0, y, grid))
-        }
-        gridCount = verts.count / strideFloats
-        gridBuffer = device.makeBuffer(bytes: verts, length: verts.count * MemoryLayout<Float>.stride, options: .storageModeShared)
+        let grid = CandleChartTheme.theme(dark: (theme as String?) == "dark").grid
+        let result = ChartGrid.build(device: device, gridColor: grid)
+        gridBuffer = result.buffer
+        gridCount = result.count
     }
 
     private func updateBuffers() {
@@ -155,8 +122,8 @@ public class NativeCandleChartView: UIView {
             metalView?.setNeedsDisplay()
             return
         }
-        let t = candleTheme((theme as String?) == "dark")
-        buffers.update(flatOHLC: arr.map { $0.doubleValue }, device: device, upColor: t.up, downColor: t.down)
+        let t = CandleChartTheme.theme(dark: (theme as String?) == "dark")
+        buffers.update(flatOHLC: arr.map { $0.doubleValue }, device: device, colors: t)
         metalView?.setNeedsDisplay()
     }
 

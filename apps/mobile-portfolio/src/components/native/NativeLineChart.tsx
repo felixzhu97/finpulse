@@ -1,14 +1,14 @@
+import type { ComponentType } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { ViewProps } from "react-native";
 import {
   Platform,
   requireNativeComponent,
-  View,
-  PanResponder,
   StyleSheet,
   Text,
+  View,
+  PanResponder,
 } from "react-native";
-import { useState, useMemo, useCallback } from "react";
-import type { ComponentType } from "react";
 
 export type PointSelectPayload = {
   index: number;
@@ -101,12 +101,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
   );
 
   if (Platform.OS === "web") {
-    return (
-      <View
-        {...rest}
-        style={[styles.webFallback, style]}
-      />
-    );
+    return <View {...rest} style={[styles.webFallback, style]} />;
   }
 
   const NativeView = NativeLineChartNative as ComponentType<NativeLineChartProps>;

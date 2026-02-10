@@ -1,9 +1,9 @@
-import type { ViewProps } from "react-native";
-import { Platform, requireNativeComponent, View, StyleSheet } from "react-native";
-import { useCallback } from "react";
 import type { ComponentType } from "react";
-import { useScrollableChart } from "./useScrollableChart";
+import { useCallback } from "react";
+import type { ViewProps } from "react-native";
+import { Platform, requireNativeComponent, StyleSheet, View } from "react-native";
 import { ScrollableChartContainer } from "./ScrollableChartContainer";
+import { useScrollableChart } from "./useScrollableChart";
 
 export type NativeCandleChartProps = {
   data?: number[];

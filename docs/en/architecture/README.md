@@ -1,11 +1,11 @@
 # FinPulse TOGAF Enterprise Architecture
 
 > FinPulse fintech analytics platform enterprise architecture views based on the TOGAF framework.  
-> Chinese documentation: [docs_ch/architecture/README.md](../../docs_ch/architecture/README.md)
+> Chinese documentation: [docs/zh/architecture/README.md](../../zh/architecture/README.md)
 
 ## Contents
 
-This directory contains **English** PlantUML diagrams for the four TOGAF architecture domains. Chinese versions (docs + diagrams) are under `docs_ch/architecture/`.
+This directory contains **English** PlantUML diagrams for the four TOGAF architecture domains. Chinese versions (docs + diagrams) are under `docs/zh/architecture/`.
 
 1. [Business Architecture](#business-architecture) — `business-architecture.puml`
 2. [Application Architecture](#application-architecture) — `application-architecture.puml`
@@ -47,7 +47,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 1. **Presentation**
    - Web: `apps/web` (Angular 21 financial analytics console; Chart.js, ng2-charts, chartjs-chart-financial, ag-grid; @fintech/ui, @fintech/utils)
    - Mobile: `apps/mobile`, `apps/mobile-portfolio` (React Native; mobile-portfolio uses Expo)
-   - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart); **NativeSparkline** for stock list. Metal (iOS) / OpenGL ES (Android); theme (light/dark), tooltips, x-axis, drag-to-scroll. Shared: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Code: `ios/mobileportfolio/*Chart/`, `android/.../view/`, `src/components/native/`. **Stocks screen**: `StockListItem`, `useRealtimeQuotes`, `usePerSymbolHistory`; WebSocket `/ws/quotes` for real-time prices; per-stock sparklines from accumulated quote history.
+   - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart); **NativeSparkline** for stock list. Metal (iOS) / OpenGL ES (Android); theme (light/dark), tooltips, x-axis, drag-to-scroll. **OOP structure**: **iOS** — `ChartSupport/` (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes); per-chart folders (NativeLineChart, NativeCandleChart, etc.); NativeSparkline (SparklineTheme, SparklinePoints); NativeDemoCard. **Android** — `view/chart/` (ChartGl, ChartCurve, LineChartTheme, BaselineChartTheme, CandleChartTheme, HistogramChartTheme, LineOnlyChartTheme); `view/sparkline/` (SparklineTheme, SparklinePoints, NativeSparklineView); `view/democard/` (NativeDemoCardView); chart View/ViewManager in `view/`. Shared JS: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`; wrappers in `src/components/native/`. **Stocks screen**: `StockListItem`, `useRealtimeQuotes`, `usePerSymbolHistory`; WebSocket `/ws/quotes`; per-stock sparklines.
    - UI library: `packages/ui`
    - Charts: Chart.js, ng2-charts, chartjs-chart-financial, react-native-chart-kit, react-native-wagmi-charts
 
@@ -85,7 +85,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 
 **Description**: Technology stack, build tools, and deployment.
 
-**Stack**: Front-end (Angular, React Native, Expo, React 19, TypeScript 5); mobile native (iOS Metal, Android OpenGL ES; shared chart logic); UI (Radix UI, Tailwind, Lucide); visualization (Chart.js, ng2-charts, chartjs-chart-financial, react-native-wagmi-charts, native charts); utilities (React Hook Form, Zod, date-fns, themes); build (Angular/TS, Maven, Java, Spring Boot); deployment (Vercel, Git, Java JAR/containers, REST); **Portfolio Analytics Backend** (FastAPI, uvicorn, port 8800; SQLAlchemy 2.0 + asyncpg, Alembic; TimescaleDB 5433, Redis 6379, Kafka 9092; AI/ML: Ollama, Hugging Face, TensorFlow, scipy/statsmodels/sumy; python-dotenv, pytest); big data (Java 17+, Spring Boot 3.2, Maven, Spark 3.5, Flink 1.19, Hadoop 3.3).
+**Stack**: Front-end (Angular, React Native, Expo, React 19, TypeScript 5); mobile native (iOS Metal, Android OpenGL ES; **iOS ChartSupport**: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes; **Android view/chart/**: ChartGl, ChartCurve, per-chart themes; view/sparkline/, view/democard/); UI (Radix UI, Tailwind, Lucide); visualization (Chart.js, ng2-charts, chartjs-chart-financial, react-native-wagmi-charts, native charts); utilities (React Hook Form, Zod, date-fns, themes); build (Angular/TS, Maven, Java, Spring Boot); deployment (Vercel, Git, Java JAR/containers, REST); **Portfolio Analytics Backend** (FastAPI, uvicorn, port 8800; SQLAlchemy 2.0 + asyncpg, Alembic; TimescaleDB 5433, Redis 6379, Kafka 9092; AI/ML: Ollama, Hugging Face, TensorFlow, scipy/statsmodels/sumy; python-dotenv, pytest); big data (Java 17+, Spring Boot 3.2, Maven, Spark 3.5, Flink 1.19, Hadoop 3.3).
 
 **Standards**: Development (TypeScript, ESLint, componentization); performance; security (HTTPS, CSP, XSS, validation); accessibility (WCAG 2.1 AA).
 
