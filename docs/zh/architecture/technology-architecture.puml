@@ -122,6 +122,7 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
     note right of NativeDemoCardTech: apps/mobile-portfolio\nDemo native card
     note right of NativeChartsTech: LineChart, CandleChart\nAmericanLineChart, BaselineChart\nHistogramChart, LineOnlyChart\nTheme light/dark, tooltips\nx-axis, drag-to-scroll
     note right of NativeOOPSupport: iOS: ChartCurve, ChartVertex,\nChartPipeline, ChartGrid, ChartThemes\nAndroid: ChartGl, ChartCurve,\n*ChartTheme; sparkline/; democard/
+    note right of RNWagmi: mobile-portfolio: 默认深色主题\n黑色 (#000000) 背景
 }
 
 package "构建工具链" <<Build>> {

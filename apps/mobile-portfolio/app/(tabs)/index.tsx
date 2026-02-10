@@ -5,6 +5,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useTheme } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import {
   NativeLineChart,
@@ -33,6 +34,8 @@ import type {
 } from "@/src/types/portfolio";
 
 export default function DashboardScreen() {
+  const { dark } = useTheme();
+  const chartTheme = dark ? "dark" : "light";
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [allocation, setAllocation] = useState<
     { type: Account["type"]; value: number }[]
@@ -137,7 +140,7 @@ export default function DashboardScreen() {
   if (!portfolio) {
     return (
       <View style={styles.centered}>
-        <Text>
+        <Text style={styles.loadingText}>
           {loaded
             ? "Unable to load portfolio. Run pnpm run start:backend to start API and seed data."
             : "Loading portfolio..."}
@@ -181,13 +184,13 @@ export default function DashboardScreen() {
           </Text>
           <NativeLineChart
             data={lineData}
+            theme={chartTheme}
             timestamps={
               history.length > 0
                 ? history.map((p) => new Date(p.date).getTime())
                 : stockLinePoints.map((p) => p.timestamp)
             }
             style={styles.nativeChart}
-            
             onInteractionStart={() => setChartScrollLock(true)}
             onInteractionEnd={() => setChartScrollLock(false)}
           />
@@ -197,20 +200,20 @@ export default function DashboardScreen() {
             Native charts (scroll horizontally for history)
           </Text>
           <Text style={styles.chartDarkLabel}>K-line (Candlestick)</Text>
-          <NativeCandleChart data={ohlcData}  style={styles.nativeChart} />
+          <NativeCandleChart data={ohlcData} theme={chartTheme} style={styles.nativeChart} />
           <Text style={styles.chartDarkLabel}>Line</Text>
-          <NativeLineOnlyChart data={lineData}  style={styles.nativeChart} />
+          <NativeLineOnlyChart data={lineData} theme={chartTheme} style={styles.nativeChart} />
           <Text style={styles.chartDarkLabel}>American line (OHLC)</Text>
-          <NativeAmericanLineChart data={ohlcData}  style={styles.nativeChart} />
+          <NativeAmericanLineChart data={ohlcData} theme={chartTheme} style={styles.nativeChart} />
           <Text style={styles.chartDarkLabel}>Baseline</Text>
           <NativeBaselineChart
             data={lineData}
             baselineValue={baselineVal}
-            
+            theme={chartTheme}
             style={styles.nativeChart}
           />
           <Text style={styles.chartDarkLabel}>Histogram</Text>
-          <NativeHistogramChart data={lineData}  style={styles.nativeChart} />
+          <NativeHistogramChart data={lineData} theme={chartTheme} style={styles.nativeChart} />
         </View>
         <Text style={[styles.subsectionTitle, styles.subsectionTitleSpaced]}>
           Sample professional stock chart
@@ -229,11 +232,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "#000000",
   },
   screen: {
     flex: 1,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "#000000",
   },
   content: {
     padding: 16,
@@ -242,7 +245,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#111827",
+    color: "rgba(255,255,255,0.9)",
     marginTop: 24,
     marginBottom: 8,
   },
@@ -258,11 +261,15 @@ const styles = StyleSheet.create({
   subsectionTitle: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#111827",
+    color: "rgba(255,255,255,0.9)",
     marginBottom: 4,
   },
   subsectionTitleSpaced: {
     marginTop: 12,
+  },
+  loadingText: {
+    color: "rgba(255,255,255,0.9)",
+    textAlign: "center",
   },
   chartLabel: {
     fontSize: 12,

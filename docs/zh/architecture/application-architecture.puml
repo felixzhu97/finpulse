@@ -90,6 +90,7 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
         }
         component "react-native-wagmi-charts" as RNCharts
     }
+    note right of MobilePortfolio: 默认深色主题\n黑色 (#000000) 背景
 }
 
 package "业务逻辑层 (Business Layer)" <<Business>> {

@@ -20,7 +20,7 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - Portfolio management, market analysis, risk management, transaction management, reporting and compliance
 - Business flows: account opening, funding, trading, risk assessment, report generation
 
-**Document location**: `docs/en/architecture/business-architecture.puml` (English); `docs/zh/architecture/` (中文)
+**Document location**: `docs/en/architecture/business-architecture.puml` (English); `docs/zh/architecture/business-architecture.puml` (中文)
 
 ### Application Architecture
 
@@ -33,9 +33,9 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - Business components: portfolio overview, market trends, asset allocation, risk analysis, transaction records, etc.
 - Application services: portfolio service, market data service, risk analysis service, reporting service
 - Back-end services: `services/portfolio-analytics` (FastAPI + DDD; SQLAlchemy 2.0, asyncpg, Alembic; TimescaleDB, Redis, Kafka)
-- **Mobile native UI**: `apps/mobile-portfolio` includes **Stocks** screen (StockListItem, NativeSparkline, useRealtimeQuotes, usePerSymbolHistory) for real-time stock list; **NativeDemoCard** and six charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** via RCTViewManager (iOS) and SimpleViewManager (Android). Charts support theme (light/dark), tooltips, x-axis labels, horizontal drag-to-scroll; shared logic: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. **OOP structure**: **iOS** — `ios/mobileportfolio/ChartSupport/` (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes); per-chart folders; NativeSparkline (SparklineTheme, SparklinePoints); NativeDemoCard. **Android** — `view/chart/` (ChartGl, ChartCurve, *ChartTheme); `view/sparkline/` (SparklineTheme, SparklinePoints, NativeSparklineView); `view/democard/` (NativeDemoCardView); chart View/ViewManager in `view/`. JS: `src/components/native/`.
+- **Mobile native UI**: `apps/mobile-portfolio` uses **default dark theme** (black #000000 background; dark chart/card surfaces, light text). **Stocks** screen: StockListItem, NativeSparkline, useRealtimeQuotes, usePerSymbolHistory. **NativeDemoCard** and six charts: NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart (RCTViewManager / SimpleViewManager). Charts support theme (light/dark), tooltips, x-axis, drag-to-scroll; shared: useScrollableChart, ScrollableChartContainer, chartTooltip. **OOP**: **iOS** — ChartSupport/ (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes); per-chart; NativeSparkline; NativeDemoCard. **Android** — view/chart/, view/sparkline/, view/democard/; JS: src/components/native/.
 
-**Document location**: `docs/en/architecture/application-architecture.puml` (English); `docs/zh/architecture/` (中文)
+**Document location**: `docs/en/architecture/application-architecture.puml` (English); `docs/zh/architecture/application-architecture.puml` (中文)
 
 **Code locations**:
 
@@ -58,7 +58,7 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - Data storage: relational DB or data warehouse, logs and report storage
 - Data presentation: charts, reports, and analysis views in web and mobile
 
-**Document location**: `docs/en/architecture/data-architecture.puml` (English); `docs/zh/architecture/` (中文)
+**Document location**: `docs/en/architecture/data-architecture.puml` (English); `docs/zh/architecture/data-architecture.puml` (中文)
 
 **Code locations**:
 
@@ -81,7 +81,7 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - Runtime: Node.js, Python
 - Deployment: Vercel, Python/FastAPI hosting
 
-**Document location**: `docs/en/architecture/technology-architecture.puml` (English); `docs/zh/architecture/` (中文)
+**Document location**: `docs/en/architecture/technology-architecture.puml` (English); `docs/zh/architecture/technology-architecture.puml` (中文)
 
 ## ADM Core Phases
 
@@ -191,15 +191,17 @@ ADM is TOGAF’s architecture development method (simplified):
 ### Architecture Documents
 
 ```text
-docs/architecture/
-├── business-architecture.puml
-├── application-architecture.puml
-├── data-architecture.puml
-├── technology-architecture.puml
-└── domain/
-    ├── finance-system.puml
-    ├── finance-system-domains.puml
-    └── finance-system-flows.puml
+docs/en/architecture/   (English)    docs/zh/architecture/   (中文)
+├── business-architecture.puml     ├── business-architecture.puml
+├── application-architecture.puml   ├── application-architecture.puml
+├── data-architecture.puml         ├── data-architecture.puml
+├── technology-architecture.puml   ├── technology-architecture.puml
+└── README.md                      └── README.md
+
+docs/en/domain/                    docs/zh/domain/
+├── finance-system.puml            ├── finance-system.puml
+├── finance-system-domains.puml    ├── finance-system-domains.puml
+└── finance-system-flows.puml      └── finance-system-flows.puml
 ```
 
 ### Code Structure Mapping
@@ -249,9 +251,9 @@ Business → Application → Data → Technology
 - Keep documentation aligned with implementation
 - Review alignment periodically
 - For changes that affect overall or cross-system architecture, update:
-  - `docs/architecture/README.md`
-  - Relevant PlantUML diagrams
-  - Corresponding items in `docs/TODO.md`
+  - `docs/en/architecture/README.md` and `docs/zh/architecture/README.md`
+  - Relevant PlantUML diagrams in docs/en/architecture/ and docs/zh/architecture/
+  - Corresponding items in `docs/en/TODO.md` and `docs/zh/TODO.md`
 
 ## Checklists
 
@@ -280,4 +282,4 @@ Business → Application → Data → Technology
 ## References
 
 - [TOGAF](https://www.opengroup.org/togaf)
-- Project architecture docs: `docs/architecture/README.md`
+- Project architecture docs: `docs/en/architecture/README.md`, `docs/zh/architecture/README.md`

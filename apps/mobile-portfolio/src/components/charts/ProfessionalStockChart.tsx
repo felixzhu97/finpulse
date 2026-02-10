@@ -22,7 +22,7 @@ export function ProfessionalStockChart({ linePoints, candlePoints }: Professiona
         <Text style={styles.label}>Price line</Text>
         <LineChart.Provider data={linePoints}>
           <LineChart height={160} width={chartWidth}>
-            <LineChart.Path color="#2563eb" />
+            <LineChart.Path color="#6366f1" />
             <LineChart.CursorCrosshair />
           </LineChart>
           <View style={styles.footer}>
@@ -56,9 +56,9 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 12,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#000000",
     borderWidth: 1,
-    borderColor: "rgba(15, 23, 42, 0.06)",
+    borderColor: "rgba(255,255,255,0.08)",
     paddingVertical: 12,
     paddingHorizontal: 8,
     overflow: "hidden",
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#111827",
+    color: "rgba(255,255,255,0.9)",
     marginBottom: 8,
   },
   footer: {
@@ -76,11 +76,11 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontSize: 13,
-    color: "#111827",
+    color: "rgba(255,255,255,0.9)",
     fontWeight: "500",
   },
   timeText: {
     fontSize: 12,
-    color: "#6b7280",
+    color: "rgba(255,255,255,0.5)",
   },
 });

@@ -76,10 +76,10 @@ export default function InsightsScreen() {
             yAxisLabel=""
             yAxisSuffix="%"
             chartConfig={{
-              backgroundGradientFrom: "#ffffff",
-              backgroundGradientTo: "#ffffff",
-              color: () => "#4f46e5",
-              labelColor: () => "#4b5563",
+              backgroundGradientFrom: "#000000",
+              backgroundGradientTo: "#000000",
+              color: () => "#6366f1",
+              labelColor: () => "rgba(255,255,255,0.7)",
               decimalPlaces: 1,
               propsForBackgroundLines: {
                 strokeWidth: 0,
@@ -106,7 +106,7 @@ export default function InsightsScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "#000000",
   },
   content: {
     padding: 16,
@@ -117,9 +117,9 @@ const styles = StyleSheet.create({
   },
   chartCard: {
     borderRadius: 12,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#000000",
     borderWidth: 1,
-    borderColor: "rgba(15, 23, 42, 0.06)",
+    borderColor: "rgba(255,255,255,0.08)",
     paddingVertical: 8,
     overflow: "hidden",
     width: "100%",
@@ -130,19 +130,19 @@ const styles = StyleSheet.create({
   summaryCard: {
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#000000",
     borderWidth: 1,
-    borderColor: "rgba(15, 23, 42, 0.06)",
+    borderColor: "rgba(255,255,255,0.08)",
   },
   summaryTitle: {
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 8,
-    color: "#111827",
+    color: "rgba(255,255,255,0.9)",
   },
   summaryBody: {
     fontSize: 13,
-    color: "#4b5563",
+    color: "rgba(255,255,255,0.6)",
     lineHeight: 18,
   },
 });

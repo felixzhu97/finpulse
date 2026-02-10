@@ -17,7 +17,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "#000000",
   },
   centered: {
     flex: 1,
@@ -29,10 +29,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 8,
+    color: "rgba(255,255,255,0.9)",
   },
   body: {
     fontSize: 13,
-    color: "#4b5563",
+    color: "rgba(255,255,255,0.6)",
     textAlign: "center",
   },
 });

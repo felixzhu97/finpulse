@@ -32,10 +32,10 @@ export function NetWorthLineChart({ points }: NetWorthLineChartProps) {
           withVerticalLabels={true}
           withShadow={false}
           chartConfig={{
-            backgroundGradientFrom: "#ffffff",
-            backgroundGradientTo: "#ffffff",
-            color: () => "#16a34a",
-            labelColor: () => "#9ca3af",
+            backgroundGradientFrom: "#000000",
+            backgroundGradientTo: "#000000",
+            color: () => "#22c55e",
+            labelColor: () => "rgba(255,255,255,0.6)",
             decimalPlaces: 0,
             propsForBackgroundLines: { strokeWidth: 0 },
           }}
@@ -49,9 +49,9 @@ export function NetWorthLineChart({ points }: NetWorthLineChartProps) {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 12,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#000000",
     borderWidth: 1,
-    borderColor: "rgba(15, 23, 42, 0.06)",
+    borderColor: "rgba(255,255,255,0.08)",
     paddingVertical: 8,
     overflow: "hidden",
     width: "100%",

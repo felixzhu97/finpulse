@@ -44,7 +44,7 @@
 **描述**：分层应用组件及其交互。
 
 **层次**：
-1. **展示层**：Web（`apps/web`，Angular）、移动（`apps/mobile`、`apps/mobile-portfolio`，React Native，Expo）；**Native UI（mobile-portfolio）**：**NativeDemoCard** 及六类原生图表；**NativeSparkline** 用于股票列表。Metal（iOS）/ OpenGL ES（Android）；主题、提示、X 轴、拖拽滚动。**OOP 结构**：**iOS** — `ChartSupport/`（ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes）；各图表目录；NativeSparkline（SparklineTheme、SparklinePoints）；NativeDemoCard。**Android** — `view/chart/`（ChartGl、ChartCurve、各图表 Theme）；`view/sparkline/`、`view/democard/`。共享逻辑：`useScrollableChart`、`ScrollableChartContainer`、`chartTooltip`；`src/components/native/` 包装组件。**Stocks 屏幕**：`StockListItem`、`useRealtimeQuotes`、`usePerSymbolHistory`；WebSocket `/ws/quotes`；每股票 sparkline。UI 库：`packages/ui`；图表：Chart.js、ng2-charts、chartjs-chart-financial、react-native-chart-kit、react-native-wagmi-charts。
+1. **展示层**：Web（`apps/web`，Angular）、移动（`apps/mobile`、`apps/mobile-portfolio`，React Native，Expo）；**Native UI（mobile-portfolio）**：默认**深色主题**（黑色 #000000 背景；深色图表/卡片、浅色文字）。**NativeDemoCard** 及六类原生图表；**NativeSparkline** 用于股票列表。Metal（iOS）/ OpenGL ES（Android）；主题（明/暗）、提示、X 轴、拖拽滚动。**OOP 结构**：**iOS** — `ChartSupport/`（ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes）；各图表目录；NativeSparkline；NativeDemoCard。**Android** — `view/chart/`、`view/sparkline/`、`view/democard/`。共享逻辑：`useScrollableChart`、`ScrollableChartContainer`、`chartTooltip`；`src/components/native/` 包装组件。**Stocks 屏幕**：`StockListItem`、`useRealtimeQuotes`、`usePerSymbolHistory`；WebSocket `/ws/quotes`；每股票 sparkline。UI 库：`packages/ui`；图表：Chart.js、ng2-charts、chartjs-chart-financial、react-native-chart-kit、react-native-wagmi-charts。
 2. **业务逻辑层**：投资组合、市场数据、交易、风险管理、用户模块
 3. **数据访问层**：数据服务（DAO、缓存）、状态管理
 4. **外部服务层**：**Portfolio Analytics API**（FastAPI，DDD；REST；AI/ML /api/v1/ai；SQLAlchemy 2.0 + asyncpg，Alembic；TimescaleDB，Redis；Kafka）；Vercel Analytics、市场数据 API、存储、大数据服务层（Java Spring Boot）
@@ -79,7 +79,7 @@
 
 ### 架构与 TODO 对齐
 
-- 高层任务：中文 [../TODO.md](../TODO.md)，英文 `docs/TODO.md`。架构变更时需同步更新：PlantUML、本 README、TODO。
+- 高层任务：`docs/zh/TODO.md`（中文）、`docs/en/TODO.md`（英文）。架构变更时需同步更新：PlantUML、本 README、TODO。
 
 ### 金融系统领域视图
 
@@ -96,7 +96,7 @@
 | Trading  | 订单/成交后   | ML 限额与敞口；AI 成交后监控  |
 | Risk & Reporting | 分析 | ML VaR；DL 预测；NLP 情感；LLM 摘要 |
 
-新增或调整 AI 能力时，请更新上述 PlantUML 及 `doc_zh/TODO.md`、`docs/TODO.md` 中「人工智能与 ML」部分。
+新增或调整 AI 能力时，请更新上述 PlantUML 及 `docs/zh/TODO.md`、`docs/en/TODO.md` 中「人工智能与 ML」部分。
 
 ## 如何使用
 

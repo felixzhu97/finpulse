@@ -47,7 +47,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 1. **Presentation**
    - Web: `apps/web` (Angular 21 financial analytics console; Chart.js, ng2-charts, chartjs-chart-financial, ag-grid; @fintech/ui, @fintech/utils)
    - Mobile: `apps/mobile`, `apps/mobile-portfolio` (React Native; mobile-portfolio uses Expo)
-   - **Native UI (mobile-portfolio)**: **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart); **NativeSparkline** for stock list. Metal (iOS) / OpenGL ES (Android); theme (light/dark), tooltips, x-axis, drag-to-scroll. **OOP structure**: **iOS** — `ChartSupport/` (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes); per-chart folders (NativeLineChart, NativeCandleChart, etc.); NativeSparkline (SparklineTheme, SparklinePoints); NativeDemoCard. **Android** — `view/chart/` (ChartGl, ChartCurve, LineChartTheme, BaselineChartTheme, CandleChartTheme, HistogramChartTheme, LineOnlyChartTheme); `view/sparkline/` (SparklineTheme, SparklinePoints, NativeSparklineView); `view/democard/` (NativeDemoCardView); chart View/ViewManager in `view/`. Shared JS: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`; wrappers in `src/components/native/`. **Stocks screen**: `StockListItem`, `useRealtimeQuotes`, `usePerSymbolHistory`; WebSocket `/ws/quotes`; per-stock sparklines.
+   - **Native UI (mobile-portfolio)**: Default **dark theme** (black #000000 background; dark chart/card surfaces, light text). **NativeDemoCard** and six native charts (NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart); **NativeSparkline** for stock list. Metal (iOS) / OpenGL ES (Android); theme (light/dark), tooltips, x-axis, drag-to-scroll. **OOP structure**: **iOS** — `ChartSupport/` (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes); per-chart folders; NativeSparkline (SparklineTheme, SparklinePoints); NativeDemoCard. **Android** — `view/chart/` (ChartGl, ChartCurve, *ChartTheme); `view/sparkline/`, `view/democard/`; chart View/ViewManager in `view/`. Shared JS: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`; wrappers in `src/components/native/`. **Stocks screen**: `StockListItem`, `useRealtimeQuotes`, `usePerSymbolHistory`; WebSocket `/ws/quotes`; per-stock sparklines.
    - UI library: `packages/ui`
    - Charts: Chart.js, ng2-charts, chartjs-chart-financial, react-native-chart-kit, react-native-wagmi-charts
 
@@ -91,7 +91,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 
 ### Architecture TODO Alignment
 
-- High-level tasks in `docs/TODO.md`. When changing architecture, update: PlantUML (`*.puml`), this README, and `docs/TODO.md`.
+- High-level tasks in `docs/en/TODO.md` and `docs/zh/TODO.md`. When changing architecture, update: PlantUML (`*.puml`), this README, and the TODO files.
 
 ### Finance System Domain Views
 

@@ -10,9 +10,9 @@ interface MetricCardProps {
 }
 
 const toneColor: Record<NonNullable<MetricCardProps["tone"]>, string> = {
-  default: "#111827",
-  positive: "#16a34a",
-  negative: "#b91c1c",
+  default: "rgba(255,255,255,0.9)",
+  positive: "#4ade80",
+  negative: "#f87171",
 };
 
 export function MetricCard({
@@ -38,9 +38,9 @@ const styles = StyleSheet.create({
   card: {
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#000000",
     borderWidth: 1,
-    borderColor: "rgba(15, 23, 42, 0.06)",
+    borderColor: "rgba(255,255,255,0.08)",
     minWidth: 120,
   },
   header: {
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: "#6b7280",
+    color: "rgba(255,255,255,0.6)",
   },
   value: {
     fontSize: 20,
@@ -60,6 +60,6 @@ const styles = StyleSheet.create({
   helper: {
     marginTop: 4,
     fontSize: 11,
-    color: "#9ca3af",
+    color: "rgba(255,255,255,0.5)",
   },
 });

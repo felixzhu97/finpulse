@@ -24,13 +24,13 @@ export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
     value: item.value,
     color:
       [
-        "#4f46e5",
-        "#0ea5e9",
-        "#22c55e",
-        "#f97316",
-        "#6366f1",
+        "#818cf8",
+        "#38bdf8",
+        "#4ade80",
+        "#fb923c",
+        "#a78bfa",
       ][index % 5],
-    legendFontColor: "#4b5563",
+    legendFontColor: "rgba(255,255,255,0.7)",
     legendFontSize: 12,
   }));
 
@@ -44,10 +44,10 @@ export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
         backgroundColor="transparent"
         paddingLeft="12"
         chartConfig={{
-          backgroundGradientFrom: "#ffffff",
-          backgroundGradientTo: "#ffffff",
-          color: () => "#111827",
-          labelColor: () => "#4b5563",
+          backgroundGradientFrom: "#000000",
+          backgroundGradientTo: "#000000",
+          color: () => "rgba(255,255,255,0.9)",
+          labelColor: () => "rgba(255,255,255,0.6)",
           decimalPlaces: 0,
         }}
         hasLegend
@@ -59,9 +59,9 @@ export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 12,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#000000",
     borderWidth: 1,
-    borderColor: "rgba(15, 23, 42, 0.06)",
+    borderColor: "rgba(255,255,255,0.08)",
     paddingVertical: 8,
   },
 });

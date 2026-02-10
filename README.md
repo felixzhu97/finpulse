@@ -221,7 +221,7 @@ pnpm run start:kafka
 pnpm run dev:api
 
 # 3) Start mobile portfolio (development build with native charts)
-pnpm run start:mobile-portfolio-ios
+pnpm dev:mobile-portfolio:ios
 ```
 
 `start:kafka` starts Docker (Kafka + Zookeeper), waits for Kafka to be ready, then runs the mock real-time quotes script. Use Ctrl+C to stop the mock producer; Kafka containers keep running until you run `docker compose down` in `services/portfolio-analytics`.
@@ -354,13 +354,13 @@ Shared utility function library containing common utility functions (such as `cn
 
 ## 🗺️ Roadmap & TODO
 
-High-level tasks and roadmap items for the whole monorepo are tracked in `docs/TODO.md`. Before each significant release, review that file together with the architecture documents under `docs/architecture` and update items as work is completed.
+High-level tasks and roadmap items for the whole monorepo are tracked in `docs/en/TODO.md` and `docs/zh/TODO.md`. Before each significant release, review those files together with the architecture documents under `docs/en/architecture` and `docs/zh/architecture` and update items as work is completed.
 
 ## 🎨 Design Features
 
 - **Modern UI** - Glassmorphism design with smooth animations
 - **Responsive Layout** - Perfect adaptation to various screen sizes
-- **Dark Theme** - Default dark mode to reduce eye strain
+- **Dark Theme** - Default dark mode; mobile-portfolio uses black (#000000) background and dark chart/card surfaces with light text
 - **Accessibility** - Follows WCAG standards for good accessibility
 - **Performance Optimization** - Angular build optimization and lazy loading for fast loading
 
