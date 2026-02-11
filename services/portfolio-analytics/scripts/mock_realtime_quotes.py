@@ -16,7 +16,6 @@ def main() -> None:
   symbols = [
     "AAPL", "TSLA", "GOOG", "GOOGL", "META", "MSFT", "AMZN",
     "BRK.B", "JPM", "SPY", "NVDA",
-    "9988.HK", "0700.HK", "3690.HK", "1810.HK",
   ]
   state = {
     "AAPL": 234.38,
@@ -30,10 +29,6 @@ def main() -> None:
     "JPM": 218.50,
     "SPY": 585.00,
     "NVDA": 875.28,
-    "9988.HK": 157.90,
-    "0700.HK": 560.00,
-    "3690.HK": 91.05,
-    "1810.HK": 35.20,
   }
 
   try:

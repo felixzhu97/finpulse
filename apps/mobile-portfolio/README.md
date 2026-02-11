@@ -24,13 +24,13 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 | Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native line chart |
 | Watchlist | `/(tabs)/watchlists` | Stock list (portfolio holdings) with real-time prices, sparklines, account rows; search (bottom sheet, closes on drawer/sort/tab), sort menu; pull-to-refresh; stock detail drawer (draggable, share) |
 | Insights | `/(tabs)/insights` | Risk metrics from API (volatility, Sharpe ratio, VaR, beta) via `GET /api/v1/risk-metrics`; computed VaR via `POST /api/v1/risk-metrics/compute` (useComputedVar hook) |
-| Account | `/(tabs)/account` | Profile (customer from `/api/v1/customers`), account list (from `/api/v1/portfolio`), Actions (Register Customer, New Payment, New Trade, Settings), drawers: RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, SettingsDrawer (theme, language, notifications via `/api/v1/user-preferences`) |
+| Account | `/(tabs)/account` | Profile (customer from `/api/v1/customers`), account list (from `/api/v1/portfolio`), Actions (Register Customer, New Payment, New Trade, Settings), drawers: RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, SettingsDrawer (theme, language, notifications via `/api/v1/user-preferences`). Uses **useFocusEffect** to load data when tab gains focus. |
 
 ## Project Structure (Thin Client)
 
 The app is a **thin client**: business logic lives on the server; the mobile app fetches data and renders UI.
 
-Account and Insights also use `usePreferences` (Redux-backed), `useRiskMetrics` and `customersApi`, `userPreferencesApi`, `riskMetricsApi` (REST: customers, user-preferences, risk-metrics). Theme changes apply immediately via Redux state management.
+Account and Insights also use `usePreferences` (Redux-backed theme/language/notifications), `useRiskMetrics` and `customersApi`, `userPreferencesApi`, `riskMetricsApi` (REST: customers, user-preferences, risk-metrics). Theme changes apply immediately via Redux state management. **Preferences loading** is component-level: `AppContent` in the root layout uses `usePreferences().loading` and shows a loading spinner until preferences are fetched; no Redux `isLoading`.
 
 - `app/`: expo-router routes and screens.
 - `src/api/`: data layer—implements backend contracts (single-layer; no subfolders).
@@ -45,7 +45,7 @@ Account and Insights also use `usePreferences` (Redux-backed), `useRiskMetrics` 
 - `src/theme/`: theme system—`colors.ts` (light/dark color schemes), `index.ts` (`useTheme` hook for dynamic theming).
 - `src/i18n/`: internationalization—`config.ts` (i18next setup), `locales/en.json` and `locales/zh.json` (translation resources), `index.ts` (exports `i18n` and `useTranslation` hook).
 - `src/hooks/`: `usePortfolio`, `useSymbolDisplayData` (Redux-backed quotes + history for list/drawer), `useRealtimeQuotes`, `usePerSymbolHistory`, `usePreferences` (Redux-backed user preferences), `useWatchlists`, `useRiskMetrics`, `useComputedVar` (VaR from portfolio history), `useDraggableDrawer`; all consume `api` and `types`.
-- `src/store/`: Redux (quotes slice, preferences slice for theme/language/notifications, selectors, `QuoteSocketSubscriber`), custom portfolio UI store (`usePortfolioStore`).
+- `src/store/`: Redux (quotes slice, preferences slice for theme/language/notifications; loading state is component-level via `usePreferences().loading`, not Redux), selectors, `QuoteSocketSubscriber`), custom portfolio UI store (`usePortfolioStore`).
 - `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Account screen: `RegisterCustomerDrawer`, `NewPaymentDrawer`, `NewTradeDrawer`, `SettingsDrawer` (all use `useDraggableDrawer`, background `colors.card`). Watchlist: `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch). All components support light/dark theme via `useTheme` and i18n via `useTranslation`.
 
 ### Diagrams
@@ -129,7 +129,7 @@ The Watchlist screen uses a single Redux-backed flow:
 The app supports light and dark themes with automatic system theme detection:
 
 - **Theme System**: `src/theme/colors.ts` defines color schemes for light and dark modes. `src/theme/index.ts` provides `useTheme()` hook that returns current theme colors based on user preference and system settings.
-- **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
+- **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Initial loading is component-level: `AppContent` shows a spinner until `usePreferences().loading` is false. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
 - **Components**: All UI components use `useTheme()` hook to dynamically adapt colors. Cards have rounded corners (`borderRadius: 16`) and support theme-aware backgrounds.
 - **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.
 

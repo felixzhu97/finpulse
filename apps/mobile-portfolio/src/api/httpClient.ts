@@ -19,8 +19,12 @@ class HttpClient {
   ): Promise<T | null> {
     const url = `${this.baseUrl}${path}`;
     const { method = "GET", body, headers = {} } = options;
+    const isDev = typeof __DEV__ !== "undefined" && __DEV__;
 
     try {
+      if (isDev) {
+        console.log(`[API] ${method} ${path}`);
+      }
       const response = await fetch(url, {
         method,
         headers: {
@@ -29,6 +33,10 @@ class HttpClient {
         },
         body: body ? JSON.stringify(body) : undefined,
       });
+
+      if (isDev) {
+        console.log(`[API] ${method} ${path} -> ${response.status}`);
+      }
 
       if (!response.ok) {
         return null;
@@ -39,8 +47,18 @@ class HttpClient {
       }
 
       const data = (await response.json()) as T;
+      if (isDev) {
+        const preview =
+          typeof data === "object" && data !== null
+            ? JSON.stringify(data).slice(0, 200) + (JSON.stringify(data).length > 200 ? "..." : "")
+            : String(data);
+        console.log(`[API] ${method} ${path} <-`, preview);
+      }
       return data;
-    } catch {
+    } catch (err) {
+      if (isDev) {
+        console.log(`[API] ${method} ${path} -> error`, err);
+      }
       return null;
     }
   }

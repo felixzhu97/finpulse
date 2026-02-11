@@ -1,13 +1,15 @@
 from typing import Annotated
 
-from fastapi import Depends, Request
+from fastapi import Depends, Request, WebSocket
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.application.use_cases.analytics_service import AnalyticsApplicationService
 from src.core.application.use_cases.market_data_service import MarketDataService
+from src.core.application.use_cases.quote_history_service import QuoteHistoryService
 from src.infrastructure.cache import RedisCache
 from src.infrastructure.config.container import analytics_service as build_analytics_service
 from src.infrastructure.config.container import market_data_service as build_market_data_service
+from src.infrastructure.config.container import quote_history_service as build_quote_history_service
 from src.infrastructure.database.session import get_session
 from src.core.application.use_cases.blockchain_service import BlockchainApplicationService
 from src.core.application.use_cases.portfolio_service import PortfolioApplicationService
@@ -38,8 +40,29 @@ from src.infrastructure.database.repositories import (
 from src.infrastructure.message_brokers import EventPublisher
 
 
-def get_market_data_service() -> MarketDataService:
-    return build_market_data_service()
+def get_realtime_quote_repo(
+    request: Request = None,
+    websocket: WebSocket = None,
+):
+    app = (request or websocket).app
+    return getattr(app.state, "realtime_quote_repo", None)
+
+
+def get_market_data_service(
+    repo=Depends(get_realtime_quote_repo),
+) -> MarketDataService:
+    if not repo:
+        return build_market_data_service(None)
+    return build_market_data_service(repo)
+
+
+def get_quote_history_service(
+    repo=Depends(get_realtime_quote_repo),
+) -> QuoteHistoryService:
+    if not repo:
+        from src.infrastructure.database.repositories.realtime_quote_repository import RealtimeQuoteRepository
+        repo = RealtimeQuoteRepository()
+    return build_quote_history_service(repo)
 
 
 def get_analytics_service() -> AnalyticsApplicationService:

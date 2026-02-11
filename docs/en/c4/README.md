@@ -34,7 +34,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-components.puml`
 
-**Description**: Portfolio Analytics API internal components: Portfolio Router (GET /portfolio, POST /seed), Resource Router (/api/v1/* CRUD and batch; AI integrated in payments, trades, customers, risk-metrics), Quotes Router; services (Portfolio, Analytics, Market Data); repositories and Kafka/Redis. The backend follows Clean Architecture (see diagram below and `services/portfolio-analytics/README.md`).
+**Description**: Portfolio Analytics API internal components: Portfolio Router (GET /portfolio, POST /seed), Resource Router (/api/v1/* CRUD and batch; AI integrated in payments, trades, customers, risk-metrics), Quotes Router (GET /quotes, GET /quotes/history, WebSocket /ws/quotes); services (Portfolio, Analytics, Market Data, Quote History); RealtimeQuoteRepository (ORM, IRealtimeQuoteRepository); Kafka Quote Consumer. The backend follows Clean Architecture (see diagram below and `services/portfolio-analytics/README.md`).
 
 ### Clean Architecture (Portfolio API)
 
@@ -52,7 +52,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-mobile-portfolio-components.puml`
 
-**Description**: Mobile Portfolio app (Expo + React Native): thin client with tabs/screens; types (Portfolio, QuoteSnapshot); api layer (portfolioApi, getQuotes, createQuoteSocket); hooks (usePortfolio, useRealtimeQuotes, usePerSymbolHistory); native charts and portfolio/account components; backend: GET /api/v1/portfolio, GET /api/v1/quotes, WS /ws/quotes.
+**Description**: Mobile Portfolio app (Expo + React Native): thin client with AppContent (preferences loading spinner), tabs/screens; types (Portfolio, QuoteSnapshot); api layer (portfolioApi, getQuotes, createQuoteSocket); hooks (usePortfolio, useRealtimeQuotes, usePerSymbolHistory, usePreferences with component-level loading); Account screen uses useFocusEffect for load on tab focus; native charts and portfolio/account components; backend: GET /api/v1/portfolio, GET /api/v1/quotes, WS /ws/quotes.
 
 ### Mobile Demo Components
 

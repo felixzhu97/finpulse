@@ -63,10 +63,5 @@ else
   echo "[start-backend] Skip seed: API not ready"
 fi
 
-cd services/portfolio-analytics
-nohup .venv/bin/python scripts/mock_realtime_quotes.py > /tmp/portfolio-mq.log 2>&1 &
-MQ_PID=$!
-cd "$ROOT"
-
 echo "Backend: http://127.0.0.1:8800  (logs: tail -f /tmp/portfolio-api.log, stop: kill $API_PID)"
-echo "MQ mock quotes: tail -f /tmp/portfolio-mq.log, stop: kill $MQ_PID"
+echo "Mock quotes: persisted to DB via API lifespan"

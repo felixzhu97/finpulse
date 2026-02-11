@@ -3,9 +3,10 @@ from typing import Annotated, Dict, List
 from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect
 
 from src.api.v1.mappers.portfolio_assembler import assemble_portfolio
-from src.api.dependencies import get_cache, get_market_data_service, get_portfolio_service
+from src.api.dependencies import get_cache, get_market_data_service, get_portfolio_service, get_quote_history_service
 from src.core.application.use_cases.market_data_service import MarketDataService
 from src.core.application.use_cases.portfolio_service import PortfolioApplicationService
+from src.core.application.use_cases.quote_history_service import QuoteHistoryService
 from src.infrastructure.cache import PORTFOLIO_AGGREGATE_KEY_PREFIX, DEFAULT_TTL, RedisCache
 
 router = APIRouter()
@@ -59,6 +60,17 @@ def register(r: APIRouter) -> None:
     ):
         requested = [s.strip().upper() for s in symbols.split(",") if s.strip()]
         return _quotes_response(svc, requested)
+
+    @r.get("/api/v1/quotes/history")
+    def quotes_history_get(
+        svc: Annotated[QuoteHistoryService, Depends(get_quote_history_service)],
+        symbols: str = Query(...),
+        minutes: int = Query(5, ge=1, le=60),
+    ):
+        requested = [s.strip().upper() for s in symbols.split(",") if s.strip()]
+        if not requested:
+            return {}
+        return svc.get_history(requested, minutes=minutes)
 
     @r.post("/api/v1/seed")
     async def portfolio_seed(

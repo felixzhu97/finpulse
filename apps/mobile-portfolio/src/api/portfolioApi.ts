@@ -97,8 +97,12 @@ class PortfolioApi {
   }
 
   private async fetchFromApi(): Promise<Portfolio | null> {
+    const tag = "[PortfolioApi]";
+    console.log(`${tag} fetchFromApi start`);
     const { httpClient } = await import("./httpClient");
-    return httpClient.get<Portfolio>("/api/v1/portfolio");
+    const result = await httpClient.get<Portfolio>("/api/v1/portfolio");
+    console.log(`${tag} fetchFromApi done:`, result != null);
+    return result;
   }
 }
 

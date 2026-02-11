@@ -11,16 +11,24 @@ import { useEffect, useMemo } from "react";
 import "react-native-reanimated";
 import { Provider, useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useColorScheme } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  useColorScheme,
+  View,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QuoteSocketSubscriber } from "@/src/store/QuoteSocketSubscriber";
 import { store, type RootState } from "@/src/store";
+import { usePreferences } from "@/src/hooks/usePreferences";
+import { DarkColors, LightColors } from "@/src/theme/colors";
 import "@/src/i18n/config";
 import { i18n } from "@/src/i18n";
 
 SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
+  const { loading } = usePreferences();
   const systemColorScheme = useColorScheme();
   const themePreference = useSelector(
     (state: RootState) => state.preferences.theme
@@ -54,6 +62,17 @@ function AppContent() {
       return systemColorScheme === "dark" ? "light" : "dark";
     }
   }, [themePreference, systemColorScheme]);
+
+  const colors =
+    systemColorScheme === "dark" ? DarkColors : LightColors;
+
+  if (loading) {
+    return (
+      <View style={[styles.loadingScreen, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.textSecondary} />
+      </View>
+    );
+  }
 
   return (
     <ThemeProvider value={theme}>
@@ -100,5 +119,10 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+  },
+  loadingScreen: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Optional
 
-from sqlalchemy import JSON, Boolean, Date, DateTime, Float, ForeignKey, Integer, Numeric, Text, UniqueConstraint, text
+from sqlalchemy import JSON, Boolean, Date, DateTime, Float, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -318,3 +318,23 @@ class WalletBalanceRow(Base):
     currency: Mapped[str] = mapped_column(Text, primary_key=True)
     balance: Mapped[float] = mapped_column(Numeric(20, 8), nullable=False, server_default=text("0"))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"))
+
+
+class RealtimeQuoteRow(Base):
+    __tablename__ = "realtime_quote"
+
+    symbol: Mapped[str] = mapped_column(String(32), primary_key=True)
+    price: Mapped[float] = mapped_column(Numeric(20, 8), nullable=False)
+    change: Mapped[float] = mapped_column(Numeric(20, 8), nullable=False)
+    change_rate: Mapped[float] = mapped_column(Numeric(12, 6), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"))
+
+
+class QuoteTickRow(Base):
+    __tablename__ = "quote_tick"
+
+    ts: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
+    symbol: Mapped[str] = mapped_column(String(32), primary_key=True)
+    price: Mapped[float] = mapped_column(Numeric(20, 8), nullable=False)
+    change: Mapped[float] = mapped_column(Numeric(20, 8), nullable=False)
+    change_rate: Mapped[float] = mapped_column(Numeric(12, 6), nullable=False)

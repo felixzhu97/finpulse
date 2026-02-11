@@ -24,7 +24,9 @@ import { GlassView } from "@/src/components/ui/GlassView";
 import { SortMenu, type SortOption } from "@/src/components/ui/SortMenu";
 import { useSymbolDisplayData } from "@/src/hooks/useSymbolDisplayData";
 import type { Account, Holding } from "@/src/types/portfolio";
-import { portfolioApi } from "@/src/api";
+import { getQuotes, getQuotesHistory, portfolioApi } from "@/src/api";
+import { useAppDispatch } from "@/src/store/useAppStore";
+import { setHistory, setSnapshot } from "@/src/store/quotesSlice";
 import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/i18n";
 
@@ -64,6 +66,7 @@ function buildListRows(
 }
 
 export default function WatchlistsScreen() {
+  const dispatch = useAppDispatch();
   const { colors } = useTheme();
   const { t, i18n } = useTranslation();
   const [baseAccounts, setBaseAccounts] = useState<Account[]>([]);
@@ -172,12 +175,27 @@ export default function WatchlistsScreen() {
     load();
   }, [load]);
 
+  const fetchQuotesAndHistory = useCallback(async () => {
+    if (symbols.length === 0) return;
+    const [history, snapshot] = await Promise.all([
+      getQuotesHistory(symbols, 5),
+      getQuotes(symbols),
+    ]).catch(() => [{}, {}] as const);
+    dispatch(setHistory(history ?? {}));
+    dispatch(setSnapshot(snapshot ?? {}));
+  }, [symbols.join(","), dispatch]);
+
+  useEffect(() => {
+    fetchQuotesAndHistory();
+  }, [fetchQuotesAndHistory]);
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     portfolioApi.invalidateCache();
     await load();
+    await fetchQuotesAndHistory();
     setRefreshing(false);
-  }, [load]);
+  }, [load, fetchQuotesAndHistory]);
 
   const closeSearchBar = useCallback(() => {
     if (!showSearchBar) return;
@@ -214,6 +232,7 @@ export default function WatchlistsScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      void fetchQuotesAndHistory();
       return () => {
         if (showSearchBar) {
           searchInputRef.current?.blur();
@@ -222,7 +241,7 @@ export default function WatchlistsScreen() {
           setSearchQuery("");
         }
       };
-    }, [showSearchBar, searchBarAnim])
+    }, [fetchQuotesAndHistory, showSearchBar, searchBarAnim])
   );
 
   if (loading) {

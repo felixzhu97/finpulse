@@ -11,8 +11,12 @@ class CustomersApi {
   }
 
   async getFirst(): Promise<Customer | null> {
+    const tag = "[CustomersApi]";
+    console.log(`${tag} getFirst start`);
     const list = await this.list(1, 0);
-    return list[0] ?? null;
+    const result = list[0] ?? null;
+    console.log(`${tag} getFirst done:`, result != null);
+    return result;
   }
 
   async create(body: CustomerCreate): Promise<Customer | null> {

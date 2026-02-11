@@ -197,34 +197,31 @@ Run API tests: `pnpm run test:api` (from repo root) or `pytest tests -v` from `s
 
 From repo root: `pnpm dev:api` runs the API (requires venv and Docker). Then run `pnpm generate-seed-data` to seed. The mobile portfolio app uses `http://localhost:8800` by default (`GET /api/v1/portfolio`). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data.
 
-### Real-time market data (Kafka + WebSocket)
+### Real-time market data (DB + WebSocket)
 
-The platform supports real-time market data for the mobile portfolio app using Kafka and a WebSocket endpoint:
+The platform supports real-time market data for the mobile portfolio app using the database and a WebSocket endpoint:
 
 - **Market data pipeline**
-  - Upstream provider or mock script publishes quotes to Kafka topic `market.quotes.enriched` (keyed by symbol).
-  - Backend `KafkaMarketDataProvider` consumes this topic and stores the latest quotes in memory.
-  - `MarketDataService` exposes these quotes via:
+  - When the backend starts, `MockQuoteWriter` produces to Kafka; `KafkaQuoteConsumer` consumes and writes to DB + Redis. If Kafka is unavailable, `MockQuoteWriter` falls back to direct DB write.
+  - TimescaleDB: `quote_tick` hypertable with batch inserts; `quote_ohlc_1min` and `quote_ohlc_5min` continuous aggregates; 7-day compression policy.
+  - `CachedMarketDataProvider` uses Redis read-through and write-through; `MarketDataService` exposes them via:
     - `GET /api/v1/quotes?symbols=AAPL,MSFT`
     - WebSocket `/ws/quotes` (`{"type":"subscribe","symbols":["AAPL","MSFT"]}` → `{"type":"snapshot","quotes":{...}}`).
 - **Mobile integration**
-  - `apps/mobile-portfolio` uses `EXPO_PUBLIC_PORTFOLIO_API_URL` (e.g. `http://192.168.3.160:8800`) and a `useRealtimeQuotes` hook.
-  - A shared `quoteSocket` client opens a WebSocket connection to `/ws/quotes` and drives real-time rendering in the account detail screen.
+  - On entering the watchlist page, the app fetches quotes from the DB via REST and pushes them to the store.
+  - A shared `quoteSocket` client opens a WebSocket connection to `/ws/quotes` for live updates in the watchlist screen.
 
-Quick local setup for real-time quotes:
+Quick local setup:
 
 ```bash
-# 1) Start Kafka and mock quote producer (from repo root; keeps running in foreground)
-pnpm run start:kafka
+# 1) Start backend (Docker: Postgres, Redis; API with built-in mock quote writer)
+pnpm run start:backend
 
-# 2) In another terminal: start backend API
-pnpm run dev:api
-
-# 3) Start mobile portfolio (development build with native charts)
+# 2) Start mobile portfolio
 pnpm dev:mobile-portfolio:ios
 ```
 
-`start:kafka` starts Docker (Kafka + Zookeeper), waits for Kafka to be ready, then runs the mock real-time quotes script. Use Ctrl+C to stop the mock producer; Kafka containers keep running until you run `docker compose down` in `services/portfolio-analytics`.
+No Kafka is required for real-time quotes; the mock writer persists data to the DB automatically when the API starts.
 
 ### Build Production Version
 

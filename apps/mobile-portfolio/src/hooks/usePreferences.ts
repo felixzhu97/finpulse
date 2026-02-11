@@ -6,7 +6,6 @@ import {
   setTheme,
   setLanguage,
   setNotificationsEnabled,
-  setLoading,
   type ThemePreference,
 } from "@/src/store/preferencesSlice";
 import { useUserPreferences } from "./useUserPreferences";
@@ -36,10 +35,6 @@ export function usePreferences() {
       i18n.changeLanguage(language);
     }
   }, [apiPreference, dispatch]);
-
-  useEffect(() => {
-    dispatch(setLoading(apiLoading));
-  }, [apiLoading, dispatch]);
 
   const updateTheme = useCallback(
     async (theme: ThemePreference) => {
@@ -169,7 +164,8 @@ export function usePreferences() {
     theme: preferences.theme,
     language: preferences.language,
     notificationsEnabled: preferences.notificationsEnabled,
-    isLoading: preferences.isLoading,
+    loading: apiLoading,
+    isLoading: apiLoading,
     updateTheme,
     updateLanguage,
     updateNotifications,

@@ -5,11 +5,12 @@
 title 移动端投资组合应用 - 组件图
 
 Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native)") {
+    Component(app_content, "AppContent", "React Native", "根布局：使用 usePreferences().loading，偏好加载完成前显示 spinner，随后渲染标签")
     Component(tabs_router, "标签路由", "Expo Router", "仪表板、自选、洞察、账户")
     Component(overview_screen, "仪表板屏幕", "React Native", "组合摘要、原生图表、净资产、资产配置")
     Component(watchlist_screen, "自选屏幕", "React Native", "股票列表（组合）、底部搜索、排序、详情抽屉")
     Component(analytics_screen, "洞察屏幕", "React Native", "风险指标（波动率、夏普比率、VaR、Beta）、根据组合历史计算的 VaR")
-    Component(account_screen, "账户屏幕", "React Native", "个人资料、账户列表、操作（注册客户、新建支付、新建交易、设置）")
+    Component(account_screen, "账户屏幕", "React Native", "个人资料、账户列表、操作（注册客户、新建支付、新建交易、设置）；useFocusEffect 在标签聚焦时加载数据")
 
     Component(types_layer, "types", "TypeScript", "Portfolio、QuoteSnapshot、Instrument 等")
     Component(api_client, "portfolioApi", "TypeScript", "GET portfolio 缓存、getAccounts、getRiskSummary、seedPortfolio")
@@ -25,7 +26,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
     Component(use_symbol_display, "useSymbolDisplayData", "Hook", "setSubscribedSymbols、从 Redux 选择；bySymbol、quoteMap、historyBySymbol")
     Component(use_portfolio, "usePortfolio", "Hook", "portfolio + allocation + history + refresh")
     Component(use_draggable_drawer, "useDraggableDrawer", "Hook", "底部抽屉滑动手画")
-    Component(use_preferences, "usePreferences", "Hook", "Redux 管理的用户偏好（主题、语言、通知）")
+    Component(use_preferences, "usePreferences", "Hook", "Redux 管理的用户偏好（主题、语言、通知）；提供 loading（组件级，来自 useUserPreferences）")
     Component(use_theme, "useTheme", "Hook", "基于偏好和系统的当前主题颜色（浅色/深色）")
     Component(use_risk_metrics, "useRiskMetrics", "Hook", "洞察 risk-metrics API")
     Component(use_computed_var, "useComputedVar", "Hook", "POST risk-metrics/compute 根据组合历史计算 VaR")
@@ -52,6 +53,8 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
 
 Container_Ext(portfolio_api, "投资组合分析 API", "REST / WebSocket", "组合、/ws/quotes、customers、accounts、payments、orders、trades、risk-metrics、risk-metrics/compute")
 
+Rel(app_content, use_preferences, "使用", "loading、主题同步")
+Rel(app_content, tabs_router, "渲染", "")
 Rel(tabs_router, overview_screen, "路由到", "")
 Rel(tabs_router, watchlist_screen, "路由到", "")
 Rel(tabs_router, analytics_screen, "路由到", "")

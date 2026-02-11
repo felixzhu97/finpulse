@@ -1,5 +1,6 @@
 from src.core.application.use_cases.analytics_service import AnalyticsApplicationService
 from src.core.application.use_cases.market_data_service import MarketDataService
+from src.core.application.use_cases.quote_history_service import QuoteHistoryService
 from src.infrastructure.external_services.analytics import (
     FraudDetectorProvider,
     ForecastProvider,
@@ -12,12 +13,21 @@ from src.infrastructure.external_services.analytics import (
 from src.infrastructure.external_services.analytics.huggingface_adapter import HfSummariseAdapter
 from src.infrastructure.external_services.analytics.ollama_adapter import OllamaGenerateAdapter
 from src.infrastructure.external_services.analytics.tf_forecast_adapter import TfForecastAdapter
-from src.infrastructure.external_services.market_data.kafka_provider import KafkaMarketDataProvider
+from src.infrastructure.cache.quote_cache import QuoteCache
+from src.infrastructure.external_services.market_data.cached_provider import CachedMarketDataProvider
+from src.infrastructure.external_services.market_data.database_provider import DatabaseMarketDataProvider
 
 
-def market_data_service() -> MarketDataService:
-    provider = KafkaMarketDataProvider()
+def market_data_service(quote_repo) -> MarketDataService:
+    provider = CachedMarketDataProvider(
+        inner=DatabaseMarketDataProvider(repository=quote_repo),
+        cache=QuoteCache(),
+    )
     return MarketDataService(provider=provider)
+
+
+def quote_history_service(quote_repo) -> QuoteHistoryService:
+    return QuoteHistoryService(repository=quote_repo)
 
 
 def analytics_service() -> AnalyticsApplicationService:

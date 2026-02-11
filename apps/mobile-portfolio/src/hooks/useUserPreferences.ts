@@ -21,15 +21,26 @@ export function useUserPreferences(): UseUserPreferencesResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  const minLoadingMs = 400;
+  const maxLoadingMs = 10000;
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(false);
+    const start = Date.now();
+    const forceDoneTimer = setTimeout(() => setLoading(false), maxLoadingMs);
+    const scheduleDone = () => {
+      clearTimeout(forceDoneTimer);
+      const elapsed = Date.now() - start;
+      const remaining = Math.max(0, minLoadingMs - elapsed);
+      setTimeout(() => setLoading(false), remaining);
+    };
     try {
       const customer = await customersApi.getFirst();
       if (!customer) {
         setCustomerId(null);
         setPreference(null);
-        setLoading(false);
+        scheduleDone();
         return;
       }
       setCustomerId(customer.customer_id);
@@ -47,7 +58,7 @@ export function useUserPreferences(): UseUserPreferencesResult {
     } catch {
       setError(true);
     } finally {
-      setLoading(false);
+      scheduleDone();
     }
   }, []);
 

@@ -43,8 +43,16 @@ const quotesSlice = createSlice({
     setStatus(state, action: { payload: QuoteConnectionStatus }) {
       state.status = action.payload;
     },
+    setHistory(state, action: { payload: Record<string, number[]> }) {
+      for (const [sym, prices] of Object.entries(action.payload)) {
+        const key = sym.toUpperCase();
+        if (prices?.length) {
+          state.history[key] = prices.slice(-MAX_HISTORY_POINTS);
+        }
+      }
+    },
   },
 });
 
-export const { setSubscribedSymbols, setSnapshot, setStatus } = quotesSlice.actions;
+export const { setSubscribedSymbols, setSnapshot, setStatus, setHistory } = quotesSlice.actions;
 export default quotesSlice.reducer;

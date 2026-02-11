@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   ActivityIndicator,
+  InteractionManager,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -51,25 +53,48 @@ export default function AccountScreen() {
   const [tradeVisible, setTradeVisible] = useState(false);
 
   const loadData = useCallback(async () => {
+    const tag = "[AccountTab]";
+    console.log(`${tag} loadData start`);
     setLoading(true);
     setError(false);
     try {
+      console.log(`${tag} calling customersApi.getFirst()`);
+      const customerPromise = customersApi.getFirst();
+      console.log(`${tag} calling portfolioApi.getAccounts()`);
+      const accountsPromise = portfolioApi.getAccounts();
+
       const [customerData, accountList] = await Promise.all([
-        customersApi.getFirst(),
-        portfolioApi.getAccounts(),
+        customerPromise,
+        accountsPromise,
       ]);
-      setCustomer(customerData);
-      setAccounts(accountList);
-    } catch {
+
+      console.log(`${tag} customersApi.getFirst() resolved:`, customerData != null);
+      console.log(`${tag} portfolioApi.getAccounts() resolved:`, accountList?.length ?? 0, "accounts");
+
+      const data = { customer: customerData, accounts: accountList ?? [] };
+      InteractionManager.runAfterInteractions(() => {
+        setCustomer(data.customer);
+        setAccounts(data.accounts);
+        setLoading(false);
+      });
+      console.log(`${tag} loadData success state:`, {
+        hasCustomer: !!customerData,
+        accountsLength: data.accounts.length,
+      });
+    } catch (e) {
+      console.log(`${tag} loadData error:`, e);
       setError(true);
+      InteractionManager.runAfterInteractions(() => setLoading(false));
     } finally {
-      setLoading(false);
+      console.log(`${tag} loadData done`);
     }
   }, []);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -78,6 +103,9 @@ export default function AccountScreen() {
   }, [loadData]);
 
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+
+  const showLoading = loading && !customer && accounts.length === 0;
+  console.log("[AccountTab] render:", { loading, hasCustomer: !!customer, accountsLength: accounts.length, showLoading });
 
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]} edges={["top"]}>
@@ -92,7 +120,7 @@ export default function AccountScreen() {
           />
         }
       >
-        {loading && !customer && accounts.length === 0 ? (
+        {showLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color={colors.textSecondary} />
           </View>

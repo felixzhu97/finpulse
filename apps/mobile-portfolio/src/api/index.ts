@@ -1,6 +1,6 @@
 export { getBaseUrl } from "./config";
 export { portfolioApi } from "./portfolioApi";
-export { getQuotes } from "./quotes";
+export { getQuotes, getQuotesHistory } from "./quotes";
 export {
   createQuoteSocket,
   type QuoteConnectionStatus,

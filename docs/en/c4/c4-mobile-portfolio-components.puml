@@ -4,11 +4,12 @@
 title Mobile Portfolio App - Component Diagram
 
 Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
+    Component(app_content, "AppContent", "React Native", "Root layout: uses usePreferences().loading, shows spinner until preferences fetched, then renders tabs")
     Component(tabs_router, "Tabs Router", "Expo Router", "Dashboard, Watchlist, Insights, Account")
     Component(overview_screen, "Dashboard Screen", "React Native", "Portfolio summary, native charts, net worth, allocation")
     Component(watchlist_screen, "Watchlist Screen", "React Native", "Stocks list (portfolio), search (bottom), sort, detail drawer")
     Component(analytics_screen, "Insights Screen", "React Native", "Risk metrics (volatility, Sharpe, VaR, beta), computed VaR from portfolio history")
-    Component(account_screen, "Account Screen", "React Native", "Profile, account list, Actions (Register, New Payment, New Trade, Settings)")
+    Component(account_screen, "Account Screen", "React Native", "Profile, account list, Actions (Register, New Payment, New Trade, Settings); useFocusEffect loads data on tab focus")
 
     Component(types_layer, "types", "TypeScript", "Portfolio, QuoteSnapshot, Instrument, etc.")
     Component(api_client, "portfolioApi", "TypeScript", "GET portfolio (cached), getAccounts, getRiskSummary, seedPortfolio")
@@ -24,7 +25,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(use_symbol_display, "useSymbolDisplayData", "Hook", "setSubscribedSymbols, select from Redux; bySymbol, quoteMap, historyBySymbol")
     Component(use_portfolio, "usePortfolio", "Hook", "portfolio + allocation + history + refresh")
     Component(use_draggable_drawer, "useDraggableDrawer", "Hook", "Slide/drag animation for bottom sheets")
-    Component(use_preferences, "usePreferences", "Hook", "Redux-backed user preferences (theme, language, notifications)")
+    Component(use_preferences, "usePreferences", "Hook", "Redux-backed user preferences (theme, language, notifications); provides loading (component-level, from useUserPreferences)")
     Component(use_theme, "useTheme", "Hook", "Current theme colors (light/dark) based on preferences and system")
     Component(use_risk_metrics, "useRiskMetrics", "Hook", "Insights risk-metrics API")
     Component(use_computed_var, "useComputedVar", "Hook", "POST risk-metrics/compute for VaR from portfolio history")
@@ -51,6 +52,8 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
 
 Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Portfolio, /ws/quotes, customers, accounts, payments, orders, trades, risk-metrics, risk-metrics/compute")
 
+Rel(app_content, use_preferences, "Uses", "loading, theme sync")
+Rel(app_content, tabs_router, "Renders", "")
 Rel(tabs_router, overview_screen, "Routes to", "")
 Rel(tabs_router, watchlist_screen, "Routes to", "")
 Rel(tabs_router, analytics_screen, "Routes to", "")

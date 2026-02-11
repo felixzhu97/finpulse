@@ -20,13 +20,13 @@
 
 **文件**：`c4-mobile-portfolio-components.puml`
 
-**说明**：移动端投资组合应用（Expo + React Native）薄客户端：标签/屏幕；types（Portfolio、QuoteSnapshot）；api 层（portfolioApi、getQuotes、createQuoteSocket）；hooks（usePortfolio、useRealtimeQuotes、usePerSymbolHistory）；原生图表与组合/账户组件；后端 GET /api/v1/portfolio、GET /api/v1/quotes、WS /ws/quotes。
+**说明**：移动端投资组合应用（Expo + React Native）薄客户端：AppContent（偏好加载 spinner）、标签/屏幕；types（Portfolio、QuoteSnapshot）；api 层（portfolioApi、getQuotes、createQuoteSocket）；hooks（usePortfolio、useRealtimeQuotes、usePerSymbolHistory、usePreferences 含组件级 loading）；账户屏使用 useFocusEffect 在标签聚焦时加载；原生图表与组合/账户组件；后端 GET /api/v1/portfolio、GET /api/v1/quotes、WS /ws/quotes。
 
 ### 投资组合分析 API 组件
 
 **文件**：`c4-components.puml`
 
-**说明**：投资组合分析 API 内部组件：投资组合路由（GET /portfolio、POST /seed）、资源路由（/api/v1/* CRUD 及 batch；AI 融入 payments、trades、customers、risk-metrics）、行情路由；服务（投资组合、分析、市场数据）；仓储与 Kafka/Redis。后端采用整洁架构（见下方图及 `services/portfolio-analytics/README.md`）。
+**说明**：投资组合分析 API 内部组件：投资组合路由（GET /portfolio、POST /seed）、资源路由（/api/v1/* CRUD 及 batch；AI 融入 payments、trades、customers、risk-metrics）、行情路由（GET /quotes、GET /quotes/history、WebSocket /ws/quotes）；服务（投资组合、分析、市场数据、行情历史）；RealtimeQuoteRepository（ORM、IRealtimeQuoteRepository）；Kafka 行情消费者。后端采用整洁架构（见下方图及 `services/portfolio-analytics/README.md`）。
 
 ### 整洁架构（投资组合 API）
 

@@ -12,12 +12,12 @@ rectangle "**API**\n(src/api/)" as API #E3F2FD {
 }
 
 rectangle "**基础设施**\n(src/infrastructure/)" as INFRA #E8F5E9 {
-  rectangle "database/\ncache/ (Redis)\nconfig/\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
+  rectangle "database/\n(RealtimeQuoteRepository：\nORM、批量操作)\ncache/ (Redis)\nconfig/\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
 }
 
 rectangle "**应用层**\n(src/core/application/)" as APP #FFF3E0 {
-  rectangle "use_cases/\n(投资组合、分析、\n区块链等)" as UC
-  rectangle "ports/\n(仓储、服务、消息代理接口)" as PORTS
+  rectangle "use_cases/\n(投资组合、分析、区块链、\nQuoteHistoryService 等)" as UC
+  rectangle "ports/\n(IRealtimeQuoteRepository、\n仓储、服务、消息代理接口)" as PORTS
 }
 
 rectangle "**领域**\n(src/core/domain/)" as DOMAIN #FCE4EC {
@@ -33,8 +33,10 @@ note right of DOMAIN
 end note
 
 note right of DI
-  唯一引用
-  infrastructure 的位置
+  唯一引用 infrastructure 的位置。
+  get_realtime_quote_repo
+  接受 Request | WebSocket，
+  以支持 WebSocket 路由。
 end note
 
 note bottom of LIFESPAN

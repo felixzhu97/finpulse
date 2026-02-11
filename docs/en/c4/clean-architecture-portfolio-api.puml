@@ -12,12 +12,12 @@ rectangle "**API**\n(src/api/)" as API #E3F2FD {
 }
 
 rectangle "**Infrastructure**\n(src/infrastructure/)" as INFRA #E8F5E9 {
-  rectangle "database/\ncache/ (Redis)\nconfig/\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
+  rectangle "database/\n(RealtimeQuoteRepository:\nORM, bulk ops)\ncache/ (Redis)\nconfig/\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
 }
 
 rectangle "**Application**\n(src/core/application/)" as APP #FFF3E0 {
-  rectangle "use_cases/\n(portfolio, analytics,\nblockchain, ...)" as UC
-  rectangle "ports/\n(repositories, services,\nmessage_brokers)" as PORTS
+  rectangle "use_cases/\n(portfolio, analytics,\nblockchain, QuoteHistoryService...)" as UC
+  rectangle "ports/\n(IRealtimeQuoteRepository,\nrepositories, services,\nmessage_brokers)" as PORTS
 }
 
 rectangle "**Domain**\n(src/core/domain/)" as DOMAIN #FCE4EC {
@@ -35,7 +35,10 @@ end note
 
 note right of DI
   Only place that
-  imports infrastructure
+  imports infrastructure.
+  get_realtime_quote_repo
+  accepts Request | WebSocket
+  for WebSocket routes.
 end note
 
 note bottom of LIFESPAN

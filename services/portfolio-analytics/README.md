@@ -34,7 +34,7 @@ Backend service providing portfolio analytics for the mobile and web clients. It
 - **Domain** (`src/core/domain/`): Entities, value objects, domain services, events, exceptions. No framework or outer-layer dependencies.
 - **Application** (`src/core/application/`): Use cases and ports (repository, service, message-broker interfaces). Depends only on domain.
 - **Infrastructure** (`src/infrastructure/`): Database (ORM, repositories, session), **cache** (Redis via `cache/redis_cache.py`), external services (analytics, market data), message brokers (Kafka). Implements application ports.
-- **API** (`src/api/`): HTTP endpoints, schemas, mappers, and dependency injection. Composition root in `dependencies.py` wires ports to infrastructure; entrypoint is `main.py` (project root). **Lifespan** (`main.py`): on startup, creates the async engine and session factory (via `create_engine_and_session_factory()`), stores them on `app.state`; `get_session` uses `request.app.state.session_factory` so all DB work runs on the same event loop (avoids "different loop" issues in async tests and production). Redis is also created in lifespan and stored on `app.state.redis`. On shutdown, Redis is closed and the engine is disposed.
+- **API** (`src/api/`): HTTP endpoints, schemas, mappers, and dependency injection. Composition root in `dependencies.py` wires ports to infrastructure; entrypoint is `main.py` (project root). **Lifespan** (`main.py`): on startup, creates the async engine and session factory (via `create_engine_and_session_factory()`), stores them on `app.state`; `get_session` uses `request.app.state.session_factory` so all DB work runs on the same event loop (avoids "different loop" issues in async tests and production). Redis is also created in lifespan and stored on `app.state.redis`. `get_realtime_quote_repo` accepts both `Request` and `WebSocket` so WebSocket routes (e.g. `/ws/quotes`) can resolve dependencies. On shutdown, Redis is closed and the engine is disposed.
 
 ### Infrastructure (runtime)
 
@@ -101,7 +101,8 @@ alembic current        # Show current revision
 
 - `GET /api/v1/portfolio` – returns the portfolio from PostgreSQL (or in-memory demo if DB is empty). Response is cached in Redis (key `portfolio:aggregate:demo-portfolio`, TTL 300s); cache is invalidated on `POST /api/v1/seed`.
 - `POST /api/v1/seed` – accepts a portfolio JSON body, stores it in PostgreSQL, invalidates portfolio aggregate cache, and publishes a `portfolio.seeded` event to Kafka.
-- `GET /api/v1/quotes?symbols=...` – returns the latest real-time quotes for the requested symbols, backed by Kafka topic `market.quotes.enriched`.
+- `GET /api/v1/quotes?symbols=...` – returns the latest real-time quotes; read-through Redis cache, fallback to `realtime_quote` table.
+- `GET /api/v1/quotes/history?symbols=...&minutes=5` – returns historical price series from `quote_tick` (or `quote_ohlc_1min` fallback); powered by `QuoteHistoryService`.
 - `WebSocket /ws/quotes` – accepts `{"type":"subscribe","symbols":["AAPL","MSFT"]}` or `"update"` messages and pushes `{"type":"snapshot","quotes":{...}}` snapshots using the same quote structure as the HTTP endpoint.
 
 **REST resources** (under `/api/v1/`): customers, user-preferences, accounts, instruments, portfolios, positions, watchlists, watchlist-items, bonds, options, orders, trades, cash-transactions, payments, settlements, market-data, risk-metrics, valuations. Each resource has list, get-by-id, create, update, delete. **Batch create**: for each resource, `POST /api/v1/<resource>/batch` accepts a JSON array of create payloads and returns an array of created entities (e.g. `POST /api/v1/customers/batch`, `POST /api/v1/instruments/batch`). The seed script (`scripts/seed/generate-seed-data.js`) uses these batch endpoints to minimise the number of HTTP calls during seeding.
@@ -138,7 +139,7 @@ Libraries used: **SciPy** (parametric VaR), **NumPy** (historical VaR, surveilla
 
 - **Real-time market data**
 
-  - Upstream producers (mock script, external provider, or Flink streaming jobs) publish enriched quotes to `market.quotes.enriched`.
-  - From repo root, `pnpm run start:kafka` starts Kafka (Docker) and the mock quote producer (`scripts/mock_realtime_quotes.py`) in one command.
-  - `KafkaMarketDataProvider` consumes this topic and keeps an in-memory cache of the latest quote per symbol.
-  - `MarketDataService` powers both `GET /api/v1/quotes` and `WebSocket /ws/quotes` for mobile and web clients.
+  - `MockQuoteWriter` produces to Kafka; `KafkaQuoteConsumer` sinks to `realtime_quote` and `quote_tick`. Fallback: direct DB write when Kafka unavailable.
+  - TimescaleDB: `quote_ohlc_1min`, `quote_ohlc_5min` continuous aggregates; compression for chunks older than 7 days.
+  - `CachedMarketDataProvider` uses Redis read-through and write-through; `MarketDataService` powers `GET /api/v1/quotes` and `WebSocket /ws/quotes`.
+  - `RealtimeQuoteRepository` uses ORM (`RealtimeQuoteRow`, `QuoteTickRow`), bulk upsert and bulk insert for `realtime_quote` and `quote_tick`; `QuoteHistoryService` use case for history via `IRealtimeQuoteRepository`.

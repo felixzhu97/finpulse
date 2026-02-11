@@ -1,4 +1,0 @@
-{
-  "ignore_dirs": ["node_modules", ".git", ".expo", "dist", "build", "coverage"],
-  "settle": 20
-}
