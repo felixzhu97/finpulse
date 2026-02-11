@@ -12,6 +12,7 @@
     "start:kafka": "cd services/portfolio-analytics && docker compose up kafka zookeeper -d && sleep 5 && (. .venv/bin/activate 2>/dev/null || true; python scripts/mock_realtime_quotes.py)",
     "build": "pnpm --filter finpulse-web build",
     "start": "pnpm --filter finpulse-web start",
+    "test": "pnpm run test:api",
     "test:api": "cd services/portfolio-analytics && (. .venv/bin/activate 2>/dev/null || true; python -m pytest tests -v)",
     "lint": "pnpm --filter finpulse-web lint"
   }

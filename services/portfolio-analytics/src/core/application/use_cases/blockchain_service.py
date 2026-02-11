@@ -33,8 +33,17 @@ class BlockchainApplicationService:
     ) -> ChainTransaction:
         if amount <= 0:
             raise ValueError("amount must be positive")
-        balance = await self._wallet.get_balance(sender_account_id, currency)
-        current = balance.balance if balance else 0.0
+        await self._ledger.get_latest_block_for_update()
+        first_id, second_id = (
+            min(sender_account_id, receiver_account_id),
+            max(sender_account_id, receiver_account_id),
+        )
+        first_balance = await self._wallet.get_balance_for_update(first_id, currency)
+        second_balance = await self._wallet.get_balance_for_update(second_id, currency)
+        sender_balance = (
+            first_balance if first_id == sender_account_id else second_balance
+        )
+        current = sender_balance.balance if sender_balance else 0.0
         if current < amount:
             raise InsufficientBalanceError(
                 f"insufficient balance: {current} {currency}"

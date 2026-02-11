@@ -23,6 +23,19 @@ Blocks are linked by `previous_hash`; the first block (genesis) uses `previous_h
 3. A new block is created with the single transfer; block hash is computed (pydantic `model_dump_json(sort_keys=True)` + SHA256).
 4. Block and chain transaction are persisted; sender and receiver wallet balances are updated in the same DB transaction.
 
+## High-Concurrency and Transaction Accuracy
+
+To keep transfers correct under concurrency:
+
+- **Pessimistic locking**: The service locks the latest block row (`get_latest_block_for_update`) and both wallet rows (`get_balance_for_update`) in a fixed order: block first, then wallet rows by `account_id` (min then max). This avoids lost updates and deadlocks.
+- **Single DB transaction**: All steps (read balance, append block, update balances) run in one request-scoped session; commit or rollback is applied at the end.
+
+## Testing
+
+- **Unit tests** (`tests/test_blockchain_service.py`): Mock ledger and wallet; assert lock order (canonical account_id), insufficient-balance and invalid-amount errors, and balance updates.
+- **API tests** (`tests/test_api_blockchain.py`): Use `blockchain_client` (app from `main`) for list blocks, get block, seed balance, transfer success, insufficient balance (4xx), and **concurrent transfers** (multiple threads posting transfers; assert final balances sum correctly). These tests need a running DB and `main` app (install deps e.g. `cryptography`); they are skipped if `main` cannot be imported.
+- **Run**: From `services/portfolio-analytics`, `pytest tests/test_blockchain_service.py tests/test_api_blockchain.py -v`.
+
 ## API Endpoints
 
 | Method | Path | Description |

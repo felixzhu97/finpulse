@@ -79,6 +79,25 @@ class BlockchainLedgerRepository(IBlockchainLedger):
         tx_ids = tuple(str(r.tx_id) for r in tx_rows)
         return block_row_to_entity(row, transaction_ids=tx_ids)
 
+    async def get_latest_block_for_update(self) -> Optional[Block]:
+        result = await self._session.execute(
+            select(BlockRow)
+            .order_by(BlockRow.block_index.desc())
+            .limit(1)
+            .with_for_update()
+        )
+        row = result.scalar_one_or_none()
+        if row is None:
+            return None
+        tx_result = await self._session.execute(
+            select(ChainTransactionRow).where(
+                ChainTransactionRow.block_index == row.block_index
+            )
+        )
+        tx_rows = tx_result.scalars().all()
+        tx_ids = tuple(str(r.tx_id) for r in tx_rows)
+        return block_row_to_entity(row, transaction_ids=tx_ids)
+
     async def list_blocks(self, limit: int = 100, offset: int = 0) -> List[Block]:
         result = await self._session.execute(
             select(BlockRow).order_by(BlockRow.block_index.asc()).limit(limit).offset(offset)

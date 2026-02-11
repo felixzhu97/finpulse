@@ -27,6 +27,20 @@ class WalletBalanceRepository(IWalletBalanceRepository):
         row = result.scalar_one_or_none()
         return wallet_balance_row_to_entity(row) if row else None
 
+    async def get_balance_for_update(
+        self, account_id: UUID, currency: str
+    ) -> Optional[WalletBalance]:
+        result = await self._session.execute(
+            select(WalletBalanceRow)
+            .where(
+                WalletBalanceRow.account_id == account_id,
+                WalletBalanceRow.currency == currency,
+            )
+            .with_for_update()
+        )
+        row = result.scalar_one_or_none()
+        return wallet_balance_row_to_entity(row) if row else None
+
     async def update_balance(
         self, account_id: UUID, currency: str, delta: float
     ) -> WalletBalance:

@@ -21,6 +21,7 @@ transformers>=4.36.0
 torch>=2.0.0
 accelerate>=0.25.0
 pytest>=7.0.0
+pytest-asyncio>=0.23.0
 pytest-timeout>=2.0.0
 python-dotenv>=1.0.0
 cryptography>=42.0.0

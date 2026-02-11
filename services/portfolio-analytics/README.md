@@ -34,7 +34,7 @@ Backend service providing portfolio analytics for the mobile and web clients. It
 - **Domain** (`src/core/domain/`): Entities, value objects, domain services, events, exceptions. No framework or outer-layer dependencies.
 - **Application** (`src/core/application/`): Use cases and ports (repository, service, message-broker interfaces). Depends only on domain.
 - **Infrastructure** (`src/infrastructure/`): Database (ORM, repositories, session), **cache** (Redis via `cache/redis_cache.py`), external services (analytics, market data), message brokers (Kafka). Implements application ports.
-- **API** (`src/api/`): HTTP endpoints, schemas, mappers, and dependency injection. Composition root in `dependencies.py` wires ports to infrastructure; entrypoint is `main.py` (project root).
+- **API** (`src/api/`): HTTP endpoints, schemas, mappers, and dependency injection. Composition root in `dependencies.py` wires ports to infrastructure; entrypoint is `main.py` (project root). **Lifespan** (`main.py`): on startup, creates the async engine and session factory (via `create_engine_and_session_factory()`), stores them on `app.state`; `get_session` uses `request.app.state.session_factory` so all DB work runs on the same event loop (avoids "different loop" issues in async tests and production). Redis is also created in lifespan and stored on `app.state.redis`. On shutdown, Redis is closed and the engine is disposed.
 
 ### Infrastructure (runtime)
 
@@ -139,7 +139,7 @@ The server exposes an AI/ML layer under `/api/v1/ai` using:
 
 **Testing**
 
-- **Pytest (no server needed)** – from repo root: `pnpm run test:api`. Runs `tests/test_api_ai.py` and `tests/test_api_portfolio.py` via FastAPI `TestClient` (risk/var, fraud, surveillance, sentiment, identity, dl/forecast, llm/summarise, portfolio get/seed). Ollama/HuggingFace/TF tests pass with 200 and skip if the backend returns an error.
+- **Pytest** – from repo root: `pnpm run test` or `pnpm run test:api` (runs `pytest tests -v` in `services/portfolio-analytics`). Tests are under `tests/api/` by feature (accounts, blockchain, ai, portfolio, trading, payments, etc.). **Async DB tests** use `httpx.AsyncClient` with `ASGITransport` and the app’s lifespan context (`blockchain_client` fixture in `conftest.py`) so the app and tests share the same event loop; session/engine are created in lifespan and bound to that loop. Unit tests live in `tests/unit/`. See `tests/README.md` for layout and concurrency testing notes.
 - **With API running** – `pnpm run generate-ai-seed-data` POSTs sample payloads to all AI endpoints; `pnpm run test:ai-api` runs `scripts/test-ai-api.sh` (curl) for a quick smoke test.
 
 To only write payloads to `scripts/seed/ai-seed-data.json`, run `pnpm run generate-ai-seed-data:output`.

@@ -6,7 +6,8 @@ skinparam defaultFontSize 11
 title 投资组合分析 API - 整洁架构分层
 
 rectangle "**API**\n(src/api/)" as API #E3F2FD {
-  rectangle "dependencies.py\n(组合根)" as DI
+  rectangle "main.py\n(lifespan: engine,\nsession_factory, redis)" as LIFESPAN
+  rectangle "dependencies.py\n(组合根)\nget_session 来自 app.state" as DI
   rectangle "v1/endpoints\nv1/schemas\nv1/mappers" as WEB
 }
 
@@ -34,6 +35,12 @@ end note
 note right of DI
   唯一引用
   infrastructure 的位置
+end note
+
+note bottom of LIFESPAN
+  engine 与 session_factory
+  在 lifespan 中创建
+  (与异步 DB 同一事件循环)
 end note
 
 @enduml

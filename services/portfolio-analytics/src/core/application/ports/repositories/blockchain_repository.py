@@ -19,6 +19,10 @@ class IBlockchainLedger(ABC):
         pass
 
     @abstractmethod
+    async def get_latest_block_for_update(self) -> Optional[Block]:
+        pass
+
+    @abstractmethod
     async def list_blocks(self, limit: int, offset: int) -> List[Block]:
         pass
 
@@ -34,6 +38,12 @@ class IBlockchainLedger(ABC):
 class IWalletBalanceRepository(ABC):
     @abstractmethod
     async def get_balance(self, account_id: UUID, currency: str) -> Optional[WalletBalance]:
+        pass
+
+    @abstractmethod
+    async def get_balance_for_update(
+        self, account_id: UUID, currency: str
+    ) -> Optional[WalletBalance]:
         pass
 
     @abstractmethod

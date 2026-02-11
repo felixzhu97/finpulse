@@ -5,7 +5,8 @@ from pydantic import BaseModel, Field
 
 class VarRequest(BaseModel):
     returns: List[float] = Field(
-        default_factory=list,
+        ...,
+        min_length=1,
         description="Daily or period log returns for the portfolio or position.",
     )
     confidence: float = Field(default=0.95, ge=0.5, le=1.0, description="VaR confidence level.")
