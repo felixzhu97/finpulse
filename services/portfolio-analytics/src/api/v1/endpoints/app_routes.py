@@ -28,6 +28,10 @@ def _quotes_response(svc: MarketDataService, symbols: List[str]) -> Dict[str, Di
 
 
 def register(r: APIRouter) -> None:
+    @r.get("/health")
+    def health_check():
+        return {"status": "ok"}
+
     @r.get("/api/v1/portfolio")
     async def portfolio_get(
         svc: Annotated[PortfolioApplicationService, Depends(get_portfolio_service)],
@@ -93,6 +97,8 @@ def register(r: APIRouter) -> None:
                     payload = _quotes_response(svc, subscribed)
                     await websocket.send_json({"type": "snapshot", "quotes": payload})
         except WebSocketDisconnect:
+            return
+        except Exception:
             return
 
 

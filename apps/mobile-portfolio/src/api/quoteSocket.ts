@@ -14,6 +14,18 @@ export interface QuoteSocketHandle {
   close(): void;
 }
 
+const DEBUG = typeof __DEV__ !== "undefined" && __DEV__;
+
+function socketLog(ev: string, detail?: unknown): void {
+  if (DEBUG) {
+    if (detail !== undefined) {
+      console.log(`[QuoteSocket] ${ev}`, detail);
+    } else {
+      console.log(`[QuoteSocket] ${ev}`);
+    }
+  }
+}
+
 function toWebSocketUrl(httpUrl: string): string {
   if (httpUrl.startsWith("https://")) {
     return "wss://" + httpUrl.slice("https://".length);
@@ -63,18 +75,19 @@ class QuoteSocket implements QuoteSocketHandle {
 
   private sendSubscribe(): void {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return;
-    this.socket.send(
-      JSON.stringify({ type: "subscribe", symbols: this.symbols })
-    );
+    const payload = { type: "subscribe", symbols: this.symbols };
+    this.socket.send(JSON.stringify(payload));
   }
 
   private connect(): void {
     if (this.closed) return;
     this.notifyStatus("connecting");
     const wsUrl = toWebSocketUrl(getBaseUrl()) + "/ws/quotes";
+    socketLog("connect", { wsUrl });
     this.socket = new WebSocket(wsUrl);
 
     this.socket.onopen = () => {
+      socketLog("onopen");
       this.reconnectDelay = 1000;
       this.notifyStatus("open");
       this.sendSubscribe();
@@ -93,13 +106,17 @@ class QuoteSocket implements QuoteSocketHandle {
           this.options.onSnapshot(data.quotes as QuoteSnapshot);
         }
       } catch {
-        // ignore
+        // Ignore parse errors
       }
     };
 
-    this.socket.onerror = () => this.notifyStatus("error");
+    this.socket.onerror = () => {
+      socketLog("onerror");
+      this.notifyStatus("error");
+    };
 
-    this.socket.onclose = () => {
+    this.socket.onclose = (event) => {
+      socketLog("onclose", { code: event.code, reason: event.reason });
       this.notifyStatus("closed");
       this.socket = null;
       if (this.timer) {
@@ -107,10 +124,10 @@ class QuoteSocket implements QuoteSocketHandle {
         this.timer = null;
       }
       if (this.closed) return;
-      setTimeout(() => {
-        this.reconnectDelay = Math.min(this.reconnectDelay * 2, 10000);
-        this.connect();
-      }, this.reconnectDelay);
+      const delay = this.reconnectDelay;
+      this.reconnectDelay = Math.min(this.reconnectDelay * 2, 10000);
+      socketLog("reconnect scheduled", { delayMs: delay });
+      setTimeout(() => this.connect(), delay);
     };
   }
 }

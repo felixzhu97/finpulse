@@ -30,8 +30,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Portfolio Analytics API", lifespan=lifespan)
-app.include_router(resource_router)
 app.include_router(app_router)
+app.include_router(resource_router)
 
 app.add_middleware(
     CORSMiddleware,
