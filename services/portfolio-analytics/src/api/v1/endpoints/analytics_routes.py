@@ -4,8 +4,20 @@ from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from src.api.v1.schemas import RiskMetricsCreate, RiskMetricsResponse, ValuationCreate, ValuationResponse
-from src.api.dependencies import get_risk_metrics_repo, get_valuation_repo
+from src.api.v1.schemas import (
+    RiskMetricsCreate,
+    RiskMetricsResponse,
+    ValuationCreate,
+    ValuationResponse,
+    VarComputeRequest,
+)
+from src.api.dependencies import (
+    get_analytics_service,
+    get_portfolio_history_repo,
+    get_risk_metrics_repo,
+    get_valuation_repo,
+)
+from src.core.application.use_cases.analytics_service import AnalyticsApplicationService
 from src.core.domain.entities.analytics import RiskMetrics, Valuation
 
 
@@ -124,6 +136,36 @@ def register(router: APIRouter) -> None:
         ok = await repo.remove(metric_id)
         if not ok:
             raise HTTPException(status_code=404, detail="Risk metrics not found")
+
+    @router.post("/risk-metrics/compute")
+    async def compute_var(
+        body: VarComputeRequest,
+        analytics: Annotated[AnalyticsApplicationService, Depends(get_analytics_service)] = None,
+        history_repo: Annotated[object, Depends(get_portfolio_history_repo)] = None,
+    ):
+        portfolio_id = body.portfolio_id
+        confidence = body.confidence
+        method = body.method
+        if not analytics or not history_repo:
+            raise HTTPException(status_code=503, detail="Analytics service unavailable")
+        points = await history_repo.get_range(str(portfolio_id), days=90)
+        if len(points) < 2:
+            raise HTTPException(status_code=400, detail="Insufficient portfolio history for VaR computation")
+        values = [float(p.value) for p in points]
+        returns = []
+        for i in range(1, len(values)):
+            if values[i - 1] and values[i - 1] != 0:
+                r = (values[i] - values[i - 1]) / values[i - 1]
+                returns.append(r)
+        if not returns:
+            raise HTTPException(status_code=400, detail="Could not compute returns from history")
+        result = analytics.compute_var(
+            returns=returns,
+            confidence=confidence,
+            method=method,
+            portfolio_id=portfolio_id,
+        )
+        return result
 
     @router.get("/valuations", response_model=list[ValuationResponse])
     async def list_valuations(

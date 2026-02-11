@@ -125,25 +125,23 @@ package "Portfolio Analytics Backend" <<Infra>> {
         component "KafkaMarketDataProvider" as KafkaMarketDataProviderInfra
     }
     component "AI/ML stack" as AIMLStack {
-        component "Ollama (LLM)" as OllamaTech
-        component "Hugging Face (transformers)" as HFTech
-        component "TensorFlow (LSTM)" as TFTech
-        component "scipy, statsmodels, sumy" as StatsTech
+        component "scipy, numpy, scikit-learn" as StatsTech
+        component "statsmodels, VADER, sumy" as StatsTech2
+        component "Ollama, HF, TF (optional)" as OptionalTech
     }
     note right of FastAPI
         services/portfolio-analytics
         GET/POST /api/v1/portfolio, seed
         GET /api/v1/quotes, WebSocket /ws/quotes
-        /api/v1/ai (VaR, fraud, surveillance,
-        sentiment, identity, forecast, summarise,
-        ollama, huggingface, tf)
+        AI in: payments (fraud), trades (surveillance),
+        customers (identity), risk-metrics (VaR)
         DDD, python-dotenv (.env), port 8800
     end note
     note right of TimescaleDB: Portfolio metadata (JSONB)\nportfolio_history hypertable\nhost port 5433
     note right of Redis: Server-side cache\n(history, portfolio aggregate, blockchain reads)\nport 6379, TTL 300s
     note right of SQLAlchemyAsync: Async ORM\nasyncpg driver
     note right of Kafka: portfolio.events topic\nportfolio.seeded events\nmarket.quotes.enriched topic\nreal-time quotes
-    note right of AIMLStack: Optional: Ollama, HF, TF\npytest, pytest-timeout
+    note right of AIMLStack: Integrated in business flows\nOptional: Ollama, HF, TF
 }
 
 

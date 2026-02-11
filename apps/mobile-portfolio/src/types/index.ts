@@ -5,3 +5,7 @@ export * from "./userPreference";
 export * from "./watchlist";
 export * from "./instrument";
 export * from "./riskMetrics";
+export * from "./payment";
+export * from "./trade";
+export * from "./order";
+export * from "./varCompute";

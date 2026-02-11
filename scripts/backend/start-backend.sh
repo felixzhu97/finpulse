@@ -12,7 +12,7 @@ cd "$ROOT"
 sleep 3
 
 echo "[start-backend] Waiting for Postgres (5433)..."
-for i in $(seq 1 15); do nc -z 127.0.0.1 5433 2>/dev/null && break; sleep 1; done
+for i in $(seq 1 30); do nc -z 127.0.0.1 5433 2>/dev/null && break; sleep 1; done
 echo "[start-backend] Waiting for Kafka (9092)..."
 for i in $(seq 1 20); do nc -z 127.0.0.1 9092 2>/dev/null && break; sleep 1; done
 sleep 2
@@ -38,16 +38,16 @@ nohup .venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8800 > /tmp/por
 API_PID=$!
 cd "$ROOT"
 
-echo "[start-backend] Waiting for API health (up to 15s)..."
+echo "[start-backend] Waiting for API health (up to 30s)..."
 API_READY=
-for i in $(seq 1 15); do
+for i in $(seq 1 30); do
   CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 --max-time 5 http://127.0.0.1:8800/api/v1/portfolio 2>/dev/null || echo "000")
   if [ "$CODE" = "200" ]; then
     API_READY=1
     echo "[start-backend] API ready (HTTP $CODE) after ${i}s"
     break
   fi
-  [ "$(( i % 5 ))" = "0" ] && echo "[start-backend] Attempt $i/15: HTTP $CODE"
+  [ "$(( i % 5 ))" = "0" ] && echo "[start-backend] Attempt $i/30: HTTP $CODE"
   sleep 1
 done
 if [ -z "$API_READY" ]; then

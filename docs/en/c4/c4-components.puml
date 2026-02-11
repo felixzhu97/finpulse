@@ -6,9 +6,8 @@ title Portfolio Analytics API - Component Diagram
 
 Container_Boundary(portfolio_api, "Portfolio Analytics API") {
     Component(portfolio_router, "Portfolio Router", "FastAPI", "REST: GET /portfolio, POST /seed")
-    Component(resource_router, "Resource Router", "FastAPI", "REST: /api/v1/* (CRUD + POST .../batch for customers, instruments, orders, etc.)")
+    Component(resource_router, "Resource Router", "FastAPI", "REST: /api/v1/* (CRUD + batch; payments→fraud, trades→surveillance, customers→identity, risk-metrics→VaR compute)")
     Component(quotes_router, "Quotes Router", "FastAPI", "REST: GET /quotes, WebSocket /ws/quotes")
-    Component(ai_router, "AI Router", "FastAPI", "REST: /api/v1/ai - VaR, fraud, sentiment, forecast")
 
     Component(redis_cache, "Redis Cache", "Python", "RedisCache: get/set/delete by prefix; portfolio aggregate, blockchain reads")
     Component(blockchain_router, "Blockchain Router", "FastAPI", "REST: /api/v1/blockchain - transfers, blocks, balances")
@@ -38,8 +37,8 @@ Rel(blockchain_router, redis_cache, "Cache", "via DI")
 Rel(resource_router, portfolio_svc, "Calls", "Async")
 Rel(resource_router, portfolio_repo, "Uses", "via DI")
 Rel(resource_router, blockchain_svc, "Calls", "via DI")
+Rel(resource_router, analytics_svc, "Calls", "payments, trades, customers, risk-metrics")
 Rel(quotes_router, market_data_svc, "Calls", "Async / WebSocket")
-Rel(ai_router, analytics_svc, "Calls", "Async")
 Rel(redis_cache, redis_db, "Read/Write", "")
 Rel(blockchain_svc, blockchain_ledger_repo, "Uses", "")
 Rel(blockchain_svc, wallet_balance_repo, "Uses", "")

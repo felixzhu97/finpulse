@@ -13,7 +13,9 @@ import { customersApi, portfolioApi } from "@/src/api";
 import type { Account, Customer } from "@/src/types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SettingsDrawer } from "@/src/components/account/SettingsDrawer";
-import { AccountListItem } from "@/src/components/account/AccountListItem";
+import { RegisterCustomerDrawer } from "@/src/components/account/RegisterCustomerDrawer";
+import { NewPaymentDrawer } from "@/src/components/account/NewPaymentDrawer";
+import { NewTradeDrawer } from "@/src/components/account/NewTradeDrawer";
 import { formatBalance } from "@/src/utils";
 import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/i18n";
@@ -44,6 +46,9 @@ export default function AccountScreen() {
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
+  const [registerVisible, setRegisterVisible] = useState(false);
+  const [paymentVisible, setPaymentVisible] = useState(false);
+  const [tradeVisible, setTradeVisible] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -128,6 +133,14 @@ export default function AccountScreen() {
                       </Text>
                     </View>
                   )}
+                  {customer.ai_identity_score != null && (
+                    <View style={[styles.userDetailRow, { borderTopColor: colors.border }]}>
+                      <Text style={[styles.userDetailLabel, { color: colors.textSecondary }]}>{t("account.aiIdentityScore")}</Text>
+                      <Text style={[styles.userDetailValue, { color: colors.text }]}>
+                        {(customer.ai_identity_score * 100).toFixed(0)}%
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </View>
             )}
@@ -196,25 +209,56 @@ export default function AccountScreen() {
             )}
 
             <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("account.actions")}</Text>
+              </View>
               <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
                 <TouchableOpacity
-                  style={styles.settingsRow}
+                  style={styles.actionRow}
+                  onPress={() => setRegisterVisible(true)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.settingsLeft}>
+                    <MaterialIcons name="person-add" size={22} color={colors.text} />
+                    <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.register")}</Text>
+                  </View>
+                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
+                </TouchableOpacity>
+                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 54 }]} />
+                <TouchableOpacity
+                  style={styles.actionRow}
+                  onPress={() => setPaymentVisible(true)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.settingsLeft}>
+                    <MaterialIcons name="payment" size={22} color={colors.text} />
+                    <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.newPayment")}</Text>
+                  </View>
+                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
+                </TouchableOpacity>
+                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 54 }]} />
+                <TouchableOpacity
+                  style={styles.actionRow}
+                  onPress={() => setTradeVisible(true)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.settingsLeft}>
+                    <MaterialIcons name="trending-up" size={22} color={colors.text} />
+                    <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.newTrade")}</Text>
+                  </View>
+                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
+                </TouchableOpacity>
+                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 54 }]} />
+                <TouchableOpacity
+                  style={styles.actionRow}
                   onPress={() => setSettingsVisible(true)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.settingsLeft}>
-                    <MaterialIcons
-                      name="settings"
-                      size={22}
-                      color={colors.text}
-                    />
+                    <MaterialIcons name="settings" size={22} color={colors.text} />
                     <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.settings")}</Text>
                   </View>
-                  <MaterialIcons
-                    name="chevron-right"
-                    size={20}
-                    color={colors.textTertiary}
-                  />
+                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -225,6 +269,19 @@ export default function AccountScreen() {
       <SettingsDrawer
         visible={settingsVisible}
         onClose={() => setSettingsVisible(false)}
+      />
+      <RegisterCustomerDrawer
+        visible={registerVisible}
+        onClose={() => setRegisterVisible(false)}
+        onSuccess={(c) => setCustomer(c)}
+      />
+      <NewPaymentDrawer
+        visible={paymentVisible}
+        onClose={() => setPaymentVisible(false)}
+      />
+      <NewTradeDrawer
+        visible={tradeVisible}
+        onClose={() => setTradeVisible(false)}
       />
     </SafeAreaView>
   );
@@ -361,6 +418,13 @@ const styles = StyleSheet.create({
   separator: {
     height: StyleSheet.hairlineWidth,
     marginLeft: 68,
+  },
+  actionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    minHeight: 56,
   },
   settingsRow: {
     flexDirection: "row",

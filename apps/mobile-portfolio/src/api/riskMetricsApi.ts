@@ -1,4 +1,4 @@
-import type { RiskMetrics } from "../types";
+import type { RiskMetrics, VarComputeRequest, VarComputeResult } from "../types";
 import { httpClient } from "./httpClient";
 
 class RiskMetricsApi {
@@ -17,6 +17,14 @@ class RiskMetricsApi {
       (a, b) => new Date(b.as_of_date).getTime() - new Date(a.as_of_date).getTime()
     );
     return sorted[0];
+  }
+
+  async computeVar(request: VarComputeRequest): Promise<VarComputeResult | null> {
+    return httpClient.post<VarComputeResult>("/api/v1/risk-metrics/compute", {
+      portfolio_id: request.portfolio_id,
+      confidence: request.confidence ?? 0.95,
+      method: request.method ?? "historical",
+    });
   }
 }
 

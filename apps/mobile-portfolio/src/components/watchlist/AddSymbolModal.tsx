@@ -1,5 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useMemo, useState } from "react";
+import { useTheme } from "@/src/theme";
 import {
   Animated,
   Dimensions,
@@ -31,6 +32,7 @@ export function AddSymbolModal({
   onSelect,
   onClose,
 }: AddSymbolModalProps) {
+  const { colors } = useTheme();
   const [search, setSearch] = useState("");
 
   const { slideAnim, dragOffset, panHandlers, backdropOpacity, closeWithAnimation } =
@@ -65,6 +67,7 @@ export function AddSymbolModal({
             styles.drawer,
             {
               height: DRAWER_HEIGHT,
+              backgroundColor: colors.cardSolid,
               transform: [
                 { translateY: Animated.add(slideAnim, dragOffset) },
               ],
@@ -130,7 +133,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
   },
   drawer: {
-    backgroundColor: "#000",
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     overflow: "hidden",

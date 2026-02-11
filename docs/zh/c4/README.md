@@ -26,7 +26,7 @@
 
 **文件**：`c4-components.puml`
 
-**说明**：投资组合分析 API 内部组件：投资组合路由（GET /portfolio、POST /seed）、资源路由（/api/v1/* CRUD 及批量创建）、行情路由、AI 路由；服务（投资组合、分析、市场数据）；仓储与 Kafka/Redis。后端采用整洁架构（见下方图及 `services/portfolio-analytics/README.md`）。
+**说明**：投资组合分析 API 内部组件：投资组合路由（GET /portfolio、POST /seed）、资源路由（/api/v1/* CRUD 及 batch；AI 融入 payments、trades、customers、risk-metrics）、行情路由；服务（投资组合、分析、市场数据）；仓储与 Kafka/Redis。后端采用整洁架构（见下方图及 `services/portfolio-analytics/README.md`）。
 
 ### 整洁架构（投资组合 API）
 

@@ -1,4 +1,5 @@
-from typing import Annotated
+from datetime import datetime
+from typing import Annotated, Optional
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -13,11 +14,31 @@ from src.api.v1.schemas import (
     SettlementResponse,
 )
 from src.api.dependencies import (
+    get_analytics_service,
     get_cash_transaction_repo,
     get_payment_repo,
     get_settlement_repo,
 )
+from src.core.application.use_cases.analytics_service import AnalyticsApplicationService
 from src.core.domain.entities.payments import CashTransaction, Payment, Settlement
+
+
+def _payment_to_response_enriched(
+    e: Payment,
+    fraud_recommendation: Optional[str] = None,
+    fraud_score: Optional[float] = None,
+) -> PaymentResponse:
+    return PaymentResponse(
+        payment_id=e.payment_id,
+        account_id=e.account_id,
+        counterparty=e.counterparty,
+        amount=e.amount,
+        currency=e.currency,
+        status=e.status,
+        created_at=e.created_at,
+        fraud_recommendation=fraud_recommendation,
+        fraud_score=fraud_score,
+    )
 
 
 def _cash_transaction_to_response(e: CashTransaction) -> CashTransactionResponse:
@@ -164,6 +185,7 @@ def register(router: APIRouter) -> None:
     async def create_payment(
         body: PaymentCreate,
         repo: Annotated[object, Depends(get_payment_repo)] = None,
+        analytics: Annotated[AnalyticsApplicationService, Depends(get_analytics_service)] = None,
     ):
         entity = Payment(
             payment_id=uuid4(),
@@ -175,7 +197,23 @@ def register(router: APIRouter) -> None:
             created_at=now(),
         )
         created = await repo.add(entity)
-        return _payment_to_response(created)
+        fraud_rec = None
+        fraud_sc = None
+        if analytics:
+            try:
+                dt = created.created_at or datetime.utcnow()
+                result = analytics.check_fraud(
+                    amount=float(created.amount),
+                    amount_currency=created.currency or "USD",
+                    hour_of_day=dt.hour,
+                    day_of_week=dt.weekday(),
+                    recent_count_24h=0,
+                )
+                fraud_rec = result.get("recommendation")
+                fraud_sc = result.get("anomaly_score")
+            except Exception:
+                pass
+        return _payment_to_response_enriched(created, fraud_recommendation=fraud_rec, fraud_score=fraud_sc)
 
     @router.post("/payments/batch", response_model=list[PaymentResponse], status_code=201)
     async def create_payments_batch(

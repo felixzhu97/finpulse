@@ -4,12 +4,14 @@ import {
   Animated,
   Dimensions,
   Modal,
+  Pressable,
   StyleSheet,
   Switch,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDraggableDrawer } from "@/src/hooks/useDraggableDrawer";
 import { usePreferences } from "@/src/hooks/usePreferences";
 import { useTheme } from "@/src/theme";
@@ -101,20 +103,13 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
   const translateY = Animated.add(slideAnim, dragOffset);
 
   return (
-    <Modal visible={visible} animationType="none" transparent>
-      <View style={styles.modalContainer}>
+    <Modal visible={visible} animationType="none" transparent onRequestClose={closeWithAnimation}>
+      <View style={styles.modalRoot}>
         <Animated.View
-          style={[
-            styles.backdrop,
-            { opacity: backdropOpacity, backgroundColor: colors.backdrop },
-          ]}
-          pointerEvents={visible ? "auto" : "none"}
+          style={[styles.backdrop, { opacity: backdropOpacity, backgroundColor: colors.backdrop }]}
+          pointerEvents="box-none"
         >
-          <TouchableOpacity
-            style={StyleSheet.absoluteFill}
-            activeOpacity={1}
-            onPress={closeWithAnimation}
-          />
+          <Pressable style={StyleSheet.absoluteFill} onPress={closeWithAnimation} />
         </Animated.View>
 
         <Animated.View
@@ -123,12 +118,15 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
             {
               height: DRAWER_HEIGHT,
               transform: [{ translateY }],
-              backgroundColor: colors.background,
+              backgroundColor: colors.cardSolid,
             },
           ]}
         >
-          <View style={[styles.handle, { backgroundColor: colors.textTertiary }]} {...panHandlers} />
-          <View style={[styles.header, { borderBottomColor: colors.border }]}>
+          <SafeAreaView style={styles.safe} edges={["top"]}>
+            <View style={styles.dragArea} {...panHandlers}>
+              <View style={[styles.dragHandle, { backgroundColor: colors.textTertiary }]} />
+            </View>
+            <View style={[styles.header, { borderBottomColor: colors.border }]}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>{t("common.settings")}</Text>
             <TouchableOpacity
               style={styles.closeButton}
@@ -241,6 +239,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
               </View>
             )}
           </View>
+          </SafeAreaView>
         </Animated.View>
       </View>
     </Modal>
@@ -248,26 +247,12 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
 }
 
 const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  drawer: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    overflow: "hidden",
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: "center",
-    marginTop: 8,
-    marginBottom: 4,
-  },
+  modalRoot: { flex: 1, justifyContent: "flex-end" },
+  backdrop: { ...StyleSheet.absoluteFillObject },
+  drawer: { borderTopLeftRadius: 14, borderTopRightRadius: 14, overflow: "hidden" },
+  safe: { flex: 1 },
+  dragArea: { paddingTop: 8, paddingBottom: 8, alignItems: "center", minHeight: 40 },
+  dragHandle: { width: 36, height: 5, borderRadius: 2.5 },
   header: {
     flexDirection: "row",
     alignItems: "center",

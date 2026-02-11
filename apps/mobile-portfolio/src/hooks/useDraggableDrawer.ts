@@ -39,10 +39,10 @@ export function useDraggableDrawer({
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
+      onStartShouldSetPanResponder: () => true,
       onStartShouldSetPanResponderCapture: () => false,
-      onMoveShouldSetPanResponder: (_, { dy, dx }) => Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10,
-      onMoveShouldSetPanResponderCapture: (_, { dy, dx }) => Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10,
+      onMoveShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponderCapture: () => false,
       onPanResponderGrant: () => {
         dragOffset.stopAnimation();
         slideAnim.stopAnimation();

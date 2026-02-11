@@ -1,4 +1,4 @@
-import type { Customer } from "../types";
+import type { Customer, CustomerCreate } from "../types";
 import { httpClient } from "./httpClient";
 
 class CustomersApi {
@@ -13,6 +13,14 @@ class CustomersApi {
   async getFirst(): Promise<Customer | null> {
     const list = await this.list(1, 0);
     return list[0] ?? null;
+  }
+
+  async create(body: CustomerCreate): Promise<Customer | null> {
+    return httpClient.post<Customer>("customers", {
+      name: body.name,
+      email: body.email ?? null,
+      kyc_status: body.kyc_status ?? null,
+    });
   }
 }
 

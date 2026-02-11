@@ -1,12 +1,30 @@
-from typing import Annotated
+from typing import Annotated, Optional
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.api.v1.endpoints.common import now_utc
 from src.api.v1.schemas import OrderCreate, OrderResponse, TradeCreate, TradeResponse
-from src.api.dependencies import get_order_repo, get_trade_repo
+from src.api.dependencies import get_analytics_service, get_order_repo, get_trade_repo
+from src.core.application.use_cases.analytics_service import AnalyticsApplicationService
 from src.core.domain.entities.trading import Order, Trade
+
+
+def _trade_to_response_enriched(
+    e,
+    surveillance_alert: Optional[str] = None,
+    surveillance_score: Optional[float] = None,
+) -> TradeResponse:
+    return TradeResponse(
+        trade_id=e.trade_id,
+        order_id=e.order_id,
+        quantity=e.quantity,
+        price=e.price,
+        fee=e.fee,
+        executed_at=e.executed_at,
+        surveillance_alert=surveillance_alert,
+        surveillance_score=surveillance_score,
+    )
 
 
 def _order_to_response(e: Order) -> OrderResponse:
@@ -146,17 +164,43 @@ def register(router: APIRouter) -> None:
     async def create_trade(
         body: TradeCreate,
         repo: Annotated[object, Depends(get_trade_repo)] = None,
+        order_repo: Annotated[object, Depends(get_order_repo)] = None,
+        analytics: Annotated[AnalyticsApplicationService, Depends(get_analytics_service)] = None,
     ):
         entity = Trade(
             trade_id=uuid4(),
             order_id=body.order_id,
             quantity=body.quantity,
             price=body.price,
-            fee=body.fee,
+            fee=body.fee or 0,
             executed_at=now(),
         )
         created = await repo.add(entity)
-        return _trade_to_response(created)
+        alert = None
+        score = None
+        if analytics and order_repo:
+            try:
+                order = await order_repo.get_by_id(body.order_id)
+                side = order.side if order else "buy"
+                notional = float(created.quantity) * float(created.price)
+                recent = await repo.list(limit=5, offset=0)
+                recent_quantities = [float(t.quantity) for t in recent if t.trade_id != created.trade_id][:5]
+                recent_notionals = [float(t.quantity) * float(t.price) for t in recent if t.trade_id != created.trade_id][:5]
+                result = analytics.score_trade_surveillance(
+                    quantity=float(created.quantity),
+                    notional=notional,
+                    side=side,
+                    recent_quantities=recent_quantities,
+                    recent_notionals=recent_notionals,
+                    instrument_id=str(order.instrument_id) if order else None,
+                )
+                alert = result.get("alert_type")
+                qz = result.get("quantity_zscore") or 0
+                nz = result.get("notional_zscore") or 0
+                score = max(abs(qz), abs(nz)) if (qz is not None or nz is not None) else None
+            except Exception:
+                pass
+        return _trade_to_response_enriched(created, surveillance_alert=alert, surveillance_score=score)
 
     @router.post("/trades/batch", response_model=list[TradeResponse], status_code=201)
     async def create_trades_batch(

@@ -34,7 +34,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-components.puml`
 
-**Description**: Portfolio Analytics API internal components: Portfolio Router (GET /portfolio, POST /seed), Resource Router (/api/v1/* CRUD and batch create), Quotes Router, AI Router; services (Portfolio, Analytics, Market Data); repositories and Kafka/Redis. The backend follows Clean Architecture (see diagram below and `services/portfolio-analytics/README.md`).
+**Description**: Portfolio Analytics API internal components: Portfolio Router (GET /portfolio, POST /seed), Resource Router (/api/v1/* CRUD and batch; AI integrated in payments, trades, customers, risk-metrics), Quotes Router; services (Portfolio, Analytics, Market Data); repositories and Kafka/Redis. The backend follows Clean Architecture (see diagram below and `services/portfolio-analytics/README.md`).
 
 ### Clean Architecture (Portfolio API)
 

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -10,9 +10,8 @@ import {
 } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import { MetricCard } from "@/src/components/ui/MetricCard";
-import { useRiskMetrics } from "@/src/hooks";
+import { useComputedVar, useRiskMetrics } from "@/src/hooks";
 import { portfolioApi } from "@/src/api";
-import { useEffect } from "react";
 import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/i18n";
 
@@ -20,6 +19,7 @@ export default function InsightsScreen() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const { metrics, loading, error, refresh } = useRiskMetrics();
+  const { computedVar, loading: varLoading, compute: computeVar } = useComputedVar();
   const [highRatio, setHighRatio] = useState(0);
   const [topConcentration, setTopConcentration] = useState(0);
   const [localLoading, setLocalLoading] = useState(true);
@@ -28,7 +28,10 @@ export default function InsightsScreen() {
   useEffect(() => {
     let active = true;
     const load = async () => {
-      const risk = await portfolioApi.getRiskSummary();
+      const [risk] = await Promise.all([
+        portfolioApi.getRiskSummary(),
+        computeVar(),
+      ]);
       if (!active) return;
       setHighRatio(risk.highRatio);
       setTopConcentration(risk.topHoldingsConcentration);
@@ -38,16 +41,16 @@ export default function InsightsScreen() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [computeVar]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await refresh();
+    await Promise.all([refresh(), computeVar()]);
     const risk = await portfolioApi.getRiskSummary();
     setHighRatio(risk.highRatio);
     setTopConcentration(risk.topHoldingsConcentration);
     setRefreshing(false);
-  }, [refresh]);
+  }, [refresh, computeVar]);
 
   const highRiskPercent = (highRatio * 100).toFixed(1);
   const concentrationPercent = (topConcentration * 100).toFixed(1);
@@ -114,37 +117,26 @@ export default function InsightsScreen() {
             helper={concentrationText}
             tone={topConcentration > 0.5 ? "negative" : "default"}
           />
-          {hasApiMetrics ? (
+          {(computedVar?.var != null || hasApiMetrics) ? (
             <View style={styles.apiSection}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("insights.riskMetricsApi")}</Text>
-              {metrics.volatility != null && (
+              {computedVar?.var != null && (
                 <MetricCard
-                  label={t("insights.volatility")}
-                  value={metrics.volatility.toFixed(4)}
-                  helper={t("insights.volatilityHelper")}
+                  label={t("insights.computedVar")}
+                  value={computedVar.var.toFixed(4)}
+                  helper={computedVar.interpretation ?? t("insights.varHelper")}
                 />
               )}
-              {metrics.sharpe_ratio != null && (
-                <MetricCard
-                  label={t("insights.sharpeRatio")}
-                  value={metrics.sharpe_ratio.toFixed(2)}
-                  helper={t("insights.sharpeRatioHelper")}
-                />
-              )}
-              {metrics.var != null && (
-                <MetricCard
-                  label={t("insights.var")}
-                  value={metrics.var.toFixed(2)}
-                  helper={t("insights.varHelper")}
-                />
-              )}
-              {metrics.beta != null && (
-                <MetricCard
-                  label={t("insights.beta")}
-                  value={metrics.beta.toFixed(2)}
-                  helper={t("insights.betaHelper")}
-                />
-              )}
+              {[
+                { key: "volatility", val: metrics?.volatility, fmt: (v: number) => v.toFixed(4), helper: "volatilityHelper" },
+                { key: "sharpeRatio", val: metrics?.sharpe_ratio, fmt: (v: number) => v.toFixed(2), helper: "sharpeRatioHelper" },
+                { key: "var", val: metrics?.var, fmt: (v: number) => v.toFixed(2), helper: "varHelper" },
+                { key: "beta", val: metrics?.beta, fmt: (v: number) => v.toFixed(2), helper: "betaHelper" },
+              ]
+                .filter((m) => m.val != null)
+                .map((m) => (
+                  <MetricCard key={m.key} label={t(`insights.${m.key}`)} value={m.fmt(m.val!)} helper={t(`insights.${m.helper}`)} />
+                ))}
             </View>
           ) : null}
           <View style={[styles.chartCard, { backgroundColor: colors.card, borderColor: colors.border }]}>

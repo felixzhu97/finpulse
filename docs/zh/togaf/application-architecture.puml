@@ -257,10 +257,11 @@ package "外部服务层 (External Services)" <<External>> {
         component "FastAPI app (DDD)" as FastAPIApp
         component "GET /api/v1/portfolio" as PortfolioGet
         component "POST /api/v1/seed" as PortfolioSeed
-        component "AI/ML /api/v1/ai" as AIMLAPI {
-            component "VaR, fraud, surveillance" as AIML1
-            component "sentiment, identity, forecast" as AIML2
-            component "Ollama, Hugging Face, TF" as AIML3
+        component "AI/ML（融入业务）" as AIMLAPI {
+            component "Payments → 欺诈检测" as AIML1
+            component "Trades → 监控" as AIML2
+            component "Customers → 身份" as AIML3
+            component "Risk-metrics → VaR 计算" as AIML4
         }
         component "Blockchain /api/v1/blockchain" as BlockchainAPI {
             component "POST /transfers, GET /balances" as BlockchainTransfers

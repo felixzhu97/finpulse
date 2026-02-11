@@ -89,7 +89,7 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 - **Python 3.10+ + FastAPI** - 投资组合分析 API（`services/portfolio-analytics`），端口 8800。DDD 结构；通过 `.env` 配置（见 `services/portfolio-analytics/.env.example`）。
 - **PostgreSQL** - 投资组合持久化（Docker，主机端口 5433）
 - **Apache Kafka** - 投资组合事件消息（Docker，端口 9092）
-- **AI/ML** - `/api/v1/ai` 下：VaR、欺诈检测、交易监控、情感分析、身份评分、预测、摘要；可选集成：Ollama、Hugging Face（transformers）、TensorFlow（LSTM 预测）。
+- **AI/ML** - 融入业务流（无独立 AI 路由）：`POST /payments` 返回欺诈检测；`POST /trades` 返回监控告警；`POST /customers` 返回身份评分；`POST /risk-metrics/compute` 根据组合历史计算 VaR。可选：Ollama、Hugging Face、TensorFlow 用于后续集成。
 - **一键启动** - `pnpm run start:backend`（Docker + API + 种子数据）。**API 测试** - `pnpm run test:api`（pytest；Ollama/HF/TF 测试在服务不可用时可能跳过；Hugging Face 首次运行约 1–3 分钟）。
 
 ### UI 与可视化
@@ -121,7 +121,7 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 - **apps/web** - 基于 Angular 的金融分析 Web 控制台。
 - **apps/mobile** - React Native 演示移动应用。
 - **apps/mobile-portfolio** - React Native（Expo）组合概览与指标应用；**Stocks** 屏幕展示实时价格与每股票 sparkline（NativeSparkline、usePerSymbolHistory）；含原生视图 **NativeDemoCard** 及六类原生图表：**NativeLineChart**、**NativeCandleChart**、**NativeAmericanLineChart**、**NativeBaselineChart**、**NativeHistogramChart**、**NativeLineOnlyChart**（iOS Metal，Android OpenGL ES）。图表支持主题（亮/暗）、提示、X 轴标签与水平拖拽滚动，共享 `useScrollableChart`、`ScrollableChartContainer`。
-- **services/portfolio-analytics** - Python FastAPI 后端（DDD）；PostgreSQL；Kafka；AI/ML 端点（VaR、欺诈、监控、情感、身份、预测、Ollama、Hugging Face、TensorFlow）；配置见 `.env.example`；一键启动 `scripts/start-backend.sh`；API 测试 `pnpm run test:api`。
+- **services/portfolio-analytics** - Python FastAPI 后端（DDD）；PostgreSQL；Kafka；AI/ML 融入 payments、trades、customers、risk-metrics；配置见 `.env.example`；一键启动 `scripts/start-backend.sh`；API 测试 `pnpm run test:api`。
 - **packages/ui** - 共享 UI 组件库。
 - **packages/utils** - 共享工具函数库。
 

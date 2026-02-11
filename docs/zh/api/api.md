@@ -1,6 +1,6 @@
 # 组合分析 API
 
-基础路径：资源与 AI 为 `/api/v1`；应用路由使用完整路径。支持查询参数：`limit`、`offset`（视接口而定）。
+基础路径：资源为 `/api/v1`；应用路由使用完整路径。支持查询参数：`limit`、`offset`（视接口而定）。
 
 ## 应用
 
@@ -195,6 +195,7 @@
 | GET | `/api/v1/risk-metrics/{metric_id}` |
 | POST | `/api/v1/risk-metrics` |
 | POST | `/api/v1/risk-metrics/batch` |
+| POST | `/api/v1/risk-metrics/compute` | 基于组合历史计算 VaR；请求体：`{ portfolio_id, confidence?, method? }` |
 | PUT | `/api/v1/risk-metrics/{metric_id}` |
 | DELETE | `/api/v1/risk-metrics/{metric_id}` |
 
@@ -209,19 +210,13 @@
 | PUT | `/api/v1/valuations/{valuation_id}` |
 | DELETE | `/api/v1/valuations/{valuation_id}` |
 
-## AI（`/api/v1/ai`）
+## AI/ML 集成（融入业务流）
 
-| 方法 | 路径 | 说明 |
-|--------|------|-------------|
-| POST | `/api/v1/ai/risk/var` | 风险价值 VaR |
-| POST | `/api/v1/ai/fraud/check` | 欺诈检测 |
-| POST | `/api/v1/ai/surveillance/trade` | 交易监控评分 |
-| POST | `/api/v1/ai/sentiment` | 情感分析 |
-| POST | `/api/v1/ai/identity/score` | 身份核验评分 |
-| POST | `/api/v1/ai/dl/forecast` | 深度学习预测 |
-| POST | `/api/v1/ai/llm/summarise` | LLM 摘要 |
-| POST | `/api/v1/ai/ollama/generate` | Ollama 生成 |
-| POST | `/api/v1/ai/huggingface/summarise` | HuggingFace 摘要 |
-| POST | `/api/v1/ai/tf/forecast` | TensorFlow 预测 |
+AI、ML、DL 已融入业务操作：
+
+- **支付**（`POST /payments`）：响应包含 `fraud_recommendation`、`fraud_score`
+- **交易**（`POST /trades`）：响应包含 `surveillance_alert`、`surveillance_score`
+- **客户**（`POST /customers`）：响应包含 `ai_identity_score`
+- **风险**（`POST /risk-metrics/compute`）：基于组合历史计算 VaR
 
 请求/响应结构见 OpenAPI：`/docs`。

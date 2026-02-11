@@ -170,24 +170,22 @@ package "Portfolio Analytics Backend" <<Infra>> {
     component "Redis" as Redis
     component "Apache Kafka" as Kafka
     component "AI/ML stack" as AIMLStack {
-        component "Ollama (LLM)" as OllamaTech
-        component "Hugging Face (transformers)" as HFTech
-        component "TensorFlow (LSTM)" as TFTech
-        component "scipy, statsmodels, sumy" as StatsTech
+        component "scipy, numpy, scikit-learn" as StatsTech
+        component "statsmodels, VADER, sumy" as StatsTech2
+        component "Ollama, HF, TF（可选）" as OptionalTech
     }
     note right of FastAPI
         services/portfolio-analytics
         GET/POST /api/v1/portfolio, seed
-        /api/v1/ai (VaR, fraud, surveillance,
-        sentiment, identity, forecast, summarise,
-        ollama, huggingface, tf)
+        AI 融入：payments（欺诈）、trades（监控）、
+        customers（身份）、risk-metrics（VaR）
         DDD, python-dotenv (.env), port 8800
     end note
     note right of TimescaleDB: Portfolio metadata (JSONB)\nportfolio_history hypertable\nhost port 5433
     note right of Redis: 服务端缓存\n(历史、组合聚合、区块链读)\nport 6379, TTL 300s
     note right of SQLAlchemyAsync: Async ORM\nasyncpg driver
     note right of Kafka: portfolio.events topic\nportfolio.seeded events
-    note right of AIMLStack: Optional: Ollama, HF, TF\npytest, pytest-timeout
+    note right of AIMLStack: 融入业务流\n可选：Ollama, HF, TF
 }
 
 package "AWS SDK" <<Infra>> {

@@ -139,10 +139,11 @@ package "External Services" <<External>> {
         component "GET /api/v1/quotes" as QuotesGet
         component "WebSocket /ws/quotes" as QuotesWS
         component "MarketDataService + KafkaMarketDataProvider" as MarketDataServiceComponent
-        component "AI/ML /api/v1/ai" as AIMLAPI {
-            component "VaR, fraud, surveillance" as AIML1
-            component "sentiment, identity, forecast" as AIML2
-            component "Ollama, Hugging Face, TF" as AIML3
+        component "AI/ML (integrated)" as AIMLAPI {
+            component "Payments → fraud" as AIML1
+            component "Trades → surveillance" as AIML2
+            component "Customers → identity" as AIML3
+            component "Risk-metrics → VaR compute" as AIML4
         }
         component "Blockchain /api/v1/blockchain" as BlockchainAPI {
             component "POST /transfers, GET /balances" as BlockchainTransfers

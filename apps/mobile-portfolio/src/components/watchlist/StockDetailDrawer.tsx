@@ -133,7 +133,7 @@ export function StockDetailDrawer({
             styles.drawer,
             {
               height: DRAWER_HEIGHT,
-              backgroundColor: colors.background,
+              backgroundColor: colors.cardSolid,
               transform: [
                 {
                   translateY: Animated.add(slideAnim, dragOffset),
@@ -287,7 +287,7 @@ export function StockDetailDrawer({
                 style={[styles.addModalOverlay, { backgroundColor: colors.backdrop }]}
                 onPress={() => setShowAddToWatchlist(false)}
               >
-                <View style={[styles.addModalSheet, { backgroundColor: colors.card }]}>
+                <View style={[styles.addModalSheet, { backgroundColor: colors.cardSolid }]}>
                   <Text style={[styles.addModalTitle, { color: colors.textTertiary }]}>Add to Watchlist</Text>
                   {watchlistContext?.watchlistOptions.map((w) => (
                     <Pressable

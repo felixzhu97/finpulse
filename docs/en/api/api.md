@@ -1,6 +1,6 @@
 # Portfolio Analytics API
 
-Base: `/api/v1` for resources and AI; app routes use full path. Query params: `limit`, `offset` where applicable.
+Base: `/api/v1` for resources; app routes use full path. Query params: `limit`, `offset` where applicable.
 
 ## App
 
@@ -195,6 +195,7 @@ Base: `/api/v1` for resources and AI; app routes use full path. Query params: `l
 | GET | `/api/v1/risk-metrics/{metric_id}` |
 | POST | `/api/v1/risk-metrics` |
 | POST | `/api/v1/risk-metrics/batch` |
+| POST | `/api/v1/risk-metrics/compute` | Compute VaR from portfolio history; body: `{ portfolio_id, confidence?, method? }` |
 | PUT | `/api/v1/risk-metrics/{metric_id}` |
 | DELETE | `/api/v1/risk-metrics/{metric_id}` |
 
@@ -209,19 +210,13 @@ Base: `/api/v1` for resources and AI; app routes use full path. Query params: `l
 | PUT | `/api/v1/valuations/{valuation_id}` |
 | DELETE | `/api/v1/valuations/{valuation_id}` |
 
-## AI (`/api/v1/ai`)
+## AI/ML integration (in business flows)
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/v1/ai/risk/var` | Value at risk |
-| POST | `/api/v1/ai/fraud/check` | Fraud check |
-| POST | `/api/v1/ai/surveillance/trade` | Trade surveillance score |
-| POST | `/api/v1/ai/sentiment` | Sentiment score |
-| POST | `/api/v1/ai/identity/score` | Identity check score |
-| POST | `/api/v1/ai/dl/forecast` | DL forecast |
-| POST | `/api/v1/ai/llm/summarise` | LLM summarise |
-| POST | `/api/v1/ai/ollama/generate` | Ollama generate |
-| POST | `/api/v1/ai/huggingface/summarise` | HuggingFace summarise |
-| POST | `/api/v1/ai/tf/forecast` | TensorFlow forecast |
+AI, ML and DL are integrated into business operations:
+
+- **Payments** (`POST /payments`): response includes `fraud_recommendation`, `fraud_score`.
+- **Trades** (`POST /trades`): response includes `surveillance_alert`, `surveillance_score`.
+- **Customers** (`POST /customers`): response includes `ai_identity_score`.
+- **Risk** (`POST /risk-metrics/compute`): computes VaR from portfolio history.
 
 Schemas: see OpenAPI at `/docs`.

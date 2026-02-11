@@ -12,6 +12,8 @@ export type {
 } from "./useWatchlists";
 export { useRiskMetrics } from "./useRiskMetrics";
 export type { UseRiskMetricsResult } from "./useRiskMetrics";
+export { useComputedVar } from "./useComputedVar";
+export type { UseComputedVarResult } from "./useComputedVar";
 export { useSymbolDisplayData } from "./useSymbolDisplayData";
 export type {
   SymbolDisplayData,

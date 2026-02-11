@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.v1.routers import router as ai_router
 from src.api.v1.resource_router import router as resource_router
 from src.api.v1.endpoints.app_routes import router as app_router
 from src.infrastructure.cache import create_redis_client
@@ -31,7 +30,6 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Portfolio Analytics API", lifespan=lifespan)
-app.include_router(ai_router)
 app.include_router(resource_router)
 app.include_router(app_router)
 

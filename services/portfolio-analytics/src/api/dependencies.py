@@ -149,3 +149,11 @@ async def get_blockchain_service(
         ledger=blockchain_ledger_repo(session),
         wallet_repository=wallet_balance_repo(session),
     )
+
+
+async def get_portfolio_history_repo(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    request: Request,
+):
+    redis_client = getattr(request.app.state, "redis", None)
+    return PortfolioHistoryRepository(session, redis_client=redis_client)

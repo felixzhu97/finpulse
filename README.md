@@ -82,7 +82,7 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 - **TimescaleDB (PostgreSQL)** - Portfolio metadata and time-series history (hypertable); Docker, host port 5433
 - **Redis** - Cache for portfolio history (Docker, port 6379)
 - **Apache Kafka** - Event messaging for portfolio events and real-time market data (Docker, port 9092)
-- **AI/ML** - Under `/api/v1/ai`: VaR, fraud check, surveillance, sentiment, identity, forecast, summarisation; optional integrations: Ollama, Hugging Face (transformers), TensorFlow (LSTM forecast).
+- **AI/ML** - Integrated into business flows (no standalone AI router): `POST /payments` returns fraud detection; `POST /trades` returns surveillance alerts; `POST /customers` returns identity score; `POST /risk-metrics/compute` computes VaR from portfolio history. Optional: Ollama, Hugging Face, TensorFlow for future integrations.
 - **One-click start** - `pnpm run start:backend` (Docker + API + seed). Seed script uses batch APIs to minimise requests. **API tests** - `pnpm run test:api` (pytest; Ollama/HF/TF tests may skip if services unavailable; Hugging Face first run can take 1–3 min).
 
 ### UI & Visualization

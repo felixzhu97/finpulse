@@ -23,8 +23,8 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 |--------|-------|-------------|
 | Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native line chart |
 | Watchlist | `/(tabs)/watchlists` | Stock list (portfolio holdings) with real-time prices, sparklines, account rows; search (bottom sheet, closes on drawer/sort/tab), sort menu; pull-to-refresh; stock detail drawer (draggable, share) |
-| Insights | `/(tabs)/insights` | Risk metrics from API (volatility, Sharpe ratio, VaR, beta, risk level) via `/api/v1/risk-metrics` |
-| Account | `/(tabs)/account` | Profile section (customer info from `/api/v1/customers`), account list (from `/api/v1/portfolio`), and Settings drawer (user preferences: theme, language, notifications via `/api/v1/user-preferences`) |
+| Insights | `/(tabs)/insights` | Risk metrics from API (volatility, Sharpe ratio, VaR, beta) via `GET /api/v1/risk-metrics`; computed VaR via `POST /api/v1/risk-metrics/compute` (useComputedVar hook) |
+| Account | `/(tabs)/account` | Profile (customer from `/api/v1/customers`), account list (from `/api/v1/portfolio`), Actions (Register Customer, New Payment, New Trade, Settings), drawers: RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, SettingsDrawer (theme, language, notifications via `/api/v1/user-preferences`) |
 
 ## Project Structure (Thin Client)
 
@@ -38,13 +38,15 @@ Account and Insights also use `usePreferences` (Redux-backed), `useRiskMetrics` 
   - `portfolioApi.ts`: GET portfolio (cached), getAccounts, getAccountById, getHoldingsByAccount, getAssetAllocationByAccountType, getPortfolioHistory, getRiskSummary, invalidateCache, seedPortfolio(POST /api/v1/seed).
   - `quotes.ts`: `getQuotes(symbols)` (GET /api/v1/quotes).
   - `quoteSocket.ts`: `createQuoteSocket()` for WebSocket `/ws/quotes`.
-  - `customersApi.ts`, `userPreferencesApi.ts`, `riskMetricsApi.ts`: REST resources for Profile, Insights. `watchlistsApi.ts`, `instrumentsApi.ts` available for future use.
+  - `customersApi.ts`, `userPreferencesApi.ts`, `riskMetricsApi.ts`: Profile, Insights, VaR compute.
+  - `accountsApi.ts`, `paymentsApi.ts`, `tradesApi.ts`, `ordersApi.ts`: Account actions (register, payment, trade flows).
+  - `watchlistsApi.ts`, `instrumentsApi.ts`: available for future use.
 - `src/types/`: shared interfaces—`portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`; `index.ts` re-exports all.
 - `src/theme/`: theme system—`colors.ts` (light/dark color schemes), `index.ts` (`useTheme` hook for dynamic theming).
 - `src/i18n/`: internationalization—`config.ts` (i18next setup), `locales/en.json` and `locales/zh.json` (translation resources), `index.ts` (exports `i18n` and `useTranslation` hook).
-- `src/hooks/`: `usePortfolio`, `useSymbolDisplayData` (Redux-backed quotes + history for list/drawer), `useRealtimeQuotes`, `usePerSymbolHistory`, `usePreferences` (Redux-backed user preferences), `useWatchlists`, `useRiskMetrics`, `useDraggableDrawer`; all consume `api` and `types`.
+- `src/hooks/`: `usePortfolio`, `useSymbolDisplayData` (Redux-backed quotes + history for list/drawer), `useRealtimeQuotes`, `usePerSymbolHistory`, `usePreferences` (Redux-backed user preferences), `useWatchlists`, `useRiskMetrics`, `useComputedVar` (VaR from portfolio history), `useDraggableDrawer`; all consume `api` and `types`.
 - `src/store/`: Redux (quotes slice, preferences slice for theme/language/notifications, selectors, `QuoteSocketSubscriber`), custom portfolio UI store (`usePortfolioStore`).
-- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Watchlist screen uses `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch). All components support light/dark theme via `useTheme` hook and internationalization via `useTranslation` hook.
+- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Account screen: `RegisterCustomerDrawer`, `NewPaymentDrawer`, `NewTradeDrawer`, `SettingsDrawer` (all use `useDraggableDrawer`, background `colors.card`). Watchlist: `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch). All components support light/dark theme via `useTheme` and i18n via `useTranslation`.
 
 ### Diagrams
 
@@ -98,10 +100,16 @@ The app connects only to the backend; there is no in-app mock data.
 | `GET /api/v1/quotes?symbols=...` | One-off quote fetch via `getQuotes(symbols)` |
 | `WS /ws/quotes` | Real-time quotes via `createQuoteSocket` (Watchlist screen) |
 | `POST /api/v1/seed` | Seed portfolio via `portfolioApi.seedPortfolio(payload)` |
-| `GET /api/v1/customers` | Customer info for Account Profile section |
-| `GET/PUT /api/v1/user-preferences` | Account Settings preferences (theme, language, notifications) |
-| `GET /api/v1/instruments` | Symbol/name lookup (if used) |
-| `GET /api/v1/risk-metrics` | Analytics risk metrics (volatility, Sharpe, VaR, beta, risk level) |
+| `GET /api/v1/customers` | Customer info for Account Profile |
+| `POST /api/v1/customers` | Register customer (returns `ai_identity_score`) |
+| `GET /api/v1/accounts` | Account list for payment/trade flows |
+| `POST /api/v1/payments` | Create payment (returns `fraud_recommendation`, `fraud_score`) |
+| `POST /api/v1/orders` | Create order |
+| `POST /api/v1/trades` | Create trade (returns `surveillance_alert`, `surveillance_score`) |
+| `GET/PUT /api/v1/user-preferences` | Account Settings (theme, language, notifications) |
+| `GET /api/v1/instruments` | Symbol/name lookup for trade flow |
+| `GET /api/v1/risk-metrics` | Analytics risk metrics (volatility, Sharpe, VaR, beta) |
+| `POST /api/v1/risk-metrics/compute` | Compute VaR from portfolio history |
 
 1. From repo root: `pnpm run start:backend` (Docker + TimescaleDB + Redis + Kafka + API + seed + mock quote producer).
 2. Or separately: `pnpm run start:kafka` for Kafka and mock quotes only.

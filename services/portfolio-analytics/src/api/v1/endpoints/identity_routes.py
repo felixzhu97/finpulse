@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -10,17 +10,19 @@ from src.api.v1.schemas import (
     UserPreferenceCreate,
     UserPreferenceResponse,
 )
-from src.api.dependencies import get_customer_repo, get_user_preference_repo
+from src.api.dependencies import get_analytics_service, get_customer_repo, get_user_preference_repo
+from src.core.application.use_cases.analytics_service import AnalyticsApplicationService
 from src.core.domain.entities.identity import Customer, UserPreference
 
 
-def _to_customer_response(e: Customer) -> CustomerResponse:
+def _to_customer_response(e: Customer, ai_identity_score: Optional[float] = None) -> CustomerResponse:
     return CustomerResponse(
         customer_id=e.customer_id,
         name=e.name,
         email=e.email,
         kyc_status=e.kyc_status,
         created_at=e.created_at,
+        ai_identity_score=ai_identity_score,
     )
 
 
@@ -60,6 +62,7 @@ def register(router: APIRouter) -> None:
     async def create_customer(
         body: CustomerCreate,
         repo: Annotated[object, Depends(get_customer_repo)] = None,
+        analytics: Annotated[AnalyticsApplicationService, Depends(get_analytics_service)] = None,
     ):
         entity = Customer(
             customer_id=uuid4(),
@@ -69,7 +72,19 @@ def register(router: APIRouter) -> None:
             created_at=now(),
         )
         created = await repo.add(entity)
-        return _to_customer_response(created)
+        score = None
+        if analytics:
+            try:
+                result = analytics.score_identity(
+                    document_type="profile",
+                    name_on_document=body.name,
+                    date_of_birth=None,
+                    id_number=None,
+                )
+                score = result.get("identity_score")
+            except Exception:
+                pass
+        return _to_customer_response(created, ai_identity_score=score)
 
     @router.post("/customers/batch", response_model=list[CustomerResponse], status_code=201)
     async def create_customers_batch(

@@ -7,14 +7,14 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(tabs_router, "Tabs Router", "Expo Router", "Dashboard, Watchlist, Insights, Account")
     Component(overview_screen, "Dashboard Screen", "React Native", "Portfolio summary, native charts, net worth, allocation")
     Component(watchlist_screen, "Watchlist Screen", "React Native", "Stocks list (portfolio), search (bottom), sort, detail drawer")
-    Component(analytics_screen, "Insights Screen", "React Native", "Risk metrics from API (volatility, Sharpe, VaR, beta)")
-    Component(account_screen, "Account Screen", "React Native", "Profile (customer info), account list, Settings drawer (user preferences)")
+    Component(analytics_screen, "Insights Screen", "React Native", "Risk metrics (volatility, Sharpe, VaR, beta), computed VaR from portfolio history")
+    Component(account_screen, "Account Screen", "React Native", "Profile, account list, Actions (Register, New Payment, New Trade, Settings)")
 
     Component(types_layer, "types", "TypeScript", "Portfolio, QuoteSnapshot, Instrument, etc.")
     Component(api_client, "portfolioApi", "TypeScript", "GET portfolio (cached), getAccounts, getRiskSummary, seedPortfolio")
     Component(quotes_rest, "getQuotes", "TypeScript", "GET /api/v1/quotes")
     Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes, subscribe, reconnect")
-    Component(rest_apis, "customersApi, userPreferencesApi, riskMetricsApi", "TypeScript", "REST for Account (Profile + Settings), Analytics")
+    Component(rest_apis, "customersApi, accountsApi, paymentsApi, tradesApi, ordersApi, userPreferencesApi, riskMetricsApi", "TypeScript", "REST: Profile, Actions (register, payment, trade), Settings, Analytics, VaR compute")
 
     Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes, history, subscribedSymbols, setSnapshot, setStatus")
     Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme, language, notificationsEnabled, setTheme, setLanguage, setNotificationsEnabled")
@@ -27,6 +27,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(use_preferences, "usePreferences", "Hook", "Redux-backed user preferences (theme, language, notifications)")
     Component(use_theme, "useTheme", "Hook", "Current theme colors (light/dark) based on preferences and system")
     Component(use_risk_metrics, "useRiskMetrics", "Hook", "Insights risk-metrics API")
+    Component(use_computed_var, "useComputedVar", "Hook", "POST risk-metrics/compute for VaR from portfolio history")
 
     Component(portfolio_summary, "PortfolioSummary", "React Native", "Net worth, today change")
     Component(asset_allocation_chart, "AssetAllocationChart", "React Native", "Pie by account type")
@@ -37,6 +38,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(native_sparkline, "NativeSparkline", "Native View", "Per-stock sparkline")
     Component(native_line_chart, "NativeLineChart", "Native View", "Metal / OpenGL ES")
     Component(stock_detail_drawer, "StockDetailDrawer", "React Native", "Draggable drawer, live price/chart, share")
+    Component(account_drawers, "Account Drawers", "React Native", "RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, SettingsDrawer (useDraggableDrawer, colors.card)")
     Component(sort_menu, "SortMenu", "React Native", "Sort by name, price, change, change %")
     Component(glass_search_bar, "Bottom search bar", "React Native", "GlassView, opens on search icon, closes on drawer/sort/tab")
     Component(glass_view, "GlassView", "React Native", "expo-blur, Liquid Glass for search bar and tab bar")
@@ -47,7 +49,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(use_translation, "useTranslation", "Hook", "Access translated strings from i18next")
 }
 
-Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Portfolio, /ws/quotes, risk-metrics")
+Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Portfolio, /ws/quotes, customers, accounts, payments, orders, trades, risk-metrics, risk-metrics/compute")
 
 Rel(tabs_router, overview_screen, "Routes to", "")
 Rel(tabs_router, watchlist_screen, "Routes to", "")
@@ -77,11 +79,16 @@ Rel(quote_subscriber, quote_socket, "Creates", "")
 Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
 
 Rel(analytics_screen, use_risk_metrics, "Uses", "")
+Rel(analytics_screen, use_computed_var, "Uses", "")
 Rel(use_risk_metrics, rest_apis, "Calls", "risk-metrics")
+Rel(use_computed_var, rest_apis, "Calls", "risk-metrics/compute")
 Rel(analytics_screen, metric_card, "Uses", "")
 
+Rel(account_screen, account_drawers, "Uses", "")
 Rel(account_screen, use_preferences, "Uses", "")
 Rel(account_screen, rest_apis, "Calls", "customers (Profile)")
+Rel(account_drawers, use_draggable_drawer, "Uses", "")
+Rel(account_drawers, rest_apis, "Calls", "customers, accounts, payments, orders, trades, user-preferences")
 Rel(use_preferences, redux_preferences, "Dispatches, selects", "")
 Rel(use_preferences, rest_apis, "Calls", "user-preferences (Settings)")
 Rel(overview_screen, use_theme, "Uses", "")

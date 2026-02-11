@@ -19,6 +19,7 @@ class CustomerResponse(BaseModel):
     email: Optional[str]
     kyc_status: Optional[str]
     created_at: datetime
+    ai_identity_score: Optional[float] = None
 
 
 class UserPreferenceCreate(BaseModel):
@@ -239,6 +240,8 @@ class TradeResponse(BaseModel):
     price: float
     fee: Optional[float]
     executed_at: datetime
+    surveillance_alert: Optional[str] = None
+    surveillance_score: Optional[float] = None
 
 
 class CashTransactionCreate(BaseModel):
@@ -279,6 +282,8 @@ class PaymentResponse(BaseModel):
     currency: str
     status: str
     created_at: datetime
+    fraud_recommendation: Optional[str] = None
+    fraud_score: Optional[float] = None
 
 
 class SettlementCreate(BaseModel):
@@ -331,6 +336,12 @@ class RiskMetricsCreate(BaseModel):
     sharpe_ratio: Optional[float] = None
     var: Optional[float] = None
     beta: Optional[float] = None
+
+
+class VarComputeRequest(BaseModel):
+    portfolio_id: str
+    confidence: float = 0.95
+    method: str = "historical"
 
 
 class RiskMetricsResponse(BaseModel):
