@@ -4,9 +4,11 @@ import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/i18n";
 
 export default function Layout() {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Tabs
@@ -24,7 +26,7 @@ export default function Layout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Dashboard",
+          title: t("tabs.dashboard"),
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="dashboard" size={24} color={color} />
           ),
@@ -33,7 +35,7 @@ export default function Layout() {
       <Tabs.Screen
         name="watchlists"
         options={{
-          title: "Watchlist",
+          title: t("tabs.watchlist"),
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="star" size={24} color={color} />
           ),
@@ -42,7 +44,7 @@ export default function Layout() {
       <Tabs.Screen
         name="insights"
         options={{
-          title: "Insights",
+          title: t("tabs.insights"),
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="insights" size={24} color={color} />
           ),
@@ -51,7 +53,7 @@ export default function Layout() {
       <Tabs.Screen
         name="account"
         options={{
-          title: "Account",
+          title: t("tabs.account"),
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="account-balance-wallet" size={24} color={color} />
           ),

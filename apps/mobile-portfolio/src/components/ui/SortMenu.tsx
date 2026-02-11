@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/i18n";
 
 export type SortOption = "name" | "price" | "change" | "changePercent";
 
@@ -18,16 +19,17 @@ interface SortMenuProps {
   onOpen?: () => void;
 }
 
-const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: "name", label: "Name" },
-  { value: "price", label: "Price" },
-  { value: "change", label: "Change" },
-  { value: "changePercent", label: "Change %" },
-];
-
 export function SortMenu({ currentSort, onSelect, onOpen }: SortMenuProps) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
+
+  const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+    { value: "name", label: t("watchlist.sortOptions.name") },
+    { value: "price", label: t("watchlist.sortOptions.price") },
+    { value: "change", label: t("watchlist.sortOptions.change") },
+    { value: "changePercent", label: t("watchlist.sortOptions.changePercent") },
+  ];
 
   const handleSelect = (option: SortOption) => {
     onSelect(option);
@@ -61,7 +63,7 @@ export function SortMenu({ currentSort, onSelect, onOpen }: SortMenuProps) {
           <View style={[styles.sheet, { backgroundColor: colors.card }]}>
             <SafeAreaView edges={["bottom"]}>
               <View style={styles.header}>
-                <Text style={[styles.headerTitle, { color: colors.textTertiary }]}>Sort by</Text>
+                <Text style={[styles.headerTitle, { color: colors.textTertiary }]}>{t("watchlist.sortBy")}</Text>
                 <Pressable
                   onPress={() => setVisible(false)}
                   hitSlop={8}

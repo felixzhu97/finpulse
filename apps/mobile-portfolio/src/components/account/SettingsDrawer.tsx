@@ -14,20 +14,10 @@ import { useDraggableDrawer } from "@/src/hooks/useDraggableDrawer";
 import { usePreferences } from "@/src/hooks/usePreferences";
 import { useTheme } from "@/src/theme";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useTranslation } from "@/src/i18n";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const DRAWER_HEIGHT = Math.min(SCREEN_HEIGHT * 0.7, 500);
-
-const THEME_OPTIONS = [
-  { value: "dark", label: "Dark" },
-  { value: "light", label: "Light" },
-  { value: "auto", label: "Auto" },
-] as const;
-
-const LANGUAGE_OPTIONS = [
-  { value: "en", label: "English" },
-  { value: "zh", label: "中文" },
-] as const;
 
 interface SettingsDrawerProps {
   visible: boolean;
@@ -36,6 +26,7 @@ interface SettingsDrawerProps {
 
 export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const {
     theme,
     language,
@@ -47,6 +38,17 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
     refresh,
   } = usePreferences();
   const [saving, setSaving] = useState(false);
+
+  const THEME_OPTIONS = [
+    { value: "dark" as const, label: t("theme.dark") },
+    { value: "light" as const, label: t("theme.light") },
+    { value: "auto" as const, label: t("theme.auto") },
+  ];
+
+  const LANGUAGE_OPTIONS = [
+    { value: "en" as const, label: t("language.en") },
+    { value: "zh" as const, label: t("language.zh") },
+  ];
 
   const { slideAnim, dragOffset, panHandlers, backdropOpacity, closeWithAnimation } =
     useDraggableDrawer({ visible, drawerHeight: DRAWER_HEIGHT, onClose });
@@ -127,7 +129,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
         >
           <View style={[styles.handle, { backgroundColor: colors.textTertiary }]} {...panHandlers} />
           <View style={[styles.header, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>{t("common.settings")}</Text>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={closeWithAnimation}
@@ -144,7 +146,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
             ) : (
               <View style={styles.settingsContent}>
                 <View style={styles.settingGroup}>
-                  <Text style={[styles.groupTitle, { color: colors.textTertiary }]}>Theme</Text>
+                  <Text style={[styles.groupTitle, { color: colors.textTertiary }]}>{t("common.theme")}</Text>
                   <View style={styles.optionsContainer}>
                     {THEME_OPTIONS.map((option) => {
                       const isSelected = theme === option.value;
@@ -181,7 +183,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                 </View>
 
                 <View style={styles.settingGroup}>
-                  <Text style={[styles.groupTitle, { color: colors.textTertiary }]}>Language</Text>
+                  <Text style={[styles.groupTitle, { color: colors.textTertiary }]}>{t("common.language")}</Text>
                   <View style={styles.optionsContainer}>
                     {LANGUAGE_OPTIONS.map((option) => {
                       const isSelected = language === option.value;
@@ -219,7 +221,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
 
                 <View style={styles.settingGroup}>
                   <View style={styles.switchRow}>
-                    <Text style={[styles.groupTitle, { color: colors.textTertiary }]}>Notifications</Text>
+                    <Text style={[styles.groupTitle, { color: colors.textTertiary }]}>{t("common.notifications")}</Text>
                     <Switch
                       value={notificationsEnabled}
                       onValueChange={handleNotificationsChange}
@@ -233,7 +235,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                 {saving && (
                   <View style={styles.savingRow}>
                     <ActivityIndicator size="small" color={colors.primary} />
-                    <Text style={[styles.savingText, { color: colors.textSecondary }]}>Saving...</Text>
+                    <Text style={[styles.savingText, { color: colors.textSecondary }]}>{t("common.saving")}</Text>
                   </View>
                 )}
               </View>

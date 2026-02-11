@@ -16,26 +16,28 @@ import { SettingsDrawer } from "@/src/components/account/SettingsDrawer";
 import { AccountListItem } from "@/src/components/account/AccountListItem";
 import { formatBalance } from "@/src/utils";
 import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/i18n";
 
-function getAccountTypeLabel(type: Account["type"]) {
+function getAccountTypeLabel(type: Account["type"], t: (key: string) => string) {
   switch (type) {
     case "brokerage":
-      return "Brokerage";
+      return t("account.accountTypes.brokerage");
     case "saving":
-      return "Savings";
+      return t("account.accountTypes.saving");
     case "checking":
-      return "Checking";
+      return t("account.accountTypes.checking");
     case "creditCard":
-      return "Credit Card";
+      return t("account.accountTypes.creditCard");
     case "cash":
-      return "Cash";
+      return t("account.accountTypes.cash");
     default:
-      return "Account";
+      return t("account.accountTypes.account");
   }
 }
 
 export default function AccountScreen() {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,10 +94,10 @@ export default function AccountScreen() {
         ) : error && !customer && accounts.length === 0 ? (
           <View style={styles.centered}>
             <Text style={[styles.errorText, { color: colors.error }]}>
-              Unable to load data. Start the backend and try again.
+              {t("account.unableToLoad")}
             </Text>
             <TouchableOpacity onPress={onRefresh} style={[styles.retryButton, { backgroundColor: colors.primary }]}>
-              <Text style={styles.retryButtonText}>Retry</Text>
+              <Text style={styles.retryButtonText}>{t("common.retry")}</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -120,7 +122,7 @@ export default function AccountScreen() {
                   </View>
                   {customer.kyc_status && (
                     <View style={[styles.userDetailRow, { borderTopColor: colors.border }]}>
-                      <Text style={[styles.userDetailLabel, { color: colors.textSecondary }]}>KYC Status</Text>
+                      <Text style={[styles.userDetailLabel, { color: colors.textSecondary }]}>{t("account.kycStatus")}</Text>
                       <Text style={[styles.userDetailValue, { color: colors.text }]}>
                         {customer.kyc_status}
                       </Text>
@@ -133,7 +135,7 @@ export default function AccountScreen() {
             {accounts.length > 0 && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>Accounts</Text>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("account.accounts")}</Text>
                   <Text style={[styles.totalBalance, { color: colors.text }]}>
                     {formatBalance(totalBalance)}
                   </Text>
@@ -158,7 +160,7 @@ export default function AccountScreen() {
                               {account.name}
                             </Text>
                             <Text style={[styles.accountType, { color: colors.textSecondary }]}>
-                              {getAccountTypeLabel(account.type)}
+                              {getAccountTypeLabel(account.type, t)}
                             </Text>
                           </View>
                         </View>
@@ -206,7 +208,7 @@ export default function AccountScreen() {
                       size={22}
                       color={colors.text}
                     />
-                    <Text style={[styles.settingsText, { color: colors.text }]}>Settings</Text>
+                    <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.settings")}</Text>
                   </View>
                   <MaterialIcons
                     name="chevron-right"

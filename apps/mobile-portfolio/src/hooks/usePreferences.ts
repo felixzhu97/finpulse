@@ -11,6 +11,7 @@ import {
 } from "@/src/store/preferencesSlice";
 import { useUserPreferences } from "./useUserPreferences";
 import { userPreferencesApi } from "@/src/api";
+import { i18n } from "@/src/i18n";
 
 export function usePreferences() {
   const dispatch = useDispatch();
@@ -24,13 +25,15 @@ export function usePreferences() {
 
   useEffect(() => {
     if (apiPreference) {
+      const language = apiPreference.language || "en";
       dispatch(
         setPreferences({
           theme: (apiPreference.theme as ThemePreference) || "dark",
-          language: apiPreference.language || "en",
+          language,
           notificationsEnabled: apiPreference.notifications_enabled,
         })
       );
+      i18n.changeLanguage(language);
     }
   }, [apiPreference, dispatch]);
 
@@ -86,6 +89,9 @@ export function usePreferences() {
         return false;
       }
       dispatch(setLanguage(language));
+      if (language) {
+        i18n.changeLanguage(language);
+      }
       try {
         const existing = await userPreferencesApi.getByCustomerId(customerId);
         const body = {

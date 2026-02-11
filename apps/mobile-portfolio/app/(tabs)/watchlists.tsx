@@ -26,13 +26,14 @@ import { useSymbolDisplayData } from "@/src/hooks/useSymbolDisplayData";
 import type { Account, Holding } from "@/src/types/portfolio";
 import { portfolioApi } from "@/src/api";
 import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/i18n";
 
 type ListRow =
   | { type: "stock"; holding: Holding; price: number; change: number }
   | { type: "account"; account: Account };
 
-function formatHeaderDate() {
-  return new Date().toLocaleDateString("en-US", {
+function formatHeaderDate(locale: string = "en-US") {
+  return new Date().toLocaleDateString(locale, {
     month: "long",
     day: "numeric",
   });
@@ -64,6 +65,7 @@ function buildListRows(
 
 export default function WatchlistsScreen() {
   const { colors } = useTheme();
+  const { t, i18n } = useTranslation();
   const [baseAccounts, setBaseAccounts] = useState<Account[]>([]);
   const [historyValues, setHistoryValues] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -239,14 +241,14 @@ export default function WatchlistsScreen() {
       <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
         <StatusBar style={colors.isDark ? "light" : "dark"} />
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>Stocks</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{t("watchlist.stocks")}</Text>
         </View>
         <View style={styles.centered}>
           <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-            Start backend and seed data first.
+            {t("watchlist.startBackendFirst")}
           </Text>
           <Pressable style={[styles.retryBtn, { backgroundColor: colors.primary }]} onPress={onRefresh}>
-            <Text style={styles.retryText}>Retry</Text>
+            <Text style={styles.retryText}>{t("common.retry")}</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -258,8 +260,8 @@ export default function WatchlistsScreen() {
       <StatusBar style={colors.isDark ? "light" : "dark"} />
       <View style={styles.header}>
         <View>
-          <Text style={[styles.title, { color: colors.text }]}>Stocks</Text>
-          <Text style={[styles.date, { color: colors.textSecondary }]}>{formatHeaderDate()}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{t("watchlist.stocks")}</Text>
+          <Text style={[styles.date, { color: colors.textSecondary }]}>{formatHeaderDate(i18n.language === "zh" ? "zh-CN" : "en-US")}</Text>
         </View>
         <View style={styles.headerActions}>
           <SortMenu
@@ -313,9 +315,9 @@ export default function WatchlistsScreen() {
           ListEmptyComponent={
             searchQuery.trim() ? (
               <View style={styles.emptyContainer}>
-                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No stocks found</Text>
+                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t("watchlist.noStocksFound")}</Text>
                 <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
-                  Try a different search term
+                  {t("watchlist.tryDifferentSearch")}
                 </Text>
               </View>
             ) : null
@@ -351,7 +353,7 @@ export default function WatchlistsScreen() {
               <TextInput
                 ref={searchInputRef}
                 style={[styles.searchInput, { color: colors.text }]}
-                placeholder="Search stocks..."
+                placeholder={t("watchlist.searchStocks")}
                 placeholderTextColor={colors.textTertiary}
                 value={searchQuery}
                 onChangeText={setSearchQuery}

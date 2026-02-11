@@ -1,0 +1,85 @@
+{
+  "common": {
+    "settings": "设置",
+    "theme": "主题",
+    "language": "语言",
+    "notifications": "通知",
+    "saving": "保存中...",
+    "retry": "重试",
+    "close": "关闭",
+    "search": "搜索",
+    "loading": "加载中..."
+  },
+  "theme": {
+    "dark": "深色",
+    "light": "浅色",
+    "auto": "自动"
+  },
+  "language": {
+    "en": "English",
+    "zh": "中文"
+  },
+  "tabs": {
+    "dashboard": "仪表盘",
+    "watchlist": "观察列表",
+    "insights": "洞察",
+    "account": "账户"
+  },
+  "dashboard": {
+    "netWorthTrend": "净资产趋势",
+    "accounts": "账户",
+    "accountsHelper": "此投资组合中的账户总数",
+    "netWorthNativeChart": "净资产（原生图表）",
+    "unableToLoad": "无法加载投资组合。请启动后端并填充数据，然后重试。",
+    "tapToRetry": "点击重试"
+  },
+  "watchlist": {
+    "stocks": "股票",
+    "searchStocks": "搜索股票...",
+    "noStocksFound": "未找到股票",
+    "tryDifferentSearch": "尝试其他搜索词",
+    "startBackendFirst": "请先启动后端并填充数据。",
+    "sortBy": "排序方式",
+    "sortOptions": {
+      "name": "名称",
+      "price": "价格",
+      "change": "涨跌",
+      "changePercent": "涨跌幅"
+    }
+  },
+  "insights": {
+    "highRiskExposure": "高风险敞口",
+    "top5HoldingsConcentration": "前5大持仓集中度",
+    "riskMetricsApi": "风险指标（API）",
+    "volatility": "波动率",
+    "volatilityHelper": "年化波动率",
+    "sharpeRatio": "夏普比率",
+    "sharpeRatioHelper": "风险调整后收益",
+    "var": "风险价值",
+    "varHelper": "风险价值",
+    "beta": "贝塔",
+    "betaHelper": "市场敏感度",
+    "summary": "摘要",
+    "summaryBody": "持仓组合的风险和集中度。当可用时，服务器风险指标（波动率、夏普、风险价值、贝塔）显示在上方。",
+    "highExposureText": "高风险资产敞口较高。",
+    "moderateExposureText": "高风险敞口适中。",
+    "highConcentrationText": "投资组合在前几大持仓中高度集中。",
+    "balancedConcentrationText": "投资组合集中度看起来平衡。",
+    "unableToLoad": "无法加载分析数据。请启动后端并重试。",
+    "tapToRetry": "点击重试"
+  },
+  "account": {
+    "accounts": "账户",
+    "kycStatus": "KYC状态",
+    "settings": "设置",
+    "unableToLoad": "无法加载数据。请启动后端并重试。",
+    "accountTypes": {
+      "brokerage": "经纪账户",
+      "saving": "储蓄账户",
+      "checking": "支票账户",
+      "creditCard": "信用卡",
+      "cash": "现金",
+      "account": "账户"
+    }
+  }
+}

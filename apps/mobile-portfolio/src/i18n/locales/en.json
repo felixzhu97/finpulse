@@ -1,0 +1,85 @@
+{
+  "common": {
+    "settings": "Settings",
+    "theme": "Theme",
+    "language": "Language",
+    "notifications": "Notifications",
+    "saving": "Saving...",
+    "retry": "Retry",
+    "close": "Close",
+    "search": "Search",
+    "loading": "Loading..."
+  },
+  "theme": {
+    "dark": "Dark",
+    "light": "Light",
+    "auto": "Auto"
+  },
+  "language": {
+    "en": "English",
+    "zh": "中文"
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "watchlist": "Watchlist",
+    "insights": "Insights",
+    "account": "Account"
+  },
+  "dashboard": {
+    "netWorthTrend": "Net worth trend",
+    "accounts": "Accounts",
+    "accountsHelper": "Total accounts in this portfolio",
+    "netWorthNativeChart": "Net worth (native chart)",
+    "unableToLoad": "Unable to load portfolio. Start the backend and seed data, then retry.",
+    "tapToRetry": "Tap to retry"
+  },
+  "watchlist": {
+    "stocks": "Stocks",
+    "searchStocks": "Search stocks...",
+    "noStocksFound": "No stocks found",
+    "tryDifferentSearch": "Try a different search term",
+    "startBackendFirst": "Start backend and seed data first.",
+    "sortBy": "Sort by",
+    "sortOptions": {
+      "name": "Name",
+      "price": "Price",
+      "change": "Change",
+      "changePercent": "Change %"
+    }
+  },
+  "insights": {
+    "highRiskExposure": "High-risk exposure",
+    "top5HoldingsConcentration": "Top 5 holdings concentration",
+    "riskMetricsApi": "Risk metrics (API)",
+    "volatility": "Volatility",
+    "volatilityHelper": "Annualized volatility",
+    "sharpeRatio": "Sharpe ratio",
+    "sharpeRatioHelper": "Risk-adjusted return",
+    "var": "VaR",
+    "varHelper": "Value at risk",
+    "beta": "Beta",
+    "betaHelper": "Market sensitivity",
+    "summary": "Summary",
+    "summaryBody": "Portfolio risk and concentration from holdings. When available, server risk metrics (volatility, Sharpe, VaR, beta) are shown above.",
+    "highExposureText": "High exposure to high-risk assets.",
+    "moderateExposureText": "High-risk exposure is moderate.",
+    "highConcentrationText": "Portfolio is highly concentrated in top holdings.",
+    "balancedConcentrationText": "Portfolio concentration looks balanced.",
+    "unableToLoad": "Unable to load analytics. Start the backend and try again.",
+    "tapToRetry": "Tap to retry"
+  },
+  "account": {
+    "accounts": "Accounts",
+    "kycStatus": "KYC Status",
+    "settings": "Settings",
+    "unableToLoad": "Unable to load data. Start the backend and try again.",
+    "accountTypes": {
+      "brokerage": "Brokerage",
+      "saving": "Savings",
+      "checking": "Checking",
+      "creditCard": "Credit Card",
+      "cash": "Cash",
+      "account": "Account"
+    }
+  }
+}

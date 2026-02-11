@@ -15,9 +15,11 @@ import { AssetAllocationChart } from "@/src/components/portfolio/AssetAllocation
 import { NetWorthLineChart } from "@/src/components/portfolio/NetWorthLineChart";
 import { usePortfolio } from "@/src/hooks/usePortfolio";
 import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/i18n";
 
 export default function DashboardScreen() {
   const { isDark, colors } = useTheme();
+  const { t } = useTranslation();
   const {
     portfolio,
     allocation,
@@ -61,10 +63,10 @@ export default function DashboardScreen() {
         ) : (
           <>
             <Text style={[styles.errorText, { color: colors.textSecondary }]}>
-              Unable to load portfolio. Start the backend and seed data, then retry.
+              {t("dashboard.unableToLoad")}
             </Text>
             <Text style={[styles.retryText, { color: colors.primary }]} onPress={refresh}>
-              Tap to retry
+              {t("dashboard.tapToRetry")}
             </Text>
           </>
         )}
@@ -87,12 +89,12 @@ export default function DashboardScreen() {
     >
       <PortfolioSummary portfolio={portfolio} />
       <View style={styles.block}>
-        <Text style={[styles.subsectionTitle, { color: colors.text }]}>Net worth trend</Text>
+        <Text style={[styles.subsectionTitle, { color: colors.text }]}>{t("dashboard.netWorthTrend")}</Text>
         <NetWorthLineChart points={history} />
         <MetricCard
-          label="Accounts"
+          label={t("dashboard.accounts")}
           value={String(portfolio.accounts.length)}
-          helper="Total accounts in this portfolio"
+          helper={t("dashboard.accountsHelper")}
         />
         <AssetAllocationChart
           items={allocation.map((item) => ({
@@ -101,7 +103,7 @@ export default function DashboardScreen() {
           }))}
         />
         <View style={[styles.chartCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.chartCardTitle, { color: colors.text }]}>Net worth (native chart)</Text>
+          <Text style={[styles.chartCardTitle, { color: colors.text }]}>{t("dashboard.netWorthNativeChart")}</Text>
           <NativeLineChart
             data={lineData}
             theme={chartTheme}

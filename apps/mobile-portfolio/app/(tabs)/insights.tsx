@@ -14,9 +14,11 @@ import { useRiskMetrics } from "@/src/hooks";
 import { portfolioApi } from "@/src/api";
 import { useEffect } from "react";
 import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/i18n";
 
 export default function InsightsScreen() {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const { metrics, loading, error, refresh } = useRiskMetrics();
   const [highRatio, setHighRatio] = useState(0);
   const [topConcentration, setTopConcentration] = useState(0);
@@ -52,13 +54,13 @@ export default function InsightsScreen() {
 
   const highRiskText =
     highRatio > 0.4
-      ? "High exposure to high-risk assets."
-      : "High-risk exposure is moderate.";
+      ? t("insights.highExposureText")
+      : t("insights.moderateExposureText");
 
   const concentrationText =
     topConcentration > 0.5
-      ? "Portfolio is highly concentrated in top holdings."
-      : "Portfolio concentration looks balanced.";
+      ? t("insights.highConcentrationText")
+      : t("insights.balancedConcentrationText");
 
   const width = Dimensions.get("window").width - 32;
 
@@ -66,10 +68,10 @@ export default function InsightsScreen() {
     return (
       <View style={[styles.centered, { backgroundColor: colors.background }]}>
         <Text style={[styles.errorText, { color: colors.error }]}>
-          Unable to load analytics. Start the backend and try again.
+          {t("insights.unableToLoad")}
         </Text>
         <Text style={[styles.retryText, { color: colors.primary }]} onPress={onRefresh}>
-          Tap to retry
+          {t("insights.tapToRetry")}
         </Text>
       </View>
     );
@@ -101,46 +103,46 @@ export default function InsightsScreen() {
       ) : (
         <View style={styles.block}>
           <MetricCard
-            label="High-risk exposure"
+            label={t("insights.highRiskExposure")}
             value={`${highRiskPercent}%`}
             helper={highRiskText}
             tone={highRatio > 0.4 ? "negative" : "default"}
           />
           <MetricCard
-            label="Top 5 holdings concentration"
+            label={t("insights.top5HoldingsConcentration")}
             value={`${concentrationPercent}%`}
             helper={concentrationText}
             tone={topConcentration > 0.5 ? "negative" : "default"}
           />
           {hasApiMetrics ? (
             <View style={styles.apiSection}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Risk metrics (API)</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("insights.riskMetricsApi")}</Text>
               {metrics.volatility != null && (
                 <MetricCard
-                  label="Volatility"
+                  label={t("insights.volatility")}
                   value={metrics.volatility.toFixed(4)}
-                  helper="Annualized volatility"
+                  helper={t("insights.volatilityHelper")}
                 />
               )}
               {metrics.sharpe_ratio != null && (
                 <MetricCard
-                  label="Sharpe ratio"
+                  label={t("insights.sharpeRatio")}
                   value={metrics.sharpe_ratio.toFixed(2)}
-                  helper="Risk-adjusted return"
+                  helper={t("insights.sharpeRatioHelper")}
                 />
               )}
               {metrics.var != null && (
                 <MetricCard
-                  label="VaR"
+                  label={t("insights.var")}
                   value={metrics.var.toFixed(2)}
-                  helper="Value at risk"
+                  helper={t("insights.varHelper")}
                 />
               )}
               {metrics.beta != null && (
                 <MetricCard
-                  label="Beta"
+                  label={t("insights.beta")}
                   value={metrics.beta.toFixed(2)}
-                  helper="Market sensitivity"
+                  helper={t("insights.betaHelper")}
                 />
               )}
             </View>
@@ -179,11 +181,9 @@ export default function InsightsScreen() {
             />
           </View>
           <View style={[styles.summaryCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.summaryTitle, { color: colors.text }]}>Summary</Text>
+            <Text style={[styles.summaryTitle, { color: colors.text }]}>{t("insights.summary")}</Text>
             <Text style={[styles.summaryBody, { color: colors.textSecondary }]}>
-              Portfolio risk and concentration from holdings. When available,
-              server risk metrics (volatility, Sharpe, VaR, beta) are shown
-              above.
+              {t("insights.summaryBody")}
             </Text>
           </View>
         </View>

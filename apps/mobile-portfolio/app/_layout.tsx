@@ -15,6 +15,8 @@ import { StyleSheet, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QuoteSocketSubscriber } from "@/src/store/QuoteSocketSubscriber";
 import { store, type RootState } from "@/src/store";
+import "@/src/i18n/config";
+import { i18n } from "@/src/i18n";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,6 +25,15 @@ function AppContent() {
   const themePreference = useSelector(
     (state: RootState) => state.preferences.theme
   );
+  const language = useSelector(
+    (state: RootState) => state.preferences.language
+  );
+
+  useEffect(() => {
+    if (language) {
+      i18n.changeLanguage(language);
+    }
+  }, [language]);
 
   const theme = useMemo(() => {
     if (themePreference === "light") {

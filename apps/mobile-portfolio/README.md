@@ -13,6 +13,7 @@ Portfolio management mobile app for viewing investment accounts, performance cha
 | Native Charts | iOS Metal (Swift), Android (Kotlin) |
 | Navigation | React Navigation (bottom-tabs) |
 | UI | expo-blur (Liquid Glass), useDraggableDrawer (bottom sheets) |
+| Internationalization | i18next, react-i18next (English, Chinese) |
 
 Native chart components: line, candlestick (K-line), American OHLC, baseline, histogram, line-only, with horizontal scroll and tooltips.
 
@@ -40,9 +41,10 @@ Account and Insights also use `usePreferences` (Redux-backed), `useRiskMetrics` 
   - `customersApi.ts`, `userPreferencesApi.ts`, `riskMetricsApi.ts`: REST resources for Profile, Insights. `watchlistsApi.ts`, `instrumentsApi.ts` available for future use.
 - `src/types/`: shared interfaces—`portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`; `index.ts` re-exports all.
 - `src/theme/`: theme system—`colors.ts` (light/dark color schemes), `index.ts` (`useTheme` hook for dynamic theming).
+- `src/i18n/`: internationalization—`config.ts` (i18next setup), `locales/en.json` and `locales/zh.json` (translation resources), `index.ts` (exports `i18n` and `useTranslation` hook).
 - `src/hooks/`: `usePortfolio`, `useSymbolDisplayData` (Redux-backed quotes + history for list/drawer), `useRealtimeQuotes`, `usePerSymbolHistory`, `usePreferences` (Redux-backed user preferences), `useWatchlists`, `useRiskMetrics`, `useDraggableDrawer`; all consume `api` and `types`.
 - `src/store/`: Redux (quotes slice, preferences slice for theme/language/notifications, selectors, `QuoteSocketSubscriber`), custom portfolio UI store (`usePortfolioStore`).
-- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Watchlist screen uses `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch). All components support light/dark theme via `useTheme` hook.
+- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Watchlist screen uses `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch). All components support light/dark theme via `useTheme` hook and internationalization via `useTranslation` hook.
 
 ### Diagrams
 
@@ -122,3 +124,13 @@ The app supports light and dark themes with automatic system theme detection:
 - **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
 - **Components**: All UI components use `useTheme()` hook to dynamically adapt colors. Cards have rounded corners (`borderRadius: 16`) and support theme-aware backgrounds.
 - **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.
+
+## Internationalization
+
+The app supports multiple languages with dynamic language switching:
+
+- **i18n System**: `src/i18n/config.ts` configures i18next with React Native support. Translation resources are stored in `src/i18n/locales/` (currently English and Chinese).
+- **Language Management**: Language preference is stored in Redux (`preferencesSlice`) and synchronized with i18next. When users change language in Settings, all UI text updates immediately.
+- **Components**: All screens and components use `useTranslation()` hook from `react-i18next` to access translated strings. Translation keys are organized by feature (common, tabs, dashboard, watchlist, insights, account).
+- **Language Persistence**: User language preference is saved via `/api/v1/user-preferences` and restored on app launch. The app initializes with the saved language or defaults to English.
+- **Supported Languages**: English (`en`) and Chinese Simplified (`zh`).

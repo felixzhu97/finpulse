@@ -43,6 +43,8 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
 
     Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL, base URL")
     Component(theme_system, "Theme System", "TypeScript", "Light/dark color schemes, useTheme hook")
+    Component(i18n_config, "i18n Config", "TypeScript", "i18next setup, translation resources (en, zh)")
+    Component(use_translation, "useTranslation", "Hook", "Access translated strings from i18next")
 }
 
 Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Portfolio, /ws/quotes, risk-metrics")
@@ -88,6 +90,15 @@ Rel(analytics_screen, use_theme, "Uses", "")
 Rel(account_screen, use_theme, "Uses", "")
 Rel(use_theme, theme_system, "Uses", "")
 Rel(use_theme, redux_preferences, "Reads", "theme preference")
+
+Rel(overview_screen, use_translation, "Uses", "")
+Rel(watchlist_screen, use_translation, "Uses", "")
+Rel(analytics_screen, use_translation, "Uses", "")
+Rel(account_screen, use_translation, "Uses", "")
+Rel(sort_menu, use_translation, "Uses", "")
+Rel(use_preferences, use_translation, "Syncs", "language change")
+Rel(use_translation, i18n_config, "Uses", "")
+Rel(use_translation, redux_preferences, "Reads", "language preference")
 
 Rel(stock_detail_drawer, use_draggable_drawer, "Uses", "")
 Rel(stock_list_item, native_sparkline, "Uses", "")
