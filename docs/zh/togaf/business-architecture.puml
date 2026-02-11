@@ -39,6 +39,7 @@ package "核心业务功能域" {
     component "市场分析" as MarketAnalysis <<Process>>
     component "风险管理" as RiskMgmt <<Process>>
     component "交易管理" as TransactionMgmt <<Process>>
+    component "数字货币（模拟）" as DigitalCurrencyMgmt <<Process>>
     component "资产管理" as AssetMgmt <<Process>>
     component "观察列表管理" as WatchListMgmt <<Process>>
     component "债券分析" as BondAnalysis <<Process>>
@@ -139,6 +140,13 @@ package "核心业务功能域" {
         - 大规模数据处理
         - 实时数据流分析
     end note
+
+    note right of DigitalCurrencyMgmt
+        <b>业务功能</b>
+        - 模拟链（区块、交易）
+        - 按账户与币种的钱包余额
+        - 转账提交与余额查询
+    end note
 }
 
 package "业务服务层" {
@@ -150,6 +158,7 @@ package "业务服务层" {
     component "数据可视化服务" as VisualizationService <<Service>>
     component "云基础设施服务" as CloudService <<Service>>
     component "大数据服务" as BigDataService <<Service>>
+    component "区块链服务" as BlockchainService <<Service>>
 
     note right of PortfolioService
         提供投资组合相关的
@@ -192,6 +201,12 @@ package "业务服务层" {
         - HDFS文件系统服务
         - YARN资源管理服务
     end note
+
+    note right of BlockchainService
+        区块链模拟服务
+        - 账本与钱包持久化
+        - 转账与余额 API
+    end note
 }
 
 ' 业务参与者到业务功能的关联
@@ -199,6 +214,7 @@ Investor --> PortfolioMgmt
 Investor --> MarketAnalysis
 Investor --> RiskMgmt
 Investor --> TransactionMgmt
+Investor --> DigitalCurrencyMgmt
 Investor --> AssetMgmt
 Investor --> WatchListMgmt
 Investor --> BondAnalysis
@@ -228,6 +244,7 @@ RiskMgmt --> RiskService
 PortfolioMgmt --> RiskService
 
 TransactionMgmt --> TransactionService
+DigitalCurrencyMgmt --> BlockchainService
 
 BondAnalysis --> CalculationService
 OptionsPricing --> CalculationService
@@ -247,6 +264,7 @@ PortfolioService --> CloudService
 MarketService --> CloudService
 RiskService --> CloudService
 TransactionService --> CloudService
+BlockchainService --> CloudService
 CalculationService --> CloudService
 BigDataService --> CloudService
 

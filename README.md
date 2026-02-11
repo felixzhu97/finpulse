@@ -78,7 +78,7 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 ### Backend Services
 
-- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. Clean Architecture (domain, application, infrastructure, API); SQLAlchemy 2.0 + asyncpg; Alembic migrations; config via `.env` (see `services/portfolio-analytics/.env.example`). REST resources under `/api/v1/*` with optional **batch create** endpoints (`POST .../batch`) for seeding.
+- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. Clean Architecture (domain, application, infrastructure, API); SQLAlchemy 2.0 + asyncpg; Alembic migrations; config via `.env` (see `services/portfolio-analytics/.env.example`). REST resources under `/api/v1/*` with optional **batch create** endpoints (`POST .../batch`) for seeding. **Blockchain simulation**: in-app chain (blocks + chain transactions + wallet balances), digital currency transfers under `/api/v1/blockchain/*` (e.g. `POST /blockchain/transfers`, `GET /blockchain/balances`), integrated with accounts; uses `cryptography` for block hashing.
 - **TimescaleDB (PostgreSQL)** - Portfolio metadata and time-series history (hypertable); Docker, host port 5433
 - **Redis** - Cache for portfolio history (Docker, port 6379)
 - **Apache Kafka** - Event messaging for portfolio events and real-time market data (Docker, port 9092)

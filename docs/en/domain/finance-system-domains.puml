@@ -24,6 +24,7 @@ package "Payments and Treasury" {
   component "Payment Domain" as PaymentDomain
   component "Settlement Domain" as SettlementDomain
   component "Treasury Domain" as TreasuryDomain
+  component "Blockchain Domain" as BlockchainDomain
 }
 
 package "Risk and Compliance" {
@@ -54,6 +55,7 @@ CustomerDomain --> IdentityDomain
 CustomerDomain --> AccountDomain
 AccountDomain --> PositionDomain
 AccountDomain --> WalletDomain
+AccountDomain --> BlockchainDomain
 
 PortfolioDomain --> PositionDomain
 OrderDomain --> ExecutionDomain

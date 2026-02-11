@@ -1,5 +1,6 @@
 from src.core.domain.entities.account import Account
 from src.core.domain.entities.analytics import RiskMetrics, Valuation
+from src.core.domain.entities.blockchain import Block, ChainTransaction, WalletBalance
 from src.core.domain.entities.identity import Customer, UserPreference
 from src.core.domain.entities.instrument import Bond, Instrument, Option
 from src.core.domain.entities.market_data import MarketData
@@ -9,8 +10,10 @@ from src.core.domain.entities.trading import Order, Trade
 from src.core.domain.entities.watchlist import Watchlist, WatchlistItem
 from src.infrastructure.database.models import (
     AccountRow,
+    BlockRow,
     BondRow,
     CashTransactionRow,
+    ChainTransactionRow,
     CustomerRow,
     InstrumentRow,
     MarketDataRow,
@@ -24,6 +27,7 @@ from src.infrastructure.database.models import (
     TradeRow,
     UserPreferenceRow,
     ValuationRow,
+    WalletBalanceRow,
     WatchlistRow,
     WatchlistItemRow,
 )
@@ -463,3 +467,37 @@ def valuation_entity_to_dict(e: Valuation) -> dict:
         "discount_rate": e.discount_rate,
         "growth_rate": e.growth_rate,
     }
+
+
+def block_row_to_entity(
+    r: BlockRow,
+    transaction_ids: tuple[str, ...] = (),
+) -> Block:
+    return Block(
+        index=r.block_index,
+        timestamp=r.timestamp,
+        previous_hash=r.previous_hash,
+        transaction_ids=transaction_ids,
+        hash=r.hash,
+    )
+
+
+def chain_transaction_row_to_entity(r: ChainTransactionRow) -> ChainTransaction:
+    return ChainTransaction(
+        tx_id=r.tx_id,
+        block_index=r.block_index,
+        sender_account_id=r.sender_account_id,
+        receiver_account_id=r.receiver_account_id,
+        amount=float(r.amount),
+        currency=r.currency,
+        created_at=r.created_at,
+    )
+
+
+def wallet_balance_row_to_entity(r: WalletBalanceRow) -> WalletBalance:
+    return WalletBalance(
+        account_id=r.account_id,
+        currency=r.currency,
+        balance=float(r.balance),
+        updated_at=r.updated_at,
+    )

@@ -287,3 +287,34 @@ class ValuationRow(Base):
     multiples: Mapped[Optional[float]] = mapped_column(Numeric(12, 6), nullable=True)
     discount_rate: Mapped[Optional[float]] = mapped_column(Numeric(12, 6), nullable=True)
     growth_rate: Mapped[Optional[float]] = mapped_column(Numeric(12, 6), nullable=True)
+
+
+class BlockRow(Base):
+    __tablename__ = "block"
+
+    block_index: Mapped[int] = mapped_column(Integer, primary_key=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    previous_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    hash: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"))
+
+
+class ChainTransactionRow(Base):
+    __tablename__ = "chain_transaction"
+
+    tx_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    block_index: Mapped[int] = mapped_column(Integer, ForeignKey("block.block_index", ondelete="CASCADE"), nullable=False)
+    sender_account_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("account.account_id", ondelete="CASCADE"), nullable=False)
+    receiver_account_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("account.account_id", ondelete="CASCADE"), nullable=False)
+    amount: Mapped[float] = mapped_column(Numeric(20, 8), nullable=False)
+    currency: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
+class WalletBalanceRow(Base):
+    __tablename__ = "wallet_balance"
+
+    account_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("account.account_id", ondelete="CASCADE"), primary_key=True)
+    currency: Mapped[str] = mapped_column(Text, primary_key=True)
+    balance: Mapped[float] = mapped_column(Numeric(20, 8), nullable=False, server_default=text("0"))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"))

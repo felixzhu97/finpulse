@@ -1,5 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.infrastructure.database.repositories.blockchain_ledger_repository import (
+    BlockchainLedgerRepository,
+)
+from src.infrastructure.database.repositories.wallet_balance_repository import (
+    WalletBalanceRepository,
+)
 from src.core.domain.entities.account import Account
 from src.core.domain.entities.analytics import RiskMetrics, Valuation
 from src.core.domain.entities.identity import Customer, UserPreference
@@ -68,6 +74,14 @@ from app.models import (
     WatchlistRow,
     WatchlistItemRow,
 )
+
+
+def blockchain_ledger_repo(session: AsyncSession) -> BlockchainLedgerRepository:
+    return BlockchainLedgerRepository(session)
+
+
+def wallet_balance_repo(session: AsyncSession) -> WalletBalanceRepository:
+    return WalletBalanceRepository(session)
 
 
 def customer_repo(session: AsyncSession) -> SqlRepository:

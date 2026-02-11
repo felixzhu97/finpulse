@@ -138,6 +138,10 @@ package "External Services" <<External>> {
             component "sentiment, identity, forecast" as AIML2
             component "Ollama, Hugging Face, TF" as AIML3
         }
+        component "Blockchain /api/v1/blockchain" as BlockchainAPI {
+            component "POST /transfers, GET /balances" as BlockchainTransfers
+            component "GET /blocks, GET /transactions" as BlockchainQuery
+        }
         component "SQLAlchemy 2.0 + asyncpg + Alembic" as SQLAlchemyStack
         component "TimescaleDB (portfolio + history)" as TimescaleDB
         component "Redis (history cache)" as RedisDB
@@ -193,6 +197,7 @@ FastAPIApp --> PortfolioSeed
 FastAPIApp --> QuotesGet
 FastAPIApp --> QuotesWS
 FastAPIApp --> AIMLAPI
+FastAPIApp --> BlockchainAPI
 FastAPIApp --> SQLAlchemyStack
 SQLAlchemyStack --> TimescaleDB
 FastAPIApp --> RedisDB

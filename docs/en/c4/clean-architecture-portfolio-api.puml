@@ -15,7 +15,7 @@ rectangle "**Infrastructure**\n(src/infrastructure/)" as INFRA #E8F5E9 {
 }
 
 rectangle "**Application**\n(src/core/application/)" as APP #FFF3E0 {
-  rectangle "use_cases/" as UC
+  rectangle "use_cases/\n(portfolio, analytics,\nblockchain, ...)" as UC
   rectangle "ports/\n(repositories, services,\nmessage_brokers)" as PORTS
 }
 

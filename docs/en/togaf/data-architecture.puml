@@ -149,6 +149,30 @@ package "Big Data Storage Entities" {
     end note
 }
 
+package "Blockchain Simulation Data" {
+    component "Block Data" as BlockData <<DataEntity>>
+    component "Chain Transaction Data" as ChainTransactionData <<DataEntity>>
+    component "Wallet Balance Data" as WalletBalanceData <<DataEntity>>
+
+    note right of BlockData
+        <b>Attributes</b>
+        - block_index (PK)
+        - timestamp, previous_hash, hash
+        - created_at
+    end note
+    note right of ChainTransactionData
+        <b>Attributes</b>
+        - tx_id (PK), block_index (FK)
+        - sender_account_id, receiver_account_id
+        - amount, currency, created_at
+    end note
+    note right of WalletBalanceData
+        <b>Attributes</b>
+        - account_id, currency (PK)
+        - balance, updated_at
+    end note
+}
+
 package "Portfolio Analytics Storage" {
     component "TimescaleDB (PostgreSQL)" as TimescaleDB <<DataEntity>>
     component "Redis (cache)" as RedisCache <<DataEntity>>
@@ -159,6 +183,7 @@ package "Portfolio Analytics Storage" {
         <b>Schema (Alembic)</b>
         - portfolio (id PK, data JSONB)
         - portfolio_history (time, portfolio_id, value) hypertable
+        - block, chain_transaction, wallet_balance (blockchain simulation)
         - SQLAlchemy 2.0 + asyncpg
         - Seed via POST /api/v1/seed
         - GET /api/v1/portfolio reads from DB
@@ -231,8 +256,14 @@ package "Data Relationships" {
     AssetData "1" --> "N" ValuationData : valuation result
     MarketData "1" --> "N" ValuationData : valuation input
 
+    UserData "1" --> "0..N" WalletBalanceData : has
+    BlockData "1" --> "0..N" ChainTransactionData : contains
+
     PortfolioData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
     TimescaleDB "1" --> "0..1" RedisCache : caches history
+    BlockData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
+    ChainTransactionData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
+    WalletBalanceData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
     TimescaleDB "1" --> "0..N" KafkaPortfolioEvents : emits events
     MarketData "1" --> "0..N" KafkaQuotesEnriched : publishes enriched quotes
 

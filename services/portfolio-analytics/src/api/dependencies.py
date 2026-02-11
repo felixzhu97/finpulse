@@ -8,10 +8,13 @@ from src.core.application.use_cases.market_data_service import MarketDataService
 from src.infrastructure.config.container import analytics_service as build_analytics_service
 from src.infrastructure.config.container import market_data_service as build_market_data_service
 from src.infrastructure.database.session import get_session
+from src.core.application.use_cases.blockchain_service import BlockchainApplicationService
+from src.core.application.use_cases.portfolio_service import PortfolioApplicationService
 from src.infrastructure.database.repositories import (
     PortfolioHistoryRepository,
     PortfolioRepository,
     account_repo,
+    blockchain_ledger_repo,
     bond_repo,
     cash_transaction_repo,
     customer_repo,
@@ -27,10 +30,10 @@ from src.infrastructure.database.repositories import (
     trade_repo,
     user_preference_repo,
     valuation_repo,
+    wallet_balance_repo,
     watchlist_repo,
     watchlist_item_repo,
 )
-from src.core.application.use_cases.portfolio_service import PortfolioApplicationService
 from src.infrastructure.message_brokers import EventPublisher
 
 
@@ -123,3 +126,12 @@ async def get_risk_metrics_repo(session: Annotated[AsyncSession, Depends(get_ses
 
 async def get_valuation_repo(session: Annotated[AsyncSession, Depends(get_session)]):
     return valuation_repo(session)
+
+
+async def get_blockchain_service(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> BlockchainApplicationService:
+    return BlockchainApplicationService(
+        ledger=blockchain_ledger_repo(session),
+        wallet_repository=wallet_balance_repo(session),
+    )

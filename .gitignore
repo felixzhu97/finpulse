@@ -67,6 +67,7 @@ next-env.d.ts
 .settings/
 *.sublime-project
 *.sublime-workspace
+.cursor/plans/
 
 # OS
 .DS_Store
@@ -101,9 +102,26 @@ __pycache__/
 .venv/
 venv/
 env/
+*.egg-info/
+*.egg
+.eggs/
+.tox/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+*.cover
+.hypothesis/
+*.ipynb_checkpoints/
 
 # Portfolio analytics (SQLite superseded by PostgreSQL)
 services/portfolio-analytics/portfolio.db
+
+# Docker (local overrides)
+docker-compose.override.yml
+docker-compose.override.yaml
 
 # Expo / React Native
 .expo/

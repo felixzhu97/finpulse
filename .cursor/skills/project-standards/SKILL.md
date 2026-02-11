@@ -1,6 +1,6 @@
 ---
 name: project-standards
-description: Keeps documentation and diagrams in sync with code changes. Use when editing code, adding features, refactoring, or when the user asks to update docs or diagrams.
+description: Keeps documentation and diagrams in sync with code changes; when API or resources change, add or update seed data using well-known real-world data. Use when editing code, adding features, refactoring, changing APIs, or when the user asks to update docs or diagrams.
 ---
 
 # Project Standards
@@ -23,7 +23,32 @@ After any change that affects behavior, structure, or contracts:
 
 Do not leave docs or diagrams outdated; update them in the same change set when possible.
 
+## Seed Data When API Changes
+
+When API or resources change (new or modified endpoints, schemas, or domain entities exposed as API):
+
+1. **Add or update seed data** so local/demo can be restored with one command.
+2. **Use well-known, real-world data** only. No placeholders like `user1`, `test-xxx`, or `foo`.
+
+| Type | Use (examples) | Avoid |
+|------|----------------|-------|
+| People/customers | Warren Buffett, Ray Dalio, Carl Icahn | user1, John Doe, Test User |
+| Symbols/instruments | AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, JPM, SPY, QQQ | STOCK1, TEST, XXX |
+| Company names | Apple Inc., Microsoft Corporation, Alphabet Inc. | Company A, Test Corp |
+| Brokers/counterparties | Charles Schwab, Interactive Brokers, Fidelity, Vanguard | Broker1, Acme Inc |
+| Bonds | US912828VM18 (2Y Treasury), US912828XG18 (10Y) | BOND001 |
+| Options | AAPL250117C00230000 (AAPL Jan 2026 230 Call) | OPTION1 |
+
+Numeric values (prices, quantities, rates) may be fictional; identifiers, names, and codes must follow the above style.
+
+- **Script**: `scripts/seed/generate-seed-data.js`
+- **Method**: Prefer `POST /api/v1/<resource>/batch`; legacy portfolio via `POST /api/v1/seed`.
+- **Run**: From repo root `pnpm run generate-seed-data` (or via `pnpm run start:backend`).
+
+For new resources, add `postBatch("/api/v1/<resource>/batch", [ ... ])` in `seedResources()` and update the final `console.log` resource count.
+
 ## Checklist Before Finishing a Task
 
 - [ ] README and other docs that describe the changed area are updated
 - [ ] English and Chinese diagrams that describe the changed area are updated
+- [ ] If API/resources changed: seed data added or updated in `generate-seed-data.js` using well-known data; no placeholder names; `pnpm run generate-seed-data` succeeds (with API running)

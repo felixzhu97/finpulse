@@ -3,6 +3,10 @@ from src.core.application.ports.repositories.analytics_repository import (
     IRiskMetricsRepository,
     IValuationRepository,
 )
+from src.core.application.ports.repositories.blockchain_repository import (
+    IBlockchainLedger,
+    IWalletBalanceRepository,
+)
 from src.core.application.ports.repositories.identity_repository import (
     ICustomerRepository,
     IUserPreferenceRepository,
@@ -32,6 +36,8 @@ from src.core.application.ports.repositories.watchlist_repository import (
 
 __all__ = [
     "IAccountRepository",
+    "IBlockchainLedger",
+    "IWalletBalanceRepository",
     "IBondRepository",
     "ICashTransactionRepository",
     "ICustomerRepository",

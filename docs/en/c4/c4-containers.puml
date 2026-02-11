@@ -10,7 +10,7 @@ System_Boundary(finpulse, "FinPulse") {
     Container(web_app, "Web App", "Angular 21", "Financial analytics console: portfolio, market trends, risk, transactions")
     Container(mobile_portfolio, "Mobile Portfolio", "Expo + React Native", "Portfolio app: stocks, real-time quotes, native charts")
     Container(mobile_demo, "Mobile Demo", "React Native", "Demo app and native chart showcase")
-    Container(portfolio_api, "Portfolio Analytics API", "FastAPI", "REST API, WebSocket, AI/ML; portfolio, market data, risk, analytics")
+    Container(portfolio_api, "Portfolio Analytics API", "FastAPI", "REST API, WebSocket, AI/ML, blockchain simulation; portfolio, market data, risk, analytics, digital currency")
     ContainerDb(timescale, "TimescaleDB", "PostgreSQL + TimescaleDB", "Portfolio metadata and history hypertable")
     ContainerDb(redis, "Redis", "In-memory", "History cache")
     ContainerQueue(kafka, "Kafka", "Event streaming", "portfolio.events, market.quotes.enriched")

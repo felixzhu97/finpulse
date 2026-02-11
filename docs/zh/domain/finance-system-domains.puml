@@ -26,6 +26,7 @@ package "支付与资金" {
   component "支付域" as PaymentDomain
   component "结算域" as SettlementDomain
   component "资金域" as TreasuryDomain
+  component "区块链域" as BlockchainDomain
 }
 
 package "风险与合规" {
@@ -56,6 +57,7 @@ CustomerDomain --> IdentityDomain
 CustomerDomain --> AccountDomain
 AccountDomain --> PositionDomain
 AccountDomain --> WalletDomain
+AccountDomain --> BlockchainDomain
 
 PortfolioDomain --> PositionDomain
 OrderDomain --> ExecutionDomain

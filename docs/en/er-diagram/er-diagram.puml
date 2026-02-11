@@ -254,6 +254,36 @@ package "Analytics and valuation" {
   }
 }
 
+package "Blockchain simulation" {
+  entity "Block" as Block {
+    * block_index : integer
+    --
+    timestamp : datetime
+    previous_hash : text
+    hash : text
+    created_at : datetime
+  }
+
+  entity "ChainTransaction" as ChainTransaction {
+    * tx_id : UUID
+    --
+    * block_index : integer
+    * sender_account_id : UUID
+    * receiver_account_id : UUID
+    amount : decimal
+    currency : text
+    created_at : datetime
+  }
+
+  entity "WalletBalance" as WalletBalance {
+    * account_id : UUID
+    * currency : text
+    --
+    balance : decimal
+    updated_at : datetime
+  }
+}
+
 Customer ||--|| UserPreference : has
 Customer ||--o{ Account : holds
 Account ||--o{ Portfolio : owns
@@ -282,5 +312,10 @@ Instrument ||--o{ Statistical : asset1
 Instrument ||--o{ Statistical : asset2
 Instrument ||--o{ Valuation : valuation result
 MarketData ||--o{ Valuation : valuation input
+
+Block ||--o{ ChainTransaction : contains
+Account ||--o{ ChainTransaction : sends
+Account ||--o{ ChainTransaction : receives
+Account ||--o{ WalletBalance : has
 
 @enduml

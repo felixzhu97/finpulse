@@ -39,6 +39,7 @@ package "Core Business Domains" {
     component "Market Analysis" as MarketAnalysis <<Process>>
     component "Risk Management" as RiskMgmt <<Process>>
     component "Transaction Management" as TransactionMgmt <<Process>>
+    component "Digital Currency (Simulation)" as DigitalCurrencyMgmt <<Process>>
     component "Asset Management" as AssetMgmt <<Process>>
     component "Watchlist Management" as WatchListMgmt <<Process>>
     component "Bond Analysis" as BondAnalysis <<Process>>
@@ -138,6 +139,13 @@ package "Core Business Domains" {
         - Large-scale processing
         - Real-time streams
     end note
+
+    note right of DigitalCurrencyMgmt
+        <b>Capabilities</b>
+        - Simulated chain (blocks, transactions)
+        - Wallet balances by account and currency
+        - Transfer submission and balance query
+    end note
 }
 
 package "Business Services" {
@@ -149,6 +157,7 @@ package "Business Services" {
     component "Visualization Service" as VisualizationService <<Service>>
     component "Cloud Service" as CloudService <<Service>>
     component "Big Data Service" as BigDataService <<Service>>
+    component "Blockchain Service" as BlockchainService <<Service>>
 
     note right of PortfolioService
         Portfolio-related
@@ -187,12 +196,19 @@ package "Business Services" {
         - Flink jobs
         - HDFS, YARN
     end note
+
+    note right of BlockchainService
+        Blockchain simulation
+        - Ledger and wallet persistence
+        - Transfer and balance API
+    end note
 }
 
 Investor --> PortfolioMgmt
 Investor --> MarketAnalysis
 Investor --> RiskMgmt
 Investor --> TransactionMgmt
+Investor --> DigitalCurrencyMgmt
 Investor --> AssetMgmt
 Investor --> WatchListMgmt
 Investor --> BondAnalysis
@@ -221,6 +237,7 @@ RiskMgmt --> RiskService
 PortfolioMgmt --> RiskService
 
 TransactionMgmt --> TransactionService
+DigitalCurrencyMgmt --> BlockchainService
 
 BondAnalysis --> CalculationService
 OptionsPricing --> CalculationService
@@ -240,6 +257,7 @@ PortfolioService --> CloudService
 MarketService --> CloudService
 RiskService --> CloudService
 TransactionService --> CloudService
+BlockchainService --> CloudService
 CalculationService --> CloudService
 BigDataService --> CloudService
 

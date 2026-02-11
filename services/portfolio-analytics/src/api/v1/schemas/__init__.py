@@ -371,3 +371,47 @@ class ValuationResponse(BaseModel):
     multiples: Optional[float]
     discount_rate: Optional[float]
     growth_rate: Optional[float]
+
+
+class TransferCreate(BaseModel):
+    sender_account_id: UUID
+    receiver_account_id: UUID
+    amount: float
+    currency: str = "SIM_COIN"
+
+
+class BlockResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=False)
+
+    index: int
+    timestamp: datetime
+    previous_hash: str
+    transaction_ids: tuple[str, ...]
+    hash: str
+
+
+class ChainTransactionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=False)
+
+    tx_id: UUID
+    block_index: int
+    sender_account_id: UUID
+    receiver_account_id: UUID
+    amount: float
+    currency: str
+    created_at: datetime
+
+
+class BlockWithTransactionsResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=False)
+
+    block: BlockResponse
+    transactions: list[ChainTransactionResponse]
+
+
+class BalanceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=False)
+
+    account_id: UUID
+    currency: str
+    balance: float

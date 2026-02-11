@@ -254,6 +254,36 @@ package "分析与估值" {
   }
 }
 
+package "Blockchain simulation" {
+  entity "Block" as Block {
+    * block_index : integer
+    --
+    timestamp : datetime
+    previous_hash : text
+    hash : text
+    created_at : datetime
+  }
+
+  entity "ChainTransaction" as ChainTransaction {
+    * tx_id : UUID
+    --
+    * block_index : integer
+    * sender_account_id : UUID
+    * receiver_account_id : UUID
+    amount : decimal
+    currency : text
+    created_at : datetime
+  }
+
+  entity "WalletBalance" as WalletBalance {
+    * account_id : UUID
+    * currency : text
+    --
+    balance : decimal
+    updated_at : datetime
+  }
+}
+
 Customer ||--|| UserPreference : 拥有
 Customer ||--o{ Account : 拥有
 Account ||--o{ Portfolio : 拥有
@@ -282,5 +312,10 @@ Instrument ||--o{ Statistical : 资产1
 Instrument ||--o{ Statistical : 资产2
 Instrument ||--o{ Valuation : 估值结果
 MarketData ||--o{ Valuation : 估值输入
+
+Block ||--o{ ChainTransaction : 包含
+Account ||--o{ ChainTransaction : 发送
+Account ||--o{ ChainTransaction : 接收
+Account ||--o{ WalletBalance : 具有
 
 @enduml
