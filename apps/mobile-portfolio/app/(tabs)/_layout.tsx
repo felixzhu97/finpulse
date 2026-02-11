@@ -1,5 +1,7 @@
+import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import React from "react";
+import { Platform, StyleSheet, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function Layout() {
@@ -26,11 +28,11 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen
-        name="accounts"
+        name="watchlists"
         options={{
-          title: "Accounts",
+          title: "Watchlist",
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="account-balance-wallet" size={24} color={color} />
+            <MaterialIcons name="star" size={24} color={color} />
           ),
         }}
       />
@@ -40,15 +42,6 @@ export default function Layout() {
           title: "Insights",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="insights" size={24} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="watchlists"
-        options={{
-          title: "Watchlists",
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="star" size={24} color={color} />
           ),
         }}
       />

@@ -12,6 +12,7 @@ Portfolio management mobile app for viewing investment accounts, performance cha
 | Charts | react-native-wagmi-charts, react-native-chart-kit, react-native-svg |
 | Native Charts | iOS Metal (Swift), Android (Kotlin) |
 | Navigation | React Navigation (bottom-tabs) |
+| UI | expo-blur (Liquid Glass), useDraggableDrawer (bottom sheets) |
 
 Native chart components: line, candlestick (K-line), American OHLC, baseline, histogram, line-only, with horizontal scroll and tooltips.
 
@@ -20,16 +21,15 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 | Screen | Route | Description |
 |--------|-------|-------------|
 | Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native line chart |
-| Stocks | `/(tabs)/accounts` | Stock list with real-time prices, per-stock sparklines, account summaries; pull-to-refresh |
+| Watchlist | `/(tabs)/watchlists` | Stock list (portfolio holdings) with real-time prices, sparklines, account rows; search (bottom sheet, closes on drawer/sort/tab), sort menu; pull-to-refresh; stock detail drawer (draggable, share) |
 | Insights | `/(tabs)/insights` | Portfolio risk (high-risk exposure, top 5 concentration), optional server risk metrics (volatility, Sharpe, VaR, beta), bar chart |
-| Watchlists | `/(tabs)/watchlists` | Create watchlists, add symbols (draggable drawer), real-time quotes; stock detail drawer with watchlist add/remove (Apple Stocks–style) |
 | Profile | `/(tabs)/profile` | User preferences (theme, language, notifications) via `/api/v1/user-preferences` |
 
 ## Project Structure (Thin Client)
 
 The app is a **thin client**: business logic lives on the server; the mobile app fetches data and renders UI.
 
-Profile, Watchlists, and Insights also use `useUserPreferences`, `useWatchlists`, `useRiskMetrics` and `customersApi`, `userPreferencesApi`, `watchlistsApi`, `instrumentsApi`, `riskMetricsApi` (REST: customers, user-preferences, watchlists, watchlist-items, instruments, risk-metrics).
+Profile and Insights also use `useUserPreferences`, `useRiskMetrics` and `customersApi`, `userPreferencesApi`, `riskMetricsApi` (REST: customers, user-preferences, risk-metrics).
 
 - `app/`: expo-router routes and screens.
 - `src/api/`: data layer—implements backend contracts (single-layer; no subfolders).
@@ -37,11 +37,11 @@ Profile, Watchlists, and Insights also use `useUserPreferences`, `useWatchlists`
   - `portfolioApi.ts`: GET portfolio (cached), getAccounts, getAccountById, getHoldingsByAccount, getAssetAllocationByAccountType, getPortfolioHistory, getRiskSummary, invalidateCache, seedPortfolio(POST /api/v1/seed).
   - `quotes.ts`: `getQuotes(symbols)` (GET /api/v1/quotes).
   - `quoteSocket.ts`: `createQuoteSocket()` for WebSocket `/ws/quotes`.
-  - `customersApi.ts`, `userPreferencesApi.ts`, `watchlistsApi.ts`, `instrumentsApi.ts`, `riskMetricsApi.ts`: REST resources for Profile, Watchlists, Insights.
+  - `customersApi.ts`, `userPreferencesApi.ts`, `riskMetricsApi.ts`: REST resources for Profile, Insights. `watchlistsApi.ts`, `instrumentsApi.ts` available for future use.
 - `src/types/`: shared interfaces—`portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`; `index.ts` re-exports all.
 - `src/hooks/`: `usePortfolio`, `useSymbolDisplayData` (Redux-backed quotes + history for list/drawer), `useRealtimeQuotes`, `usePerSymbolHistory`, `useUserPreferences`, `useWatchlists`, `useRiskMetrics`, `useDraggableDrawer`; all consume `api` and `types`.
 - `src/store/`: Redux (quotes slice, selectors, `QuoteSocketSubscriber`), custom portfolio UI store (`usePortfolioStore`).
-- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Watchlist: `WatchlistCard`, `WatchlistItemRow`, `StockDetailDrawer` (draggable, watchlist options), `AddSymbolModal` (draggable drawer).
+- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Watchlist screen uses `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch).
 
 ### Diagrams
 
@@ -93,12 +93,11 @@ The app connects only to the backend; there is no in-app mock data.
 |----------|--------|
 | `GET /api/v1/portfolio` | Aggregated portfolio (Dashboard, Accounts, Insights) |
 | `GET /api/v1/quotes?symbols=...` | One-off quote fetch via `getQuotes(symbols)` |
-| `WS /ws/quotes` | Real-time quotes via `createQuoteSocket` (Stocks, Watchlists) |
+| `WS /ws/quotes` | Real-time quotes via `createQuoteSocket` (Watchlist screen) |
 | `POST /api/v1/seed` | Seed portfolio via `portfolioApi.seedPortfolio(payload)` |
-| `GET /api/v1/customers` | Resolve current customer for Profile and Watchlists |
+| `GET /api/v1/customers` | Resolve current customer for Profile |
 | `GET/PUT /api/v1/user-preferences` | Profile preferences (theme, language, notifications) |
-| `GET/POST/DELETE /api/v1/watchlists`, `watchlist-items` | Watchlists screen |
-| `GET /api/v1/instruments` | Symbol/name lookup for watchlist items |
+| `GET /api/v1/instruments` | Symbol/name lookup (if used) |
 | `GET /api/v1/risk-metrics` | Insights server metrics (volatility, Sharpe, VaR, beta) when available |
 
 1. From repo root: `pnpm run start:backend` (Docker + TimescaleDB + Redis + Kafka + API + seed + mock quote producer).
@@ -108,8 +107,8 @@ The app connects only to the backend; there is no in-app mock data.
 
 ### Real-time quotes and sparklines
 
-Stocks and Watchlists use a single Redux-backed flow:
+The Watchlist screen uses a single Redux-backed flow:
 
-- **QuoteSocketSubscriber** (in root layout) reads `subscribedSymbols` from the store, opens one WebSocket to `/ws/quotes`, and dispatches `setSnapshot` / `setStatus`. Screens call **useSymbolDisplayData(symbols)** to set subscribed symbols and read `bySymbol`, `quoteMap`, `historyBySymbol` from the store (with memoized selectors).
-- **StockDetailDrawer** and **AddSymbolModal** use **useDraggableDrawer** for slide-up/drag-to-close animation; close button and backdrop use the same close animation.
-- **StockListItem** and **WatchlistItemRow** show NativeSparkline (history from `useSymbolDisplayData`), current price, and daily change. Tapping a row opens **StockDetailDrawer** with live price and chart; on Watchlists, the drawer shows watchlist options (remove from list, add to another list).
+- **QuoteSocketSubscriber** (in root layout) reads `subscribedSymbols` from the store, opens one WebSocket to `/ws/quotes`, and dispatches `setSnapshot` / `setStatus`. The Stocks screen calls **useSymbolDisplayData(symbols)** to set subscribed symbols and read `bySymbol`, `quoteMap`, `historyBySymbol` from the store (with memoized selectors).
+- **StockDetailDrawer** uses **useDraggableDrawer** for slide-up/drag-to-close animation; close button and backdrop use the same close animation; share action is available in the drawer header.
+- **StockListItem** shows sparkline (history from `useSymbolDisplayData`), current price, and daily change. Tapping a row opens **StockDetailDrawer** with live price and chart. **SortMenu** (name, price, change, change %) and a **bottom search bar** (opened by header search icon, **GlassView**; closes when opening detail drawer, sort menu, or switching tab) are on the Watchlist screen. Tab bar uses **expo-blur** (Liquid Glass) background.

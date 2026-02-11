@@ -1,7 +1,8 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
-  ActivityIndicator,
+  Animated,
   FlatList,
   Pressable,
   RefreshControl,
@@ -10,204 +11,373 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useWatchlists } from "@/src/hooks";
-import { useSymbolDisplayData } from "@/src/hooks/useSymbolDisplayData";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { AccountListItem } from "@/src/components/account/AccountListItem";
+import { StockListItem } from "@/src/components/account/StockListItem";
 import {
-  WatchlistCard,
-  AddSymbolModal,
   StockDetailDrawer,
   type StockDetailItem,
 } from "@/src/components/watchlist";
-import type { WatchlistContext } from "@/src/components/watchlist/StockDetailDrawer";
-import type { Instrument } from "@/src/types";
+import { GlassView } from "@/src/components/ui/GlassView";
+import { SortMenu, type SortOption } from "@/src/components/ui/SortMenu";
+import { useSymbolDisplayData } from "@/src/hooks/useSymbolDisplayData";
+import type { Account, Holding } from "@/src/types/portfolio";
+import { portfolioApi } from "@/src/api";
 
-function getSymbolsFromItems(
-  items: { instrument_id: string }[],
-  instruments: Instrument[]
-): string[] {
-  const symbols: string[] = [];
-  for (const item of items) {
-    const inst = instruments.find((i) => i.instrument_id === item.instrument_id);
-    if (inst?.symbol) symbols.push(inst.symbol.toUpperCase());
+type ListRow =
+  | { type: "stock"; holding: Holding; price: number; change: number }
+  | { type: "account"; account: Account };
+
+function formatHeaderDate() {
+  return new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+  });
+}
+
+function buildListRows(
+  baseAccounts: Account[],
+  quotes: Record<string, { price: number; change: number }>
+): ListRow[] {
+  const rows: ListRow[] = [];
+  for (const account of baseAccounts) {
+    const stockHoldings = account.holdings.filter((h) => h.symbol !== "CASH");
+    if (stockHoldings.length > 0) {
+      for (const h of stockHoldings) {
+        const q = quotes[h.symbol.toUpperCase()];
+        rows.push({
+          type: "stock",
+          holding: h,
+          price: q?.price ?? h.price,
+          change: q?.change ?? 0,
+        });
+      }
+    } else {
+      rows.push({ type: "account", account });
+    }
   }
-  return [...new Set(symbols)];
+  return rows;
 }
 
 export default function WatchlistsScreen() {
-  const {
-    watchlists,
-    instruments,
-    loading,
-    error,
-    refresh,
-    addItem,
-    removeItem,
-    createWatchlist,
-  } = useWatchlists();
+  const [baseAccounts, setBaseAccounts] = useState<Account[]>([]);
+  const [historyValues, setHistoryValues] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [addModalWatchlistId, setAddModalWatchlistId] = useState<string | null>(
-    null
-  );
-  const [newListName, setNewListName] = useState("");
-  const [showCreate, setShowCreate] = useState(false);
   const [detailItem, setDetailItem] = useState<StockDetailItem | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("name");
+  const [showSearchBar, setShowSearchBar] = useState(false);
+  const searchInputRef = useRef<TextInput>(null);
+  const searchBarAnim = useRef(new Animated.Value(0)).current;
 
-  const allSymbols = useMemo(
+  const listSymbols = useMemo(
     () =>
-      watchlists.flatMap((w) =>
-        getSymbolsFromItems(w.items, instruments)
+      Array.from(
+        new Set(
+          baseAccounts.flatMap((a) =>
+            a.holdings.map((h) => h.symbol).filter((s) => s !== "CASH")
+          )
+        )
       ),
-    [watchlists, instruments]
+    [baseAccounts]
   );
+
   const symbols = useMemo(
     () =>
       Array.from(
-        new Set([
-          ...allSymbols,
-          ...(detailItem ? [detailItem.symbol] : []),
-        ])
+        new Set([...listSymbols, ...(detailItem ? [detailItem.symbol] : [])])
       ),
-    [allSymbols, detailItem?.symbol]
+    [listSymbols, detailItem?.symbol]
   );
-  const { quoteMap, historyBySymbol, bySymbol } = useSymbolDisplayData(symbols);
 
-  const watchlistContext = useMemo((): WatchlistContext | null => {
-    if (!detailItem || !instruments.length) return null;
-    const instrument = instruments.find(
-      (i) => i.symbol.toUpperCase() === detailItem!.symbol.toUpperCase()
-    );
-    if (!instrument) return null;
-    const memberships: { watchlistItemId: string; watchlistName: string }[] = [];
-    const listIdsWithSymbol = new Set<string>();
-    for (const w of watchlists) {
-      for (const item of w.items) {
-        if (item.instrument_id === instrument.instrument_id) {
-          memberships.push({
-            watchlistItemId: item.watchlist_item_id,
-            watchlistName: w.watchlist.name,
-          });
-          listIdsWithSymbol.add(w.watchlist.watchlist_id);
+  const initialPrices = useMemo(
+    () =>
+      Object.fromEntries(
+        baseAccounts.flatMap((a) =>
+          a.holdings
+            .filter((h) => h.symbol !== "CASH")
+            .map((h) => [h.symbol.toUpperCase(), h.price])
+        )
+      ),
+    [baseAccounts]
+  );
+
+  const { quoteMap, historyBySymbol, bySymbol } = useSymbolDisplayData(
+    symbols,
+    initialPrices
+  );
+
+  const baseRows = useMemo(
+    () => buildListRows(baseAccounts, quoteMap),
+    [baseAccounts, quoteMap]
+  );
+
+  const filteredAndSortedRows = useMemo(() => {
+    let filtered = baseRows;
+    if (searchQuery.trim()) {
+      const query = searchQuery.trim().toUpperCase();
+      filtered = filtered.filter((row) => {
+        if (row.type === "stock") {
+          return (
+            row.holding.symbol.toUpperCase().includes(query) ||
+            row.holding.name.toUpperCase().includes(query)
+          );
         }
-      }
+        return row.account.name.toUpperCase().includes(query);
+      });
     }
-    const watchlistOptions = watchlists
-      .filter((w) => !listIdsWithSymbol.has(w.watchlist.watchlist_id))
-      .map((w) => ({ watchlist_id: w.watchlist.watchlist_id, name: w.watchlist.name }));
 
-    return {
-      memberships,
-      watchlistOptions,
-      onAdd: (watchlistId: string) => {
-        addItem(watchlistId, instrument.instrument_id);
-      },
-      onRemove: (watchlistItemId: string) => {
-        removeItem(watchlistItemId);
-      },
-    };
-  }, [detailItem, instruments, watchlists, addItem, removeItem]);
+    const stockRows = filtered.filter(
+      (r): r is Extract<ListRow, { type: "stock" }> => r.type === "stock"
+    );
+    const accountRows = filtered.filter(
+      (r): r is Extract<ListRow, { type: "account" }> => r.type === "account"
+    );
+
+    const sortedStocks = [...stockRows].sort((a, b) => {
+      switch (sortBy) {
+        case "name":
+          return a.holding.symbol.localeCompare(b.holding.symbol);
+        case "price":
+          return b.price - a.price;
+        case "change":
+          return b.change - a.change;
+        case "changePercent":
+          const aPercent = a.price > 0 ? (a.change / a.price) * 100 : 0;
+          const bPercent = b.price > 0 ? (b.change / b.price) * 100 : 0;
+          return bPercent - aPercent;
+        default:
+          return 0;
+      }
+    });
+
+    return [...sortedStocks, ...accountRows];
+  }, [baseRows, searchQuery, sortBy]);
+
+  const load = useCallback(async () => {
+    const portfolio = await portfolioApi.getPortfolio();
+    setBaseAccounts(portfolio?.accounts ?? []);
+    setHistoryValues(portfolio?.history.map((h) => h.value) ?? []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await refresh();
+    portfolioApi.invalidateCache();
+    await load();
     setRefreshing(false);
-  }, [refresh]);
+  }, [load]);
 
-  const handleAddSymbol = useCallback(
-    async (instrumentId: string) => {
-      if (!addModalWatchlistId) return;
-      await addItem(addModalWatchlistId, instrumentId);
-      setAddModalWatchlistId(null);
-    },
-    [addModalWatchlistId, addItem]
+  const closeSearchBar = useCallback(() => {
+    if (!showSearchBar) return;
+    searchInputRef.current?.blur();
+    setShowSearchBar(false);
+    Animated.spring(searchBarAnim, {
+      toValue: 0,
+      useNativeDriver: true,
+    }).start(() => {
+      setSearchQuery("");
+    });
+  }, [showSearchBar, searchBarAnim]);
+
+  const handleSearchPress = useCallback(() => {
+    const nextShow = !showSearchBar;
+    setShowSearchBar(nextShow);
+    Animated.spring(searchBarAnim, {
+      toValue: nextShow ? 1 : 0,
+      useNativeDriver: true,
+    }).start(() => {
+      if (nextShow) {
+        setTimeout(() => searchInputRef.current?.focus(), 100);
+      } else {
+        setSearchQuery("");
+      }
+    });
+  }, [showSearchBar, searchBarAnim]);
+
+  useEffect(() => {
+    if (detailItem !== null && showSearchBar) {
+      closeSearchBar();
+    }
+  }, [detailItem, showSearchBar, closeSearchBar]);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        if (showSearchBar) {
+          searchInputRef.current?.blur();
+          setShowSearchBar(false);
+          searchBarAnim.setValue(0);
+          setSearchQuery("");
+        }
+      };
+    }, [showSearchBar, searchBarAnim])
   );
 
-  const handleCreateWatchlist = useCallback(async () => {
-    const name = newListName.trim() || "My list";
-    const created = await createWatchlist(name);
-    if (created) {
-      setNewListName("");
-      setShowCreate(false);
-    }
-  }, [newListName, createWatchlist]);
-
-  if (loading && watchlists.length === 0) {
+  if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0A84FF" />
-        <Text style={styles.loadingText}>Loading watchlists...</Text>
-      </View>
+      <SafeAreaView style={styles.screen}>
+        <StatusBar style="light" />
+        <View style={styles.centered}>
+          <Text style={styles.loadingText}>Loading stocks...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
-  if (error) {
+  if (baseAccounts.length === 0) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>
-          Unable to load watchlists. Start the backend and try again.
-        </Text>
-        <Pressable style={styles.retryBtn} onPress={onRefresh}>
-          <Text style={styles.retryText}>Retry</Text>
-        </Pressable>
-      </View>
+      <SafeAreaView style={styles.screen}>
+        <StatusBar style="light" />
+        <View style={styles.header}>
+          <Text style={styles.title}>Stocks</Text>
+        </View>
+        <View style={styles.centered}>
+          <Text style={styles.loadingText}>
+            Start backend and seed data first.
+          </Text>
+          <Pressable style={styles.retryBtn} onPress={onRefresh}>
+            <Text style={styles.retryText}>Retry</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen} edges={["top"]}>
+      <StatusBar style="light" />
       <View style={styles.header}>
-        <Text style={styles.title}>Watchlists</Text>
-        <Pressable
-          style={styles.iconButton}
-          onPress={() => setShowCreate(true)}
-        >
-          <MaterialIcons name="add" size={24} color="#fff" />
-        </Pressable>
-      </View>
-      <FlatList
-        data={watchlists}
-        keyExtractor={(item) => item.watchlist.watchlist_id}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#fff"
+        <View>
+          <Text style={styles.title}>Stocks</Text>
+          <Text style={styles.date}>{formatHeaderDate()}</Text>
+        </View>
+        <View style={styles.headerActions}>
+          <SortMenu
+            currentSort={sortBy}
+            onSelect={setSortBy}
+            onOpen={closeSearchBar}
           />
-        }
-        renderItem={({ item }) => (
-          <View style={styles.cardWrap}>
-            <WatchlistCard
-              title={item.watchlist.name}
-              items={item.items}
-              instruments={instruments}
-              quotes={quoteMap}
-              historyBySymbol={historyBySymbol}
-              onItemPress={setDetailItem}
+          <Pressable style={styles.iconButton} onPress={handleSearchPress}>
+            <MaterialIcons name="search" size={24} color="#fff" />
+          </Pressable>
+        </View>
+      </View>
+      <View style={styles.listContainer}>
+        <FlatList
+          data={filteredAndSortedRows}
+          keyExtractor={(item) =>
+            item.type === "stock" ? item.holding.id : item.account.id
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#fff"
             />
+          }
+          renderItem={({ item }) =>
+            item.type === "stock" ? (
+              <StockListItem
+                holding={item.holding}
+                price={item.price}
+                change={item.change}
+                historyValues={historyBySymbol[item.holding.symbol.toUpperCase()]}
+                onPress={() =>
+                  setDetailItem({
+                    symbol: item.holding.symbol,
+                    name: item.holding.name,
+                    price: item.price,
+                    change: item.change,
+                    historyValues:
+                      historyBySymbol[item.holding.symbol.toUpperCase()],
+                  })
+                }
+              />
+            ) : (
+              <AccountListItem
+                account={item.account}
+                historyValues={historyValues}
+              />
+            )
+          }
+          ListEmptyComponent={
+            searchQuery.trim() ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No stocks found</Text>
+                <Text style={styles.emptySubtext}>
+                  Try a different search term
+                </Text>
+              </View>
+            ) : null
+          }
+        />
+      </View>
+      <Animated.View
+        style={[
+          styles.searchBarContainer,
+          {
+            opacity: searchBarAnim,
+            transform: [
+              {
+                translateY: searchBarAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [100, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+        pointerEvents={showSearchBar ? "auto" : "none"}
+      >
+        <GlassView intensity={70} tint="dark" style={styles.searchBarGlass}>
+          <View style={styles.searchBarRow}>
+            <GlassView intensity={50} tint="dark" style={styles.searchBarWrapper}>
+              <MaterialIcons
+                name="search"
+                size={20}
+                color="rgba(255,255,255,0.6)"
+                style={styles.searchIcon}
+              />
+              <TextInput
+                ref={searchInputRef}
+                style={styles.searchInput}
+                placeholder="Search stocks..."
+                placeholderTextColor="rgba(255,255,255,0.45)"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="search"
+              />
+              {searchQuery.length > 0 && (
+                <Pressable
+                  onPress={() => setSearchQuery("")}
+                  hitSlop={8}
+                  style={styles.clearBtn}
+                >
+                  <MaterialIcons name="close" size={18} color="rgba(255,255,255,0.6)" />
+                </Pressable>
+              )}
+            </GlassView>
             <Pressable
-              style={styles.addSymbolBtn}
-              onPress={() => setAddModalWatchlistId(item.watchlist.watchlist_id)}
+              onPress={handleSearchPress}
+              hitSlop={8}
+              style={styles.searchCloseBtn}
             >
-              <MaterialIcons name="add-circle-outline" size={22} color="#0A84FF" />
-              <Text style={styles.addSymbolText}>Add symbol</Text>
+              <GlassView intensity={60} tint="dark" style={styles.searchCloseGlass}>
+                <MaterialIcons name="close" size={24} color="#fff" />
+              </GlassView>
             </Pressable>
           </View>
-        )}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyText}>No watchlists yet.</Text>
-            <Text style={styles.emptySub}>
-              Create one with the + button, or start the backend and seed data.
-            </Text>
-          </View>
-        }
-      />
-      <AddSymbolModal
-        visible={addModalWatchlistId !== null}
-        instruments={instruments}
-        onSelect={handleAddSymbol}
-        onClose={() => setAddModalWatchlistId(null)}
-      />
+        </GlassView>
+      </Animated.View>
       <StockDetailDrawer
         visible={detailItem !== null}
         item={detailItem}
@@ -217,41 +387,8 @@ export default function WatchlistsScreen() {
             ? bySymbol[detailItem.symbol.toUpperCase()] ?? null
             : null
         }
-        watchlistContext={watchlistContext}
       />
-      {showCreate && (
-        <View style={styles.createOverlay}>
-          <View style={styles.createSheet}>
-            <Text style={styles.createTitle}>New watchlist</Text>
-            <TextInput
-              style={styles.createInput}
-              value={newListName}
-              onChangeText={setNewListName}
-              placeholder="List name"
-              placeholderTextColor="rgba(255,255,255,0.4)"
-              autoFocus
-            />
-            <View style={styles.createActions}>
-              <Pressable
-                style={[styles.createBtn, styles.cancelBtn]}
-                onPress={() => {
-                  setShowCreate(false);
-                  setNewListName("");
-                }}
-              >
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.createBtn, styles.confirmBtn]}
-                onPress={handleCreateWatchlist}
-              >
-                <Text style={styles.confirmBtnText}>Create</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -259,6 +396,15 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: "#000",
+  },
+  centered: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingText: {
+    color: "#9ca3af",
+    fontSize: 16,
   },
   header: {
     flexDirection: "row",
@@ -274,45 +420,28 @@ const styles = StyleSheet.create({
     color: "#fff",
     letterSpacing: -0.5,
   },
+  date: {
+    fontSize: 13,
+    color: "rgba(255,255,255,0.5)",
+    marginTop: 4,
+    fontWeight: "400",
+  },
+  headerActions: {
+    flexDirection: "row",
+    gap: 8,
+  },
   iconButton: {
     width: 44,
     height: 44,
+    borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
   },
-  listContent: {
-    paddingBottom: 40,
-  },
-  cardWrap: {
-    marginBottom: 0,
-  },
-  addSymbolBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-  },
-  addSymbolText: {
-    fontSize: 14,
-    color: "#0A84FF",
-  },
-  centered: {
+  listContainer: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  loadingText: {
-    color: "rgba(255,255,255,0.7)",
-    marginTop: 12,
-  },
-  errorText: {
-    color: "#f87171",
-    textAlign: "center",
   },
   retryBtn: {
-    marginTop: 16,
+    marginTop: 12,
     paddingVertical: 10,
     paddingHorizontal: 20,
     backgroundColor: "rgba(255,255,255,0.1)",
@@ -322,69 +451,75 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
   },
-  empty: {
-    paddingVertical: 40,
+  emptyContainer: {
+    padding: 40,
     alignItems: "center",
   },
   emptyText: {
-    fontSize: 16,
-    color: "rgba(255,255,255,0.7)",
+    fontSize: 17,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.9)",
+    marginBottom: 4,
   },
-  emptySub: {
-    fontSize: 13,
+  emptySubtext: {
+    fontSize: 15,
     color: "rgba(255,255,255,0.5)",
-    marginTop: 8,
-    textAlign: "center",
   },
-  createOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
+  searchBarContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
-  createSheet: {
-    backgroundColor: "#1a1a1a",
-    borderRadius: 16,
-    padding: 24,
-    width: "100%",
-    maxWidth: 340,
+  searchBarGlass: {
+    borderRadius: 20,
+    overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(255,255,255,0.12)",
   },
-  createTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#fff",
-    marginBottom: 16,
-  },
-  createInput: {
-    backgroundColor: "rgba(255,255,255,0.08)",
-    borderRadius: 10,
-    padding: 14,
-    fontSize: 16,
-    color: "#fff",
-    marginBottom: 20,
-  },
-  createActions: {
+  searchBarRow: {
     flexDirection: "row",
-    gap: 12,
-    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 10,
+    padding: 6,
   },
-  createBtn: {
+  searchBarWrapper: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 14,
+    paddingHorizontal: 12,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+    overflow: "hidden",
   },
-  cancelBtn: {
-    backgroundColor: "rgba(255,255,255,0.1)",
+  searchCloseBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    overflow: "hidden",
   },
-  cancelBtnText: {
-    color: "rgba(255,255,255,0.8)",
+  searchCloseGlass: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  confirmBtn: {
-    backgroundColor: "#0A84FF",
+  searchIcon: {
+    marginRight: 8,
   },
-  confirmBtnText: {
+  searchInput: {
+    flex: 1,
+    fontSize: 17,
     color: "#fff",
-    fontWeight: "600",
+    padding: 0,
+  },
+  clearBtn: {
+    padding: 4,
+    marginLeft: 8,
   },
 });

@@ -6,6 +6,7 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   View,
@@ -99,6 +100,18 @@ export function StockDetailDrawer({
     price
   );
 
+  const handleShare = async () => {
+    try {
+      const shareText = `${item.symbol} - ${formatPrice(price)} (${isUp ? "+" : ""}${changePercent}%)`;
+      await Share.share({
+        message: shareText,
+        title: item.symbol,
+      });
+    } catch {
+      // Share cancelled or failed
+    }
+  };
+
   return (
     <Modal
       visible={visible}
@@ -133,9 +146,14 @@ export function StockDetailDrawer({
             <View style={styles.headerBar}>
               <View style={styles.headerRow}>
                 <Text style={styles.symbolTitle}>{item.symbol}</Text>
-                <Pressable onPress={closeWithAnimation} hitSlop={12} style={styles.closeBtn}>
-                  <MaterialIcons name="close" size={22} color="#fff" />
-                </Pressable>
+                <View style={styles.headerActions}>
+                  <Pressable onPress={handleShare} hitSlop={12} style={styles.actionBtn}>
+                    <MaterialIcons name="share" size={20} color="#fff" />
+                  </Pressable>
+                  <Pressable onPress={closeWithAnimation} hitSlop={12} style={styles.closeBtn}>
+                    <MaterialIcons name="close" size={22} color="#fff" />
+                  </Pressable>
+                </View>
               </View>
             </View>
             <ScrollView
@@ -334,6 +352,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  actionBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   closeBtn: {
     width: 32,

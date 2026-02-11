@@ -28,6 +28,8 @@ PODS:
     - Yoga
   - ExpoAsset (12.0.12):
     - ExpoModulesCore
+  - ExpoBlur (14.0.3):
+    - ExpoModulesCore
   - ExpoFileSystem (19.0.21):
     - ExpoModulesCore
   - ExpoFont (14.0.11):
@@ -2055,6 +2057,7 @@ DEPENDENCIES:
   - "EXConstants (from `../../../node_modules/.pnpm/expo-constants@18.0.13_expo@54.0.32_react-native@0.81.5_@babel+core@7.28.6_@react-nativ_c5cd3bc6eb385faa1daaa06267520b2f/node_modules/expo-constants/ios`)"
   - "Expo (from `../../../node_modules/.pnpm/expo@54.0.32_@babel+core@7.28.6_@expo+metro-runtime@6.1.2_expo-router@6.0.22_react-nati_af2853b0a503f5dcc038f0d9078465da/node_modules/expo`)"
   - "ExpoAsset (from `../../../node_modules/.pnpm/expo-asset@12.0.12_expo@54.0.32_react-native@0.81.5_@babel+core@7.28.6_@react-native-co_48c3517e60e8dc0fb78b4b53bddf3135/node_modules/expo-asset/ios`)"
+  - "ExpoBlur (from `../../../node_modules/.pnpm/expo-blur@14.0.3_expo@54.0.32_react-native@0.81.5_@babel+core@7.28.6_@react-native-comm_ef2aeddc48057b3f829d63776307d6dd/node_modules/expo-blur/ios`)"
   - "ExpoFileSystem (from `../../../node_modules/.pnpm/expo-file-system@19.0.21_expo@54.0.32_react-native@0.81.5_@babel+core@7.28.6_@react-nat_b074d967862bbdd4c01b19b7623ed718/node_modules/expo-file-system/ios`)"
   - "ExpoFont (from `../../../node_modules/.pnpm/expo-font@14.0.11_expo@54.0.32_react-native@0.81.5_@babel+core@7.28.6_@react-native-com_e6fad51aef211e960818dab9c03a7c89/node_modules/expo-font/ios`)"
   - "ExpoHead (from `../../../node_modules/.pnpm/expo-router@6.0.22_2303a0fd4f8905ab5c4049bb052d03ef/node_modules/expo-router/ios`)"
@@ -2146,6 +2149,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/.pnpm/expo@54.0.32_@babel+core@7.28.6_@expo+metro-runtime@6.1.2_expo-router@6.0.22_react-nati_af2853b0a503f5dcc038f0d9078465da/node_modules/expo"
   ExpoAsset:
     :path: "../../../node_modules/.pnpm/expo-asset@12.0.12_expo@54.0.32_react-native@0.81.5_@babel+core@7.28.6_@react-native-co_48c3517e60e8dc0fb78b4b53bddf3135/node_modules/expo-asset/ios"
+  ExpoBlur:
+    :path: "../../../node_modules/.pnpm/expo-blur@14.0.3_expo@54.0.32_react-native@0.81.5_@babel+core@7.28.6_@react-native-comm_ef2aeddc48057b3f829d63776307d6dd/node_modules/expo-blur/ios"
   ExpoFileSystem:
     :path: "../../../node_modules/.pnpm/expo-file-system@19.0.21_expo@54.0.32_react-native@0.81.5_@babel+core@7.28.6_@react-nat_b074d967862bbdd4c01b19b7623ed718/node_modules/expo-file-system/ios"
   ExpoFont:
@@ -2316,6 +2321,7 @@ SPEC CHECKSUMS:
   EXConstants: fce59a631a06c4151602843667f7cfe35f81e271
   Expo: 4e503a041c59c4e34c8be262a135848ad5cd3710
   ExpoAsset: f867e55ceb428aab99e1e8c082b5aee7c159ea18
+  ExpoBlur: 392c1207f71d0ecf22371621c1fbd44ba84d9742
   ExpoFileSystem: 858a44267a3e6e9057e0888ad7c7cfbf55d52063
   ExpoFont: f543ce20a228dd702813668b1a07b46f51878d47
   ExpoHead: 4425246bc93411f0fe7f6945f95f698e91db8780
