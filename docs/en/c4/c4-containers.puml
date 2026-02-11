@@ -12,7 +12,7 @@ System_Boundary(finpulse, "FinPulse") {
     Container(mobile_demo, "Mobile Demo", "React Native", "Demo app and native chart showcase")
     Container(portfolio_api, "Portfolio Analytics API", "FastAPI", "REST API, WebSocket, AI/ML, blockchain simulation; portfolio, market data, risk, analytics, digital currency")
     ContainerDb(timescale, "TimescaleDB", "PostgreSQL + TimescaleDB", "Portfolio metadata and history hypertable")
-    ContainerDb(redis, "Redis", "In-memory", "History cache")
+    ContainerDb(redis, "Redis", "In-memory", "History, portfolio aggregate, blockchain read cache")
     ContainerQueue(kafka, "Kafka", "Event streaming", "portfolio.events, market.quotes.enriched")
 }
 

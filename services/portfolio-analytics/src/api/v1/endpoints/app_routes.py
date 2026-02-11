@@ -3,9 +3,10 @@ from typing import Annotated, Dict, List
 from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect
 
 from src.api.v1.mappers.portfolio_assembler import assemble_portfolio
+from src.api.dependencies import get_cache, get_market_data_service, get_portfolio_service
 from src.core.application.use_cases.market_data_service import MarketDataService
 from src.core.application.use_cases.portfolio_service import PortfolioApplicationService
-from src.api.dependencies import get_market_data_service, get_portfolio_service
+from src.infrastructure.cache import PORTFOLIO_AGGREGATE_KEY_PREFIX, DEFAULT_TTL, RedisCache
 
 router = APIRouter()
 
@@ -30,9 +31,22 @@ def register(r: APIRouter) -> None:
     @r.get("/api/v1/portfolio")
     async def portfolio_get(
         svc: Annotated[PortfolioApplicationService, Depends(get_portfolio_service)],
+        cache: Annotated[RedisCache, Depends(get_cache)] = None,
     ):
+        cache_key = f"{PORTFOLIO_AGGREGATE_KEY_PREFIX}demo-portfolio"
+        if cache:
+            cached = await cache.get(cache_key)
+            if cached is not None:
+                return cached
         portfolio = await svc.get_portfolio()
-        return assemble_portfolio(portfolio)
+        response = assemble_portfolio(portfolio)
+        if cache:
+            await cache.set(
+                cache_key,
+                response.model_dump(mode="json"),
+                ttl_seconds=DEFAULT_TTL,
+            )
+        return response
 
     @r.get("/api/v1/quotes")
     def quotes_get(
@@ -46,10 +60,13 @@ def register(r: APIRouter) -> None:
     async def portfolio_seed(
         payload: dict,
         svc: Annotated[PortfolioApplicationService, Depends(get_portfolio_service)],
+        cache: Annotated[RedisCache, Depends(get_cache)] = None,
     ):
         ok = await svc.seed_portfolio(payload)
         if not ok:
             raise HTTPException(status_code=400, detail="Invalid portfolio payload")
+        if cache:
+            await cache.delete_by_prefix(PORTFOLIO_AGGREGATE_KEY_PREFIX)
         return {"ok": True}
 
     @r.websocket("/ws/quotes")

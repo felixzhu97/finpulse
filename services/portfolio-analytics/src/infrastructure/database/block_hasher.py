@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import List
 
@@ -28,7 +29,7 @@ def compute_block_hash(
         previous_hash=previous_hash,
         transaction_ids=list(transaction_ids),
     )
-    data = payload.model_dump_json(sort_keys=True).encode("utf-8")
+    data = json.dumps(payload.model_dump(), sort_keys=True).encode("utf-8")
     digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
     digest.update(data)
     return digest.finalize().hex()

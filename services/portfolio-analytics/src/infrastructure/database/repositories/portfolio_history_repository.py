@@ -1,41 +1,26 @@
 import json
 from datetime import datetime, timedelta, timezone
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.infrastructure.config import REDIS_URL, HISTORY_CACHE_TTL_SECONDS
+from src.infrastructure.config import HISTORY_CACHE_TTL_SECONDS
 from src.core.domain.value_objects.portfolio import HistoryPoint
 from src.core.application.ports.repositories.portfolio_repository import IPortfolioHistoryRepository
 from src.infrastructure.database.models import PortfolioHistoryRow
-
-try:
-    import redis.asyncio as aioredis
-except ImportError:
-    aioredis = None
 
 _CACHE_KEY_PREFIX = "portfolio:history:"
 
 
 class PortfolioHistoryRepository(IPortfolioHistoryRepository):
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession, redis_client: Optional[object] = None):
         self._session = session
-        self._redis = None
-
-    async def _get_redis(self):
-        if aioredis is None:
-            return None
-        if self._redis is None:
-            try:
-                self._redis = aioredis.from_url(REDIS_URL, decode_responses=True)
-            except Exception:
-                pass
-        return self._redis
+        self._redis = redis_client
 
     async def get_range(self, portfolio_id: str, days: int = 30) -> List[HistoryPoint]:
-        redis_client = await self._get_redis()
+        redis_client = self._redis
         cache_key = f"{_CACHE_KEY_PREFIX}{portfolio_id}:{days}d"
         if redis_client:
             try:
@@ -102,7 +87,7 @@ class PortfolioHistoryRepository(IPortfolioHistoryRepository):
         except Exception:
             return
 
-        redis_client = await self._get_redis()
+        redis_client = self._redis
         if redis_client:
             try:
                 keys = [f"{_CACHE_KEY_PREFIX}{portfolio_id}:{d}d" for d in [7, 30, 90]]

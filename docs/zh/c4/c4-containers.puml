@@ -12,7 +12,7 @@ System_Boundary(finpulse, "FinPulse") {
     Container(mobile_demo, "移动端演示", "React Native", "演示应用与原生图表展示")
     Container(portfolio_api, "投资组合分析 API", "FastAPI", "REST API、WebSocket、AI/ML、区块链模拟；投资组合、市场数据、风险、分析、数字货币")
     ContainerDb(timescale, "TimescaleDB", "PostgreSQL + TimescaleDB", "投资组合元数据与历史超表")
-    ContainerDb(redis, "Redis", "内存", "历史缓存")
+    ContainerDb(redis, "Redis", "内存", "历史、组合聚合、区块链读缓存")
     ContainerQueue(kafka, "Kafka", "事件流", "portfolio.events, market.quotes.enriched")
 }
 

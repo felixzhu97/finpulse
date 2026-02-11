@@ -380,6 +380,12 @@ class TransferCreate(BaseModel):
     currency: str = "SIM_COIN"
 
 
+class SeedBalanceCreate(BaseModel):
+    account_id: UUID
+    currency: str = "SIM_COIN"
+    amount: float
+
+
 class BlockResponse(BaseModel):
     model_config = ConfigDict(from_attributes=False)
 

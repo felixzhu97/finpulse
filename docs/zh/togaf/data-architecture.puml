@@ -241,9 +241,11 @@ package "Portfolio Analytics Storage" {
         - Seed via POST /api/v1/seed
     end note
     note right of RedisCache
-        <b>Cache</b>
-        - portfolio:history:{id}:{days}d
-        - TTL 300s
+        <b>缓存（共享客户端）</b>
+        - portfolio:history:{id}:{days}d（TTL 来自 env）
+        - portfolio:aggregate:demo-portfolio（300s）
+        - blockchain:*（区块、交易、余额；300s）
+        - seed/transfer/seed-balance 时失效
     end note
     note right of KafkaPortfolioEvents
         <b>Events</b>
@@ -325,7 +327,7 @@ package "数据关系" {
 
     ' Portfolio Analytics storage
     PortfolioData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
-    TimescaleDB "1" --> "0..1" RedisCache : caches history
+    TimescaleDB "1" --> "0..1" RedisCache : 服务端缓存（历史、聚合、区块链读）
     BlockData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
     ChainTransactionData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
     WalletBalanceData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)

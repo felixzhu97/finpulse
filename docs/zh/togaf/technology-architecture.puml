@@ -184,7 +184,7 @@ package "Portfolio Analytics Backend" <<Infra>> {
         DDD, python-dotenv (.env), port 8800
     end note
     note right of TimescaleDB: Portfolio metadata (JSONB)\nportfolio_history hypertable\nhost port 5433
-    note right of Redis: History cache\nport 6379, TTL 300s
+    note right of Redis: 服务端缓存\n(历史、组合聚合、区块链读)\nport 6379, TTL 300s
     note right of SQLAlchemyAsync: Async ORM\nasyncpg driver
     note right of Kafka: portfolio.events topic\nportfolio.seeded events
     note right of AIMLStack: Optional: Ollama, HF, TF\npytest, pytest-timeout

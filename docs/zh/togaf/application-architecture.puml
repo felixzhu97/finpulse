@@ -262,7 +262,7 @@ package "外部服务层 (External Services)" <<External>> {
         }
         component "SQLAlchemy 2.0 + asyncpg + Alembic" as SQLAlchemyStack
         component "TimescaleDB (portfolio + history)" as TimescaleDB
-        component "Redis (history cache)" as RedisDB
+        component "Redis (服务端缓存)" as RedisDB
         component "Kafka (portfolio.events)" as KafkaTopic
     }
 

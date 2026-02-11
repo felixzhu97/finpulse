@@ -400,6 +400,8 @@ async function seedResources() {
     { trade_id: trade4.trade_id, payment_id: payment4.payment_id, status: "settled" },
   ]);
 
+  await seedBlockchain(accountIds);
+
   const now = new Date().toISOString();
   const marketDataItems = [
     { instrument_id: inst1.instrument_id, timestamp: now, open: 227.2, high: 229.5, low: 226.8, close: 228.5, volume: 52000000, change_pct: 0.57 },
@@ -427,7 +429,41 @@ async function seedResources() {
   ];
   await postBatch("/api/v1/valuations/batch", valuationItems);
 
-  console.log("[seed] Domain resources seeded via batch APIs: customers(3), user-preferences(3), accounts(5), instruments(10), portfolios(4), watchlists(3), watchlist-items(9), positions(10), bonds(2), options(1), orders(4), trades(4), cash-transactions(4), payments(4), settlements(4), market-data(7), risk-metrics(3), valuations(5).");
+  console.log("[seed] Domain resources seeded via batch APIs: customers(3), user-preferences(3), accounts(5), instruments(10), portfolios(4), watchlists(3), watchlist-items(9), positions(10), bonds(2), options(1), orders(4), trades(4), cash-transactions(4), payments(4), settlements(4), blockchain(seed-balance + transfers), market-data(7), risk-metrics(3), valuations(5).");
+}
+
+async function seedBlockchain(accountIds) {
+  const currency = "SIM_COIN";
+  const initialBalance = 10000;
+
+  for (let i = 0; i < Math.min(3, accountIds.length); i++) {
+    await post("/api/v1/blockchain/seed-balance", {
+      account_id: accountIds[i],
+      currency,
+      amount: initialBalance,
+    });
+  }
+  console.log("[seed] Blockchain: seeded SIM_COIN balance for 3 accounts");
+
+  await post("/api/v1/blockchain/transfers", {
+    sender_account_id: accountIds[0],
+    receiver_account_id: accountIds[1],
+    amount: 500,
+    currency,
+  });
+  await post("/api/v1/blockchain/transfers", {
+    sender_account_id: accountIds[0],
+    receiver_account_id: accountIds[2],
+    amount: 300,
+    currency,
+  });
+  await post("/api/v1/blockchain/transfers", {
+    sender_account_id: accountIds[1],
+    receiver_account_id: accountIds[2],
+    amount: 200,
+    currency,
+  });
+  console.log("[seed] Blockchain: 3 SIM_COIN transfers created (blocks + chain transactions)");
 }
 
 async function main() {

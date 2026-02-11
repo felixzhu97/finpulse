@@ -10,6 +10,7 @@ Container_Boundary(portfolio_api, "投资组合分析 API") {
     Component(quotes_router, "行情路由", "FastAPI", "REST: GET /quotes, WebSocket /ws/quotes")
     Component(ai_router, "AI 路由", "FastAPI", "REST: /api/v1/ai - VaR、欺诈、情感、预测")
 
+    Component(redis_cache, "Redis 缓存", "Python", "RedisCache：按前缀 get/set/delete；组合聚合、区块链读缓存")
     Component(blockchain_router, "区块链路由", "FastAPI", "REST: /api/v1/blockchain - 转账、区块、余额")
     Component(blockchain_svc, "区块链服务", "Python", "数字货币转账与链式账本")
     Component(blockchain_ledger_repo, "区块链账本仓储", "SQLAlchemy", "区块与链上交易持久化")
@@ -28,15 +29,18 @@ Container_Boundary(portfolio_api, "投资组合分析 API") {
 }
 
 ContainerDb(timescale, "TimescaleDB", "PostgreSQL", "投资组合与历史")
-ContainerDb(redis_db, "Redis", "内存", "历史缓存")
+ContainerDb(redis_db, "Redis", "内存", "历史、组合聚合、区块链读缓存")
 ContainerQueue(kafka, "Kafka", "事件流", "portfolio.events, market.quotes.enriched")
 
+Rel(portfolio_router, redis_cache, "缓存", "通过 DI")
 Rel(portfolio_router, portfolio_svc, "调用", "Async")
+Rel(blockchain_router, redis_cache, "缓存", "通过 DI")
 Rel(resource_router, portfolio_svc, "调用", "Async")
 Rel(resource_router, portfolio_repo, "使用", "通过 DI")
 Rel(resource_router, blockchain_svc, "调用", "通过 DI")
 Rel(quotes_router, market_data_svc, "调用", "Async / WebSocket")
 Rel(ai_router, analytics_svc, "调用", "Async")
+Rel(redis_cache, redis_db, "读写", "")
 Rel(blockchain_svc, blockchain_ledger_repo, "使用", "")
 Rel(blockchain_svc, wallet_balance_repo, "使用", "")
 Rel(blockchain_ledger_repo, timescale, "SQL", "asyncpg")

@@ -189,10 +189,11 @@ package "Portfolio Analytics Storage" {
         - GET /api/v1/portfolio reads from DB
     end note
     note right of RedisCache
-        <b>Cache</b>
-        - portfolio:history:{id}:{days}d
-        - TTL 300s
-        - Invalidated on seed
+        <b>Cache (shared client)</b>
+        - portfolio:history:{id}:{days}d (TTL from env)
+        - portfolio:aggregate:demo-portfolio (300s)
+        - blockchain:* (blocks, block_txs, tx, balance; 300s)
+        - Invalidated on seed / transfer / seed-balance
     end note
     note right of KafkaPortfolioEvents
         <b>Events</b>
@@ -260,7 +261,7 @@ package "Data Relationships" {
     BlockData "1" --> "0..N" ChainTransactionData : contains
 
     PortfolioData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
-    TimescaleDB "1" --> "0..1" RedisCache : caches history
+    TimescaleDB "1" --> "0..1" RedisCache : server-side cache (history, aggregate, blockchain reads)
     BlockData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
     ChainTransactionData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
     WalletBalanceData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)

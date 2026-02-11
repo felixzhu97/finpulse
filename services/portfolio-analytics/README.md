@@ -14,8 +14,8 @@ Backend service providing portfolio analytics for the mobile and web clients. It
                                         │
     ┌───────────────────────────────────┼───────────────────────────────────┐
     │           Infrastructure (src/infrastructure/)                          │
-    │  database/, config/, external_services/, message_brokers/               │
-    │  Implements application ports                                          │
+    │  database/, cache/ (Redis), config/, external_services/,                │
+    │  message_brokers/; implements application ports                        │
     └───────────────────────────────────┬───────────────────────────────────┘
                                         │
     ┌───────────────────────────────────┼───────────────────────────────────┐
@@ -33,7 +33,7 @@ Backend service providing portfolio analytics for the mobile and web clients. It
 
 - **Domain** (`src/core/domain/`): Entities, value objects, domain services, events, exceptions. No framework or outer-layer dependencies.
 - **Application** (`src/core/application/`): Use cases and ports (repository, service, message-broker interfaces). Depends only on domain.
-- **Infrastructure** (`src/infrastructure/`): Database (ORM, repositories, session), external services (analytics, market data), message brokers (Kafka). Implements application ports.
+- **Infrastructure** (`src/infrastructure/`): Database (ORM, repositories, session), **cache** (Redis via `cache/redis_cache.py`), external services (analytics, market data), message brokers (Kafka). Implements application ports.
 - **API** (`src/api/`): HTTP endpoints, schemas, mappers, and dependency injection. Composition root in `dependencies.py` wires ports to infrastructure; entrypoint is `main.py` (project root).
 
 ### Infrastructure (runtime)
@@ -47,7 +47,7 @@ docker compose up -d
 Default connection:
 
 - **TimescaleDB (PostgreSQL):** `postgresql://postgres:postgres@127.0.0.1:5433/portfolio` – portfolio metadata in JSONB; portfolio history in hypertable `portfolio_history`
-- **Redis:** `redis://127.0.0.1:6379/0` – cache for portfolio history (TTL 300s)
+- **Redis:** `redis://127.0.0.1:6379/0` – server-side cache (shared client in app lifespan). Used for: portfolio history range (`portfolio:history:{id}:{days}d`, TTL from `HISTORY_CACHE_TTL_SECONDS`), portfolio aggregate response (`portfolio:aggregate:demo-portfolio`, 300s), and blockchain read responses (blocks list, block+transactions, transaction by id, balance; prefix `blockchain:*`, 300s). Writes (seed, transfer, seed-balance) invalidate the relevant cache keys so reads stay consistent.
 - **Kafka:** `localhost:9092`. Topics:
   - `portfolio.events` – portfolio seed events (created on first produce)
   - `market.quotes.enriched` – enriched real-time market quotes (symbol-keyed, produced by external provider or Flink jobs)
@@ -99,14 +99,14 @@ alembic current        # Show current revision
 
 **Portfolio and real-time**
 
-- `GET /api/v1/portfolio` – returns the portfolio from PostgreSQL (or in-memory demo if DB is empty).
-- `POST /api/v1/seed` – accepts a portfolio JSON body, stores it in PostgreSQL, and publishes a `portfolio.seeded` event to Kafka.
+- `GET /api/v1/portfolio` – returns the portfolio from PostgreSQL (or in-memory demo if DB is empty). Response is cached in Redis (key `portfolio:aggregate:demo-portfolio`, TTL 300s); cache is invalidated on `POST /api/v1/seed`.
+- `POST /api/v1/seed` – accepts a portfolio JSON body, stores it in PostgreSQL, invalidates portfolio aggregate cache, and publishes a `portfolio.seeded` event to Kafka.
 - `GET /api/v1/quotes?symbols=...` – returns the latest real-time quotes for the requested symbols, backed by Kafka topic `market.quotes.enriched`.
 - `WebSocket /ws/quotes` – accepts `{"type":"subscribe","symbols":["AAPL","MSFT"]}` or `"update"` messages and pushes `{"type":"snapshot","quotes":{...}}` snapshots using the same quote structure as the HTTP endpoint.
 
 **REST resources** (under `/api/v1/`): customers, user-preferences, accounts, instruments, portfolios, positions, watchlists, watchlist-items, bonds, options, orders, trades, cash-transactions, payments, settlements, market-data, risk-metrics, valuations. Each resource has list, get-by-id, create, update, delete. **Batch create**: for each resource, `POST /api/v1/<resource>/batch` accepts a JSON array of create payloads and returns an array of created entities (e.g. `POST /api/v1/customers/batch`, `POST /api/v1/instruments/batch`). The seed script (`scripts/seed/generate-seed-data.js`) uses these batch endpoints to minimise the number of HTTP calls during seeding.
 
-**Blockchain simulation** (under `/api/v1/blockchain/`): in-app chain (blocks + chain transactions + wallet balances). Endpoints: `GET /blockchain/blocks` (list blocks), `GET /blockchain/blocks/{block_index}` (block with transactions), `POST /blockchain/transfers` (submit transfer; body: sender_account_id, receiver_account_id, amount, currency), `GET /blockchain/transactions/{tx_id}`, `GET /blockchain/balances?account_id=...&currency=SIM_COIN`. Default currency `SIM_COIN`; balances are per account and can be shown as an asset type in portfolio views. See `docs/en/domain/blockchain-simulation.md`.
+**Blockchain simulation** (under `/api/v1/blockchain/`): in-app chain (blocks + chain transactions + wallet balances). Endpoints: `GET /blockchain/blocks` (list blocks), `GET /blockchain/blocks/{block_index}` (block with transactions), `POST /blockchain/transfers` (submit transfer; body: sender_account_id, receiver_account_id, amount, currency), `GET /blockchain/transactions/{tx_id}`, `GET /blockchain/balances?account_id=...&currency=SIM_COIN`. Read responses are cached in Redis (prefix `blockchain:*`, TTL 300s); `POST /blockchain/seed-balance` and `POST /blockchain/transfers` invalidate the relevant cache. Default currency `SIM_COIN`; balances are per account and can be shown as an asset type in portfolio views. See `docs/en/domain/blockchain-simulation.md`.
 
 ### AI and ML (framework and endpoints)
 

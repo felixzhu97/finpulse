@@ -1,19 +1,26 @@
+import logging
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from src.api.dependencies import get_blockchain_service
+from src.api.dependencies import get_blockchain_service, get_cache
 from src.api.v1.schemas import (
     BalanceResponse,
     BlockResponse,
     BlockWithTransactionsResponse,
     ChainTransactionResponse,
+    SeedBalanceCreate,
     TransferCreate,
 )
 from src.core.application.use_cases.blockchain_service import (
     BlockchainApplicationService,
     InsufficientBalanceError,
+)
+from src.infrastructure.cache import (
+    BLOCKCHAIN_KEY_PREFIX,
+    DEFAULT_TTL,
+    RedisCache,
 )
 
 
@@ -39,7 +46,43 @@ def _tx_to_response(tx) -> ChainTransactionResponse:
     )
 
 
+def _block_to_cache(b: BlockResponse) -> dict:
+    return b.model_dump(mode="json")
+
+
+def _tx_to_cache(t: ChainTransactionResponse) -> dict:
+    return t.model_dump(mode="json")
+
+
 def register(router: APIRouter) -> None:
+    @router.post(
+        "/blockchain/seed-balance",
+        response_model=BalanceResponse,
+        status_code=201,
+    )
+    async def seed_balance(
+        body: SeedBalanceCreate,
+        service: Annotated[
+            BlockchainApplicationService, Depends(get_blockchain_service)
+        ] = None,
+        cache: Annotated[RedisCache, Depends(get_cache)] = None,
+    ):
+        try:
+            wallet = await service.seed_balance(
+                body.account_id, body.currency, body.amount
+            )
+            if cache:
+                await cache.delete(
+                    f"{BLOCKCHAIN_KEY_PREFIX}balance:{body.account_id}:{body.currency}"
+                )
+            return BalanceResponse(
+                account_id=wallet.account_id,
+                currency=wallet.currency,
+                balance=wallet.balance,
+            )
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
     @router.get("/blockchain/blocks", response_model=list[BlockResponse])
     async def list_blocks(
         limit: int = Query(100, ge=1, le=500),
@@ -47,9 +90,22 @@ def register(router: APIRouter) -> None:
         service: Annotated[
             BlockchainApplicationService, Depends(get_blockchain_service)
         ] = None,
+        cache: Annotated[RedisCache, Depends(get_cache)] = None,
     ):
+        cache_key = f"{BLOCKCHAIN_KEY_PREFIX}blocks:{limit}:{offset}"
+        if cache:
+            cached = await cache.get(cache_key)
+            if cached is not None:
+                return [BlockResponse.model_validate(x) for x in cached]
         blocks = await service.get_chain(limit=limit, offset=offset)
-        return [_block_to_response(b) for b in blocks]
+        response = [_block_to_response(b) for b in blocks]
+        if cache:
+            await cache.set(
+                cache_key,
+                [_block_to_cache(r) for r in response],
+                ttl_seconds=DEFAULT_TTL,
+            )
+        return response
 
     @router.get(
         "/blockchain/blocks/{block_index}",
@@ -60,15 +116,28 @@ def register(router: APIRouter) -> None:
         service: Annotated[
             BlockchainApplicationService, Depends(get_blockchain_service)
         ] = None,
+        cache: Annotated[RedisCache, Depends(get_cache)] = None,
     ):
+        cache_key = f"{BLOCKCHAIN_KEY_PREFIX}block_txs:{block_index}"
+        if cache:
+            cached = await cache.get(cache_key)
+            if cached is not None:
+                return BlockWithTransactionsResponse.model_validate(cached)
         result = await service.get_block_with_transactions(block_index)
         if result is None:
             raise HTTPException(status_code=404, detail="Block not found")
         block, transactions = result
-        return BlockWithTransactionsResponse(
+        response = BlockWithTransactionsResponse(
             block=_block_to_response(block),
             transactions=[_tx_to_response(t) for t in transactions],
         )
+        if cache:
+            await cache.set(
+                cache_key,
+                response.model_dump(mode="json"),
+                ttl_seconds=DEFAULT_TTL,
+            )
+        return response
 
     @router.post(
         "/blockchain/transfers",
@@ -80,6 +149,7 @@ def register(router: APIRouter) -> None:
         service: Annotated[
             BlockchainApplicationService, Depends(get_blockchain_service)
         ] = None,
+        cache: Annotated[RedisCache, Depends(get_cache)] = None,
     ):
         try:
             tx = await service.submit_transfer(
@@ -88,11 +158,16 @@ def register(router: APIRouter) -> None:
                 amount=body.amount,
                 currency=body.currency,
             )
+            if cache:
+                await cache.delete_by_prefix(BLOCKCHAIN_KEY_PREFIX)
             return _tx_to_response(tx)
         except InsufficientBalanceError as e:
             raise HTTPException(status_code=400, detail=str(e))
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            logging.getLogger(__name__).exception("blockchain transfer failed")
+            raise HTTPException(status_code=500, detail=str(e))
 
     @router.get(
         "/blockchain/transactions/{tx_id}",
@@ -103,11 +178,24 @@ def register(router: APIRouter) -> None:
         service: Annotated[
             BlockchainApplicationService, Depends(get_blockchain_service)
         ] = None,
+        cache: Annotated[RedisCache, Depends(get_cache)] = None,
     ):
+        cache_key = f"{BLOCKCHAIN_KEY_PREFIX}tx:{tx_id}"
+        if cache:
+            cached = await cache.get(cache_key)
+            if cached is not None:
+                return ChainTransactionResponse.model_validate(cached)
         tx = await service.get_transaction(tx_id)
         if tx is None:
             raise HTTPException(status_code=404, detail="Transaction not found")
-        return _tx_to_response(tx)
+        response = _tx_to_response(tx)
+        if cache:
+            await cache.set(
+                cache_key,
+                _tx_to_cache(response),
+                ttl_seconds=DEFAULT_TTL,
+            )
+        return response
 
     @router.get("/blockchain/balances", response_model=BalanceResponse)
     async def get_balance(
@@ -116,10 +204,23 @@ def register(router: APIRouter) -> None:
         service: Annotated[
             BlockchainApplicationService, Depends(get_blockchain_service)
         ] = None,
+        cache: Annotated[RedisCache, Depends(get_cache)] = None,
     ):
+        cache_key = f"{BLOCKCHAIN_KEY_PREFIX}balance:{account_id}:{currency}"
+        if cache:
+            cached = await cache.get(cache_key)
+            if cached is not None:
+                return BalanceResponse.model_validate(cached)
         balance = await service.get_balance(account_id, currency)
-        return BalanceResponse(
+        response = BalanceResponse(
             account_id=account_id,
             currency=currency,
             balance=balance,
         )
+        if cache:
+            await cache.set(
+                cache_key,
+                response.model_dump(mode="json"),
+                ttl_seconds=DEFAULT_TTL,
+            )
+        return response

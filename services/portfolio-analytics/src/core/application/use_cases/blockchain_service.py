@@ -69,6 +69,13 @@ class BlockchainApplicationService:
         balance = await self._wallet.get_balance(account_id, currency)
         return balance.balance if balance else 0.0
 
+    async def seed_balance(
+        self, account_id: UUID, currency: str, amount: float
+    ) -> WalletBalance:
+        if amount <= 0:
+            raise ValueError("amount must be positive")
+        return await self._wallet.update_balance(account_id, currency, amount)
+
     async def get_chain(self, limit: int = 100, offset: int = 0) -> List[Block]:
         return await self._ledger.list_blocks(limit=limit, offset=offset)
 

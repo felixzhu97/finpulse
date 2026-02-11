@@ -11,7 +11,7 @@ rectangle "**API**\n(src/api/)" as API #E3F2FD {
 }
 
 rectangle "**基础设施**\n(src/infrastructure/)" as INFRA #E8F5E9 {
-  rectangle "database/\nconfig/\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
+  rectangle "database/\ncache/ (Redis)\nconfig/\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
 }
 
 rectangle "**应用层**\n(src/core/application/)" as APP #FFF3E0 {

@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.v1.routers import router as ai_router
 from src.api.v1.resource_router import router as resource_router
 from src.api.v1.endpoints.app_routes import router as app_router
+from src.infrastructure.cache import RedisCache, create_redis_client
 
 
 @asynccontextmanager
@@ -17,7 +18,11 @@ async def lifespan(app: FastAPI):
         command.upgrade(alembic_cfg, "head")
     except Exception:
         pass
+    redis_client = create_redis_client()
+    app.state.redis = redis_client
     yield
+    if redis_client:
+        await redis_client.aclose()
 
 
 app = FastAPI(title="Portfolio Analytics API", lifespan=lifespan)

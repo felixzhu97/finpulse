@@ -10,6 +10,7 @@ Container_Boundary(portfolio_api, "Portfolio Analytics API") {
     Component(quotes_router, "Quotes Router", "FastAPI", "REST: GET /quotes, WebSocket /ws/quotes")
     Component(ai_router, "AI Router", "FastAPI", "REST: /api/v1/ai - VaR, fraud, sentiment, forecast")
 
+    Component(redis_cache, "Redis Cache", "Python", "RedisCache: get/set/delete by prefix; portfolio aggregate, blockchain reads")
     Component(blockchain_router, "Blockchain Router", "FastAPI", "REST: /api/v1/blockchain - transfers, blocks, balances")
     Component(blockchain_svc, "Blockchain Service", "Python", "Digital currency transfers and chain ledger")
     Component(blockchain_ledger_repo, "Blockchain Ledger Repository", "SQLAlchemy", "Block and chain_transaction persistence")
@@ -28,15 +29,18 @@ Container_Boundary(portfolio_api, "Portfolio Analytics API") {
 }
 
 ContainerDb(timescale, "TimescaleDB", "PostgreSQL", "Portfolio and history")
-ContainerDb(redis_db, "Redis", "In-memory", "History cache")
+ContainerDb(redis_db, "Redis", "In-memory", "History, portfolio aggregate, blockchain read cache")
 ContainerQueue(kafka, "Kafka", "Event streaming", "portfolio.events, market.quotes.enriched")
 
+Rel(portfolio_router, redis_cache, "Cache", "via DI")
 Rel(portfolio_router, portfolio_svc, "Calls", "Async")
+Rel(blockchain_router, redis_cache, "Cache", "via DI")
 Rel(resource_router, portfolio_svc, "Calls", "Async")
 Rel(resource_router, portfolio_repo, "Uses", "via DI")
 Rel(resource_router, blockchain_svc, "Calls", "via DI")
 Rel(quotes_router, market_data_svc, "Calls", "Async / WebSocket")
 Rel(ai_router, analytics_svc, "Calls", "Async")
+Rel(redis_cache, redis_db, "Read/Write", "")
 Rel(blockchain_svc, blockchain_ledger_repo, "Uses", "")
 Rel(blockchain_svc, wallet_balance_repo, "Uses", "")
 Rel(blockchain_ledger_repo, timescale, "SQL", "asyncpg")
