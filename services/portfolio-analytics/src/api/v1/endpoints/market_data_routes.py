@@ -65,9 +65,8 @@ def register(router: APIRouter) -> None:
         body: list[MarketDataCreate],
         repo: Annotated[object, Depends(get_market_data_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = MarketData(
+        entities = [
+            MarketData(
                 data_id=uuid4(),
                 instrument_id=item.instrument_id,
                 timestamp=item.timestamp,
@@ -78,9 +77,10 @@ def register(router: APIRouter) -> None:
                 volume=item.volume,
                 change_pct=item.change_pct,
             )
-            created = await repo.add(entity)
-            result.append(_to_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_to_response(e) for e in created]
 
     @router.put("/market-data/{data_id}", response_model=MarketDataResponse)
     async def update_market_data(

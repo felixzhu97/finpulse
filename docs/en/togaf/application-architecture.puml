@@ -41,6 +41,12 @@ package "Presentation Layer" <<Presentation>> {
 
     component "apps/mobile-portfolio" as MobilePortfolio {
         component "Expo + React Native" as ExpoRN
+        component "api (thin client)" as MobileApi {
+            component "portfolioApi" as PortfolioApi
+            component "getQuotes" as GetQuotes
+            component "createQuoteSocket" as CreateQuoteSocket
+        }
+        component "usePortfolio" as UsePortfolio
         component "Stocks screen" as StocksScreen {
             component "StockListItem" as StockListItem
             component "NativeSparkline" as NativeSparkline
@@ -72,7 +78,7 @@ package "Presentation Layer" <<Presentation>> {
         }
         component "react-native-wagmi-charts" as RNCharts
     }
-    note right of MobilePortfolio: Default dark theme\nBlack (#000000) background
+    note right of MobilePortfolio: Thin client: types, api (portfolioApi,\ngetQuotes, createQuoteSocket), hooks.\nDefault dark theme, black (#000000) background
 }
 
 package "Business Layer" <<Business>> {

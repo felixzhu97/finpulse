@@ -52,7 +52,7 @@ export function NativeBaselineChart(props: NativeBaselineChartProps) {
       renderChart={({ width, minHeight, fill }) => (
         <NativeView
           data={flatData}
-          baselineValue={baselineValue != null ? String(baselineValue) : undefined}
+          baselineValue={baselineValue}
           theme={theme}
           style={[fill ? styles.fill : { width }, { minHeight }, styles.chart]}
           {...rest}

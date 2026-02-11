@@ -1,0 +1,19 @@
+import type { Customer } from "../types";
+import { httpClient } from "./httpClient";
+
+class CustomersApi {
+  async list(limit = 100, offset = 0): Promise<Customer[]> {
+    return httpClient.getList<Customer>("customers", limit, offset);
+  }
+
+  async getById(customerId: string): Promise<Customer | null> {
+    return httpClient.getById<Customer>("customers", customerId);
+  }
+
+  async getFirst(): Promise<Customer | null> {
+    const list = await this.list(1, 0);
+    return list[0] ?? null;
+  }
+}
+
+export const customersApi = new CustomersApi();

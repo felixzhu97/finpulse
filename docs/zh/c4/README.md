@@ -16,6 +16,12 @@
 6. **移动端投资组合组件** — `c4-mobile-portfolio-components.puml`
 7. **移动端演示组件** — `c4-mobile-demo-components.puml`
 
+### 移动端投资组合组件
+
+**文件**：`c4-mobile-portfolio-components.puml`
+
+**说明**：移动端投资组合应用（Expo + React Native）薄客户端：标签/屏幕；types（Portfolio、QuoteSnapshot）；api 层（portfolioApi、getQuotes、createQuoteSocket）；hooks（usePortfolio、useRealtimeQuotes、usePerSymbolHistory）；原生图表与组合/账户组件；后端 GET /api/v1/portfolio、GET /api/v1/quotes、WS /ws/quotes。
+
 ### 投资组合分析 API 组件
 
 **文件**：`c4-components.puml`

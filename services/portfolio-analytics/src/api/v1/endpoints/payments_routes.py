@@ -97,9 +97,8 @@ def register(router: APIRouter) -> None:
         body: list[CashTransactionCreate],
         repo: Annotated[object, Depends(get_cash_transaction_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = CashTransaction(
+        entities = [
+            CashTransaction(
                 transaction_id=uuid4(),
                 account_id=item.account_id,
                 type=item.type,
@@ -108,9 +107,10 @@ def register(router: APIRouter) -> None:
                 status=item.status,
                 created_at=now(),
             )
-            created = await repo.add(entity)
-            result.append(_cash_transaction_to_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_cash_transaction_to_response(e) for e in created]
 
     @router.put("/cash-transactions/{transaction_id}", response_model=CashTransactionResponse)
     async def update_cash_transaction(
@@ -182,9 +182,8 @@ def register(router: APIRouter) -> None:
         body: list[PaymentCreate],
         repo: Annotated[object, Depends(get_payment_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Payment(
+        entities = [
+            Payment(
                 payment_id=uuid4(),
                 account_id=item.account_id,
                 counterparty=item.counterparty,
@@ -193,9 +192,10 @@ def register(router: APIRouter) -> None:
                 status=item.status,
                 created_at=now(),
             )
-            created = await repo.add(entity)
-            result.append(_payment_to_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_payment_to_response(e) for e in created]
 
     @router.put("/payments/{payment_id}", response_model=PaymentResponse)
     async def update_payment(
@@ -265,18 +265,12 @@ def register(router: APIRouter) -> None:
         body: list[SettlementCreate],
         repo: Annotated[object, Depends(get_settlement_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Settlement(
-                settlement_id=uuid4(),
-                trade_id=item.trade_id,
-                payment_id=item.payment_id,
-                status=item.status,
-                settled_at=item.settled_at,
-            )
-            created = await repo.add(entity)
-            result.append(_settlement_to_response(created))
-        return result
+        entities = [
+            Settlement(settlement_id=uuid4(), trade_id=item.trade_id, payment_id=item.payment_id, status=item.status, settled_at=item.settled_at)
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_settlement_to_response(e) for e in created]
 
     @router.put("/settlements/{settlement_id}", response_model=SettlementResponse)
     async def update_settlement(

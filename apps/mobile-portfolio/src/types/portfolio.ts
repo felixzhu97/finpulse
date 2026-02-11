@@ -53,3 +53,12 @@ export interface Portfolio {
   history: PortfolioHistoryPoint[];
 }
 
+export interface RiskSummary {
+  highRatio: number;
+  topHoldingsConcentration: number;
+}
+
+export interface AssetAllocationItem {
+  type: AccountType;
+  value: number;
+}

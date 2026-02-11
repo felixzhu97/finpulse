@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { createQuoteSocket, QuoteConnectionStatus, QuoteSnapshot } from "../services/quoteSocket";
+import {
+  createQuoteSocket,
+  type QuoteConnectionStatus,
+  type QuoteSnapshot,
+} from "@/src/api";
 
 export interface UseRealtimeQuotesResult {
   quotes: QuoteSnapshot;
@@ -11,8 +15,13 @@ export function useRealtimeQuotes(symbols: string[]): UseRealtimeQuotesResult {
   const [status, setStatus] = useState<QuoteConnectionStatus>("idle");
 
   const cleanedSymbols = useMemo(
-    () => Array.from(new Set(symbols.map((s) => s.toUpperCase()).filter((s) => s.length > 0))),
-    [symbols],
+    () =>
+      Array.from(
+        new Set(
+          symbols.map((s) => s.toUpperCase()).filter((s) => s.length > 0)
+        )
+      ),
+    [symbols]
   );
 
   useEffect(() => {
@@ -23,18 +32,11 @@ export function useRealtimeQuotes(symbols: string[]): UseRealtimeQuotesResult {
     }
     const handle = createQuoteSocket({
       symbols: cleanedSymbols,
-      onSnapshot: (next) => {
-        setQuotes(next);
-      },
-      onStatusChange: (next) => {
-        setStatus(next);
-      },
+      onSnapshot: (next) => setQuotes(next),
+      onStatusChange: (next) => setStatus(next),
     });
-    return () => {
-      handle.close();
-    };
+    return () => handle.close();
   }, [cleanedSymbols.join(",")]);
 
   return { quotes, status };
 }
-

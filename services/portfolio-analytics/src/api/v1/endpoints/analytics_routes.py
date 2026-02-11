@@ -79,9 +79,8 @@ def register(router: APIRouter) -> None:
         body: list[RiskMetricsCreate],
         repo: Annotated[object, Depends(get_risk_metrics_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = RiskMetrics(
+        entities = [
+            RiskMetrics(
                 metric_id=uuid4(),
                 portfolio_id=item.portfolio_id,
                 as_of_date=item.as_of_date or date.today(),
@@ -91,9 +90,10 @@ def register(router: APIRouter) -> None:
                 var=item.var,
                 beta=item.beta,
             )
-            created = await repo.add(entity)
-            result.append(_risk_metrics_to_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_risk_metrics_to_response(e) for e in created]
 
     @router.put("/risk-metrics/{metric_id}", response_model=RiskMetricsResponse)
     async def update_risk_metrics(
@@ -168,9 +168,8 @@ def register(router: APIRouter) -> None:
         body: list[ValuationCreate],
         repo: Annotated[object, Depends(get_valuation_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Valuation(
+        entities = [
+            Valuation(
                 valuation_id=uuid4(),
                 instrument_id=item.instrument_id,
                 as_of_date=item.as_of_date or date.today(),
@@ -182,9 +181,10 @@ def register(router: APIRouter) -> None:
                 discount_rate=item.discount_rate,
                 growth_rate=item.growth_rate,
             )
-            created = await repo.add(entity)
-            result.append(_valuation_to_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_valuation_to_response(e) for e in created]
 
     @router.put("/valuations/{valuation_id}", response_model=ValuationResponse)
     async def update_valuation(

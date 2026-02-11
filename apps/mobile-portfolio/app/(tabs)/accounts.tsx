@@ -1,20 +1,24 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   Pressable,
+  RefreshControl,
   SafeAreaView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { getPortfolio } from "@/src/services/portfolioService";
 import { AccountListItem } from "@/src/components/account/AccountListItem";
 import { StockListItem } from "@/src/components/account/StockListItem";
-import { useRealtimeQuotes } from "@/src/hooks/useRealtimeQuotes";
-import { usePerSymbolHistory } from "@/src/hooks/usePerSymbolHistory";
+import {
+  StockDetailDrawer,
+  type StockDetailItem,
+} from "@/src/components/watchlist";
+import { useSymbolDisplayData } from "@/src/hooks/useSymbolDisplayData";
 import type { Account, Holding } from "@/src/types/portfolio";
+import { portfolioApi } from "@/src/api";
 
 type ListRow =
   | { type: "stock"; holding: Holding; price: number; change: number }
@@ -52,8 +56,10 @@ export default function AccountsScreen() {
   const [baseAccounts, setBaseAccounts] = useState<Account[]>([]);
   const [historyValues, setHistoryValues] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [detailItem, setDetailItem] = useState<StockDetailItem | null>(null);
 
-  const symbols = useMemo(
+  const listSymbols = useMemo(
     () =>
       Array.from(
         new Set(
@@ -65,22 +71,15 @@ export default function AccountsScreen() {
     [baseAccounts]
   );
 
-  const { quotes } = useRealtimeQuotes(symbols);
-
-  const quoteMap = useMemo(
+  const symbols = useMemo(
     () =>
-      Object.fromEntries(
-        Object.entries(quotes).map(([k, v]) => [
-          k,
-          { price: v.price, change: v.change },
+      Array.from(
+        new Set([
+          ...listSymbols,
+          ...(detailItem ? [detailItem.symbol] : []),
         ])
       ),
-    [quotes]
-  );
-
-  const rows = useMemo(
-    () => buildListRows(baseAccounts, quoteMap),
-    [baseAccounts, quoteMap]
+    [listSymbols, detailItem?.symbol]
   );
 
   const initialPrices = useMemo(
@@ -95,22 +94,45 @@ export default function AccountsScreen() {
     [baseAccounts]
   );
 
-  const historyBySymbol = usePerSymbolHistory(symbols, quoteMap, initialPrices);
+  const { quoteMap, historyBySymbol, bySymbol } = useSymbolDisplayData(
+    symbols,
+    initialPrices
+  );
+
+  const rows = useMemo(
+    () => buildListRows(baseAccounts, quoteMap),
+    [baseAccounts, quoteMap]
+  );
+
+  const load = useCallback(async () => {
+    const portfolio = await portfolioApi.getPortfolio();
+    setBaseAccounts(portfolio?.accounts ?? []);
+    setHistoryValues(portfolio?.history.map((h) => h.value) ?? []);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     let active = true;
-    const load = async () => {
-      const portfolio = await getPortfolio();
+    const run = async () => {
+      setLoading(true);
+      const portfolio = await portfolioApi.getPortfolio();
       if (!active) return;
       setBaseAccounts(portfolio?.accounts ?? []);
       setHistoryValues(portfolio?.history.map((h) => h.value) ?? []);
       setLoading(false);
     };
-    load();
+    run();
     return () => {
       active = false;
     };
   }, []);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    portfolioApi.invalidateCache();
+    await load();
+    setRefreshing(false);
+  }, [load]);
 
   if (loading) {
     return (
@@ -131,7 +153,12 @@ export default function AccountsScreen() {
           <Text style={styles.title}>Stocks</Text>
         </View>
         <View style={styles.centered}>
-          <Text style={styles.loadingText}>Start backend and seed data first.</Text>
+          <Text style={styles.loadingText}>
+            Start backend and seed data first.
+          </Text>
+          <Pressable style={styles.retryBtn} onPress={onRefresh}>
+            <Text style={styles.retryText}>Retry</Text>
+          </Pressable>
         </View>
       </SafeAreaView>
     );
@@ -146,11 +173,8 @@ export default function AccountsScreen() {
           <Text style={styles.date}>{formatHeaderDate()}</Text>
         </View>
         <View style={styles.headerActions}>
-          <Pressable style={styles.iconButton}>
-            <MaterialIcons name="search" size={24} color="#fff" />
-          </Pressable>
-          <Pressable style={styles.iconButton}>
-            <MaterialIcons name="more-vert" size={24} color="#fff" />
+          <Pressable style={styles.iconButton} onPress={onRefresh}>
+            <MaterialIcons name="refresh" size={24} color="#fff" />
           </Pressable>
         </View>
       </View>
@@ -160,6 +184,13 @@ export default function AccountsScreen() {
           keyExtractor={(item) =>
             item.type === "stock" ? item.holding.id : item.account.id
           }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#fff"
+            />
+          }
           renderItem={({ item }) =>
             item.type === "stock" ? (
               <StockListItem
@@ -167,6 +198,16 @@ export default function AccountsScreen() {
                 price={item.price}
                 change={item.change}
                 historyValues={historyBySymbol[item.holding.symbol.toUpperCase()]}
+                onPress={() =>
+                  setDetailItem({
+                    symbol: item.holding.symbol,
+                    name: item.holding.name,
+                    price: item.price,
+                    change: item.change,
+                    historyValues:
+                      historyBySymbol[item.holding.symbol.toUpperCase()],
+                  })
+                }
               />
             ) : (
               <AccountListItem
@@ -177,6 +218,16 @@ export default function AccountsScreen() {
           }
         />
       </View>
+      <StockDetailDrawer
+        visible={detailItem !== null}
+        item={detailItem}
+        onClose={() => setDetailItem(null)}
+        displayData={
+          detailItem
+            ? bySymbol[detailItem.symbol.toUpperCase()] ?? null
+            : null
+        }
+      />
     </SafeAreaView>
   );
 }
@@ -198,20 +249,22 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    alignItems: "flex-end",
+    paddingHorizontal: 16,
     paddingTop: 8,
+    paddingBottom: 12,
   },
   title: {
-    fontSize: 34,
+    fontSize: 28,
     fontWeight: "700",
     color: "#fff",
+    letterSpacing: -0.5,
   },
   date: {
-    fontSize: 15,
-    color: "#9ca3af",
-    marginTop: 2,
+    fontSize: 13,
+    color: "rgba(255,255,255,0.5)",
+    marginTop: 4,
+    fontWeight: "400",
   },
   headerActions: {
     flexDirection: "row",
@@ -226,6 +279,17 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
+    paddingHorizontal: 0,
+  },
+  retryBtn: {
+    marginTop: 12,
+    paddingVertical: 10,
     paddingHorizontal: 20,
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderRadius: 10,
+  },
+  retryText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 });

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
-import type { Holding } from "../../types/portfolio";
+import type { Holding } from "@/src/types/portfolio";
+import { formatCurrency, formatSigned, formatSignedPercent } from "@/src/utils";
 
 interface HoldingListItemProps {
   holding: Holding;
@@ -7,37 +8,6 @@ interface HoldingListItemProps {
   displayMarketValue?: number;
   displayProfit?: number;
   displayProfitRate?: number;
-}
-
-function formatCurrency(value: number, currency: string) {
-  return `${currency} ${value.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-  })}`;
-}
-
-function formatSigned(value: number) {
-  const formatted = value.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-  });
-  if (value > 0) {
-    return `+${formatted}`;
-  }
-  if (value < 0) {
-    return `-${formatted}`;
-  }
-  return "0";
-}
-
-function formatPercent(value: number) {
-  const percent = value * 100;
-  const formatted = percent.toFixed(2);
-  if (percent > 0) {
-    return `+${formatted}%`;
-  }
-  if (percent < 0) {
-    return `${formatted}%`;
-  }
-  return "0.00%";
 }
 
 export function HoldingListItem({
@@ -74,7 +44,7 @@ export function HoldingListItem({
           numberOfLines={1}
           style={[styles.change, { color: isPositive ? "#16a34a" : "#b91c1c" }]}
         >
-          {formatSigned(profit)} · {formatPercent(profitRate)}
+          {formatSigned(profit, 0)} · {formatSignedPercent(profitRate)}
         </Text>
       </View>
     </View>

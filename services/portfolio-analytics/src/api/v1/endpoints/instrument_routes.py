@@ -100,19 +100,12 @@ def register(router: APIRouter) -> None:
         body: list[InstrumentCreate],
         repo: Annotated[object, Depends(get_instrument_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Instrument(
-                instrument_id=uuid4(),
-                symbol=item.symbol,
-                name=item.name,
-                asset_class=item.asset_class,
-                currency=item.currency,
-                exchange=item.exchange,
-            )
-            created = await repo.add(entity)
-            result.append(_instrument_to_response(created))
-        return result
+        entities = [
+            Instrument(instrument_id=uuid4(), symbol=item.symbol, name=item.name, asset_class=item.asset_class, currency=item.currency, exchange=item.exchange)
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_instrument_to_response(e) for e in created]
 
     @router.put("/instruments/{instrument_id}", response_model=InstrumentResponse)
     async def update_instrument(
@@ -184,9 +177,8 @@ def register(router: APIRouter) -> None:
         body: list[BondCreate],
         repo: Annotated[object, Depends(get_bond_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Bond(
+        entities = [
+            Bond(
                 bond_id=uuid4(),
                 instrument_id=item.instrument_id,
                 face_value=item.face_value,
@@ -197,9 +189,10 @@ def register(router: APIRouter) -> None:
                 maturity_years=item.maturity_years,
                 frequency=item.frequency,
             )
-            created = await repo.add(entity)
-            result.append(_bond_to_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_bond_to_response(e) for e in created]
 
     @router.put("/bonds/{bond_id}", response_model=BondResponse)
     async def update_bond(
@@ -280,9 +273,8 @@ def register(router: APIRouter) -> None:
         body: list[OptionCreate],
         repo: Annotated[object, Depends(get_option_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Option(
+        entities = [
+            Option(
                 option_id=uuid4(),
                 instrument_id=item.instrument_id,
                 underlying_instrument_id=item.underlying_instrument_id,
@@ -299,9 +291,10 @@ def register(router: APIRouter) -> None:
                 rho=item.rho,
                 implied_volatility=item.implied_volatility,
             )
-            created = await repo.add(entity)
-            result.append(_option_to_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_option_to_response(e) for e in created]
 
     @router.put("/options/{option_id}", response_model=OptionResponse)
     async def update_option(

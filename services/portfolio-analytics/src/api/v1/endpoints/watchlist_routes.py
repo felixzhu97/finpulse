@@ -72,17 +72,9 @@ def register(router: APIRouter) -> None:
         body: list[WatchlistCreate],
         repo: Annotated[object, Depends(get_watchlist_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Watchlist(
-                watchlist_id=uuid4(),
-                customer_id=item.customer_id,
-                name=item.name,
-                created_at=now(),
-            )
-            created = await repo.add(entity)
-            result.append(_watchlist_to_response(created))
-        return result
+        entities = [Watchlist(watchlist_id=uuid4(), customer_id=item.customer_id, name=item.name, created_at=now()) for item in body]
+        created = await repo.add_many(entities)
+        return [_watchlist_to_response(e) for e in created]
 
     @router.put("/watchlists/{watchlist_id}", response_model=WatchlistResponse)
     async def update_watchlist(
@@ -148,17 +140,12 @@ def register(router: APIRouter) -> None:
         body: list[WatchlistItemCreate],
         repo: Annotated[object, Depends(get_watchlist_item_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = WatchlistItem(
-                watchlist_item_id=uuid4(),
-                watchlist_id=item.watchlist_id,
-                instrument_id=item.instrument_id,
-                added_at=now(),
-            )
-            created = await repo.add(entity)
-            result.append(_watchlist_item_to_response(created))
-        return result
+        entities = [
+            WatchlistItem(watchlist_item_id=uuid4(), watchlist_id=item.watchlist_id, instrument_id=item.instrument_id, added_at=now())
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_watchlist_item_to_response(e) for e in created]
 
     @router.put("/watchlist-items/{watchlist_item_id}", response_model=WatchlistItemResponse)
     async def update_watchlist_item(

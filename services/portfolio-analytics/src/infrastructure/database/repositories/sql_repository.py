@@ -46,6 +46,23 @@ class SqlRepository:
         await self._session.refresh(row)
         return self._to_entity(row)
 
+    async def add_many(self, entities: List[TEntity]) -> List[TEntity]:
+        if not entities:
+            return []
+        rows = []
+        for e in entities:
+            data = dict(self._from_entity(e))
+            if getattr(e, self._id_attr, None) is None:
+                data.pop(self._id_attr, None)
+            rows.append(self._row_class(**data))
+        self._session.add_all(rows)
+        await self._session.flush()
+        for row, entity in zip(rows, entities):
+            id_val = getattr(row, self._id_attr, None)
+            if id_val is not None and getattr(entity, self._id_attr, None) is None:
+                setattr(entity, self._id_attr, id_val)
+        return entities
+
     async def save(self, entity: TEntity) -> Optional[TEntity]:
         id_val = getattr(entity, self._id_attr)
         result = await self._session.execute(

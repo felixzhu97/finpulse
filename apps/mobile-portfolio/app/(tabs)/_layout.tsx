@@ -44,6 +44,15 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen
+        name="watchlists"
+        options={{
+          title: "Watchlists",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="star" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",

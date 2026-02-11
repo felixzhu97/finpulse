@@ -1,5 +1,5 @@
 @startuml c4-mobile-demo-components
-!include https://cdn.jsdelivr.net/gh/plantuml-stdlib/C4-PlantUML@master/C4_Component.puml
+!include ../../c4-lib/C4-PlantUML/C4_Component.puml
 
 title Mobile Demo App - Component Diagram
 

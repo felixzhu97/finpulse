@@ -1,6 +1,6 @@
-const defaultBaseUrl = "http://localhost:8800";
+const DEFAULT_BASE_URL = "http://localhost:8800";
 
-export function getPortfolioApiBaseUrl(): string {
+export function getBaseUrl(): string {
   const env =
     typeof process !== "undefined" &&
     process.env &&
@@ -8,5 +8,5 @@ export function getPortfolioApiBaseUrl(): string {
   if (env && typeof env === "string" && env.trim() !== "") {
     return env.replace(/\/$/, "");
   }
-  return defaultBaseUrl;
+  return DEFAULT_BASE_URL;
 }

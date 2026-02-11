@@ -1,21 +1,7 @@
-import { getPortfolioApiBaseUrl } from "../config/api";
+import type { QuoteConnectionStatus, QuoteSnapshot } from "../types";
+import { getBaseUrl } from "./config";
 
-export type QuoteSnapshot = Record<
-  string,
-  {
-    price: number;
-    change: number;
-    changeRate: number;
-    timestamp: number;
-  }
->;
-
-export type QuoteConnectionStatus =
-  | "idle"
-  | "connecting"
-  | "open"
-  | "closed"
-  | "error";
+export type { QuoteConnectionStatus, QuoteSnapshot };
 
 export interface QuoteSocketOptions {
   symbols: string[];
@@ -38,7 +24,7 @@ function toWebSocketUrl(httpUrl: string): string {
   return httpUrl;
 }
 
-export class QuoteSocket implements QuoteSocketHandle {
+class QuoteSocket implements QuoteSocketHandle {
   private symbols: string[];
   private socket: WebSocket | null = null;
   private closed = false;
@@ -47,7 +33,7 @@ export class QuoteSocket implements QuoteSocketHandle {
 
   constructor(private readonly options: QuoteSocketOptions) {
     this.symbols = Array.from(
-      new Set(options.symbols.map((s) => s.toUpperCase())),
+      new Set(options.symbols.map((s) => s.toUpperCase()))
     );
     this.connect();
   }
@@ -76,22 +62,16 @@ export class QuoteSocket implements QuoteSocketHandle {
   }
 
   private sendSubscribe(): void {
-    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-      return;
-    }
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return;
     this.socket.send(
-      JSON.stringify({
-        type: "subscribe",
-        symbols: this.symbols,
-      }),
+      JSON.stringify({ type: "subscribe", symbols: this.symbols })
     );
   }
 
   private connect(): void {
     if (this.closed) return;
     this.notifyStatus("connecting");
-    const base = getPortfolioApiBaseUrl();
-    const wsUrl = toWebSocketUrl(base) + "/ws/quotes";
+    const wsUrl = toWebSocketUrl(getBaseUrl()) + "/ws/quotes";
     this.socket = new WebSocket(wsUrl);
 
     this.socket.onopen = () => {
@@ -106,20 +86,18 @@ export class QuoteSocket implements QuoteSocketHandle {
       try {
         const data = JSON.parse(event.data);
         if (
-          data &&
-          data.type === "snapshot" &&
+          data?.type === "snapshot" &&
           data.quotes &&
           typeof data.quotes === "object"
         ) {
           this.options.onSnapshot(data.quotes as QuoteSnapshot);
         }
       } catch {
+        // ignore
       }
     };
 
-    this.socket.onerror = () => {
-      this.notifyStatus("error");
-    };
+    this.socket.onerror = () => this.notifyStatus("error");
 
     this.socket.onclose = () => {
       this.notifyStatus("closed");
@@ -137,6 +115,8 @@ export class QuoteSocket implements QuoteSocketHandle {
   }
 }
 
-export function createQuoteSocket(options: QuoteSocketOptions): QuoteSocketHandle {
+export function createQuoteSocket(
+  options: QuoteSocketOptions
+): QuoteSocketHandle {
   return new QuoteSocket(options);
 }

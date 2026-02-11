@@ -52,7 +52,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-mobile-portfolio-components.puml`
 
-**Description**: Mobile Portfolio app (Expo + React Native): tabs, screens, PortfolioService, QuoteSocket, hooks, native charts, portfolio/account components.
+**Description**: Mobile Portfolio app (Expo + React Native): thin client with tabs/screens; types (Portfolio, QuoteSnapshot); api layer (portfolioApi, getQuotes, createQuoteSocket); hooks (usePortfolio, useRealtimeQuotes, usePerSymbolHistory); native charts and portfolio/account components; backend: GET /api/v1/portfolio, GET /api/v1/quotes, WS /ws/quotes.
 
 ### Mobile Demo Components
 

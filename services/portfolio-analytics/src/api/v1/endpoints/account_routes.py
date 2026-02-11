@@ -62,9 +62,8 @@ def register(router: APIRouter) -> None:
         body: list[AccountCreate],
         repo: Annotated[object, Depends(get_account_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Account(
+        entities = [
+            Account(
                 account_id=uuid4(),
                 customer_id=item.customer_id,
                 account_type=item.account_type,
@@ -72,9 +71,10 @@ def register(router: APIRouter) -> None:
                 status=item.status,
                 opened_at=now(),
             )
-            created = await repo.add(entity)
-            result.append(_to_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_to_response(e) for e in created]
 
     @router.put("/accounts/{account_id}", response_model=AccountResponse)
     async def update_account(

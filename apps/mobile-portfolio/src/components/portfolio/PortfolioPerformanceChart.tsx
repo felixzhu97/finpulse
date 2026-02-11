@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text } from "react-native";
-import type { PortfolioHistoryPoint } from "../../types/portfolio";
+import type { PortfolioHistoryPoint } from "@/src/types/portfolio";
 
 interface PortfolioPerformanceChartProps {
   points: PortfolioHistoryPoint[];

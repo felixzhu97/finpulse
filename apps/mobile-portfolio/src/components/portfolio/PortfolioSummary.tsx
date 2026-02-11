@@ -1,27 +1,10 @@
 import { StyleSheet, View } from "react-native";
-import type { Portfolio } from "../../types/portfolio";
+import type { Portfolio } from "@/src/types/portfolio";
+import { formatCurrency, formatSignedPercent } from "@/src/utils";
 import { MetricCard } from "../ui/MetricCard";
 
 interface PortfolioSummaryProps {
   portfolio: Portfolio;
-}
-
-function formatCurrency(value: number, currency: string) {
-  return `${currency} ${value.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-  })}`;
-}
-
-function formatSignedPercent(value: number) {
-  const percent = value * 100;
-  const formatted = percent.toFixed(2);
-  if (percent > 0) {
-    return `+${formatted}%`;
-  }
-  if (percent < 0) {
-    return `${formatted}%`;
-  }
-  return "0.00%";
 }
 
 export function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {

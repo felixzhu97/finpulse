@@ -23,7 +23,7 @@ if [ ! -d .venv ]; then
   python3 -m venv .venv
 fi
 . .venv/bin/activate
-pip install -r requirements.txt || { echo "pip install failed; check network and PyPI"; exit 1; }
+.venv/bin/python -m pip install -r requirements.txt || { echo "pip install failed; check network and PyPI"; exit 1; }
 
 echo "[start-backend] Freeing port 8800..."
 lsof -i :8800 -t 2>/dev/null | xargs kill 2>/dev/null || true
@@ -34,7 +34,7 @@ sleep 1
 echo "[start-backend] Running migrations..."
 .venv/bin/alembic upgrade head 2>/dev/null || true
 echo "[start-backend] Starting API on :8800..."
-nohup .venv/bin/uvicorn main:app --host 0.0.0.0 --port 8800 > /tmp/portfolio-api.log 2>&1 &
+nohup .venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8800 > /tmp/portfolio-api.log 2>&1 &
 API_PID=$!
 cd "$ROOT"
 
@@ -56,8 +56,12 @@ if [ -z "$API_READY" ]; then
   tail -n 20 /tmp/portfolio-api.log 2>/dev/null || true
 fi
 
-echo "[start-backend] Running seed script (PORTFOLIO_API_URL=http://127.0.0.1:8800)..."
-PORTFOLIO_API_URL=http://127.0.0.1:8800 node scripts/seed/generate-seed-data.js
+if [ -n "$API_READY" ]; then
+  echo "[start-backend] Running seed script (PORTFOLIO_API_URL=http://127.0.0.1:8800)..."
+  PORTFOLIO_API_URL=http://127.0.0.1:8800 node scripts/seed/generate-seed-data.js
+else
+  echo "[start-backend] Skip seed: API not ready"
+fi
 
 cd services/portfolio-analytics
 nohup .venv/bin/python scripts/mock_realtime_quotes.py > /tmp/portfolio-mq.log 2>&1 &

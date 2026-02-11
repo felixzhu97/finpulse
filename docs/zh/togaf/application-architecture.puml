@@ -59,6 +59,12 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
 
     component "apps/mobile-portfolio" as MobilePortfolio {
         component "Expo + React Native" as ExpoRN
+        component "api (薄客户端)" as MobileApi {
+            component "portfolioApi" as PortfolioApi
+            component "getQuotes" as GetQuotes
+            component "createQuoteSocket" as CreateQuoteSocket
+        }
+        component "usePortfolio" as UsePortfolio
         component "Stocks 屏幕" as StocksScreen {
             component "StockListItem" as StockListItem
             component "NativeSparkline" as NativeSparkline
@@ -90,7 +96,7 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
         }
         component "react-native-wagmi-charts" as RNCharts
     }
-    note right of MobilePortfolio: 默认深色主题\n黑色 (#000000) 背景
+    note right of MobilePortfolio: 薄客户端：types、api (portfolioApi、\ngetQuotes、createQuoteSocket)、hooks。\n默认深色主题，黑色 (#000000) 背景
 }
 
 package "业务逻辑层 (Business Layer)" <<Business>> {

@@ -1,27 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
-import type { Account } from "../../types/portfolio";
+import type { Account } from "@/src/types/portfolio";
+import { formatBalance, formatSigned } from "@/src/utils";
+import { getStockChangeInfo } from "@/src/utils/stockUtils";
 import { Sparkline } from "../ui/Sparkline";
 
 interface AccountListItemProps {
   account: Account;
   historyValues?: number[];
-}
-
-function formatBalance(value: number) {
-  return value.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
-  });
-}
-
-function formatSigned(value: number) {
-  const formatted = value.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
-  });
-  if (value > 0) return `+${formatted}`;
-  if (value < 0) return `${formatted}`;
-  return "0";
 }
 
 function getAccountTypeLabel(type: Account["type"]) {
@@ -42,10 +27,10 @@ function getAccountTypeLabel(type: Account["type"]) {
 }
 
 export function AccountListItem({ account, historyValues }: AccountListItemProps) {
-  const isUp = account.todayChange > 0;
-  const isDown = account.todayChange < 0;
-  const trend = isUp ? "up" : isDown ? "down" : "flat";
-  const badgeBg = isUp ? "#ef4444" : isDown ? "#22c55e" : "#374151";
+  const { isUp, trend, changeColor, changePercent } = getStockChangeInfo(
+    account.todayChange,
+    account.balance
+  );
 
   return (
     <View style={styles.row}>
@@ -58,12 +43,17 @@ export function AccountListItem({ account, historyValues }: AccountListItemProps
         </Text>
       </View>
       <View style={styles.sparkline}>
-        <Sparkline data={historyValues} trend={trend} width={60} height={32} />
+        <Sparkline data={historyValues} trend={trend} width={80} height={36} />
       </View>
       <View style={styles.right}>
         <Text style={styles.price}>{formatBalance(account.balance)}</Text>
-        <View style={[styles.badge, { backgroundColor: badgeBg }]}>
-          <Text style={styles.badgeText}>{formatSigned(account.todayChange)}</Text>
+        <View style={styles.changeContainer}>
+          <Text style={[styles.change, { color: changeColor }]}>
+            {isUp ? "+" : ""}{formatSigned(account.todayChange, 0)}
+          </Text>
+          <Text style={[styles.changePercent, { color: changeColor }]}>
+            {isUp ? "+" : ""}{changePercent}%
+          </Text>
         </View>
       </View>
     </View>
@@ -74,47 +64,58 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 0,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    minHeight: 64,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(156,163,175,0.25)",
+    borderBottomColor: "rgba(255,255,255,0.1)",
   },
   left: {
     flex: 1,
     minWidth: 0,
+    paddingRight: 12,
   },
   code: {
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: "600",
     color: "#fff",
+    letterSpacing: -0.3,
   },
   subtitle: {
     fontSize: 13,
-    color: "#9ca3af",
-    marginTop: 2,
+    color: "rgba(255,255,255,0.5)",
+    marginTop: 3,
+    letterSpacing: -0.1,
   },
   sparkline: {
-    width: 60,
+    width: 80,
     alignItems: "center",
     justifyContent: "center",
+    marginHorizontal: 8,
   },
   right: {
     alignItems: "flex-end",
+    minWidth: 90,
   },
   price: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: "600",
     color: "#fff",
+    letterSpacing: -0.3,
   },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+  changeContainer: {
+    alignItems: "flex-end",
     marginTop: 4,
   },
-  badgeText: {
-    fontSize: 13,
+  change: {
+    fontSize: 15,
     fontWeight: "500",
-    color: "#fff",
+    letterSpacing: -0.2,
+  },
+  changePercent: {
+    fontSize: 13,
+    fontWeight: "400",
+    marginTop: 1,
+    letterSpacing: -0.1,
   },
 });

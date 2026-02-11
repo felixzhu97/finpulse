@@ -77,18 +77,12 @@ def register(router: APIRouter) -> None:
         body: list[PortfolioSchemaCreate],
         repo: Annotated[object, Depends(get_portfolio_schema_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = PortfolioSchema(
-                portfolio_id=uuid4(),
-                account_id=item.account_id,
-                name=item.name,
-                base_currency=item.base_currency,
-                created_at=now(),
-            )
-            created = await repo.add(entity)
-            result.append(_portfolio_to_response(created))
-        return result
+        entities = [
+            PortfolioSchema(portfolio_id=uuid4(), account_id=item.account_id, name=item.name, base_currency=item.base_currency, created_at=now())
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_portfolio_to_response(e) for e in created]
 
     @router.put("/portfolios/{portfolio_id}", response_model=PortfolioSchemaResponse)
     async def update_portfolio(
@@ -157,9 +151,8 @@ def register(router: APIRouter) -> None:
         body: list[PositionCreate],
         repo: Annotated[object, Depends(get_position_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Position(
+        entities = [
+            Position(
                 position_id=uuid4(),
                 portfolio_id=item.portfolio_id,
                 instrument_id=item.instrument_id,
@@ -167,9 +160,10 @@ def register(router: APIRouter) -> None:
                 cost_basis=item.cost_basis,
                 as_of_date=item.as_of_date or date.today(),
             )
-            created = await repo.add(entity)
-            result.append(_position_to_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_position_to_response(e) for e in created]
 
     @router.put("/positions/{position_id}", response_model=PositionResponse)
     async def update_position(

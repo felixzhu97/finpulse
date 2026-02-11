@@ -76,18 +76,12 @@ def register(router: APIRouter) -> None:
         body: list[CustomerCreate],
         repo: Annotated[object, Depends(get_customer_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Customer(
-                customer_id=uuid4(),
-                name=item.name,
-                email=item.email,
-                kyc_status=item.kyc_status,
-                created_at=now(),
-            )
-            created = await repo.add(entity)
-            result.append(_to_customer_response(created))
-        return result
+        entities = [
+            Customer(customer_id=uuid4(), name=item.name, email=item.email, kyc_status=item.kyc_status, created_at=now())
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_to_customer_response(e) for e in created]
 
     @router.put("/customers/{customer_id}", response_model=CustomerResponse)
     async def update_customer(
@@ -156,9 +150,8 @@ def register(router: APIRouter) -> None:
         body: list[UserPreferenceCreate],
         repo: Annotated[object, Depends(get_user_preference_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = UserPreference(
+        entities = [
+            UserPreference(
                 preference_id=uuid4(),
                 customer_id=item.customer_id,
                 theme=item.theme,
@@ -166,9 +159,10 @@ def register(router: APIRouter) -> None:
                 notifications_enabled=item.notifications_enabled,
                 updated_at=now(),
             )
-            created = await repo.add(entity)
-            result.append(_to_user_preference_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_to_user_preference_response(e) for e in created]
 
     @router.put("/user-preferences/{preference_id}", response_model=UserPreferenceResponse)
     async def update_user_preference(

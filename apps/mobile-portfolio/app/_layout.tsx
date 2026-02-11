@@ -1,17 +1,16 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
+import { Provider } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { QuoteSocketSubscriber } from "@/src/store/QuoteSocketSubscriber";
+import { store } from "@/src/store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,17 +30,20 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={DarkTheme}>
-      <StatusBar style="light" translucent />
-      <GestureHandlerRootView style={styles.root}>
-        <SafeAreaView style={styles.root}>
-          <Stack initialRouteName="(tabs)">
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-        </SafeAreaView>
-      </GestureHandlerRootView>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider value={DarkTheme}>
+        <StatusBar style="light" translucent />
+        <GestureHandlerRootView style={styles.root}>
+          <SafeAreaView style={styles.root}>
+            <QuoteSocketSubscriber />
+            <Stack initialRouteName="(tabs)">
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          </SafeAreaView>
+        </GestureHandlerRootView>
+      </ThemeProvider>
+    </Provider>
   );
 }
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import type { PortfolioHistoryPoint } from "../../types/portfolio";
+import type { PortfolioHistoryPoint } from "@/src/types/portfolio";
 
 interface NetWorthLineChartProps {
   points: PortfolioHistoryPoint[];

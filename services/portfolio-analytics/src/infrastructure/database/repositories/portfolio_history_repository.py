@@ -67,23 +67,24 @@ class PortfolioHistoryRepository(IPortfolioHistoryRepository):
     async def append(self, portfolio_id: str, points: List[HistoryPoint]) -> None:
         if not points:
             return
-        try:
-            for p in points:
-                try:
-                    ts = datetime.strptime(p.date, "%Y-%m-%d").replace(
-                        hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc
-                    )
-                except ValueError:
-                    continue
-                stmt = insert(PortfolioHistoryRow).values(
-                    time=ts,
-                    portfolio_id=portfolio_id,
-                    value=p.value,
-                ).on_conflict_do_update(
-                    index_elements=["portfolio_id", "time"],
-                    set_={"value": p.value},
+        values = []
+        for p in points:
+            try:
+                ts = datetime.strptime(p.date, "%Y-%m-%d").replace(
+                    hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc
                 )
-                await self._session.execute(stmt)
+                values.append({"time": ts, "portfolio_id": portfolio_id, "value": p.value})
+            except ValueError:
+                continue
+        if not values:
+            return
+        try:
+            insert_stmt = insert(PortfolioHistoryRow).values(values)
+            stmt = insert_stmt.on_conflict_do_update(
+                index_elements=["portfolio_id", "time"],
+                set_={"value": insert_stmt.excluded.value},
+            )
+            await self._session.execute(stmt)
         except Exception:
             return
 

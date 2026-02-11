@@ -77,9 +77,8 @@ def register(router: APIRouter) -> None:
         body: list[OrderCreate],
         repo: Annotated[object, Depends(get_order_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Order(
+        entities = [
+            Order(
                 order_id=uuid4(),
                 account_id=item.account_id,
                 instrument_id=item.instrument_id,
@@ -89,9 +88,10 @@ def register(router: APIRouter) -> None:
                 status=item.status,
                 created_at=now(),
             )
-            created = await repo.add(entity)
-            result.append(_order_to_response(created))
-        return result
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_order_to_response(e) for e in created]
 
     @router.put("/orders/{order_id}", response_model=OrderResponse)
     async def update_order(
@@ -163,19 +163,12 @@ def register(router: APIRouter) -> None:
         body: list[TradeCreate],
         repo: Annotated[object, Depends(get_trade_repo)] = None,
     ):
-        result = []
-        for item in body:
-            entity = Trade(
-                trade_id=uuid4(),
-                order_id=item.order_id,
-                quantity=item.quantity,
-                price=item.price,
-                fee=item.fee,
-                executed_at=now(),
-            )
-            created = await repo.add(entity)
-            result.append(_trade_to_response(created))
-        return result
+        entities = [
+            Trade(trade_id=uuid4(), order_id=item.order_id, quantity=item.quantity, price=item.price, fee=item.fee, executed_at=now())
+            for item in body
+        ]
+        created = await repo.add_many(entities)
+        return [_trade_to_response(e) for e in created]
 
     @router.put("/trades/{trade_id}", response_model=TradeResponse)
     async def update_trade(

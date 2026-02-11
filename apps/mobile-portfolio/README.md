@@ -8,7 +8,7 @@ Portfolio management mobile app for viewing investment accounts, performance cha
 |----------|--------------|
 | Framework | Expo 54, React 19, React Native 0.81 |
 | Routing | expo-router 6 (file-based) |
-| State | Zustand |
+| State | Redux Toolkit (quotes), custom store (portfolio UI) |
 | Charts | react-native-wagmi-charts, react-native-chart-kit, react-native-svg |
 | Native Charts | iOS Metal (Swift), Android (Kotlin) |
 | Navigation | React Navigation (bottom-tabs) |
@@ -19,24 +19,34 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 
 | Screen | Route | Description |
 |--------|-------|-------------|
-| Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native chart demos |
-| Stocks | `/(tabs)/accounts` | Stock list with real-time prices, per-stock sparklines, account summaries |
-| Insights | `/(tabs)/insights` | Portfolio insights and analytics |
-| Profile | `/(tabs)/profile` | User profile |
+| Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native line chart |
+| Stocks | `/(tabs)/accounts` | Stock list with real-time prices, per-stock sparklines, account summaries; pull-to-refresh |
+| Insights | `/(tabs)/insights` | Portfolio risk (high-risk exposure, top 5 concentration), optional server risk metrics (volatility, Sharpe, VaR, beta), bar chart |
+| Watchlists | `/(tabs)/watchlists` | Create watchlists, add symbols (draggable drawer), real-time quotes; stock detail drawer with watchlist add/remove (Apple Stocks–style) |
+| Profile | `/(tabs)/profile` | User preferences (theme, language, notifications) via `/api/v1/user-preferences` |
 
-## Project Structure
+## Project Structure (Thin Client)
+
+The app is a **thin client**: business logic lives on the server; the mobile app fetches data and renders UI.
+
+Profile, Watchlists, and Insights also use `useUserPreferences`, `useWatchlists`, `useRiskMetrics` and `customersApi`, `userPreferencesApi`, `watchlistsApi`, `instrumentsApi`, `riskMetricsApi` (REST: customers, user-preferences, watchlists, watchlist-items, instruments, risk-metrics).
 
 - `app/`: expo-router routes and screens.
-- `src/components/`: presentational components only, grouped by domain:
-  - `account/`: StockListItem, AccountListItem.
-  - `portfolio/`: portfolio summary and charts.
-  - `ui/`: generic UI such as metric cards.
-  - `charts/`: advanced chart examples.
-  - `native/`: native chart wrappers and scroll/tooltip helpers.
-- `src/services/`: data fetching and caching (e.g. `portfolioService`, `quoteSocket`).
-- `src/hooks/`: reusable hooks (e.g. `useRealtimeQuotes`, `usePerSymbolHistory`).
-- `src/store/`: global state with Zustand.
-- `src/types/`: shared TypeScript types used across the app.
+- `src/api/`: data layer—implements backend contracts (single-layer; no subfolders).
+  - `config.ts`: base URL (`EXPO_PUBLIC_PORTFOLIO_API_URL`).
+  - `portfolioApi.ts`: GET portfolio (cached), getAccounts, getAccountById, getHoldingsByAccount, getAssetAllocationByAccountType, getPortfolioHistory, getRiskSummary, invalidateCache, seedPortfolio(POST /api/v1/seed).
+  - `quotes.ts`: `getQuotes(symbols)` (GET /api/v1/quotes).
+  - `quoteSocket.ts`: `createQuoteSocket()` for WebSocket `/ws/quotes`.
+  - `customersApi.ts`, `userPreferencesApi.ts`, `watchlistsApi.ts`, `instrumentsApi.ts`, `riskMetricsApi.ts`: REST resources for Profile, Watchlists, Insights.
+- `src/types/`: shared interfaces—`portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`; `index.ts` re-exports all.
+- `src/hooks/`: `usePortfolio`, `useSymbolDisplayData` (Redux-backed quotes + history for list/drawer), `useRealtimeQuotes`, `usePerSymbolHistory`, `useUserPreferences`, `useWatchlists`, `useRiskMetrics`, `useDraggableDrawer`; all consume `api` and `types`.
+- `src/store/`: Redux (quotes slice, selectors, `QuoteSocketSubscriber`), custom portfolio UI store (`usePortfolioStore`).
+- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Watchlist: `WatchlistCard`, `WatchlistItemRow`, `StockDetailDrawer` (draggable, watchlist options), `AddSymbolModal` (draggable drawer).
+
+### Diagrams
+
+- **C4 component diagram** (en): `docs/en/c4/c4-mobile-portfolio-components.puml`
+- **C4 component diagram** (zh): `docs/zh/c4/c4-mobile-portfolio-components.puml`
 
 ## Getting Started
 
@@ -79,15 +89,27 @@ If you see **"Unable to locate a Java Runtime"**: set `JAVA_HOME` to a JDK 17+ (
 
 The app connects only to the backend; there is no in-app mock data.
 
+| Endpoint | Usage |
+|----------|--------|
+| `GET /api/v1/portfolio` | Aggregated portfolio (Dashboard, Accounts, Insights) |
+| `GET /api/v1/quotes?symbols=...` | One-off quote fetch via `getQuotes(symbols)` |
+| `WS /ws/quotes` | Real-time quotes via `createQuoteSocket` (Stocks, Watchlists) |
+| `POST /api/v1/seed` | Seed portfolio via `portfolioApi.seedPortfolio(payload)` |
+| `GET /api/v1/customers` | Resolve current customer for Profile and Watchlists |
+| `GET/PUT /api/v1/user-preferences` | Profile preferences (theme, language, notifications) |
+| `GET/POST/DELETE /api/v1/watchlists`, `watchlist-items` | Watchlists screen |
+| `GET /api/v1/instruments` | Symbol/name lookup for watchlist items |
+| `GET /api/v1/risk-metrics` | Insights server metrics (volatility, Sharpe, VaR, beta) when available |
+
 1. From repo root: `pnpm run start:backend` (Docker + TimescaleDB + Redis + Kafka + API + seed + mock quote producer).
 2. Or separately: `pnpm run start:kafka` for Kafka and mock quotes only.
-3. The app expects `GET /api/v1/portfolio` for initial state and WebSocket `/ws/quotes` for real-time prices. Override the base URL with `EXPO_PUBLIC_PORTFOLIO_API_URL` in `.env` if needed (e.g. `http://192.168.x.x:8800` when using a simulator or device).
-4. Pull-to-refresh on the dashboard clears the cache and refetches from the backend.
+3. Override the base URL with `EXPO_PUBLIC_PORTFOLIO_API_URL` in `.env` if needed (e.g. `http://192.168.x.x:8800` when using a simulator or device).
+4. Pull-to-refresh on the dashboard calls `usePortfolio().refresh()` and refetches from the backend.
 
 ### Real-time quotes and sparklines
 
-The Stocks screen displays holdings and account summaries with live data:
+Stocks and Watchlists use a single Redux-backed flow:
 
-- `useRealtimeQuotes` opens a WebSocket connection to `/ws/quotes`, subscribes to symbols, and listens for `snapshot` messages.
-- `usePerSymbolHistory` accumulates per-symbol price history from quote snapshots for sparkline display.
-- `StockListItem` shows each stock with NativeSparkline (per-stock history from real-time data), current price, and daily change.
+- **QuoteSocketSubscriber** (in root layout) reads `subscribedSymbols` from the store, opens one WebSocket to `/ws/quotes`, and dispatches `setSnapshot` / `setStatus`. Screens call **useSymbolDisplayData(symbols)** to set subscribed symbols and read `bySymbol`, `quoteMap`, `historyBySymbol` from the store (with memoized selectors).
+- **StockDetailDrawer** and **AddSymbolModal** use **useDraggableDrawer** for slide-up/drag-to-close animation; close button and backdrop use the same close animation.
+- **StockListItem** and **WatchlistItemRow** show NativeSparkline (history from `useSymbolDisplayData`), current price, and daily change. Tapping a row opens **StockDetailDrawer** with live price and chart; on Watchlists, the drawer shows watchlist options (remove from list, add to another list).
