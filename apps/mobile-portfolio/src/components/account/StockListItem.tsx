@@ -3,6 +3,7 @@ import type { Holding } from "@/src/types/portfolio";
 import { formatPrice, formatSigned } from "@/src/utils";
 import { getStockChangeInfo } from "@/src/utils/stockUtils";
 import { Sparkline } from "../ui/Sparkline";
+import { useTheme } from "@/src/theme";
 
 interface StockListItemProps {
   holding: Holding;
@@ -19,15 +20,16 @@ export function StockListItem({
   historyValues,
   onPress,
 }: StockListItemProps) {
+  const { colors } = useTheme();
   const { isUp, trend, changeColor, changePercent } = getStockChangeInfo(change, price);
 
   return (
-    <Pressable style={styles.row} onPress={onPress}>
+    <Pressable style={[styles.row, { borderBottomColor: colors.border }]} onPress={onPress}>
       <View style={styles.left}>
-        <Text style={styles.symbol} numberOfLines={1}>
+        <Text style={[styles.symbol, { color: colors.text }]} numberOfLines={1}>
           {holding.symbol}
         </Text>
-        <Text style={styles.name} numberOfLines={1}>
+        <Text style={[styles.name, { color: colors.textSecondary }]} numberOfLines={1}>
           {holding.name}
         </Text>
       </View>
@@ -35,7 +37,7 @@ export function StockListItem({
         <Sparkline data={historyValues} trend={trend} width={80} height={36} />
       </View>
       <View style={styles.right}>
-        <Text style={styles.price}>{formatPrice(price)}</Text>
+        <Text style={[styles.price, { color: colors.text }]}>{formatPrice(price)}</Text>
         <View style={styles.changeContainer}>
           <Text style={[styles.change, { color: changeColor }]}>
             {isUp ? "+" : ""}{formatSigned(change)}
@@ -57,7 +59,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     minHeight: 64,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(255,255,255,0.1)",
   },
   left: {
     flex: 1,
@@ -67,12 +68,10 @@ const styles = StyleSheet.create({
   symbol: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#fff",
     letterSpacing: -0.3,
   },
   name: {
     fontSize: 13,
-    color: "rgba(255,255,255,0.5)",
     marginTop: 3,
     letterSpacing: -0.1,
   },
@@ -89,7 +88,6 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#fff",
     letterSpacing: -0.3,
   },
   changeContainer: {

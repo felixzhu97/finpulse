@@ -17,3 +17,5 @@ export type {
   SymbolDisplayData,
   UseSymbolDisplayDataResult,
 } from "./useSymbolDisplayData";
+export { usePreferences } from "./usePreferences";
+export { useDraggableDrawer } from "./useDraggableDrawer";

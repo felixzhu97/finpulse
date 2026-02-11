@@ -8,7 +8,7 @@ Portfolio management mobile app for viewing investment accounts, performance cha
 |----------|--------------|
 | Framework | Expo 54, React 19, React Native 0.81 |
 | Routing | expo-router 6 (file-based) |
-| State | Redux Toolkit (quotes), custom store (portfolio UI) |
+| State | Redux Toolkit (quotes, preferences), custom store (portfolio UI) |
 | Charts | react-native-wagmi-charts, react-native-chart-kit, react-native-svg |
 | Native Charts | iOS Metal (Swift), Android (Kotlin) |
 | Navigation | React Navigation (bottom-tabs) |
@@ -22,14 +22,14 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 |--------|-------|-------------|
 | Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native line chart |
 | Watchlist | `/(tabs)/watchlists` | Stock list (portfolio holdings) with real-time prices, sparklines, account rows; search (bottom sheet, closes on drawer/sort/tab), sort menu; pull-to-refresh; stock detail drawer (draggable, share) |
-| Insights | `/(tabs)/insights` | Portfolio risk (high-risk exposure, top 5 concentration), optional server risk metrics (volatility, Sharpe, VaR, beta), bar chart |
-| Profile | `/(tabs)/profile` | User preferences (theme, language, notifications) via `/api/v1/user-preferences` |
+| Insights | `/(tabs)/insights` | Risk metrics from API (volatility, Sharpe ratio, VaR, beta, risk level) via `/api/v1/risk-metrics` |
+| Account | `/(tabs)/account` | Profile section (customer info from `/api/v1/customers`), account list (from `/api/v1/portfolio`), and Settings drawer (user preferences: theme, language, notifications via `/api/v1/user-preferences`) |
 
 ## Project Structure (Thin Client)
 
 The app is a **thin client**: business logic lives on the server; the mobile app fetches data and renders UI.
 
-Profile and Insights also use `useUserPreferences`, `useRiskMetrics` and `customersApi`, `userPreferencesApi`, `riskMetricsApi` (REST: customers, user-preferences, risk-metrics).
+Account and Insights also use `usePreferences` (Redux-backed), `useRiskMetrics` and `customersApi`, `userPreferencesApi`, `riskMetricsApi` (REST: customers, user-preferences, risk-metrics). Theme changes apply immediately via Redux state management.
 
 - `app/`: expo-router routes and screens.
 - `src/api/`: data layer—implements backend contracts (single-layer; no subfolders).
@@ -39,9 +39,10 @@ Profile and Insights also use `useUserPreferences`, `useRiskMetrics` and `custom
   - `quoteSocket.ts`: `createQuoteSocket()` for WebSocket `/ws/quotes`.
   - `customersApi.ts`, `userPreferencesApi.ts`, `riskMetricsApi.ts`: REST resources for Profile, Insights. `watchlistsApi.ts`, `instrumentsApi.ts` available for future use.
 - `src/types/`: shared interfaces—`portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`; `index.ts` re-exports all.
-- `src/hooks/`: `usePortfolio`, `useSymbolDisplayData` (Redux-backed quotes + history for list/drawer), `useRealtimeQuotes`, `usePerSymbolHistory`, `useUserPreferences`, `useWatchlists`, `useRiskMetrics`, `useDraggableDrawer`; all consume `api` and `types`.
-- `src/store/`: Redux (quotes slice, selectors, `QuoteSocketSubscriber`), custom portfolio UI store (`usePortfolioStore`).
-- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Watchlist screen uses `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch).
+- `src/theme/`: theme system—`colors.ts` (light/dark color schemes), `index.ts` (`useTheme` hook for dynamic theming).
+- `src/hooks/`: `usePortfolio`, `useSymbolDisplayData` (Redux-backed quotes + history for list/drawer), `useRealtimeQuotes`, `usePerSymbolHistory`, `usePreferences` (Redux-backed user preferences), `useWatchlists`, `useRiskMetrics`, `useDraggableDrawer`; all consume `api` and `types`.
+- `src/store/`: Redux (quotes slice, preferences slice for theme/language/notifications, selectors, `QuoteSocketSubscriber`), custom portfolio UI store (`usePortfolioStore`).
+- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Watchlist screen uses `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch). All components support light/dark theme via `useTheme` hook.
 
 ### Diagrams
 
@@ -91,14 +92,14 @@ The app connects only to the backend; there is no in-app mock data.
 
 | Endpoint | Usage |
 |----------|--------|
-| `GET /api/v1/portfolio` | Aggregated portfolio (Dashboard, Accounts, Insights) |
+| `GET /api/v1/portfolio` | Aggregated portfolio (Overview, Accounts, Analytics) |
 | `GET /api/v1/quotes?symbols=...` | One-off quote fetch via `getQuotes(symbols)` |
 | `WS /ws/quotes` | Real-time quotes via `createQuoteSocket` (Watchlist screen) |
 | `POST /api/v1/seed` | Seed portfolio via `portfolioApi.seedPortfolio(payload)` |
-| `GET /api/v1/customers` | Resolve current customer for Profile |
-| `GET/PUT /api/v1/user-preferences` | Profile preferences (theme, language, notifications) |
+| `GET /api/v1/customers` | Customer info for Account Profile section |
+| `GET/PUT /api/v1/user-preferences` | Account Settings preferences (theme, language, notifications) |
 | `GET /api/v1/instruments` | Symbol/name lookup (if used) |
-| `GET /api/v1/risk-metrics` | Insights server metrics (volatility, Sharpe, VaR, beta) when available |
+| `GET /api/v1/risk-metrics` | Analytics risk metrics (volatility, Sharpe, VaR, beta, risk level) |
 
 1. From repo root: `pnpm run start:backend` (Docker + TimescaleDB + Redis + Kafka + API + seed + mock quote producer).
 2. Or separately: `pnpm run start:kafka` for Kafka and mock quotes only.
@@ -112,3 +113,12 @@ The Watchlist screen uses a single Redux-backed flow:
 - **QuoteSocketSubscriber** (in root layout) reads `subscribedSymbols` from the store, opens one WebSocket to `/ws/quotes`, and dispatches `setSnapshot` / `setStatus`. The Stocks screen calls **useSymbolDisplayData(symbols)** to set subscribed symbols and read `bySymbol`, `quoteMap`, `historyBySymbol` from the store (with memoized selectors).
 - **StockDetailDrawer** uses **useDraggableDrawer** for slide-up/drag-to-close animation; close button and backdrop use the same close animation; share action is available in the drawer header.
 - **StockListItem** shows sparkline (history from `useSymbolDisplayData`), current price, and daily change. Tapping a row opens **StockDetailDrawer** with live price and chart. **SortMenu** (name, price, change, change %) and a **bottom search bar** (opened by header search icon, **GlassView**; closes when opening detail drawer, sort menu, or switching tab) are on the Watchlist screen. Tab bar uses **expo-blur** (Liquid Glass) background.
+
+## Theming
+
+The app supports light and dark themes with automatic system theme detection:
+
+- **Theme System**: `src/theme/colors.ts` defines color schemes for light and dark modes. `src/theme/index.ts` provides `useTheme()` hook that returns current theme colors based on user preference and system settings.
+- **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
+- **Components**: All UI components use `useTheme()` hook to dynamically adapt colors. Cards have rounded corners (`borderRadius: 16`) and support theme-aware backgrounds.
+- **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.

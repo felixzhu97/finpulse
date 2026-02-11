@@ -3,18 +3,21 @@ import { Tabs } from "expo-router";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useTheme } from "@/src/theme";
 
 export default function Layout() {
+  const { colors } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#0A84FF",
-        tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
+        tabBarActiveTintColor: colors.tabIconActive,
+        tabBarInactiveTintColor: colors.tabIconInactive,
         tabBarStyle: {
-          backgroundColor: "#000000",
-          borderTopWidth: 0.5,
-          borderTopColor: "rgba(255,255,255,0.1)",
+          backgroundColor: colors.tabBar,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: colors.tabBarBorder,
         },
       }}
     >
@@ -46,11 +49,11 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="account"
         options={{
-          title: "Profile",
+          title: "Account",
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="person" size={24} color={color} />
+            <MaterialIcons name="account-balance-wallet" size={24} color={color} />
           ),
         }}
       />

@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useTheme } from "@/src/theme";
 
 interface MetricCardProps {
   label: string;
@@ -9,12 +10,6 @@ interface MetricCardProps {
   icon?: ReactNode;
 }
 
-const toneColor: Record<NonNullable<MetricCardProps["tone"]>, string> = {
-  default: "rgba(255,255,255,0.9)",
-  positive: "#4ade80",
-  negative: "#f87171",
-};
-
 export function MetricCard({
   label,
   value,
@@ -22,14 +17,22 @@ export function MetricCard({
   tone = "default",
   icon,
 }: MetricCardProps) {
+  const { colors } = useTheme();
+  
+  const toneColorMap: Record<NonNullable<MetricCardProps["tone"]>, string> = {
+    default: colors.text,
+    positive: colors.success,
+    negative: colors.error,
+  };
+
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={styles.header}>
-        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
         {icon}
       </View>
-      <Text style={[styles.value, { color: toneColor[tone] }]}>{value}</Text>
-      {helper ? <Text style={styles.helper}>{helper}</Text> : null}
+      <Text style={[styles.value, { color: toneColorMap[tone] }]}>{value}</Text>
+      {helper ? <Text style={[styles.helper, { color: colors.textSecondary }]}>{helper}</Text> : null}
     </View>
   );
 }
@@ -38,9 +41,7 @@ const styles = StyleSheet.create({
   card: {
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "#000000",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderWidth: StyleSheet.hairlineWidth,
     minWidth: 120,
   },
   header: {
@@ -51,7 +52,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: "rgba(255,255,255,0.6)",
   },
   value: {
     fontSize: 20,
@@ -60,6 +60,5 @@ const styles = StyleSheet.create({
   helper: {
     marginTop: 4,
     fontSize: 11,
-    color: "rgba(255,255,255,0.5)",
   },
 });

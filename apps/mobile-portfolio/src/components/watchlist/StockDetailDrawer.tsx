@@ -18,6 +18,7 @@ import type { SymbolDisplayData } from "@/src/hooks/useSymbolDisplayData";
 import { formatPrice, formatSigned } from "@/src/utils";
 import { getStockChangeInfo } from "@/src/utils/stockUtils";
 import { Sparkline } from "../ui/Sparkline";
+import { useTheme } from "@/src/theme";
 
 export interface StockDetailItem {
   symbol: string;
@@ -61,6 +62,7 @@ export function StockDetailDrawer({
   displayData,
   watchlistContext,
 }: StockDetailDrawerProps) {
+  const { colors } = useTheme();
   const [selectedPeriod, setSelectedPeriod] = useState<typeof PERIODS[number]>("1D");
   const [showAddToWatchlist, setShowAddToWatchlist] = useState(false);
 
@@ -121,7 +123,7 @@ export function StockDetailDrawer({
     >
       <View style={styles.modalRoot}>
         <Animated.View
-          style={[styles.backdrop, { opacity: backdropOpacity }]}
+          style={[styles.backdrop, { opacity: backdropOpacity, backgroundColor: colors.backdrop }]}
           pointerEvents="box-none"
         >
           <Pressable style={StyleSheet.absoluteFill} onPress={closeWithAnimation} />
@@ -131,6 +133,7 @@ export function StockDetailDrawer({
             styles.drawer,
             {
               height: DRAWER_HEIGHT,
+              backgroundColor: colors.background,
               transform: [
                 {
                   translateY: Animated.add(slideAnim, dragOffset),
@@ -141,17 +144,17 @@ export function StockDetailDrawer({
         >
           <SafeAreaView style={styles.safe} edges={["top"]}>
             <View style={styles.dragArea} {...panHandlers}>
-              <View style={styles.dragHandle} />
+              <View style={[styles.dragHandle, { backgroundColor: colors.textTertiary }]} />
             </View>
             <View style={styles.headerBar}>
               <View style={styles.headerRow}>
-                <Text style={styles.symbolTitle}>{item.symbol}</Text>
+                <Text style={[styles.symbolTitle, { color: colors.text }]}>{item.symbol}</Text>
                 <View style={styles.headerActions}>
                   <Pressable onPress={handleShare} hitSlop={12} style={styles.actionBtn}>
-                    <MaterialIcons name="share" size={20} color="#fff" />
+                    <MaterialIcons name="share" size={20} color={colors.text} />
                   </Pressable>
                   <Pressable onPress={closeWithAnimation} hitSlop={12} style={styles.closeBtn}>
-                    <MaterialIcons name="close" size={22} color="#fff" />
+                    <MaterialIcons name="close" size={22} color={colors.text} />
                   </Pressable>
                 </View>
               </View>
@@ -163,17 +166,17 @@ export function StockDetailDrawer({
               scrollEnabled={true}
             >
               {item.name ? (
-                <Text style={styles.companyName} numberOfLines={1}>
+                <Text style={[styles.companyName, { color: colors.textSecondary }]} numberOfLines={1}>
                   {item.name}
                 </Text>
               ) : null}
-              <Text style={styles.price}>{formatPrice(price)}</Text>
+              <Text style={[styles.price, { color: colors.text }]}>{formatPrice(price)}</Text>
               <View style={styles.changeRow}>
                 <Text style={[styles.changeText, { color: changeColor }]}>
                   {isUp ? "+" : ""}{formatSigned(change)} ({isUp ? "+" : ""}
                   {changePercent}%)
                 </Text>
-                <Text style={styles.todayLabel}>Today</Text>
+                <Text style={[styles.todayLabel, { color: colors.textSecondary }]}>Today</Text>
               </View>
               <View style={styles.periodRow}>
                 {PERIODS.map((p) => (
@@ -182,13 +185,19 @@ export function StockDetailDrawer({
                     onPress={() => setSelectedPeriod(p)}
                     style={[
                       styles.periodPill,
-                      selectedPeriod === p && styles.periodPillActive,
+                      {
+                        backgroundColor: selectedPeriod === p ? colors.primaryLight : colors.surface,
+                        borderColor: selectedPeriod === p ? colors.primary : colors.border,
+                      },
                     ]}
                   >
                     <Text
                       style={[
                         styles.periodText,
-                        selectedPeriod === p && styles.periodTextActive,
+                        {
+                          color: selectedPeriod === p ? colors.primary : colors.textSecondary,
+                          fontWeight: selectedPeriod === p ? "600" : "400",
+                        },
                       ]}
                     >
                       {p}
@@ -205,62 +214,62 @@ export function StockDetailDrawer({
                 />
               </View>
               <View style={styles.statsSection}>
-                <Text style={styles.sectionTitle}>Key Statistics</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Key Statistics</Text>
                 <View style={styles.statsTable}>
-                  <View style={styles.statsRow}>
-                    <Text style={styles.statsLabel}>Open</Text>
-                    <Text style={styles.statsValue}>
+                  <View style={[styles.statsRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>Open</Text>
+                    <Text style={[styles.statsValue, { color: colors.text }]}>
                       {stats ? formatPrice(stats.open) : "—"}
                     </Text>
                   </View>
-                  <View style={styles.statsRow}>
-                    <Text style={styles.statsLabel}>High</Text>
-                    <Text style={styles.statsValue}>
+                  <View style={[styles.statsRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>High</Text>
+                    <Text style={[styles.statsValue, { color: colors.text }]}>
                       {stats ? formatPrice(stats.high) : "—"}
                     </Text>
                   </View>
-                  <View style={styles.statsRow}>
-                    <Text style={styles.statsLabel}>Low</Text>
-                    <Text style={styles.statsValue}>
+                  <View style={[styles.statsRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>Low</Text>
+                    <Text style={[styles.statsValue, { color: colors.text }]}>
                       {stats ? formatPrice(stats.low) : "—"}
                     </Text>
                   </View>
-                  <View style={styles.statsRow}>
-                    <Text style={styles.statsLabel}>Volume</Text>
-                    <Text style={styles.statsValue}>—</Text>
+                  <View style={[styles.statsRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>Volume</Text>
+                    <Text style={[styles.statsValue, { color: colors.text }]}>—</Text>
                   </View>
                 </View>
               </View>
               {watchlistContext ? (
-                <View style={styles.watchlistSection}>
-                  <Text style={styles.sectionTitle}>Watchlist</Text>
+                <View style={[styles.watchlistSection, { borderTopColor: colors.border }]}>
+                  <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>Watchlist</Text>
                   {watchlistContext.memberships.map((m) => (
                     <Pressable
                       key={m.watchlistItemId}
-                      style={styles.watchlistRow}
+                      style={[styles.watchlistRow, { borderBottomColor: colors.border }]}
                       onPress={() => watchlistContext.onRemove(m.watchlistItemId)}
                     >
                       <MaterialIcons
                         name="star"
                         size={20}
-                        color="rgba(255,255,255,0.6)"
+                        color={colors.textSecondary}
                       />
-                      <Text style={styles.watchlistRowLabel}>
+                      <Text style={[styles.watchlistRowLabel, { color: colors.text }]}>
                         Remove from {m.watchlistName}
                       </Text>
                     </Pressable>
                   ))}
                   {watchlistContext.watchlistOptions.length > 0 ? (
                     <Pressable
-                      style={styles.watchlistRow}
+                      style={[styles.watchlistRow, { borderBottomColor: colors.border }]}
                       onPress={() => setShowAddToWatchlist(true)}
                     >
                       <MaterialIcons
                         name="add-circle-outline"
                         size={20}
-                        color="#0A84FF"
+                        color={colors.primary}
                       />
-                      <Text style={[styles.watchlistRowLabel, styles.addToWatchlistText]}>
+                      <Text style={[styles.watchlistRowLabel, styles.addToWatchlistText, { color: colors.primary }]}>
                         Add to Watchlist
                       </Text>
                     </Pressable>
@@ -275,11 +284,11 @@ export function StockDetailDrawer({
               onRequestClose={() => setShowAddToWatchlist(false)}
             >
               <Pressable
-                style={styles.addModalOverlay}
+                style={[styles.addModalOverlay, { backgroundColor: colors.backdrop }]}
                 onPress={() => setShowAddToWatchlist(false)}
               >
-                <View style={styles.addModalSheet}>
-                  <Text style={styles.addModalTitle}>Add to Watchlist</Text>
+                <View style={[styles.addModalSheet, { backgroundColor: colors.card }]}>
+                  <Text style={[styles.addModalTitle, { color: colors.textTertiary }]}>Add to Watchlist</Text>
                   {watchlistContext?.watchlistOptions.map((w) => (
                     <Pressable
                       key={w.watchlist_id}
@@ -289,14 +298,14 @@ export function StockDetailDrawer({
                         setShowAddToWatchlist(false);
                       }}
                     >
-                      <Text style={styles.addModalRowText}>{w.name}</Text>
+                      <Text style={[styles.addModalRowText, { color: colors.primary }]}>{w.name}</Text>
                     </Pressable>
                   ))}
                   <Pressable
                     style={styles.addModalCancel}
                     onPress={() => setShowAddToWatchlist(false)}
                   >
-                    <Text style={styles.addModalCancelText}>Cancel</Text>
+                    <Text style={[styles.addModalCancelText, { color: colors.primary }]}>Cancel</Text>
                   </Pressable>
                 </View>
               </Pressable>
@@ -315,10 +324,8 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#000",
   },
   drawer: {
-    backgroundColor: "#000",
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     overflow: "hidden",
@@ -336,7 +343,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 5,
     borderRadius: 2.5,
-    backgroundColor: "rgba(255,255,255,0.3)",
   },
   headerBar: {
     paddingHorizontal: 16,
@@ -345,7 +351,6 @@ const styles = StyleSheet.create({
   symbolTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#fff",
     letterSpacing: -0.4,
   },
   headerRow: {
@@ -362,7 +367,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -370,7 +374,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -383,13 +386,11 @@ const styles = StyleSheet.create({
   },
   companyName: {
     fontSize: 15,
-    color: "rgba(255,255,255,0.6)",
     marginBottom: 4,
   },
   price: {
     fontSize: 34,
     fontWeight: "700",
-    color: "#fff",
     letterSpacing: -0.8,
     marginBottom: 4,
   },
@@ -406,7 +407,6 @@ const styles = StyleSheet.create({
   },
   todayLabel: {
     fontSize: 15,
-    color: "rgba(255,255,255,0.5)",
     fontWeight: "400",
   },
   periodRow: {
@@ -418,17 +418,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
-  },
-  periodPillActive: {
-    backgroundColor: "rgba(255,255,255,0.15)",
+    borderWidth: StyleSheet.hairlineWidth,
   },
   periodText: {
     fontSize: 15,
     fontWeight: "500",
-    color: "rgba(255,255,255,0.5)",
-  },
-  periodTextActive: {
-    color: "#fff",
   },
   chartContainer: {
     width: CHART_WIDTH,
@@ -438,13 +432,11 @@ const styles = StyleSheet.create({
   },
   statsSection: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "rgba(255,255,255,0.12)",
     paddingTop: 20,
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: "600",
-    color: "rgba(255,255,255,0.5)",
     textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 12,
@@ -458,21 +450,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(255,255,255,0.08)",
   },
   statsLabel: {
     fontSize: 17,
-    color: "rgba(255,255,255,0.8)",
     fontWeight: "400",
   },
   statsValue: {
     fontSize: 17,
-    color: "#fff",
     fontWeight: "600",
   },
   watchlistSection: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "rgba(255,255,255,0.12)",
     paddingTop: 20,
     marginTop: 8,
   },
@@ -483,24 +471,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     gap: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(255,255,255,0.08)",
   },
   watchlistRowLabel: {
     flex: 1,
     fontSize: 17,
-    color: "rgba(255,255,255,0.9)",
     fontWeight: "400",
   },
-  addToWatchlistText: {
-    color: "#0A84FF",
-  },
+  addToWatchlistText: {},
   addModalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end",
   },
   addModalSheet: {
-    backgroundColor: "#1c1c1e",
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     paddingHorizontal: 16,
@@ -510,7 +492,6 @@ const styles = StyleSheet.create({
   addModalTitle: {
     fontSize: 13,
     fontWeight: "600",
-    color: "rgba(255,255,255,0.5)",
     textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 12,
@@ -520,7 +501,6 @@ const styles = StyleSheet.create({
   },
   addModalRowText: {
     fontSize: 17,
-    color: "#0A84FF",
     fontWeight: "400",
   },
   addModalCancel: {
@@ -530,7 +510,6 @@ const styles = StyleSheet.create({
   },
   addModalCancelText: {
     fontSize: 17,
-    color: "#0A84FF",
     fontWeight: "600",
   },
 });

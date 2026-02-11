@@ -1,11 +1,12 @@
 import { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   RefreshControl,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import { useTheme } from "@react-navigation/native";
+import { useTheme as useNavTheme } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import { NativeLineChart } from "@/src/components/native";
 import { PortfolioSummary } from "@/src/components/portfolio/PortfolioSummary";
@@ -13,9 +14,10 @@ import { MetricCard } from "@/src/components/ui/MetricCard";
 import { AssetAllocationChart } from "@/src/components/portfolio/AssetAllocationChart";
 import { NetWorthLineChart } from "@/src/components/portfolio/NetWorthLineChart";
 import { usePortfolio } from "@/src/hooks/usePortfolio";
+import { useTheme } from "@/src/theme";
 
 export default function DashboardScreen() {
-  const { dark } = useTheme();
+  const { isDark, colors } = useTheme();
   const {
     portfolio,
     allocation,
@@ -24,7 +26,7 @@ export default function DashboardScreen() {
     error,
     refresh,
   } = usePortfolio();
-  const chartTheme = dark ? "dark" : "light";
+  const chartTheme = isDark ? "dark" : "light";
   const [chartScrollLock, setChartScrollLock] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -53,16 +55,18 @@ export default function DashboardScreen() {
 
   if (!portfolio) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.loadingText}>
-          {loading
-            ? "Loading portfolio..."
-            : "Unable to load portfolio. Start the backend and seed data, then retry."}
-        </Text>
-        {!loading && (
-          <Text style={styles.retryText} onPress={refresh}>
-            Tap to retry
-          </Text>
+      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+        {loading ? (
+          <ActivityIndicator size="small" color={colors.textSecondary} />
+        ) : (
+          <>
+            <Text style={[styles.errorText, { color: colors.textSecondary }]}>
+              Unable to load portfolio. Start the backend and seed data, then retry.
+            </Text>
+            <Text style={[styles.retryText, { color: colors.primary }]} onPress={refresh}>
+              Tap to retry
+            </Text>
+          </>
         )}
       </View>
     );
@@ -70,20 +74,20 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView
-      style={styles.screen}
+      style={[styles.screen, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
       scrollEnabled={!chartScrollLock}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#fff"
+            tintColor={colors.primary}
           />
         }
     >
       <PortfolioSummary portfolio={portfolio} />
       <View style={styles.block}>
-        <Text style={styles.subsectionTitle}>Net worth trend</Text>
+        <Text style={[styles.subsectionTitle, { color: colors.text }]}>Net worth trend</Text>
         <NetWorthLineChart points={history} />
         <MetricCard
           label="Accounts"
@@ -96,8 +100,8 @@ export default function DashboardScreen() {
             value: item.value,
           }))}
         />
-        <View style={styles.chartCard}>
-          <Text style={styles.chartCardTitle}>Net worth (native chart)</Text>
+        <View style={[styles.chartCard, { backgroundColor: colors.card }]}>
+          <Text style={[styles.chartCardTitle, { color: colors.text }]}>Net worth (native chart)</Text>
           <NativeLineChart
             data={lineData}
             theme={chartTheme}
@@ -117,11 +121,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#000000",
   },
   screen: {
     flex: 1,
-    backgroundColor: "#000000",
   },
   content: {
     padding: 16,
@@ -134,19 +136,19 @@ const styles = StyleSheet.create({
   subsectionTitle: {
     fontSize: 14,
     fontWeight: "600",
-    color: "rgba(255,255,255,0.9)",
     marginBottom: 4,
   },
-  loadingText: {
-    color: "rgba(255,255,255,0.9)",
+  errorText: {
     textAlign: "center",
+    fontSize: 15,
+    marginBottom: 8,
   },
   retryText: {
-    color: "#0A84FF",
     marginTop: 12,
+    fontSize: 15,
+    fontWeight: "500",
   },
   chartCard: {
-    backgroundColor: "#000",
     borderRadius: 12,
     padding: 12,
     marginTop: 12,
@@ -155,7 +157,6 @@ const styles = StyleSheet.create({
   chartCardTitle: {
     fontSize: 14,
     fontWeight: "600",
-    color: "rgba(255,255,255,0.9)",
     marginBottom: 8,
   },
   nativeChart: {

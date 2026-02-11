@@ -13,8 +13,10 @@ import { MetricCard } from "@/src/components/ui/MetricCard";
 import { useRiskMetrics } from "@/src/hooks";
 import { portfolioApi } from "@/src/api";
 import { useEffect } from "react";
+import { useTheme } from "@/src/theme";
 
 export default function InsightsScreen() {
+  const { colors } = useTheme();
   const { metrics, loading, error, refresh } = useRiskMetrics();
   const [highRatio, setHighRatio] = useState(0);
   const [topConcentration, setTopConcentration] = useState(0);
@@ -62,11 +64,11 @@ export default function InsightsScreen() {
 
   if (error && !metrics && !localLoading) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>
+      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+        <Text style={[styles.errorText, { color: colors.error }]}>
           Unable to load analytics. Start the backend and try again.
         </Text>
-        <Text style={styles.retryText} onPress={onRefresh}>
+        <Text style={[styles.retryText, { color: colors.primary }]} onPress={onRefresh}>
           Tap to retry
         </Text>
       </View>
@@ -82,20 +84,19 @@ export default function InsightsScreen() {
 
   return (
     <ScrollView
-      style={styles.screen}
+      style={[styles.screen, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor="#fff"
+          tintColor={colors.primary}
         />
       }
     >
       {loading && !metrics && localLoading ? (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#0A84FF" />
-          <Text style={styles.loadingText}>Loading insights...</Text>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color={colors.textSecondary} />
         </View>
       ) : (
         <View style={styles.block}>
@@ -113,7 +114,7 @@ export default function InsightsScreen() {
           />
           {hasApiMetrics ? (
             <View style={styles.apiSection}>
-              <Text style={styles.sectionTitle}>Risk metrics (API)</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Risk metrics (API)</Text>
               {metrics.volatility != null && (
                 <MetricCard
                   label="Volatility"
@@ -144,7 +145,7 @@ export default function InsightsScreen() {
               )}
             </View>
           ) : null}
-          <View style={styles.chartCard}>
+          <View style={[styles.chartCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <BarChart
               data={{
                 labels: ["High risk", "Top 5"],
@@ -163,10 +164,10 @@ export default function InsightsScreen() {
               yAxisLabel=""
               yAxisSuffix="%"
               chartConfig={{
-                backgroundGradientFrom: "#000000",
-                backgroundGradientTo: "#000000",
-                color: () => "#6366f1",
-                labelColor: () => "rgba(255,255,255,0.7)",
+                backgroundGradientFrom: colors.background,
+                backgroundGradientTo: colors.background,
+                color: () => colors.primary,
+                labelColor: () => colors.textSecondary,
                 decimalPlaces: 1,
                 propsForBackgroundLines: {
                   strokeWidth: 0,
@@ -177,9 +178,9 @@ export default function InsightsScreen() {
               style={styles.barChart}
             />
           </View>
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryTitle}>Summary</Text>
-            <Text style={styles.summaryBody}>
+          <View style={[styles.summaryCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.summaryTitle, { color: colors.text }]}>Summary</Text>
+            <Text style={[styles.summaryBody, { color: colors.textSecondary }]}>
               Portfolio risk and concentration from holdings. When available,
               server risk metrics (volatility, Sharpe, VaR, beta) are shown
               above.
@@ -194,7 +195,6 @@ export default function InsightsScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#000000",
   },
   content: {
     padding: 16,
@@ -203,6 +203,13 @@ const styles = StyleSheet.create({
   block: {
     gap: 16,
   },
+  loadingContainer: {
+    flex: 1,
+    minHeight: 300,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 60,
+  },
   centered: {
     flex: 1,
     minHeight: 200,
@@ -210,16 +217,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
   },
-  loadingText: {
-    color: "rgba(255,255,255,0.7)",
-    marginTop: 12,
-  },
   errorText: {
-    color: "#f87171",
     textAlign: "center",
   },
   retryText: {
-    color: "#0A84FF",
     marginTop: 12,
   },
   apiSection: {
@@ -228,14 +229,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: "600",
-    color: "rgba(255,255,255,0.9)",
     marginBottom: 4,
   },
   chartCard: {
     borderRadius: 12,
-    backgroundColor: "#000000",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderWidth: StyleSheet.hairlineWidth,
     paddingVertical: 8,
     overflow: "hidden",
     width: "100%",
@@ -246,19 +244,15 @@ const styles = StyleSheet.create({
   summaryCard: {
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "#000000",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderWidth: StyleSheet.hairlineWidth,
   },
   summaryTitle: {
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 8,
-    color: "rgba(255,255,255,0.9)",
   },
   summaryBody: {
     fontSize: 13,
-    color: "rgba(255,255,255,0.6)",
     lineHeight: 18,
   },
 });

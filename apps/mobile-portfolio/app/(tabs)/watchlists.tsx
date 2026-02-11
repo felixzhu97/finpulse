@@ -2,6 +2,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import {
+  ActivityIndicator,
   Animated,
   FlatList,
   Pressable,
@@ -24,6 +25,7 @@ import { SortMenu, type SortOption } from "@/src/components/ui/SortMenu";
 import { useSymbolDisplayData } from "@/src/hooks/useSymbolDisplayData";
 import type { Account, Holding } from "@/src/types/portfolio";
 import { portfolioApi } from "@/src/api";
+import { useTheme } from "@/src/theme";
 
 type ListRow =
   | { type: "stock"; holding: Holding; price: number; change: number }
@@ -61,6 +63,7 @@ function buildListRows(
 }
 
 export default function WatchlistsScreen() {
+  const { colors } = useTheme();
   const [baseAccounts, setBaseAccounts] = useState<Account[]>([]);
   const [historyValues, setHistoryValues] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -222,10 +225,10 @@ export default function WatchlistsScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.screen}>
-        <StatusBar style="light" />
-        <View style={styles.centered}>
-          <Text style={styles.loadingText}>Loading stocks...</Text>
+      <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
+        <StatusBar style={colors.isDark ? "light" : "dark"} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color={colors.textSecondary} />
         </View>
       </SafeAreaView>
     );
@@ -233,16 +236,16 @@ export default function WatchlistsScreen() {
 
   if (baseAccounts.length === 0) {
     return (
-      <SafeAreaView style={styles.screen}>
-        <StatusBar style="light" />
+      <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
+        <StatusBar style={colors.isDark ? "light" : "dark"} />
         <View style={styles.header}>
-          <Text style={styles.title}>Stocks</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Stocks</Text>
         </View>
         <View style={styles.centered}>
-          <Text style={styles.loadingText}>
+          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
             Start backend and seed data first.
           </Text>
-          <Pressable style={styles.retryBtn} onPress={onRefresh}>
+          <Pressable style={[styles.retryBtn, { backgroundColor: colors.primary }]} onPress={onRefresh}>
             <Text style={styles.retryText}>Retry</Text>
           </Pressable>
         </View>
@@ -251,12 +254,12 @@ export default function WatchlistsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.screen} edges={["top"]}>
-      <StatusBar style="light" />
+    <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]} edges={["top"]}>
+      <StatusBar style={colors.isDark ? "light" : "dark"} />
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Stocks</Text>
-          <Text style={styles.date}>{formatHeaderDate()}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Stocks</Text>
+          <Text style={[styles.date, { color: colors.textSecondary }]}>{formatHeaderDate()}</Text>
         </View>
         <View style={styles.headerActions}>
           <SortMenu
@@ -265,7 +268,7 @@ export default function WatchlistsScreen() {
             onOpen={closeSearchBar}
           />
           <Pressable style={styles.iconButton} onPress={handleSearchPress}>
-            <MaterialIcons name="search" size={24} color="#fff" />
+            <MaterialIcons name="search" size={24} color={colors.text} />
           </Pressable>
         </View>
       </View>
@@ -279,7 +282,7 @@ export default function WatchlistsScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#fff"
+              tintColor={colors.primary}
             />
           }
           renderItem={({ item }) =>
@@ -310,8 +313,8 @@ export default function WatchlistsScreen() {
           ListEmptyComponent={
             searchQuery.trim() ? (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No stocks found</Text>
-                <Text style={styles.emptySubtext}>
+                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No stocks found</Text>
+                <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
                   Try a different search term
                 </Text>
               </View>
@@ -342,14 +345,14 @@ export default function WatchlistsScreen() {
               <MaterialIcons
                 name="search"
                 size={20}
-                color="rgba(255,255,255,0.6)"
+                color={colors.textSecondary}
                 style={styles.searchIcon}
               />
               <TextInput
                 ref={searchInputRef}
-                style={styles.searchInput}
+                style={[styles.searchInput, { color: colors.text }]}
                 placeholder="Search stocks..."
-                placeholderTextColor="rgba(255,255,255,0.45)"
+                placeholderTextColor={colors.textTertiary}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 autoCapitalize="none"
@@ -362,7 +365,7 @@ export default function WatchlistsScreen() {
                   hitSlop={8}
                   style={styles.clearBtn}
                 >
-                  <MaterialIcons name="close" size={18} color="rgba(255,255,255,0.6)" />
+                  <MaterialIcons name="close" size={18} color={colors.textSecondary} />
                 </Pressable>
               )}
             </GlassView>
@@ -372,7 +375,7 @@ export default function WatchlistsScreen() {
               style={styles.searchCloseBtn}
             >
               <GlassView intensity={60} tint="dark" style={styles.searchCloseGlass}>
-                <MaterialIcons name="close" size={24} color="#fff" />
+                <MaterialIcons name="close" size={24} color={colors.text} />
               </GlassView>
             </Pressable>
           </View>
@@ -395,16 +398,16 @@ export default function WatchlistsScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#000",
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  loadingText: {
-    color: "#9ca3af",
-    fontSize: 16,
   },
   header: {
     flexDirection: "row",
@@ -417,12 +420,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#fff",
     letterSpacing: -0.5,
   },
   date: {
     fontSize: 13,
-    color: "rgba(255,255,255,0.5)",
     marginTop: 4,
     fontWeight: "400",
   },
@@ -436,6 +437,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "transparent",
   },
   listContainer: {
     flex: 1,
@@ -458,12 +460,10 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 17,
     fontWeight: "600",
-    color: "rgba(255,255,255,0.9)",
     marginBottom: 4,
   },
   emptySubtext: {
     fontSize: 15,
-    color: "rgba(255,255,255,0.5)",
   },
   searchBarContainer: {
     position: "absolute",
@@ -515,7 +515,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 17,
-    color: "#fff",
     padding: 0,
   },
   clearBtn: {

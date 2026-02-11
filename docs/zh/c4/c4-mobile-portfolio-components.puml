@@ -5,26 +5,28 @@
 title 移动端投资组合应用 - 组件图
 
 Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native)") {
-    Component(tabs_router, "标签路由", "Expo Router", "仪表盘、自选、洞察、个人")
-    Component(dashboard_screen, "仪表盘屏幕", "React Native", "组合摘要、原生图表、净资产、资产配置")
+    Component(tabs_router, "标签路由", "Expo Router", "仪表板、自选、洞察、账户")
+    Component(overview_screen, "仪表板屏幕", "React Native", "组合摘要、原生图表、净资产、资产配置")
     Component(watchlist_screen, "自选屏幕", "React Native", "股票列表（组合）、底部搜索、排序、详情抽屉")
-    Component(insights_screen, "洞察屏幕", "React Native", "风险指标、服务端 risk-metrics API")
-    Component(profile_screen, "个人屏幕", "React Native", "用户偏好 via API")
+    Component(analytics_screen, "洞察屏幕", "React Native", "风险指标（波动率、夏普比率、VaR、Beta）")
+    Component(account_screen, "账户屏幕", "React Native", "个人资料（客户信息）、账户列表、设置抽屉（用户偏好）")
 
     Component(types_layer, "types", "TypeScript", "Portfolio、QuoteSnapshot、Instrument 等")
     Component(api_client, "portfolioApi", "TypeScript", "GET portfolio 缓存、getAccounts、getRiskSummary、seedPortfolio")
     Component(quotes_rest, "getQuotes", "TypeScript", "GET /api/v1/quotes")
     Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes、订阅、重连")
-    Component(rest_apis, "customersApi, userPreferencesApi, riskMetricsApi", "TypeScript", "Profile、Insights 用 REST")
+    Component(rest_apis, "customersApi, userPreferencesApi, riskMetricsApi", "TypeScript", "账户（个人资料+设置）、分析用 REST")
 
     Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes、history、subscribedSymbols、setSnapshot、setStatus")
+    Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme、language、notificationsEnabled、setTheme、setLanguage、setNotificationsEnabled")
     Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "读取 subscribedSymbols、运行 WebSocket、派发到 store")
     Component(portfolio_store, "组合 Store", "自定义", "当前选中账户 id（UI）")
 
     Component(use_symbol_display, "useSymbolDisplayData", "Hook", "setSubscribedSymbols、从 Redux 选择；bySymbol、quoteMap、historyBySymbol")
     Component(use_portfolio, "usePortfolio", "Hook", "portfolio + allocation + history + refresh")
     Component(use_draggable_drawer, "useDraggableDrawer", "Hook", "底部抽屉滑动手画")
-    Component(use_user_prefs, "useUserPreferences", "Hook", "个人偏好")
+    Component(use_preferences, "usePreferences", "Hook", "Redux 管理的用户偏好（主题、语言、通知）")
+    Component(use_theme, "useTheme", "Hook", "基于偏好和系统的当前主题颜色（浅色/深色）")
     Component(use_risk_metrics, "useRiskMetrics", "Hook", "洞察 risk-metrics API")
 
     Component(portfolio_summary, "PortfolioSummary", "React Native", "净资产、当日变动")
@@ -41,22 +43,23 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
     Component(glass_view, "GlassView", "React Native", "expo-blur，Liquid Glass 用于搜索栏与标签栏")
 
     Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL、Base URL")
+    Component(theme_system, "主题系统", "TypeScript", "浅色/深色配色方案、useTheme hook")
 }
 
 Container_Ext(portfolio_api, "投资组合分析 API", "REST / WebSocket", "组合、/ws/quotes、risk-metrics")
 
-Rel(tabs_router, dashboard_screen, "路由到", "")
+Rel(tabs_router, overview_screen, "路由到", "")
 Rel(tabs_router, watchlist_screen, "路由到", "")
-Rel(tabs_router, insights_screen, "路由到", "")
-Rel(tabs_router, profile_screen, "路由到", "")
+Rel(tabs_router, analytics_screen, "路由到", "")
+Rel(tabs_router, account_screen, "路由到", "")
 
-Rel(dashboard_screen, use_portfolio, "使用", "")
+Rel(overview_screen, use_portfolio, "使用", "")
 Rel(use_portfolio, api_client, "调用", "")
-Rel(dashboard_screen, portfolio_summary, "使用", "")
-Rel(dashboard_screen, asset_allocation_chart, "使用", "")
-Rel(dashboard_screen, net_worth_chart, "使用", "")
-Rel(dashboard_screen, native_line_chart, "使用", "")
-Rel(dashboard_screen, portfolio_store, "读取", "")
+Rel(overview_screen, portfolio_summary, "使用", "")
+Rel(overview_screen, asset_allocation_chart, "使用", "")
+Rel(overview_screen, net_worth_chart, "使用", "")
+Rel(overview_screen, native_line_chart, "使用", "")
+Rel(overview_screen, portfolio_store, "读取", "")
 
 Rel(watchlist_screen, api_client, "调用", "getPortfolio")
 Rel(watchlist_screen, use_symbol_display, "使用", "")
@@ -72,13 +75,20 @@ Rel(quote_subscriber, redux_quotes, "派发 setSnapshot", "")
 Rel(quote_subscriber, quote_socket, "创建", "")
 Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
 
-Rel(insights_screen, api_client, "调用", "getRiskSummary")
-Rel(insights_screen, use_risk_metrics, "使用", "")
+Rel(analytics_screen, use_risk_metrics, "使用", "")
 Rel(use_risk_metrics, rest_apis, "调用", "risk-metrics")
-Rel(insights_screen, metric_card, "使用", "")
+Rel(analytics_screen, metric_card, "使用", "")
 
-Rel(profile_screen, use_user_prefs, "使用", "")
-Rel(use_user_prefs, rest_apis, "调用", "user-preferences")
+Rel(account_screen, use_preferences, "使用", "")
+Rel(account_screen, rest_apis, "调用", "customers（个人资料）")
+Rel(use_preferences, redux_preferences, "派发、选择", "")
+Rel(use_preferences, rest_apis, "调用", "user-preferences（设置）")
+Rel(overview_screen, use_theme, "使用", "")
+Rel(watchlist_screen, use_theme, "使用", "")
+Rel(analytics_screen, use_theme, "使用", "")
+Rel(account_screen, use_theme, "使用", "")
+Rel(use_theme, theme_system, "使用", "")
+Rel(use_theme, redux_preferences, "读取", "主题偏好")
 
 Rel(stock_detail_drawer, use_draggable_drawer, "使用", "")
 Rel(stock_list_item, native_sparkline, "使用", "")

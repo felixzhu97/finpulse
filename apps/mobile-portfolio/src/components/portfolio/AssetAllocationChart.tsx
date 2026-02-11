@@ -1,5 +1,6 @@
 import { Dimensions, StyleSheet, View } from "react-native";
 import { PieChart } from "react-native-chart-kit";
+import { useTheme } from "@/src/theme";
 
 type AllocationItem = {
   label: string;
@@ -11,6 +12,7 @@ interface AssetAllocationChartProps {
 }
 
 export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
+  const { colors } = useTheme();
   const total = items.reduce((sum, item) => sum + item.value, 0);
 
   if (!total) {
@@ -30,12 +32,12 @@ export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
         "#fb923c",
         "#a78bfa",
       ][index % 5],
-    legendFontColor: "rgba(255,255,255,0.7)",
+    legendFontColor: colors.textSecondary,
     legendFontSize: 12,
   }));
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <PieChart
         data={chartData}
         width={width}
@@ -44,10 +46,10 @@ export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
         backgroundColor="transparent"
         paddingLeft="12"
         chartConfig={{
-          backgroundGradientFrom: "#000000",
-          backgroundGradientTo: "#000000",
-          color: () => "rgba(255,255,255,0.9)",
-          labelColor: () => "rgba(255,255,255,0.6)",
+          backgroundGradientFrom: colors.background,
+          backgroundGradientTo: colors.background,
+          color: () => colors.text,
+          labelColor: () => colors.textSecondary,
           decimalPlaces: 0,
         }}
         hasLegend
@@ -59,9 +61,7 @@ export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 12,
-    backgroundColor: "#000000",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderWidth: StyleSheet.hairlineWidth,
     paddingVertical: 8,
   },
 });

@@ -4,26 +4,28 @@
 title Mobile Portfolio App - Component Diagram
 
 Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
-    Component(tabs_router, "Tabs Router", "Expo Router", "Dashboard, Watchlist, Insights, Profile")
-    Component(dashboard_screen, "Dashboard Screen", "React Native", "Portfolio summary, native charts, net worth, allocation")
+    Component(tabs_router, "Tabs Router", "Expo Router", "Dashboard, Watchlist, Insights, Account")
+    Component(overview_screen, "Dashboard Screen", "React Native", "Portfolio summary, native charts, net worth, allocation")
     Component(watchlist_screen, "Watchlist Screen", "React Native", "Stocks list (portfolio), search (bottom), sort, detail drawer")
-    Component(insights_screen, "Insights Screen", "React Native", "Risk metrics, server risk-metrics API")
-    Component(profile_screen, "Profile Screen", "React Native", "User preferences via API")
+    Component(analytics_screen, "Insights Screen", "React Native", "Risk metrics from API (volatility, Sharpe, VaR, beta)")
+    Component(account_screen, "Account Screen", "React Native", "Profile (customer info), account list, Settings drawer (user preferences)")
 
     Component(types_layer, "types", "TypeScript", "Portfolio, QuoteSnapshot, Instrument, etc.")
     Component(api_client, "portfolioApi", "TypeScript", "GET portfolio (cached), getAccounts, getRiskSummary, seedPortfolio")
     Component(quotes_rest, "getQuotes", "TypeScript", "GET /api/v1/quotes")
     Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes, subscribe, reconnect")
-    Component(rest_apis, "customersApi, userPreferencesApi, riskMetricsApi", "TypeScript", "REST for Profile, Insights")
+    Component(rest_apis, "customersApi, userPreferencesApi, riskMetricsApi", "TypeScript", "REST for Account (Profile + Settings), Analytics")
 
     Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes, history, subscribedSymbols, setSnapshot, setStatus")
+    Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme, language, notificationsEnabled, setTheme, setLanguage, setNotificationsEnabled")
     Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "Reads subscribedSymbols, runs WebSocket, dispatches to store")
     Component(portfolio_store, "Portfolio Store", "Custom", "Selected account id (UI)")
 
     Component(use_symbol_display, "useSymbolDisplayData", "Hook", "setSubscribedSymbols, select from Redux; bySymbol, quoteMap, historyBySymbol")
     Component(use_portfolio, "usePortfolio", "Hook", "portfolio + allocation + history + refresh")
     Component(use_draggable_drawer, "useDraggableDrawer", "Hook", "Slide/drag animation for bottom sheets")
-    Component(use_user_prefs, "useUserPreferences", "Hook", "Profile preferences")
+    Component(use_preferences, "usePreferences", "Hook", "Redux-backed user preferences (theme, language, notifications)")
+    Component(use_theme, "useTheme", "Hook", "Current theme colors (light/dark) based on preferences and system")
     Component(use_risk_metrics, "useRiskMetrics", "Hook", "Insights risk-metrics API")
 
     Component(portfolio_summary, "PortfolioSummary", "React Native", "Net worth, today change")
@@ -40,22 +42,23 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(glass_view, "GlassView", "React Native", "expo-blur, Liquid Glass for search bar and tab bar")
 
     Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL, base URL")
+    Component(theme_system, "Theme System", "TypeScript", "Light/dark color schemes, useTheme hook")
 }
 
 Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Portfolio, /ws/quotes, risk-metrics")
 
-Rel(tabs_router, dashboard_screen, "Routes to", "")
+Rel(tabs_router, overview_screen, "Routes to", "")
 Rel(tabs_router, watchlist_screen, "Routes to", "")
-Rel(tabs_router, insights_screen, "Routes to", "")
-Rel(tabs_router, profile_screen, "Routes to", "")
+Rel(tabs_router, analytics_screen, "Routes to", "")
+Rel(tabs_router, account_screen, "Routes to", "")
 
-Rel(dashboard_screen, use_portfolio, "Uses", "")
+Rel(overview_screen, use_portfolio, "Uses", "")
 Rel(use_portfolio, api_client, "Calls", "")
-Rel(dashboard_screen, portfolio_summary, "Uses", "")
-Rel(dashboard_screen, asset_allocation_chart, "Uses", "")
-Rel(dashboard_screen, net_worth_chart, "Uses", "")
-Rel(dashboard_screen, native_line_chart, "Uses", "")
-Rel(dashboard_screen, portfolio_store, "Reads", "")
+Rel(overview_screen, portfolio_summary, "Uses", "")
+Rel(overview_screen, asset_allocation_chart, "Uses", "")
+Rel(overview_screen, net_worth_chart, "Uses", "")
+Rel(overview_screen, native_line_chart, "Uses", "")
+Rel(overview_screen, portfolio_store, "Reads", "")
 
 Rel(watchlist_screen, api_client, "Calls", "getPortfolio")
 Rel(watchlist_screen, use_symbol_display, "Uses", "")
@@ -71,13 +74,20 @@ Rel(quote_subscriber, redux_quotes, "Dispatches setSnapshot", "")
 Rel(quote_subscriber, quote_socket, "Creates", "")
 Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
 
-Rel(insights_screen, api_client, "Calls", "getRiskSummary")
-Rel(insights_screen, use_risk_metrics, "Uses", "")
+Rel(analytics_screen, use_risk_metrics, "Uses", "")
 Rel(use_risk_metrics, rest_apis, "Calls", "risk-metrics")
-Rel(insights_screen, metric_card, "Uses", "")
+Rel(analytics_screen, metric_card, "Uses", "")
 
-Rel(profile_screen, use_user_prefs, "Uses", "")
-Rel(use_user_prefs, rest_apis, "Calls", "user-preferences")
+Rel(account_screen, use_preferences, "Uses", "")
+Rel(account_screen, rest_apis, "Calls", "customers (Profile)")
+Rel(use_preferences, redux_preferences, "Dispatches, selects", "")
+Rel(use_preferences, rest_apis, "Calls", "user-preferences (Settings)")
+Rel(overview_screen, use_theme, "Uses", "")
+Rel(watchlist_screen, use_theme, "Uses", "")
+Rel(analytics_screen, use_theme, "Uses", "")
+Rel(account_screen, use_theme, "Uses", "")
+Rel(use_theme, theme_system, "Uses", "")
+Rel(use_theme, redux_preferences, "Reads", "theme preference")
 
 Rel(stock_detail_drawer, use_draggable_drawer, "Uses", "")
 Rel(stock_list_item, native_sparkline, "Uses", "")

@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "@/src/theme";
 
 export type SortOption = "name" | "price" | "change" | "changePercent";
 
@@ -25,6 +26,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 ];
 
 export function SortMenu({ currentSort, onSelect, onOpen }: SortMenuProps) {
+  const { colors } = useTheme();
   const [visible, setVisible] = useState(false);
 
   const handleSelect = (option: SortOption) => {
@@ -44,7 +46,7 @@ export function SortMenu({ currentSort, onSelect, onOpen }: SortMenuProps) {
         style={styles.button}
         hitSlop={8}
       >
-        <MaterialIcons name="sort" size={22} color="#fff" />
+        <MaterialIcons name="sort" size={22} color={colors.text} />
       </Pressable>
       <Modal
         visible={visible}
@@ -53,32 +55,32 @@ export function SortMenu({ currentSort, onSelect, onOpen }: SortMenuProps) {
         onRequestClose={() => setVisible(false)}
       >
         <Pressable
-          style={styles.overlay}
+          style={[styles.overlay, { backgroundColor: colors.backdrop }]}
           onPress={() => setVisible(false)}
         >
-          <View style={styles.sheet}>
+          <View style={[styles.sheet, { backgroundColor: colors.card }]}>
             <SafeAreaView edges={["bottom"]}>
               <View style={styles.header}>
-                <Text style={styles.headerTitle}>Sort by</Text>
+                <Text style={[styles.headerTitle, { color: colors.textTertiary }]}>Sort by</Text>
                 <Pressable
                   onPress={() => setVisible(false)}
                   hitSlop={8}
                 >
-                  <MaterialIcons name="close" size={22} color="#fff" />
+                  <MaterialIcons name="close" size={22} color={colors.text} />
                 </Pressable>
               </View>
               {SORT_OPTIONS.map((option) => (
                 <Pressable
                   key={option.value}
-                  style={styles.option}
+                  style={[styles.option, { borderBottomColor: colors.border }]}
                   onPress={() => handleSelect(option.value)}
                 >
-                  <Text style={styles.optionText}>{option.label}</Text>
+                  <Text style={[styles.optionText, { color: colors.text }]}>{option.label}</Text>
                   {currentSort === option.value && (
                     <MaterialIcons
                       name="check"
                       size={20}
-                      color="#0A84FF"
+                      color={colors.primary}
                     />
                   )}
                 </Pressable>
@@ -101,11 +103,9 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: "#1c1c1e",
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     paddingHorizontal: 16,
@@ -121,7 +121,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 13,
     fontWeight: "600",
-    color: "rgba(255,255,255,0.5)",
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -131,11 +130,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(255,255,255,0.08)",
   },
   optionText: {
     fontSize: 17,
-    color: "#fff",
     fontWeight: "400",
   },
 });

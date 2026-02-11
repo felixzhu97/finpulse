@@ -3,6 +3,7 @@ import type { Account } from "@/src/types/portfolio";
 import { formatBalance, formatSigned } from "@/src/utils";
 import { getStockChangeInfo } from "@/src/utils/stockUtils";
 import { Sparkline } from "../ui/Sparkline";
+import { useTheme } from "@/src/theme";
 
 interface AccountListItemProps {
   account: Account;
@@ -27,18 +28,19 @@ function getAccountTypeLabel(type: Account["type"]) {
 }
 
 export function AccountListItem({ account, historyValues }: AccountListItemProps) {
+  const { colors } = useTheme();
   const { isUp, trend, changeColor, changePercent } = getStockChangeInfo(
     account.todayChange,
     account.balance
   );
 
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, { borderBottomColor: colors.border }]}>
       <View style={styles.left}>
-        <Text style={styles.code} numberOfLines={1}>
+        <Text style={[styles.code, { color: colors.text }]} numberOfLines={1}>
           {account.name}
         </Text>
-        <Text style={styles.subtitle} numberOfLines={1}>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={1}>
           {getAccountTypeLabel(account.type)}
         </Text>
       </View>
@@ -46,7 +48,7 @@ export function AccountListItem({ account, historyValues }: AccountListItemProps
         <Sparkline data={historyValues} trend={trend} width={80} height={36} />
       </View>
       <View style={styles.right}>
-        <Text style={styles.price}>{formatBalance(account.balance)}</Text>
+        <Text style={[styles.price, { color: colors.text }]}>{formatBalance(account.balance)}</Text>
         <View style={styles.changeContainer}>
           <Text style={[styles.change, { color: changeColor }]}>
             {isUp ? "+" : ""}{formatSigned(account.todayChange, 0)}
@@ -68,7 +70,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     minHeight: 64,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(255,255,255,0.1)",
   },
   left: {
     flex: 1,
@@ -78,12 +79,10 @@ const styles = StyleSheet.create({
   code: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#fff",
     letterSpacing: -0.3,
   },
   subtitle: {
     fontSize: 13,
-    color: "rgba(255,255,255,0.5)",
     marginTop: 3,
     letterSpacing: -0.1,
   },
@@ -100,7 +99,6 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#fff",
     letterSpacing: -0.3,
   },
   changeContainer: {
