@@ -79,6 +79,6 @@ plantuml -tsvg *.puml
 
 ## 最近更新
 
-- **OOP 架构**：原生图表代码重构，使用 OOP 辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartRenderer、ChartDataCalculator、HistogramRenderer）
-- **代码简化**：移除未使用代码，简化逻辑，提升可维护性
+- **OOP 架构**：原生图表代码重构，使用抽象基类（`BaseChartViewManager`、`BaseChartView`、`BaseChartRenderer`）和辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartDataCalculator）。共享工具：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes。
+- **代码简化**：通过继承和抽象移除未使用代码，简化逻辑，提升可维护性
 - **图表布局**：全宽渲染，优化布局计算

@@ -50,103 +50,40 @@ private final class AmericanLineBuffers {
 }
 
 @objc(NativeAmericanLineChartView)
-public class NativeAmericanLineChartView: UIView {
-    private var metalView: MTKView?
-    private var device: MTLDevice?
-    private var commandQueue: MTLCommandQueue?
-    private var pipeline: MTLRenderPipelineState?
-    private var gridBuffer: MTLBuffer?
-    private var gridCount = 0
+public class NativeAmericanLineChartView: BaseChartView {
     private let buffers = AmericanLineBuffers()
 
     @objc public var data: NSArray? {
         didSet { updateBuffers() }
     }
 
-    @objc public var theme: NSString? {
-        didSet {
-            applyTheme()
-            if let d = device { buildGrid(device: d); updateBuffers() }
-        }
+    public override func createRenderer(device: MTLDevice, pixelFormat: MTLPixelFormat) -> BaseChartRenderer {
+        return BaseChartRenderer(device: device, pixelFormat: pixelFormat)
     }
 
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        backgroundColor = .clear
-        isOpaque = false
-        setupMetal()
+    public override func applyTheme() {
+        metalView?.clearColor = CandleChartTheme.theme(dark: isDarkTheme).clear
     }
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        backgroundColor = .clear
-        isOpaque = false
-        setupMetal()
+    public override func buildGrid(device: MTLDevice) {
+        guard let renderer = renderer else { return }
+        let colors = CandleChartTheme.theme(dark: isDarkTheme)
+        renderer.updateGrid(gridColor: colors.grid, bottomSeparatorColor: colors.grid)
     }
 
-    private func setupMetal() {
-        guard let device = MTLCreateSystemDefaultDevice() else { return }
-        self.device = device
-        commandQueue = device.makeCommandQueue()
-        let view = MTKView(frame: bounds, device: device)
-        view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        view.delegate = self
-        view.isOpaque = false
-        view.backgroundColor = .clear
-        view.colorPixelFormat = .bgra8Unorm
-        applyTheme()
-        view.isPaused = true
-        view.enableSetNeedsDisplay = true
-        addSubview(view)
-        metalView = view
-        pipeline = ChartPipeline.make(device: device, pixelFormat: view.colorPixelFormat)
-        buildGrid(device: device)
-    }
-
-    private func applyTheme() {
-        metalView?.clearColor = CandleChartTheme.theme(dark: (theme as String?) == "dark").clear
-    }
-
-    private func buildGrid(device: MTLDevice) {
-        let colors = CandleChartTheme.theme(dark: (theme as String?) == "dark")
-        let bottomSeparatorColor: (Float, Float, Float, Float) = colors.grid
-        let result = ChartGrid.build(device: device, gridColor: colors.grid, bottomSeparatorColor: bottomSeparatorColor)
-        gridBuffer = result.buffer
-        gridCount = result.count
-    }
-
-    private func updateBuffers() {
+    public override func updateBuffers() {
         guard let arr = data as? [NSNumber], arr.count >= 4, let device = device else {
             buffers.bodyCount = 0
             buffers.wicksCount = 0
             metalView?.setNeedsDisplay()
             return
         }
-        let t = CandleChartTheme.theme(dark: (theme as String?) == "dark")
+        let t = CandleChartTheme.theme(dark: isDarkTheme)
         buffers.update(flatOHLC: arr.map { $0.doubleValue }, device: device, colors: t)
         metalView?.setNeedsDisplay()
     }
 
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-        metalView?.setNeedsDisplay()
-    }
-}
-
-extension NativeAmericanLineChartView: MTKViewDelegate {
-    public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {}
-
-    public func draw(in view: MTKView) {
-        guard let drawable = view.currentDrawable,
-              let pass = view.currentRenderPassDescriptor,
-              let pipeline = pipeline,
-              let commandBuffer = commandQueue?.makeCommandBuffer(),
-              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: pass) else { return }
-        encoder.setRenderPipelineState(pipeline)
-        if let grid = gridBuffer, gridCount > 0 {
-            encoder.setVertexBuffer(grid, offset: 0, index: 0)
-            encoder.drawPrimitives(type: .line, vertexStart: 0, vertexCount: gridCount)
-        }
+    public override func drawCustomContent(renderer: BaseChartRenderer, encoder: MTLRenderCommandEncoder) {
         if let bodies = buffers.bodySegments, buffers.bodyCount >= 2 {
             encoder.setVertexBuffer(bodies, offset: 0, index: 0)
             encoder.drawPrimitives(type: .line, vertexStart: 0, vertexCount: buffers.bodyCount)
@@ -155,8 +92,5 @@ extension NativeAmericanLineChartView: MTKViewDelegate {
             encoder.setVertexBuffer(wicks, offset: 0, index: 0)
             encoder.drawPrimitives(type: .line, vertexStart: 0, vertexCount: buffers.wicksCount)
         }
-        encoder.endEncoding()
-        commandBuffer.present(drawable)
-        commandBuffer.commit()
     }
 }

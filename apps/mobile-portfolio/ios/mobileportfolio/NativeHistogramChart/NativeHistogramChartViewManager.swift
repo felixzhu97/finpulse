@@ -2,13 +2,9 @@ import React
 import UIKit
 
 @objc(NativeHistogramChart)
-class NativeHistogramChart: RCTViewManager {
-
-    override func view() -> UIView! {
+class NativeHistogramChart: BaseChartViewManager {
+    
+    override func createView() -> UIView {
         return NativeHistogramChartView()
-    }
-
-    override static func requiresMainQueueSetup() -> Bool {
-        return true
     }
 }

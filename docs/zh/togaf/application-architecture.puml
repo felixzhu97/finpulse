@@ -86,13 +86,21 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
         }
         component "原生图表支持 (OOP)" as NativeChartSupport {
             component "iOS ChartSupport" as IOSChartSupport
+            component "iOS 基类" as IOSBaseClasses {
+                component "BaseChartViewManager" as IOSBaseViewManager
+                component "BaseChartView" as IOSBaseView
+                component "BaseChartRenderer" as IOSBaseRenderer
+            }
             component "iOS OOP 辅助类" as IOSOOPHelpers {
                 component "ChartLayoutCalculator" as IOSLayoutCalc
                 component "ValueFormatter" as IOSValueFormatter
                 component "AxisLabelManager" as IOSAxisManager
-                component "ChartRenderer" as IOSChartRenderer
                 component "ChartDataCalculator" as IOSDataCalc
-                component "HistogramRenderer" as IOSHistRenderer
+            }
+            component "iOS 共享工具" as IOSSharedUtils {
+                component "ChartCurve, ChartVertex" as IOSCurveVertex
+                component "ChartPipeline, ChartGrid" as IOSPipelineGrid
+                component "ChartThemes" as IOSThemes
             }
             component "Android view/chart/" as AndroidChartPkg
             component "Android OOP 辅助类" as AndroidOOPHelpers {
@@ -328,13 +336,20 @@ NativeDemoCard --> NativeDemoCardAndroid
 ExpoRN --> NativeCharts
 NativeCharts --> NativeChartSupport
 NativeChartSupport --> IOSChartSupport
+NativeChartSupport --> IOSBaseClasses
+IOSBaseClasses --> IOSBaseViewManager
+IOSBaseClasses --> IOSBaseView
+IOSBaseClasses --> IOSBaseRenderer
+IOSBaseView --> IOSBaseRenderer
 NativeChartSupport --> IOSOOPHelpers
 IOSOOPHelpers --> IOSLayoutCalc
 IOSOOPHelpers --> IOSValueFormatter
 IOSOOPHelpers --> IOSAxisManager
-IOSOOPHelpers --> IOSChartRenderer
 IOSOOPHelpers --> IOSDataCalc
-IOSOOPHelpers --> IOSHistRenderer
+NativeChartSupport --> IOSSharedUtils
+IOSSharedUtils --> IOSCurveVertex
+IOSSharedUtils --> IOSPipelineGrid
+IOSSharedUtils --> IOSThemes
 NativeChartSupport --> AndroidChartPkg
 NativeChartSupport --> AndroidOOPHelpers
 AndroidOOPHelpers --> AndroidLayoutCalc

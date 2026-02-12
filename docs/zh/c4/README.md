@@ -20,7 +20,7 @@
 
 **文件**：`c4-mobile-portfolio-components.puml`
 
-**说明**：移动端投资组合应用（Expo + React Native）薄客户端：AppContent（偏好加载 spinner）、标签/屏幕；types（Portfolio、QuoteSnapshot）；api 层（portfolioApi、getQuotes、createQuoteSocket）；hooks（usePortfolio、useRealtimeQuotes、usePerSymbolHistory、usePreferences 含组件级 loading）；账户屏使用 useFocusEffect 在标签聚焦时加载；原生图表与组合/账户组件；后端 GET /api/v1/portfolio、GET /api/v1/quotes、WS /ws/quotes。原生代码遵循 OOP 原则，使用辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartRenderer、ChartDataCalculator、HistogramRenderer）。代码已简化，移除未使用代码并优化逻辑。图表全宽渲染，无左侧内边距。
+**说明**：移动端投资组合应用（Expo + React Native）薄客户端：AppContent（偏好加载 spinner）、标签/屏幕；types（Portfolio、QuoteSnapshot）；api 层（portfolioApi、getQuotes、createQuoteSocket）；hooks（usePortfolio、useRealtimeQuotes、usePerSymbolHistory、usePreferences 含组件级 loading）；账户屏使用 useFocusEffect 在标签聚焦时加载；原生图表与组合/账户组件；后端 GET /api/v1/portfolio、GET /api/v1/quotes、WS /ws/quotes。原生代码遵循 OOP 原则，使用抽象基类（`BaseChartViewManager`、`BaseChartView`、`BaseChartRenderer`）和辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartDataCalculator）。共享工具：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes。代码已简化，移除未使用代码并优化逻辑。图表全宽渲染，无左侧内边距。
 
 ### 投资组合分析 API 组件
 
@@ -63,7 +63,7 @@ git clone https://github.com/plantuml-stdlib/C4-PlantUML.git .
 
 ## 最近更新
 
-- **OOP 优化**：原生图表代码重构，使用 OOP 辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartRenderer、ChartDataCalculator、HistogramRenderer）
-- **代码简化**：移除未使用代码，简化逻辑，优化性能
+- **OOP 架构**：原生图表代码重构，使用抽象基类（`BaseChartViewManager`、`BaseChartView`、`BaseChartRenderer`）和辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartDataCalculator）。共享工具：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes。
+- **代码简化**：通过继承和抽象移除未使用代码，简化逻辑，提升可维护性
 - **图表布局**：图表全宽渲染，无左侧内边距，延伸至最左侧边缘
 - **周期数据处理**：PeriodDataProcessor 类封装周期过滤和成交量匹配逻辑

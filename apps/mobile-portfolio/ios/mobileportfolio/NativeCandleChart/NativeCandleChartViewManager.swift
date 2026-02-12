@@ -2,13 +2,9 @@ import React
 import UIKit
 
 @objc(NativeCandleChart)
-class NativeCandleChart: RCTViewManager {
-
-    override func view() -> UIView! {
+class NativeCandleChart: BaseChartViewManager {
+    
+    override func createView() -> UIView {
         return NativeCandleChartView()
-    }
-
-    override static func requiresMainQueueSetup() -> Bool {
-        return true
     }
 }

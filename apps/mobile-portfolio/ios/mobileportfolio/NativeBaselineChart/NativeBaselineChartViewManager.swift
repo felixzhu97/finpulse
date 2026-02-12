@@ -2,13 +2,9 @@ import React
 import UIKit
 
 @objc(NativeBaselineChart)
-class NativeBaselineChart: RCTViewManager {
-
-    override func view() -> UIView! {
+class NativeBaselineChart: BaseChartViewManager {
+    
+    override func createView() -> UIView {
         return NativeBaselineChartView()
-    }
-
-    override static func requiresMainQueueSetup() -> Bool {
-        return true
     }
 }

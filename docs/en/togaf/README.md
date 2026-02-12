@@ -94,6 +94,6 @@ Technology Architecture
 
 ## Recent Updates
 
-- **OOP Architecture**: Native chart code refactored with OOP helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartRenderer, ChartDataCalculator, HistogramRenderer)
-- **Code Simplification**: Removed unused code, simplified logic, improved maintainability
+- **OOP Architecture**: Native chart code refactored with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
+- **Code Simplification**: Removed unused code, simplified logic, improved maintainability through inheritance and abstraction
 - **Chart Layout**: Full-width rendering with optimized layout calculations

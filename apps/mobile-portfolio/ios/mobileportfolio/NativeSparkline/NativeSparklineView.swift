@@ -74,7 +74,6 @@ public class NativeSparklineView: UIView {
             path.addLine(to: CGPoint(x: points[i].x * width, y: points[i].y * height))
         }
         
-        let lastPoint = CGPoint(x: points[points.count - 1].x * width, y: points[points.count - 1].y * height)
         path.addLine(to: CGPoint(x: width, y: height))
         path.closeSubpath()
         
