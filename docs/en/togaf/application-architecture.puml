@@ -133,16 +133,19 @@ package "External Services" <<External>> {
 
     component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
         component "FastAPI app (DDD)" as FastAPIApp
-        component "GET /api/v1/portfolio" as PortfolioGet
-        component "POST /api/v1/seed" as PortfolioSeed
-        component "GET /api/v1/quotes" as QuotesGet
-        component "WebSocket /ws/quotes" as QuotesWS
+        component "GET /api/v1/portfolio, POST /seed" as PortfolioGet
+        component "GET /api/v1/quotes, WebSocket /ws/quotes" as QuotesGet
         component "MarketDataService + KafkaMarketDataProvider" as MarketDataServiceComponent
         component "AI/ML (integrated)" as AIMLAPI {
             component "Payments → fraud" as AIML1
             component "Trades → surveillance" as AIML2
             component "Customers → identity" as AIML3
-            component "Risk-metrics → VaR compute" as AIML4
+            component "Risk-metrics → VaR, POST /risk-metrics/compute-batch" as AIML4
+        }
+        component "Analytics (ClickHouse)" as AnalyticsAPI {
+            component "GET /analytics/portfolio-risk" as AnalyticsRisk
+            component "GET /analytics/delta-info" as AnalyticsDelta
+            component "POST /forecast/model (MLflow)" as ForecastModel
         }
         component "Blockchain /api/v1/blockchain" as BlockchainAPI {
             component "POST /transfers, GET /balances" as BlockchainTransfers
@@ -151,6 +154,8 @@ package "External Services" <<External>> {
         component "SQLAlchemy 2.0 + asyncpg + Alembic" as SQLAlchemyStack
         component "TimescaleDB (portfolio + history)" as TimescaleDB
         component "Redis (server-side cache)" as RedisDB
+        component "ClickHouse (analytics)" as ClickHouseDB
+        component "MinIO (S3, Faust/Spark)" as MinIOStorage
         component "Kafka (portfolio.events)" as KafkaTopic
         component "Kafka (market.quotes.enriched)" as KafkaQuotesTopic
     }
@@ -199,14 +204,17 @@ MobilePortfolio --> RNCharts
 MobilePortfolio --> PortfolioAnalyticsAPI
 MobilePortfolio --> QuotesWS
 FastAPIApp --> PortfolioGet
-FastAPIApp --> PortfolioSeed
 FastAPIApp --> QuotesGet
 FastAPIApp --> QuotesWS
 FastAPIApp --> AIMLAPI
+FastAPIApp --> AnalyticsAPI
+AnalyticsAPI --> ClickHouseDB
 FastAPIApp --> BlockchainAPI
 FastAPIApp --> SQLAlchemyStack
 SQLAlchemyStack --> TimescaleDB
 FastAPIApp --> RedisDB
+FastAPIApp --> ClickHouseDB
+FastAPIApp --> MinIOStorage
 FastAPIApp --> KafkaTopic
 FastAPIApp --> MarketDataServiceComponent
 MarketDataServiceComponent --> KafkaQuotesTopic

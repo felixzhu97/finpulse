@@ -10,10 +10,12 @@ System_Boundary(finpulse, "FinPulse") {
     Container(web_app, "Web App", "Angular 21", "Financial analytics console: portfolio, market trends, risk, transactions")
     Container(mobile_portfolio, "Mobile Portfolio", "Expo + React Native", "Portfolio app: stocks, real-time quotes, native charts")
     Container(mobile_demo, "Mobile Demo", "React Native", "Demo app and native chart showcase")
-    Container(portfolio_api, "Portfolio Analytics API", "FastAPI", "REST API, WebSocket, AI/ML (in payments, trades, customers, risk-metrics), blockchain; portfolio, market data, risk, analytics, digital currency")
+    Container(portfolio_api, "Portfolio Analytics API", "FastAPI", "REST, WebSocket; AI/ML (payments, trades, customers, risk-metrics); blockchain; portfolio, market data; batch VaR, ClickHouse analytics (portfolio-risk, delta-info), MLflow forecast/model")
     ContainerDb(timescale, "TimescaleDB", "PostgreSQL + TimescaleDB", "Portfolio metadata and history hypertable")
     ContainerDb(redis, "Redis", "In-memory", "History, portfolio aggregate, blockchain read cache")
+    ContainerDb(clickhouse, "ClickHouse", "OLAP", "portfolio_risk_daily, delta_table_stats; read by API")
     ContainerQueue(kafka, "Kafka", "Event streaming", "portfolio.events, market.quotes.enriched")
+    Container(minio, "MinIO", "S3-compatible", "Data lake; Faust writes quote batches; Spark/Delta")
 }
 
 Container_Ext(market_api, "Market Data API", "External", "Third-party market data")
@@ -27,6 +29,8 @@ Rel(mobile_demo, portfolio_api, "API calls", "REST")
 Rel(portfolio_api, timescale, "Reads and writes", "SQL / asyncpg")
 Rel(portfolio_api, redis, "Cache", "Redis protocol")
 Rel(portfolio_api, kafka, "Publishes and consumes", "Kafka")
+Rel(portfolio_api, clickhouse, "Reads analytics", "HTTP")
+Rel(portfolio_api, minio, "Batch jobs write", "S3")
 Rel(portfolio_api, market_api, "Fetches quotes", "REST")
 Rel(web_app, vercel, "Hosted on", "Vercel")
 

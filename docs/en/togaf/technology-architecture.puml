@@ -259,7 +259,7 @@ legend right
     pnpm monorepo, Vercel
     React Native, Expo, native charts (Metal/OpenGL ES)
     Portfolio Analytics: FastAPI + PostgreSQL + Kafka
-    One-click: pnpm run start:backend
+    Backend: pnpm run start:backend, pnpm run stop:backend
 endlegend
 
 @enduml

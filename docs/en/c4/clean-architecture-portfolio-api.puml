@@ -12,7 +12,7 @@ rectangle "**API**\n(src/api/)" as API #E3F2FD {
 }
 
 rectangle "**Infrastructure**\n(src/infrastructure/)" as INFRA #E8F5E9 {
-  rectangle "database/\n(RealtimeQuoteRepository:\nORM, bulk ops)\ncache/ (Redis)\nconfig/\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
+  rectangle "database/\n(RealtimeQuoteRepository:\nORM, bulk ops)\ncache/ (Redis)\nconfig/\nanalytics/ (ClickHouse)\nobject_storage/ (S3/MinIO)\nstream/ (Faust)\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
 }
 
 rectangle "**Application**\n(src/core/application/)" as APP #FFF3E0 {
