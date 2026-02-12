@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from src.core.application.ports.services.analytics_ports import (
+    IBatchRiskVarPort,
     IFraudDetectorPort,
     IForecastPort,
     IHfSummarisePort,
@@ -12,7 +13,6 @@ from src.core.application.ports.services.analytics_ports import (
     ISentimentPort,
     ISummarisationPort,
     ISurveillancePort,
-    ITfForecastPort,
 )
 
 
@@ -28,7 +28,7 @@ class AnalyticsApplicationService:
         summarisation: ISummarisationPort,
         ollama_generate: IOllamaGeneratePort,
         hf_summarise: IHfSummarisePort,
-        tf_forecast: ITfForecastPort,
+        batch_risk_var: Optional[IBatchRiskVarPort] = None,
     ):
         self._risk_var = risk_var
         self._fraud = fraud
@@ -39,7 +39,17 @@ class AnalyticsApplicationService:
         self._summarisation = summarisation
         self._ollama = ollama_generate
         self._hf = hf_summarise
-        self._tf = tf_forecast
+        self._batch_risk_var = batch_risk_var
+
+    def compute_var_batch(
+        self,
+        entries: List[Tuple[str, List[float]]],
+        confidence: float = 0.95,
+        method: str = "historical",
+    ) -> List[dict]:
+        if self._batch_risk_var is None:
+            return []
+        return self._batch_risk_var.compute_var_batch(entries=entries, confidence=confidence, method=method)
 
     def compute_var(
         self,
@@ -130,8 +140,3 @@ class AnalyticsApplicationService:
         except Exception as e:
             return {"summary": "", "model": "", "error": str(e)}
 
-    def tf_forecast(self, values: List[float], horizon: int = 1, lookback: int = 5) -> dict:
-        try:
-            return self._tf.forecast(values=values, horizon=horizon, lookback=lookback)
-        except Exception as e:
-            return {"forecast": [], "horizon": horizon, "provider": "tensorflow", "error": str(e)}

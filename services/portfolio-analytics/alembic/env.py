@@ -2,12 +2,11 @@ from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Connection
 from sqlalchemy.pool import NullPool
 
-from app.config import DATABASE_URL
-from app.database import Base
-from app.models import PortfolioHistoryRow, PortfolioRow
+from src.infrastructure.config import DATABASE_URL
+from src.infrastructure.database.session import Base
+from src.infrastructure.database import models as _models
 
 config = context.config
 if config.config_file_name is not None:

@@ -1,4 +1,5 @@
 @startuml c4-mobile-demo-components
+!define RELATIVE_INCLUDE 1
 !include ../../c4-lib/C4-PlantUML/C4_Component.puml
 
 title Mobile Demo App - Component Diagram

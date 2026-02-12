@@ -1,5 +1,4 @@
 @startuml er-diagram
-skinparam linetype ortho
 
 title Fintech System - Entity Relationship Diagram
 

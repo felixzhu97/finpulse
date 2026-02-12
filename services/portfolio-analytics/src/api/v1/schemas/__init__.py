@@ -1,8 +1,8 @@
 from datetime import date, datetime
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class CustomerCreate(BaseModel):
@@ -342,6 +342,13 @@ class VarComputeRequest(BaseModel):
     portfolio_id: str
     confidence: float = 0.95
     method: str = "historical"
+
+
+class VarBatchComputeRequest(BaseModel):
+    portfolio_ids: List[str] = Field(..., min_length=1)
+    days: int = Field(default=90, ge=2, le=365)
+    confidence: float = Field(default=0.95, ge=0.5, le=1.0)
+    method: str = Field(default="historical", pattern="^(historical|parametric)$")
 
 
 class RiskMetricsResponse(BaseModel):

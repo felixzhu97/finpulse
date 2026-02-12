@@ -67,9 +67,3 @@ class HfSummariseRequest(BaseModel):
     text: str = Field(min_length=1, description="Long-form report or document excerpt.")
     max_length: int = Field(default=150, ge=30, le=512)
     min_length: int = Field(default=30, ge=10, le=256)
-
-
-class TfForecastRequest(BaseModel):
-    values: List[float] = Field(default_factory=list, min_length=6, description="Price or risk series for forecasting.")
-    horizon: int = Field(default=1, ge=1, le=12)
-    lookback: int = Field(default=5, ge=2, le=20)

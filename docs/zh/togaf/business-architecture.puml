@@ -3,7 +3,6 @@
 !define BUSINESS_PROCESS #FFF4E6
 !define BUSINESS_SERVICE #E8F5E9
 
-skinparam linetype ortho
 
 skinparam component {
     BackgroundColor<<Actor>> BUSINESS_ACTOR

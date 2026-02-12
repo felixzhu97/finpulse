@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Annotated
+from typing import Annotated, Optional
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,10 +9,13 @@ from src.api.v1.schemas import (
     RiskMetricsResponse,
     ValuationCreate,
     ValuationResponse,
+    VarBatchComputeRequest,
     VarComputeRequest,
 )
 from src.api.dependencies import (
     get_analytics_service,
+    get_clickhouse_analytics,
+    get_model_loader,
     get_portfolio_history_repo,
     get_risk_metrics_repo,
     get_valuation_repo,
@@ -166,6 +169,101 @@ def register(router: APIRouter) -> None:
             portfolio_id=portfolio_id,
         )
         return result
+
+    @router.post("/risk-metrics/compute-batch")
+    async def compute_var_batch(
+        body: VarBatchComputeRequest,
+        analytics: Annotated[AnalyticsApplicationService, Depends(get_analytics_service)] = None,
+        history_repo: Annotated[object, Depends(get_portfolio_history_repo)] = None,
+    ):
+        if not analytics or not history_repo:
+            raise HTTPException(status_code=503, detail="Analytics service unavailable")
+        entries = []
+        for portfolio_id in body.portfolio_ids:
+            points = await history_repo.get_range(str(portfolio_id), days=body.days)
+            if len(points) < 2:
+                continue
+            values = [float(p.value) for p in points]
+            returns = []
+            for i in range(1, len(values)):
+                if values[i - 1] and values[i - 1] != 0:
+                    r = (values[i] - values[i - 1]) / values[i - 1]
+                    returns.append(r)
+            if returns:
+                entries.append((str(portfolio_id), returns))
+        if not entries:
+            raise HTTPException(status_code=400, detail="Insufficient portfolio history for any portfolio")
+        result = analytics.compute_var_batch(
+            entries=entries,
+            confidence=body.confidence,
+            method=body.method,
+        )
+        return result
+
+    @router.post("/forecast/model")
+    def forecast_with_model(
+        body: dict,
+        loader: Annotated[object, Depends(get_model_loader)] = None,
+    ):
+        if loader is None:
+            raise HTTPException(status_code=503, detail="Model loader unavailable")
+        model_uri = body.get("model_uri")
+        values = body.get("values", [])
+        if not model_uri or not values:
+            raise HTTPException(status_code=400, detail="model_uri and values required")
+        try:
+            model = loader.load(model_uri)
+            import pandas as pd
+            df = pd.DataFrame([values])
+            pred = model.predict(df)
+            if hasattr(pred, "values"):
+                forecast = pred.values.flatten().tolist()
+            elif hasattr(pred, "tolist"):
+                forecast = pred.tolist()
+            else:
+                forecast = list(pred)
+            if forecast and isinstance(forecast[0], (list, tuple)):
+                forecast = list(forecast[0])
+            return {"forecast": forecast, "model_uri": model_uri}
+        except Exception as e:
+            raise HTTPException(status_code=422, detail=str(e)) from e
+
+    @router.get("/analytics/portfolio-risk")
+    def get_portfolio_risk_from_analytics(
+        portfolio_id: Optional[str] = None,
+        limit: int = 100,
+        ch: Annotated[object, Depends(get_clickhouse_analytics)] = None,
+    ):
+        if ch is None:
+            raise HTTPException(status_code=503, detail="Analytics store unavailable")
+        try:
+            rows = ch.get_portfolio_risk(portfolio_id=portfolio_id, limit=limit)
+            return {"data": rows}
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=f"Analytics query failed: {e}") from e
+
+    @router.get("/analytics/delta-info")
+    def get_delta_info(
+        path: Optional[str] = None,
+        ch: Annotated[object, Depends(get_clickhouse_analytics)] = None,
+    ):
+        if ch is None:
+            raise HTTPException(status_code=503, detail="Analytics store unavailable")
+        import os
+        lookup = path or os.environ.get("DELTA_SAMPLE_PATH")
+        if not lookup:
+            raise HTTPException(status_code=400, detail="path query or DELTA_SAMPLE_PATH env required")
+        try:
+            stats = ch.get_latest_delta_stats(lookup)
+            if stats is None:
+                return {"path": lookup, "row_count": None, "sample": [], "updated_at": None}
+            sample = []
+            if stats.get("sample_json"):
+                import json
+                sample = json.loads(stats["sample_json"])
+            return {"path": stats["path"], "row_count": stats["row_count"], "sample": sample, "updated_at": stats.get("updated_at")}
+        except Exception as e:
+            raise HTTPException(status_code=503, detail=str(e)) from e
 
     @router.get("/valuations", response_model=list[ValuationResponse])
     async def list_valuations(

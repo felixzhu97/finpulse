@@ -7,26 +7,26 @@ import pytest_asyncio
 from fastapi.testclient import TestClient
 from httpx import ASGITransport, AsyncClient
 
-from app.main import app
-
 try:
-    from main import app as blockchain_app
+    from main import app
 except ImportError:
-    blockchain_app = None
+    app = None
 
 
 @pytest.fixture
 def client() -> TestClient:
+    if app is None:
+        pytest.skip("main app not available")
     return TestClient(app)
 
 
 @pytest_asyncio.fixture
 async def blockchain_client():
-    if blockchain_app is None:
-        pytest.skip("blockchain app (main) not available")
-    async with blockchain_app.router.lifespan_context(blockchain_app):
+    if app is None:
+        pytest.skip("main app not available")
+    async with app.router.lifespan_context(app):
         async with AsyncClient(
-            transport=ASGITransport(app=blockchain_app),
+            transport=ASGITransport(app=app),
             base_url="http://test",
         ) as ac:
             yield ac

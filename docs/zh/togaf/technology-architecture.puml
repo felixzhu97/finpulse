@@ -4,7 +4,6 @@
 !define DEPLOY #E8F5E9
 !define INFRA #FFF3E0
 
-skinparam linetype ortho
 
 skinparam component {
     BackgroundColor<<Frontend>> FRONTEND
@@ -172,20 +171,21 @@ package "Portfolio Analytics Backend" <<Infra>> {
     component "AI/ML stack" as AIMLStack {
         component "scipy, numpy, scikit-learn" as StatsTech
         component "statsmodels, VADER, sumy" as StatsTech2
-        component "Ollama, HF, TF（可选）" as OptionalTech
+        component "Ollama, HF（可选）；PyTorch, MLflow" as OptionalTech
     }
     note right of FastAPI
         services/portfolio-analytics
         GET/POST /api/v1/portfolio, seed
         AI 融入：payments（欺诈）、trades（监控）、
         customers（身份）、risk-metrics（VaR）
+        MinIO, ClickHouse, Airflow, MLflow, Faust（批/流）
         DDD, python-dotenv (.env), port 8800
     end note
     note right of TimescaleDB: Portfolio metadata (JSONB)\nportfolio_history hypertable\nhost port 5433
     note right of Redis: 服务端缓存\n(历史、组合聚合、区块链读)\nport 6379, TTL 300s
     note right of SQLAlchemyAsync: Async ORM\nasyncpg driver
     note right of Kafka: portfolio.events topic\nportfolio.seeded events
-    note right of AIMLStack: 融入业务流\n可选：Ollama, HF, TF
+    note right of AIMLStack: 融入业务流\n可选：Ollama, HF；PyTorch+MLflow 推理
 }
 
 package "AWS SDK" <<Infra>> {

@@ -38,11 +38,13 @@ Backend service providing portfolio analytics for the mobile and web clients. It
 
 ### Infrastructure (runtime)
 
-Start TimescaleDB, Redis, and Kafka locally (from this directory):
+Start core services (TimescaleDB, Redis, Kafka) or the full stack including MinIO, ClickHouse, Airflow, MLflow (from this directory):
 
 ```bash
 docker compose up -d
 ```
+
+For core-only: `docker compose up -d postgres redis zookeeper kafka`.
 
 Default connection:
 
@@ -56,7 +58,7 @@ Override with env: `DATABASE_URL`, `REDIS_URL`, `HISTORY_CACHE_TTL_SECONDS`, `KA
 
 ### Run the API
 
-**All commands must be run from the project root** (`fintech-project`), not from `docs/` or other subdirs.
+**All commands must be run from the project root** (`finpulse`), not from `docs/` or other subdirs.
 
 **Option A – One command (from project root):**
 
@@ -120,9 +122,9 @@ LLM, ML and DL are integrated into business operations rather than exposed as st
 | **Customers** | `POST /customers` enriches response with `ai_identity_score` via rule-based document/identity scoring. |
 | **Risk metrics** | `POST /risk-metrics/compute` computes VaR from portfolio history using SciPy (parametric) or NumPy (historical). |
 
-Libraries used: **SciPy** (parametric VaR), **NumPy** (historical VaR, surveillance), **scikit-learn** (fraud detection), **statsmodels** (forecast), **VADER** (sentiment), **sumy/nltk** (summarisation). Optional: **Ollama**, **Hugging Face**, **TensorFlow** remain available via `AnalyticsApplicationService` for future business integrations.
+Libraries used: **SciPy** (parametric VaR), **NumPy** (historical VaR, surveillance), **scikit-learn** (fraud detection), **statsmodels** (forecast), **VADER** (sentiment), **sumy/nltk** (summarisation). Optional: **Ollama**, **Hugging Face** via `AnalyticsApplicationService`; **PyTorch** and **MLflow** for model training and inference.
 
-**Testing**
+### Testing
 
 - **Pytest** – from repo root: `pnpm run test` or `pnpm run test:api` (runs `pytest tests -v` in `services/portfolio-analytics`). Tests are under `tests/api/` by feature (accounts, blockchain, portfolio, trading, payments, etc.). **Async DB tests** use `httpx.AsyncClient` with `ASGITransport` and the app’s lifespan context (`blockchain_client` fixture in `conftest.py`) so the app and tests share the same event loop; session/engine are created in lifespan and bound to that loop. Unit tests live in `tests/unit/`. See `tests/README.md` for layout and concurrency testing notes.
 ### Messaging
@@ -143,3 +145,23 @@ Libraries used: **SciPy** (parametric VaR), **NumPy** (historical VaR, surveilla
   - TimescaleDB: `quote_ohlc_1min`, `quote_ohlc_5min` continuous aggregates; compression for chunks older than 7 days.
   - `CachedMarketDataProvider` uses Redis read-through and write-through; `MarketDataService` powers `GET /api/v1/quotes` and `WebSocket /ws/quotes`.
   - `RealtimeQuoteRepository` uses ORM (`RealtimeQuoteRow`, `QuoteTickRow`), bulk upsert and bulk insert for `realtime_quote` and `quote_tick`; `QuoteHistoryService` use case for history via `IRealtimeQuoteRepository`.
+
+### Big data and ML stack
+
+The service integrates a Python-centric big data stack alongside the core API. All components are optional and started via `docker compose up -d` from this directory.
+
+| Component | Purpose | Port / URL |
+|-----------|---------|------------|
+| **MinIO** | S3-compatible object storage (data lake) | 9000 (API), 9001 (console) |
+| **Delta Lake** | ACID table format on object storage; used by PySpark jobs | Via Spark / MinIO paths |
+| **ClickHouse** | OLAP analytics store for batch/stream results | 8123 (HTTP), 9009 (native) |
+| **PySpark** | Batch processing (e.g. batch VaR, Delta writes) | N/A (job process) |
+| **Faust** | Lightweight stream processing (Kafka consumers) | N/A (worker process) |
+| **Airflow** | DAG orchestration for batch and ML jobs | 8080 (webserver) |
+| **MLflow** | Experiment tracking and model registry | 5001 |
+
+- **Batch VaR**: `POST /api/v1/risk-metrics/compute-batch` accepts `portfolio_ids`, `days`, `confidence`, `method` and returns VaR per portfolio. Standalone job: `python -m jobs.batch.var_batch [--input path.json] [--delta-path ...]` (writes to ClickHouse and optionally Delta).
+- **Delta read**: Run `python -m jobs.batch.delta_sync_info` to sync Delta table stats to ClickHouse; then `GET /api/v1/analytics/delta-info?path=...` returns row count and sample.
+- **Stream**: Run Faust with `faust -A src.infrastructure.stream.faust_app worker -l info` (consumes `market.quotes.enriched`, `portfolio.events`). Set `STREAM_WRITE_TO_MINIO=1` to write batches to MinIO via `S3ObjectStorageClient`.
+- **ML**: `python -m jobs.ml.train_sample` logs a sample PyTorch model to MLflow. `POST /api/v1/forecast/model` with `{"model_uri": "runs:/...", "values": [...]}` loads a model via MLflow and returns predictions. `GET /api/v1/analytics/portfolio-risk` and `GET /api/v1/analytics/delta-info` read from ClickHouse.
+- **Runbook**: See `docs/runbook.md` in this directory for startup order and troubleshooting.

@@ -54,7 +54,7 @@ from src.infrastructure.database.repositories.persistence_mappers import (
     watchlist_row_to_entity,
 )
 from src.infrastructure.database.repositories.sql_repository import SqlRepository
-from app.models import (
+from src.infrastructure.database.models import (
     AccountRow,
     BondRow,
     CashTransactionRow,

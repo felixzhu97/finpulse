@@ -2,8 +2,6 @@
 !define DATA_COMPONENT #E3F2FD
 !define DATA_FLOW #FFF9C4
 
-skinparam linetype ortho
-
 skinparam component {
     BackgroundColor<<DataEntity>> DATA_COMPONENT
     BackgroundColor<<DataFlow>> DATA_FLOW
@@ -206,6 +204,12 @@ package "Portfolio Analytics Storage" {
         - price, change, changeRate, timestamp
         - consumed by MarketDataService and mobile portfolio WebSocket (/ws/quotes)
     end note
+    component "MinIO (S3) + Delta Lake" as MinIODelta <<DataEntity>>
+    component "ClickHouse (analytics)" as ClickHouseAnalytics <<DataEntity>>
+    component "MLflow (models)" as MLflowModels <<DataEntity>>
+    note right of MinIODelta: Data lake; raw/curated/analytics; PySpark batch jobs
+    note right of ClickHouseAnalytics: portfolio_risk_daily, quote_ohlc_1h, delta_table_stats
+    note right of MLflowModels: Experiment tracking; PyTorch model registry
 }
 
 package "AWS Storage Entities" {

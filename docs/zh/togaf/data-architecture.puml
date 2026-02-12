@@ -2,7 +2,6 @@
 !define DATA_COMPONENT #E3F2FD
 !define DATA_FLOW #FFF9C4
 
-skinparam linetype ortho
 
 skinparam component {
     BackgroundColor<<DataEntity>> DATA_COMPONENT
@@ -252,6 +251,12 @@ package "Portfolio Analytics Storage" {
         - type: portfolio.seeded
         - portfolio_id, payload (full portfolio JSON)
     end note
+    component "MinIO (S3) + Delta Lake" as MinIODelta <<DataEntity>>
+    component "ClickHouse (analytics)" as ClickHouseAnalytics <<DataEntity>>
+    component "MLflow (models)" as MLflowModels <<DataEntity>>
+    note right of MinIODelta: 数据湖；raw/curated/analytics；PySpark 批处理
+    note right of ClickHouseAnalytics: portfolio_risk_daily, quote_ohlc_1h，delta_table_stats
+    note right of MLflowModels: 实验跟踪；PyTorch 模型注册
 }
 
 package "AWS存储数据实体" {

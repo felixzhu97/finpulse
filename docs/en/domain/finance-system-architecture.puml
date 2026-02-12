@@ -1,5 +1,4 @@
 @startuml
-skinparam linetype ortho
 
 skinparam component {
   BorderColor #333333

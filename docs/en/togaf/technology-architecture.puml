@@ -4,8 +4,6 @@
 !define DEPLOY #E8F5E9
 !define INFRA #FFF3E0
 
-skinparam linetype ortho
-
 skinparam component {
     BackgroundColor<<Frontend>> FRONTEND
     BackgroundColor<<Build>> BUILD
@@ -127,7 +125,7 @@ package "Portfolio Analytics Backend" <<Infra>> {
     component "AI/ML stack" as AIMLStack {
         component "scipy, numpy, scikit-learn" as StatsTech
         component "statsmodels, VADER, sumy" as StatsTech2
-        component "Ollama, HF, TF (optional)" as OptionalTech
+        component "Ollama, HF (optional); PyTorch, MLflow" as OptionalTech
     }
     note right of FastAPI
         services/portfolio-analytics
@@ -135,13 +133,14 @@ package "Portfolio Analytics Backend" <<Infra>> {
         GET /api/v1/quotes, WebSocket /ws/quotes
         AI in: payments (fraud), trades (surveillance),
         customers (identity), risk-metrics (VaR)
+        MinIO, ClickHouse, Airflow, MLflow, Faust (batch/stream)
         DDD, python-dotenv (.env), port 8800
     end note
     note right of TimescaleDB: Portfolio metadata (JSONB)\nportfolio_history hypertable\nhost port 5433
     note right of Redis: Server-side cache\n(history, portfolio aggregate, blockchain reads)\nport 6379, TTL 300s
     note right of SQLAlchemyAsync: Async ORM\nasyncpg driver
     note right of Kafka: portfolio.events topic\nportfolio.seeded events\nmarket.quotes.enriched topic\nreal-time quotes
-    note right of AIMLStack: Integrated in business flows\nOptional: Ollama, HF, TF
+    note right of AIMLStack: Integrated in business flows\nOptional: Ollama, HF; PyTorch+MLflow inference
 }
 
 

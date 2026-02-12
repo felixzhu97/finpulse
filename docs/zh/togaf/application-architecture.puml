@@ -4,7 +4,6 @@
 !define DATA_LAYER #E8F5E9
 !define EXTERNAL #FFF3E0
 
-skinparam linetype ortho
 
 skinparam component {
     BackgroundColor<<Presentation>> PRESENTATION_LAYER

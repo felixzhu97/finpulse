@@ -37,7 +37,17 @@ from src.infrastructure.database.repositories import (
     watchlist_repo,
     watchlist_item_repo,
 )
+from src.infrastructure.analytics import ClickHouseAnalyticsClient
 from src.infrastructure.message_brokers import EventPublisher
+
+
+def get_clickhouse_analytics() -> ClickHouseAnalyticsClient:
+    return ClickHouseAnalyticsClient()
+
+
+def get_model_loader():
+    from src.infrastructure.ml import MLflowModelLoader
+    return MLflowModelLoader()
 
 
 def get_realtime_quote_repo(

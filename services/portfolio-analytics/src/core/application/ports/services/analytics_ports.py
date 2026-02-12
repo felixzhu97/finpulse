@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from typing import List, Optional, Protocol
+from typing import Any, List, Optional, Protocol, Tuple
+
+
+class IModelLoader(Protocol):
+    def load(self, model_uri: str) -> Any: ...
 
 
 class IRiskVarPort(Protocol):
@@ -70,10 +74,10 @@ class IHfSummarisePort(Protocol):
     ) -> dict: ...
 
 
-class ITfForecastPort(Protocol):
-    def forecast(
+class IBatchRiskVarPort(Protocol):
+    def compute_var_batch(
         self,
-        values: List[float],
-        horizon: int = 1,
-        lookback: int = 5,
-    ) -> dict: ...
+        entries: List[Tuple[str, List[float]]],
+        confidence: float = 0.95,
+        method: str = "historical",
+    ) -> List[dict]: ...

@@ -12,7 +12,7 @@ from src.infrastructure.external_services.analytics import (
 )
 from src.infrastructure.external_services.analytics.huggingface_adapter import HfSummariseAdapter
 from src.infrastructure.external_services.analytics.ollama_adapter import OllamaGenerateAdapter
-from src.infrastructure.external_services.analytics.tf_forecast_adapter import TfForecastAdapter
+from src.infrastructure.external_services.analytics.pyspark_batch_var_adapter import PySparkBatchRiskVarAdapter
 from src.infrastructure.cache.quote_cache import QuoteCache
 from src.infrastructure.external_services.market_data.cached_provider import CachedMarketDataProvider
 from src.infrastructure.external_services.market_data.database_provider import DatabaseMarketDataProvider
@@ -31,8 +31,10 @@ def quote_history_service(quote_repo) -> QuoteHistoryService:
 
 
 def analytics_service() -> AnalyticsApplicationService:
+    risk_var = RiskVarProvider()
+    batch_risk_var = PySparkBatchRiskVarAdapter(risk_var_provider=risk_var)
     return AnalyticsApplicationService(
-        risk_var=RiskVarProvider(),
+        risk_var=risk_var,
         fraud=FraudDetectorProvider(),
         surveillance=SurveillanceProvider(),
         sentiment=SentimentProvider(),
@@ -41,5 +43,5 @@ def analytics_service() -> AnalyticsApplicationService:
         summarisation=SummarisationProvider(),
         ollama_generate=OllamaGenerateAdapter(),
         hf_summarise=HfSummariseAdapter(),
-        tf_forecast=TfForecastAdapter(),
+        batch_risk_var=batch_risk_var,
     )
