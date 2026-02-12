@@ -1351,6 +1351,8 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
+  - react-native-get-random-values (1.11.0):
+    - React-Core
   - react-native-safe-area-context (5.6.2):
     - hermes-engine
     - RCTRequired
@@ -2102,6 +2104,7 @@ DEPENDENCIES:
   - "React-logger (from `../../../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@react-native-community+cli@18.0.1_typescript@5._d3cf837df3e70e060b0bca161e38ff2a/node_modules/react-native/ReactCommon/logger`)"
   - "React-Mapbuffer (from `../../../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@react-native-community+cli@18.0.1_typescript@5._d3cf837df3e70e060b0bca161e38ff2a/node_modules/react-native/ReactCommon`)"
   - "React-microtasksnativemodule (from `../../../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@react-native-community+cli@18.0.1_typescript@5._d3cf837df3e70e060b0bca161e38ff2a/node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)"
+  - "react-native-get-random-values (from `../../../node_modules/.pnpm/react-native-get-random-values@1.11.0_react-native@0.81.5_@babel+core@7.28.6_@react-nat_71de7a41bdfdda28fc541b47d11568fc/node_modules/react-native-get-random-values`)"
   - "react-native-safe-area-context (from `../../../node_modules/.pnpm/react-native-safe-area-context@5.6.2_react-native@0.81.5_@babel+core@7.28.6_@react-nati_a1309793bc9959ace830b815e89ea5ba/node_modules/react-native-safe-area-context`)"
   - "React-NativeModulesApple (from `../../../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@react-native-community+cli@18.0.1_typescript@5._d3cf837df3e70e060b0bca161e38ff2a/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)"
   - "React-oscompat (from `../../../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@react-native-community+cli@18.0.1_typescript@5._d3cf837df3e70e060b0bca161e38ff2a/node_modules/react-native/ReactCommon/oscompat`)"
@@ -2238,6 +2241,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@react-native-community+cli@18.0.1_typescript@5._d3cf837df3e70e060b0bca161e38ff2a/node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../../../node_modules/.pnpm/react-native@0.81.5_@babel+core@7.28.6_@react-native-community+cli@18.0.1_typescript@5._d3cf837df3e70e060b0bca161e38ff2a/node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-get-random-values:
+    :path: "../../../node_modules/.pnpm/react-native-get-random-values@1.11.0_react-native@0.81.5_@babel+core@7.28.6_@react-nat_71de7a41bdfdda28fc541b47d11568fc/node_modules/react-native-get-random-values"
   react-native-safe-area-context:
     :path: "../../../node_modules/.pnpm/react-native-safe-area-context@5.6.2_react-native@0.81.5_@babel+core@7.28.6_@react-nati_a1309793bc9959ace830b815e89ea5ba/node_modules/react-native-safe-area-context"
   React-NativeModulesApple:
@@ -2365,6 +2370,7 @@ SPEC CHECKSUMS:
   React-logger: 50fdb9a8236da90c0b1072da5c32ee03aeb5bf28
   React-Mapbuffer: 9050ee10c19f4f7fca8963d0211b2854d624973e
   React-microtasksnativemodule: f775db9e991c6f3b8ccbc02bfcde22770f96e23b
+  react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-safe-area-context: 37e680fc4cace3c0030ee46e8987d24f5d3bdab2
   React-NativeModulesApple: 8969913947d5b576de4ed371a939455a8daf28aa
   React-oscompat: ce47230ed20185e91de62d8c6d139ae61763d09c
