@@ -134,7 +134,7 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
     note right of RN: React Native core\nrequireNativeComponent\nView managers
     note right of NativeDemoCardTech: apps/mobile-portfolio\nDemo native card
     note right of NativeChartsTech: LineChart, CandleChart\nAmericanLineChart, BaselineChart\nHistogramChart, LineOnlyChart\nTheme light/dark, tooltips\nx-axis, drag-to-scroll
-    note right of NativeOOPSupport: iOS: ChartCurve, ChartVertex,\nChartPipeline, ChartGrid, ChartThemes\nAndroid: ChartGl, ChartCurve,\n*ChartTheme; sparkline/; democard/
+    note right of NativeOOPSupport: iOS: ChartCurve, ChartVertex,\nChartPipeline, ChartGrid, ChartThemes\nOOP 辅助类: ChartLayoutCalculator,\nValueFormatter, AxisLabelManager,\nChartRenderer, ChartDataCalculator,\nHistogramRenderer\nAndroid: ChartGl, ChartCurve,\n*ChartTheme; OOP 辅助类:\nChartLayoutCalculator, ValueFormatter,\nAxisLabelManager, HistogramRenderer\nsparkline/; democard/
     note right of RNWagmi: mobile-portfolio: 默认深色主题\n黑色 (#000000) 背景
 }
 
@@ -344,7 +344,19 @@ NativeChartsTech --> NativeChartsIOSTech
 NativeChartsTech --> NativeChartsAndroidTech
 NativeChartsTech --> NativeOOPSupport
 NativeOOPSupport --> IOSChartSupportTech
+NativeOOPSupport --> IOSOOPHelpersTech
+IOSOOPHelpersTech --> IOSLayoutCalcTech
+IOSOOPHelpersTech --> IOSValueFormatterTech
+IOSOOPHelpersTech --> IOSAxisManagerTech
+IOSOOPHelpersTech --> IOSChartRendererTech
+IOSOOPHelpersTech --> IOSDataCalcTech
+IOSOOPHelpersTech --> IOSHistRendererTech
 NativeOOPSupport --> AndroidPkgsTech
+NativeOOPSupport --> AndroidOOPHelpersTech
+AndroidOOPHelpersTech --> AndroidLayoutCalcTech
+AndroidOOPHelpersTech --> AndroidValueFormatterTech
+AndroidOOPHelpersTech --> AndroidAxisManagerTech
+AndroidOOPHelpersTech --> AndroidHistRendererTech
 RN --> SharedChartLogicTech
 NativeChartsTech --> SharedChartLogicTech
 RN --> RNWagmi
