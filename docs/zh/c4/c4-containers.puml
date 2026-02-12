@@ -7,15 +7,26 @@ title FinPulse 金融科技平台 - 容器（模块）图
 Person(investor, "投资者", "投资组合与市场分析")
 
 System_Boundary(finpulse, "FinPulse") {
-    Container(web_app, "Web 应用", "Angular 21", "金融分析控制台：投资组合、市场趋势、风险、交易")
-    Container(mobile_portfolio, "移动端投资组合", "Expo + React Native", "投资组合应用：股票、实时行情、原生图表")
-    Container(mobile_demo, "移动端演示", "React Native", "演示应用与原生图表展示")
-    Container(portfolio_api, "投资组合分析 API", "FastAPI", "REST、WebSocket；AI/ML（payments、trades、customers、risk-metrics）；区块链；投资组合、市场数据；批量 VaR、ClickHouse 分析（portfolio-risk、delta-info）、MLflow forecast/model")
-    ContainerDb(timescale, "TimescaleDB", "PostgreSQL + TimescaleDB", "投资组合元数据与历史超表")
-    ContainerDb(redis, "Redis", "内存", "历史、组合聚合、区块链读缓存")
-    ContainerDb(clickhouse, "ClickHouse", "OLAP", "portfolio_risk_daily、delta_table_stats；API 读取")
-    ContainerQueue(kafka, "Kafka", "事件流", "portfolio.events, market.quotes.enriched")
-    Container(minio, "MinIO", "S3 兼容", "数据湖；Faust 写入行情批次；Spark/Delta")
+    Boundary(frontend_boundary, "前端应用") {
+        Container(web_app, "Web 应用", "Angular 21", "金融分析控制台：投资组合、市场趋势、风险、交易")
+        Container(mobile_portfolio, "移动端投资组合", "Expo + React Native", "投资组合应用：股票、实时行情、原生图表。整洁架构：展示层 → 应用层 → 领域层 ← 基础设施层")
+        Container(mobile_demo, "移动端演示", "React Native", "演示应用与原生图表展示")
+    }
+    
+    Boundary(backend_boundary, "后端服务") {
+        Container(portfolio_api, "投资组合分析 API", "FastAPI", "REST、WebSocket；AI/ML（payments、trades、customers、risk-metrics）；区块链；投资组合、市场数据；批量 VaR、ClickHouse 分析（portfolio-risk、delta-info）、MLflow forecast/model")
+    }
+    
+    Boundary(data_boundary, "数据存储") {
+        ContainerDb(timescale, "TimescaleDB", "PostgreSQL + TimescaleDB", "投资组合元数据与历史超表")
+        ContainerDb(redis, "Redis", "内存", "历史、组合聚合、区块链读缓存")
+        ContainerDb(clickhouse, "ClickHouse", "OLAP", "portfolio_risk_daily、delta_table_stats；API 读取")
+        Container(minio, "MinIO", "S3 兼容", "数据湖；Faust 写入行情批次；Spark/Delta")
+    }
+    
+    Boundary(messaging_boundary, "消息队列") {
+        ContainerQueue(kafka, "Kafka", "事件流", "portfolio.events, market.quotes.enriched")
+    }
 }
 
 Container_Ext(market_api, "市场数据 API", "外部", "第三方市场数据")
@@ -33,5 +44,7 @@ Rel(portfolio_api, clickhouse, "读取分析", "HTTP")
 Rel(portfolio_api, minio, "批任务写入", "S3")
 Rel(portfolio_api, market_api, "获取行情", "REST")
 Rel(web_app, vercel, "托管于", "Vercel")
+
+LAYOUT_TOP_DOWN()
 
 @enduml

@@ -5,28 +5,35 @@
 title 投资组合分析 API - 组件图
 
 Container_Boundary(portfolio_api, "投资组合分析 API") {
-    Component(portfolio_router, "投资组合路由", "FastAPI", "REST: GET /portfolio, POST /seed")
-    Component(resource_router, "资源路由", "FastAPI", "REST: /api/v1/*（CRUD 及 batch；payments→欺诈检测、trades→监控、customers→身份、risk-metrics→VaR 计算）")
-    Component(quotes_router, "行情路由", "FastAPI", "REST: GET /quotes、GET /quotes/history、WebSocket /ws/quotes")
-
-    Component(redis_cache, "Redis 缓存", "Python", "RedisCache：按前缀 get/set/delete；组合聚合、区块链读缓存")
-    Component(blockchain_router, "区块链路由", "FastAPI", "REST: /api/v1/blockchain - 转账、区块、余额")
-    Component(blockchain_svc, "区块链服务", "Python", "数字货币转账与链式账本")
-    Component(blockchain_ledger_repo, "区块链账本仓储", "SQLAlchemy", "区块与链上交易持久化")
-    Component(wallet_balance_repo, "钱包余额仓储", "SQLAlchemy", "按账户与币种的余额")
-
-    Component(portfolio_svc, "投资组合服务", "Python", "投资组合 CRUD 与聚合")
-    Component(analytics_svc, "分析服务", "Python", "风险分析与 AI 编排")
-    Component(market_data_svc, "市场数据服务", "Python", "通过 CachedMarketDataProvider 提供实时行情")
-    Component(quote_history_svc, "行情历史服务", "Python", "通过 IRealtimeQuoteRepository 提供历史价格序列")
-
-    Component(portfolio_repo, "投资组合仓储", "SQLAlchemy", "TimescaleDB 持久化")
-    Component(history_repo, "投资组合历史仓储", "SQLAlchemy", "历史超表访问")
-    Component(realtime_quote_repo, "实时行情仓储", "SQLAlchemy ORM", "realtime_quote、quote_tick；实现 IRealtimeQuoteRepository")
-    Component(kafka_provider, "Kafka 行情消费者", "Python", "消费 market.quotes.enriched，写入 realtime_quote_repo")
-    Component(event_publisher, "事件发布者", "Python", "发布 portfolio.events")
-
-    Component(ai_providers, "AI 提供方", "Python", "Ollama、Hugging Face、TF；VaR、欺诈、情感")
+    Boundary(api_boundary, "API 层") {
+        Component(portfolio_router, "投资组合路由", "FastAPI", "REST: GET /portfolio, POST /seed")
+        Component(resource_router, "资源路由", "FastAPI", "REST: /api/v1/*（CRUD 及 batch；payments→欺诈检测、trades→监控、customers→身份、risk-metrics→VaR 计算）")
+        Component(quotes_router, "行情路由", "FastAPI", "REST: GET /quotes、GET /quotes/history、WebSocket /ws/quotes")
+        Component(blockchain_router, "区块链路由", "FastAPI", "REST: /api/v1/blockchain - 转账、区块、余额")
+    }
+    
+    Boundary(service_boundary, "服务层") {
+        Component(portfolio_svc, "投资组合服务", "Python", "投资组合 CRUD 与聚合")
+        Component(analytics_svc, "分析服务", "Python", "风险分析与 AI 编排")
+        Component(market_data_svc, "市场数据服务", "Python", "通过 CachedMarketDataProvider 提供实时行情")
+        Component(quote_history_svc, "行情历史服务", "Python", "通过 IRealtimeQuoteRepository 提供历史价格序列")
+        Component(blockchain_svc, "区块链服务", "Python", "数字货币转账与链式账本")
+    }
+    
+    Boundary(repository_boundary, "仓储层") {
+        Component(portfolio_repo, "投资组合仓储", "SQLAlchemy", "TimescaleDB 持久化")
+        Component(history_repo, "投资组合历史仓储", "SQLAlchemy", "历史超表访问")
+        Component(realtime_quote_repo, "实时行情仓储", "SQLAlchemy ORM", "realtime_quote、quote_tick；实现 IRealtimeQuoteRepository")
+        Component(blockchain_ledger_repo, "区块链账本仓储", "SQLAlchemy", "区块与链上交易持久化")
+        Component(wallet_balance_repo, "钱包余额仓储", "SQLAlchemy", "按账户与币种的余额")
+    }
+    
+    Boundary(infrastructure_boundary, "基础设施层") {
+        Component(redis_cache, "Redis 缓存", "Python", "RedisCache：按前缀 get/set/delete；组合聚合、区块链读缓存")
+        Component(kafka_provider, "Kafka 行情消费者", "Python", "消费 market.quotes.enriched，写入 realtime_quote_repo")
+        Component(event_publisher, "事件发布者", "Python", "发布 portfolio.events")
+        Component(ai_providers, "AI 提供方", "Python", "Ollama、Hugging Face、TF；VaR、欺诈、情感")
+    }
 }
 
 ContainerDb(timescale, "TimescaleDB", "PostgreSQL", "投资组合与历史")
@@ -60,5 +67,7 @@ Rel(history_repo, redis_db, "缓存", "")
 Rel(kafka_provider, kafka, "消费", "")
 Rel(kafka_provider, realtime_quote_repo, "写入", "upsert_quotes、insert_ticks")
 Rel(event_publisher, kafka, "发布", "")
+
+LAYOUT_TOP_DOWN()
 
 @enduml

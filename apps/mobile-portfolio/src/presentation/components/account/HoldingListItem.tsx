@@ -1,0 +1,93 @@
+import { StyleSheet, Text, View } from "react-native";
+import type { Holding } from "@/src/domain/entities/portfolio";
+import { formatCurrency, formatSigned, formatSignedPercent } from "@/src/infrastructure/utils";
+
+interface HoldingListItemProps {
+  holding: Holding;
+  displayPrice?: number;
+  displayMarketValue?: number;
+  displayProfit?: number;
+  displayProfitRate?: number;
+}
+
+export function HoldingListItem({
+  holding,
+  displayPrice,
+  displayMarketValue,
+  displayProfit,
+  displayProfitRate,
+}: HoldingListItemProps) {
+  const price = displayPrice ?? holding.price;
+  const marketValue = displayMarketValue ?? holding.marketValue;
+  const profit = displayProfit ?? holding.profit;
+  const profitRate = displayProfitRate ?? holding.profitRate;
+  const isPositive = profit >= 0;
+
+  return (
+    <View style={styles.row}>
+      <View style={styles.left}>
+        <Text numberOfLines={1} style={styles.name}>
+          {holding.name}
+        </Text>
+        <Text numberOfLines={1} style={styles.meta}>
+          {holding.symbol} · {holding.quantity} shares
+        </Text>
+        <Text numberOfLines={1} style={styles.meta}>
+          Price {formatCurrency(price, "USD")}
+        </Text>
+      </View>
+      <View style={styles.right}>
+        <Text numberOfLines={1} style={styles.value}>
+          {formatCurrency(marketValue, "USD")}
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={[styles.change, { color: isPositive ? "#16a34a" : "#b91c1c" }]}
+        >
+          {formatSigned(profit, 0)} · {formatSignedPercent(profitRate)}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(15, 23, 42, 0.06)",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+    minHeight: 56,
+  },
+  left: {
+    flex: 1,
+    minWidth: 0,
+  },
+  name: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#111827",
+  },
+  meta: {
+    marginTop: 2,
+    fontSize: 12,
+    color: "#6b7280",
+  },
+  right: {
+    alignItems: "flex-end",
+    flexShrink: 0,
+  },
+  value: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  change: {
+    marginTop: 2,
+    fontSize: 12,
+  },
+});
+

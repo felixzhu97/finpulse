@@ -11,18 +11,18 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { accountsApi, customersApi, portfolioApi } from "@/src/api";
-import type { Account, Customer } from "@/src/types";
-import type { AccountResource } from "@/src/api";
+import type { Account, Customer } from "@/src/domain/entities";
+import { container } from "@/src/application";
+import type { AccountResource } from "@/src/domain/entities/accountResource";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { SettingsDrawer } from "@/src/components/account/SettingsDrawer";
-import { RegisterCustomerDrawer } from "@/src/components/account/RegisterCustomerDrawer";
-import { NewPaymentDrawer } from "@/src/components/account/NewPaymentDrawer";
-import { NewTradeDrawer } from "@/src/components/account/NewTradeDrawer";
-import { BlockchainBalanceCard, BlockchainTransferDrawer } from "@/src/components/blockchain";
-import { formatBalance } from "@/src/utils";
-import { useTheme } from "@/src/theme";
-import { useTranslation } from "@/src/i18n";
+import { SettingsDrawer } from "@/src/presentation/components/account/SettingsDrawer";
+import { RegisterCustomerDrawer } from "@/src/presentation/components/account/RegisterCustomerDrawer";
+import { NewPaymentDrawer } from "@/src/presentation/components/account/NewPaymentDrawer";
+import { NewTradeDrawer } from "@/src/presentation/components/account/NewTradeDrawer";
+import { BlockchainBalanceCard, BlockchainTransferDrawer } from "@/src/presentation/components/blockchain";
+import { formatBalance } from "@/src/infrastructure/utils";
+import { useTheme } from "@/src/presentation/theme";
+import { useTranslation } from "@/src/presentation/i18n";
 
 function getAccountTypeLabel(type: Account["type"], t: (key: string) => string) {
   switch (type) {
@@ -60,8 +60,11 @@ export default function AccountScreen() {
     setLoading(true);
     setError(false);
     try {
-      const customerPromise = customersApi.getFirst();
-      const accountsPromise = portfolioApi.getAccounts();
+      const customerUseCase = container.getCustomerUseCase();
+      const portfolioUseCase = container.getPortfolioUseCase();
+      const customerPromise = customerUseCase.execute();
+      const accountsPromise = portfolioUseCase.getAccounts();
+      const accountsApi = container.getAccountsApi();
       const accountResourcesPromise = accountsApi.list(100, 0);
 
       const [customerData, accountList, accountResourcesList] = await Promise.all([

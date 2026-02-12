@@ -58,13 +58,28 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
 
     component "apps/mobile-portfolio" as MobilePortfolio {
         component "Expo + React Native" as ExpoRN
-        component "api (薄客户端)" as MobileApi {
-            component "portfolioApi" as PortfolioApi
-            component "getQuotes" as GetQuotes
-            component "createQuoteSocket" as CreateQuoteSocket
+        component "整洁架构" as CleanArch {
+            component "展示层" as PresentationLayer {
+                component "组件" as MobileComponents
+                component "Hooks" as MobileHooks
+                component "Redux Store" as MobileRedux
+                component "主题和国际化" as MobileThemeI18n
+            }
+            component "应用层" as ApplicationLayer {
+                component "用例" as MobileUseCases
+                component "依赖注入容器" as DependencyContainer
+            }
+            component "领域层" as DomainLayer {
+                component "实体" as MobileEntities
+                component "仓库接口" as MobileRepoInterfaces
+            }
+            component "基础设施层" as InfrastructureLayer {
+                component "仓库实现" as MobileRepositories
+                component "API 客户端" as MobileApiClients
+                component "服务和工具" as MobileServicesUtils
+            }
         }
-        component "usePortfolio" as UsePortfolio
-        component "Stocks 屏幕" as StocksScreen {
+        component "股票屏幕" as StocksScreen {
             component "StockListItem" as StockListItem
             component "NativeSparkline" as NativeSparkline
             component "useRealtimeQuotes" as UseRealtimeQuotes
@@ -117,7 +132,7 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
         }
         component "react-native-wagmi-charts" as RNCharts
     }
-    note right of MobilePortfolio: 薄客户端：types、api (portfolioApi、\ngetQuotes、createQuoteSocket)、hooks。\n默认深色主题，黑色 (#000000) 背景
+    note right of MobilePortfolio: 整洁架构：展示层 → 应用层 → 领域层。\n基础设施层实现领域接口。\n通过 DependencyContainer 进行依赖注入。\n薄客户端：业务逻辑在服务器端。
 }
 
 package "业务逻辑层 (Business Layer)" <<Business>> {
@@ -323,6 +338,33 @@ interface "风险分析API" as RiskAPI
 interface "Spark API" as SparkAPI
 interface "Flink API" as FlinkAPI
 interface "Hadoop API" as HadoopAPI
+
+' Mobile portfolio Clean Architecture
+ExpoRN --> CleanArch
+CleanArch --> PresentationLayer
+CleanArch --> ApplicationLayer
+CleanArch --> DomainLayer
+CleanArch --> InfrastructureLayer
+PresentationLayer --> ApplicationLayer
+ApplicationLayer --> DomainLayer
+InfrastructureLayer --> DomainLayer
+ApplicationLayer --> InfrastructureLayer
+PresentationLayer --> MobileComponents
+PresentationLayer --> MobileHooks
+PresentationLayer --> MobileRedux
+PresentationLayer --> MobileThemeI18n
+ApplicationLayer --> MobileUseCases
+ApplicationLayer --> DependencyContainer
+DomainLayer --> MobileEntities
+DomainLayer --> MobileRepoInterfaces
+InfrastructureLayer --> MobileRepositories
+InfrastructureLayer --> MobileApiClients
+InfrastructureLayer --> MobileServicesUtils
+MobileRepositories --> MobileRepoInterfaces
+MobileUseCases --> MobileRepoInterfaces
+DependencyContainer --> MobileRepositories
+DependencyContainer --> MobileUseCases
+MobileHooks --> DependencyContainer
 
 ' Mobile portfolio native views
 ExpoRN --> StocksScreen

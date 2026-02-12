@@ -14,21 +14,21 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AccountListItem } from "@/src/components/account/AccountListItem";
-import { StockListItem } from "@/src/components/account/StockListItem";
+import { AccountListItem } from "@/src/presentation/components/account/AccountListItem";
+import { StockListItem } from "@/src/presentation/components/account/StockListItem";
 import {
   StockDetailDrawer,
   type StockDetailItem,
-} from "@/src/components/watchlist";
-import { GlassView } from "@/src/components/ui/GlassView";
-import { SortMenu, type SortOption } from "@/src/components/ui/SortMenu";
-import { useSymbolDisplayData } from "@/src/hooks/useSymbolDisplayData";
-import type { Account, Holding } from "@/src/types/portfolio";
-import { getQuotes, getQuotesHistory, portfolioApi } from "@/src/api";
-import { useAppDispatch } from "@/src/store/useAppStore";
-import { setHistory, setSnapshot } from "@/src/store/quotesSlice";
-import { useTheme } from "@/src/theme";
-import { useTranslation } from "@/src/i18n";
+} from "@/src/presentation/components/watchlist";
+import { GlassView } from "@/src/presentation/components/ui/GlassView";
+import { SortMenu, type SortOption } from "@/src/presentation/components/ui/SortMenu";
+import { useSymbolDisplayData } from "@/src/presentation/hooks/useSymbolDisplayData";
+import type { Account, Holding } from "@/src/domain/entities/portfolio";
+import { container } from "@/src/application";
+import { useAppDispatch } from "@/src/presentation/store/useAppStore";
+import { setHistory, setSnapshot } from "@/src/presentation/store/quotesSlice";
+import { useTheme } from "@/src/presentation/theme";
+import { useTranslation } from "@/src/presentation/i18n";
 
 type ListRow =
   | { type: "stock"; holding: Holding; price: number; change: number }
@@ -165,7 +165,8 @@ export default function WatchlistsScreen() {
   }, [baseRows, searchQuery, sortBy]);
 
   const load = useCallback(async () => {
-    const portfolio = await portfolioApi.getPortfolio();
+    const portfolioRepository = container.getPortfolioRepository();
+    const portfolio = await portfolioRepository.getPortfolio();
     setBaseAccounts(portfolio?.accounts ?? []);
     setHistoryValues(portfolio?.history.map((h) => h.value) ?? []);
     setLoading(false);
@@ -177,11 +178,18 @@ export default function WatchlistsScreen() {
 
   const fetchQuotesAndHistory = useCallback(async () => {
     if (symbols.length === 0) return;
-    const [history, snapshot] = await Promise.all([
-      getQuotesHistory(symbols, 5),
-      getQuotes(symbols),
+    const quoteRepository = container.getQuoteRepository();
+    const [historyData, snapshot] = await Promise.all([
+      Promise.all(symbols.map(s => quoteRepository.getQuotesHistory(s, 5))).then(results => {
+        const history: Record<string, number[]> = {};
+        symbols.forEach((s, i) => {
+          history[s.toUpperCase()] = results[i];
+        });
+        return history;
+      }),
+      quoteRepository.getQuotes(symbols),
     ]).catch(() => [{}, {}] as const);
-    dispatch(setHistory(history ?? {}));
+    dispatch(setHistory(historyData ?? {}));
     dispatch(setSnapshot(snapshot ?? {}));
   }, [symbols.join(","), dispatch]);
 
@@ -191,7 +199,8 @@ export default function WatchlistsScreen() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    portfolioApi.invalidateCache();
+    const portfolioRepository = container.getPortfolioRepository();
+    portfolioRepository.invalidateCache();
     await load();
     await fetchQuotesAndHistory();
     setRefreshing(false);

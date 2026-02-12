@@ -2,7 +2,7 @@
 !define RELATIVE_INCLUDE 1
 !include ../../c4-lib/C4-PlantUML/C4_Component.puml
 
-title Mobile Portfolio App - Component Diagram
+title Mobile Portfolio App - Component Diagram (Clean Architecture)
 
 Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(app_content, "AppContent", "React Native", "Root layout: uses usePreferences().loading, shows spinner until preferences fetched, then renders tabs")
@@ -12,124 +12,180 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(analytics_screen, "Insights Screen", "React Native", "Risk metrics (volatility, Sharpe, VaR, beta), computed VaR from portfolio history")
     Component(account_screen, "Account Screen", "React Native", "Profile, account list, Actions (Register, New Payment, New Trade, Settings); useFocusEffect loads data on tab focus")
 
-    Component(types_layer, "types", "TypeScript", "Portfolio, QuoteSnapshot, Instrument, etc.")
-    Component(api_client, "portfolioApi", "TypeScript", "GET portfolio (cached), getAccounts, getRiskSummary, seedPortfolio")
-    Component(quotes_rest, "getQuotes", "TypeScript", "GET /api/v1/quotes")
-    Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes, subscribe, reconnect")
-    Component(rest_apis, "customersApi, accountsApi, paymentsApi, tradesApi, ordersApi, userPreferencesApi, riskMetricsApi", "TypeScript", "REST: Profile, Actions (register, payment, trade), Settings, Analytics, VaR compute")
+    ' Presentation Layer
+    Boundary(presentation_layer, "Presentation Layer") {
+        Component(portfolio_summary, "PortfolioSummary", "React Native", "Net worth, today change")
+        Component(asset_allocation_chart, "AssetAllocationChart", "React Native", "Pie by account type")
+        Component(net_worth_chart, "NetWorthLineChart", "React Native", "Net worth trend")
+        Component(account_list_item, "AccountListItem", "React Native", "Account row")
+        Component(stock_list_item, "StockListItem", "React Native", "Holding row, price, sparkline, opens detail drawer")
+        Component(metric_card, "MetricCard", "React Native", "Label, value, helper")
+        Component(native_sparkline, "NativeSparkline", "Native View", "Per-stock sparkline")
+        Component(stock_detail_drawer, "StockDetailDrawer", "React Native", "Draggable drawer, live price/chart, share")
+        Component(account_drawers, "Account Drawers", "React Native", "RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, SettingsDrawer")
+        Component(sort_menu, "SortMenu", "React Native", "Sort by name, price, change, change %")
+        Component(glass_search_bar, "Bottom search bar", "React Native", "GlassView, opens on search icon")
+        Component(glass_view, "GlassView", "React Native", "expo-blur, Liquid Glass")
+        
+        Component(use_portfolio_hook, "usePortfolio", "Hook", "Portfolio data fetching")
+        Component(use_symbol_display_hook, "useSymbolDisplayData", "Hook", "Redux-backed quotes + history")
+        Component(use_draggable_drawer_hook, "useDraggableDrawer", "Hook", "Slide/drag animation")
+        Component(use_preferences_hook, "usePreferences", "Hook", "Redux-backed user preferences")
+        Component(use_theme_hook, "useTheme", "Hook", "Current theme colors")
+        Component(use_risk_metrics_hook, "useRiskMetrics", "Hook", "Risk metrics API")
+        Component(use_computed_var_hook, "useComputedVar", "Hook", "VaR computation")
+        
+        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes, history, subscribedSymbols")
+        Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme, language, notifications")
+        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "WebSocket subscriber")
+        Component(portfolio_store, "Portfolio Store", "Custom", "Selected account id")
+        
+        Component(theme_system, "Theme System", "TypeScript", "Light/dark color schemes")
+        Component(i18n_config, "i18n Config", "TypeScript", "i18next setup, translations")
+        Component(use_translation, "useTranslation", "Hook", "Translation hook")
+    }
 
-    Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes, history, subscribedSymbols, setSnapshot, setStatus")
-    Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme, language, notificationsEnabled, setTheme, setLanguage, setNotificationsEnabled")
-    Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "Reads subscribedSymbols, runs WebSocket, dispatches to store")
-    Component(portfolio_store, "Portfolio Store", "Custom", "Selected account id (UI)")
+    ' Application Layer
+    Boundary(application_layer, "Application Layer") {
+        Component(dependency_container, "DependencyContainer", "TypeScript", "Dependency injection container")
+        Component(get_portfolio_usecase, "GetPortfolioUseCase", "TypeScript", "Portfolio use case")
+        Component(get_customer_usecase, "GetCustomerUseCase", "TypeScript", "Customer use case")
+        Component(get_quotes_usecase, "GetQuotesUseCase", "TypeScript", "Quotes use case")
+    }
 
-    Component(use_symbol_display, "useSymbolDisplayData", "Hook", "setSubscribedSymbols, select from Redux; bySymbol, quoteMap, historyBySymbol")
-    Component(use_portfolio, "usePortfolio", "Hook", "portfolio + allocation + history + refresh")
-    Component(use_draggable_drawer, "useDraggableDrawer", "Hook", "Slide/drag animation for bottom sheets")
-    Component(use_preferences, "usePreferences", "Hook", "Redux-backed user preferences (theme, language, notifications); provides loading (component-level, from useUserPreferences)")
-    Component(use_theme, "useTheme", "Hook", "Current theme colors (light/dark) based on preferences and system")
-    Component(use_risk_metrics, "useRiskMetrics", "Hook", "Insights risk-metrics API")
-    Component(use_computed_var, "useComputedVar", "Hook", "POST risk-metrics/compute for VaR from portfolio history")
+    ' Domain Layer
+    Boundary(domain_layer, "Domain Layer") {
+        Component(domain_entities, "Domain Entities", "TypeScript", "Portfolio, Quote, Customer, etc.")
+        Component(portfolio_repo_interface, "IPortfolioRepository", "TypeScript", "Portfolio repository interface")
+        Component(quote_repo_interface, "IQuoteRepository", "TypeScript", "Quote repository interface")
+        Component(customer_repo_interface, "ICustomerRepository", "TypeScript", "Customer repository interface")
+        Component(other_repo_interfaces, "Other Repository Interfaces", "TypeScript", "UserPreference, Watchlist, Instrument, etc.")
+    }
 
-    Component(portfolio_summary, "PortfolioSummary", "React Native", "Net worth, today change")
-    Component(asset_allocation_chart, "AssetAllocationChart", "React Native", "Pie by account type")
-    Component(net_worth_chart, "NetWorthLineChart", "React Native", "Net worth trend")
-    Component(account_list_item, "AccountListItem", "React Native", "Account row")
-    Component(stock_list_item, "StockListItem", "React Native", "Holding row, price, sparkline, opens detail drawer")
-    Component(metric_card, "MetricCard", "React Native", "Label, value, helper")
-    Component(native_sparkline, "NativeSparkline", "Native View", "Per-stock sparkline")
-    Component(base_chart_view_manager, "BaseChartViewManager", "Native Base Class", "Abstract RCTViewManager for chart view managers")
-    Component(base_chart_view, "BaseChartView", "Native Base Class", "Abstract UIView with Metal setup, theme, grid, rendering delegation")
-    Component(base_chart_renderer, "BaseChartRenderer", "Native Base Class", "Abstract Metal renderer with grid drawing, pipeline management")
-    Component(native_line_chart, "NativeLineChart", "Native View", "Metal / OpenGL ES, inherits from BaseChartView/BaseChartRenderer, uses OOP helpers (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator)")
-    Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "OOP class for period data filtering and volume matching")
-    Component(stock_detail_drawer, "StockDetailDrawer", "React Native", "Draggable drawer, live price/chart, share, simplified logic")
-    Component(account_drawers, "Account Drawers", "React Native", "RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, SettingsDrawer (useDraggableDrawer, colors.card)")
-    Component(sort_menu, "SortMenu", "React Native", "Sort by name, price, change, change %")
-    Component(glass_search_bar, "Bottom search bar", "React Native", "GlassView, opens on search icon, closes on drawer/sort/tab")
-    Component(glass_view, "GlassView", "React Native", "expo-blur, Liquid Glass for search bar and tab bar")
+    ' Infrastructure Layer
+    Boundary(infrastructure_layer, "Infrastructure Layer") {
+        Component(http_client, "HttpClient", "TypeScript", "HTTP client wrapper")
+        Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes")
+        Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL")
+        
+        Component(portfolio_repo_impl, "PortfolioRepository", "TypeScript", "Implements IPortfolioRepository")
+        Component(quote_repo_impl, "QuoteRepository", "TypeScript", "Implements IQuoteRepository")
+        Component(customer_repo_impl, "CustomerRepository", "TypeScript", "Implements ICustomerRepository")
+        Component(other_repo_impls, "Other Repositories", "TypeScript", "UserPreference, Watchlist, etc.")
+        Component(accounts_api, "accountsApi", "TypeScript", "Accounts API client")
+        
+        Component(web3_service, "web3Service", "TypeScript", "Web3 integration")
+        Component(utils, "Utils", "TypeScript", "formatters, stockUtils, PeriodDataProcessor")
+    }
 
-    Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL, base URL")
-    Component(theme_system, "Theme System", "TypeScript", "Light/dark color schemes, useTheme hook")
-    Component(i18n_config, "i18n Config", "TypeScript", "i18next setup, translation resources (en, zh)")
-    Component(use_translation, "useTranslation", "Hook", "Access translated strings from i18next")
+    ' Native Components
+    Boundary(native_layer, "Native Components") {
+        Component(base_chart_view_manager, "BaseChartViewManager", "Native Base Class", "Abstract RCTViewManager")
+        Component(base_chart_view, "BaseChartView", "Native Base Class", "Abstract UIView with Metal")
+        Component(base_chart_renderer, "BaseChartRenderer", "Native Base Class", "Abstract Metal renderer")
+        Component(native_line_chart, "NativeLineChart", "Native View", "Metal / OpenGL ES chart")
+        Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "Period data filtering")
+    }
 }
 
-Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Portfolio, /ws/quotes, customers, accounts, payments, orders, trades, risk-metrics, risk-metrics/compute")
+Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Portfolio, /ws/quotes, customers, accounts, payments, orders, trades, risk-metrics")
 
-Rel(app_content, use_preferences, "Uses", "loading, theme sync")
+' Presentation to Application
+Rel(use_portfolio_hook, dependency_container, "Gets use case", "")
+Rel(use_symbol_display_hook, dependency_container, "Gets repository", "")
+Rel(use_preferences_hook, dependency_container, "Gets repository", "")
+Rel(use_risk_metrics_hook, dependency_container, "Gets repository", "")
+Rel(use_computed_var_hook, dependency_container, "Gets repository", "")
+
+' Application to Domain
+Rel(dependency_container, get_portfolio_usecase, "Provides", "")
+Rel(dependency_container, get_customer_usecase, "Provides", "")
+Rel(dependency_container, get_quotes_usecase, "Provides", "")
+Rel(get_portfolio_usecase, portfolio_repo_interface, "Uses", "")
+Rel(get_customer_usecase, customer_repo_interface, "Uses", "")
+Rel(get_quotes_usecase, quote_repo_interface, "Uses", "")
+
+' Infrastructure implements Domain
+Rel(portfolio_repo_impl, portfolio_repo_interface, "Implements", "")
+Rel(quote_repo_impl, quote_repo_interface, "Implements", "")
+Rel(customer_repo_impl, customer_repo_interface, "Implements", "")
+Rel(other_repo_impls, other_repo_interfaces, "Implements", "")
+
+' Application uses Infrastructure
+Rel(dependency_container, portfolio_repo_impl, "Provides", "")
+Rel(dependency_container, quote_repo_impl, "Provides", "")
+Rel(dependency_container, customer_repo_impl, "Provides", "")
+Rel(dependency_container, other_repo_impls, "Provides", "")
+
+' Infrastructure to External API
+Rel(portfolio_repo_impl, http_client, "Uses", "")
+Rel(quote_repo_impl, http_client, "Uses", "")
+Rel(customer_repo_impl, http_client, "Uses", "")
+Rel(http_client, api_config, "Uses", "")
+Rel(http_client, portfolio_api, "HTTP", "")
+Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
+Rel(accounts_api, http_client, "Uses", "")
+Rel(accounts_api, portfolio_api, "HTTP", "")
+
+' Presentation UI
+Rel(app_content, use_preferences_hook, "Uses", "")
 Rel(app_content, tabs_router, "Renders", "")
 Rel(tabs_router, overview_screen, "Routes to", "")
 Rel(tabs_router, watchlist_screen, "Routes to", "")
 Rel(tabs_router, analytics_screen, "Routes to", "")
 Rel(tabs_router, account_screen, "Routes to", "")
 
-Rel(overview_screen, use_portfolio, "Uses", "")
-Rel(use_portfolio, api_client, "Calls", "")
+Rel(overview_screen, use_portfolio_hook, "Uses", "")
 Rel(overview_screen, portfolio_summary, "Uses", "")
 Rel(overview_screen, asset_allocation_chart, "Uses", "")
 Rel(overview_screen, net_worth_chart, "Uses", "")
 Rel(overview_screen, native_line_chart, "Uses", "")
-Rel(native_line_chart, base_chart_view, "Inherits from", "")
-Rel(native_line_chart, base_chart_renderer, "Uses", "")
-Rel(base_chart_view, base_chart_renderer, "Creates", "")
-Rel(base_chart_view_manager, base_chart_view, "Creates", "")
-Rel(overview_screen, portfolio_store, "Reads", "")
 
-Rel(watchlist_screen, api_client, "Calls", "getPortfolio")
-Rel(watchlist_screen, use_symbol_display, "Uses", "")
+Rel(watchlist_screen, use_symbol_display_hook, "Uses", "")
 Rel(watchlist_screen, stock_list_item, "Uses", "")
 Rel(watchlist_screen, account_list_item, "Uses", "")
 Rel(watchlist_screen, stock_detail_drawer, "Uses", "")
 Rel(watchlist_screen, sort_menu, "Uses", "")
 Rel(watchlist_screen, glass_search_bar, "Uses", "")
-Rel(glass_search_bar, glass_view, "Uses", "")
 
-Rel(use_symbol_display, redux_quotes, "Dispatches, selects", "")
-Rel(quote_subscriber, redux_quotes, "Dispatches setSnapshot", "")
-Rel(quote_subscriber, quote_socket, "Creates", "")
-Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
-
-Rel(analytics_screen, use_risk_metrics, "Uses", "")
-Rel(analytics_screen, use_computed_var, "Uses", "")
-Rel(use_risk_metrics, rest_apis, "Calls", "risk-metrics")
-Rel(use_computed_var, rest_apis, "Calls", "risk-metrics/compute")
+Rel(analytics_screen, use_risk_metrics_hook, "Uses", "")
+Rel(analytics_screen, use_computed_var_hook, "Uses", "")
 Rel(analytics_screen, metric_card, "Uses", "")
 
 Rel(account_screen, account_drawers, "Uses", "")
-Rel(account_screen, use_preferences, "Uses", "")
-Rel(account_screen, rest_apis, "Calls", "customers (Profile)")
-Rel(account_drawers, use_draggable_drawer, "Uses", "")
-Rel(account_drawers, rest_apis, "Calls", "customers, accounts, payments, orders, trades, user-preferences")
-Rel(use_preferences, redux_preferences, "Dispatches, selects", "")
-Rel(use_preferences, rest_apis, "Calls", "user-preferences (Settings)")
-Rel(overview_screen, use_theme, "Uses", "")
-Rel(watchlist_screen, use_theme, "Uses", "")
-Rel(analytics_screen, use_theme, "Uses", "")
-Rel(account_screen, use_theme, "Uses", "")
-Rel(use_theme, theme_system, "Uses", "")
-Rel(use_theme, redux_preferences, "Reads", "theme preference")
+Rel(account_screen, use_preferences_hook, "Uses", "")
+
+' Redux and State
+Rel(use_symbol_display_hook, redux_quotes, "Dispatches, selects", "")
+Rel(quote_subscriber, redux_quotes, "Dispatches", "")
+Rel(quote_subscriber, quote_socket, "Creates", "")
+Rel(use_preferences_hook, redux_preferences, "Dispatches, selects", "")
+
+' Theme and i18n
+Rel(overview_screen, use_theme_hook, "Uses", "")
+Rel(watchlist_screen, use_theme_hook, "Uses", "")
+Rel(analytics_screen, use_theme_hook, "Uses", "")
+Rel(account_screen, use_theme_hook, "Uses", "")
+Rel(use_theme_hook, theme_system, "Uses", "")
+Rel(use_theme_hook, redux_preferences, "Reads", "")
 
 Rel(overview_screen, use_translation, "Uses", "")
 Rel(watchlist_screen, use_translation, "Uses", "")
 Rel(analytics_screen, use_translation, "Uses", "")
 Rel(account_screen, use_translation, "Uses", "")
-Rel(sort_menu, use_translation, "Uses", "")
-Rel(use_preferences, use_translation, "Syncs", "language change")
 Rel(use_translation, i18n_config, "Uses", "")
-Rel(use_translation, redux_preferences, "Reads", "language preference")
 
-Rel(stock_detail_drawer, use_draggable_drawer, "Uses", "")
-Rel(stock_detail_drawer, period_data_processor, "Uses", "Period filtering")
-Rel(stock_list_item, native_sparkline, "Uses", "")
+' Native charts
+Rel(native_line_chart, base_chart_view, "Inherits from", "")
+Rel(native_line_chart, base_chart_renderer, "Uses", "")
+Rel(base_chart_view_manager, base_chart_view, "Creates", "")
+Rel(stock_detail_drawer, period_data_processor, "Uses", "")
 
-Rel(api_client, api_config, "Uses", "Base URL")
-Rel(api_client, portfolio_api, "HTTP", "GET /api/v1/portfolio")
-Rel(rest_apis, api_config, "Uses", "")
-Rel(rest_apis, portfolio_api, "HTTP", "REST")
-Rel(quotes_rest, api_config, "Uses", "")
-Rel(quotes_rest, portfolio_api, "HTTP", "GET /api/v1/quotes")
-Rel(api_client, types_layer, "Uses", "")
-Rel(quote_socket, types_layer, "Uses", "")
+' Domain entities
+Rel(portfolio_repo_interface, domain_entities, "Returns", "")
+Rel(quote_repo_interface, domain_entities, "Returns", "")
+Rel(customer_repo_interface, domain_entities, "Returns", "")
+
+LAYOUT_TOP_DOWN()
 
 @enduml

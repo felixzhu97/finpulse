@@ -40,12 +40,27 @@ package "Presentation Layer" <<Presentation>> {
 
     component "apps/mobile-portfolio" as MobilePortfolio {
         component "Expo + React Native" as ExpoRN
-        component "api (thin client)" as MobileApi {
-            component "portfolioApi" as PortfolioApi
-            component "getQuotes" as GetQuotes
-            component "createQuoteSocket" as CreateQuoteSocket
+        component "Clean Architecture" as CleanArch {
+            component "Presentation Layer" as PresentationLayer {
+                component "Components" as MobileComponents
+                component "Hooks" as MobileHooks
+                component "Redux Store" as MobileRedux
+                component "Theme & i18n" as MobileThemeI18n
+            }
+            component "Application Layer" as ApplicationLayer {
+                component "Use Cases" as MobileUseCases
+                component "DependencyContainer" as DependencyContainer
+            }
+            component "Domain Layer" as DomainLayer {
+                component "Entities" as MobileEntities
+                component "Repository Interfaces" as MobileRepoInterfaces
+            }
+            component "Infrastructure Layer" as InfrastructureLayer {
+                component "Repositories" as MobileRepositories
+                component "API Clients" as MobileApiClients
+                component "Services & Utils" as MobileServicesUtils
+            }
         }
-        component "usePortfolio" as UsePortfolio
         component "Stocks screen" as StocksScreen {
             component "StockListItem" as StockListItem
             component "NativeSparkline" as NativeSparkline
@@ -99,7 +114,7 @@ package "Presentation Layer" <<Presentation>> {
         }
         component "react-native-wagmi-charts" as RNCharts
     }
-    note right of MobilePortfolio: Thin client: types, api (portfolioApi,\ngetQuotes, createQuoteSocket), hooks.\nDefault dark theme, black (#000000) background
+    note right of MobilePortfolio: Clean Architecture: Presentation → Application → Domain.\nInfrastructure implements Domain interfaces.\nDependency injection via DependencyContainer.\nThin client: business logic on server.
 }
 
 package "Business Layer" <<Business>> {
@@ -188,6 +203,33 @@ interface "Portfolio API" as PortfolioAPI
 interface "Market Data API" as MarketDataAPI
 interface "Transaction API" as TransactionAPI
 interface "Risk API" as RiskAPI
+
+' Mobile portfolio Clean Architecture
+ExpoRN --> CleanArch
+CleanArch --> PresentationLayer
+CleanArch --> ApplicationLayer
+CleanArch --> DomainLayer
+CleanArch --> InfrastructureLayer
+PresentationLayer --> ApplicationLayer
+ApplicationLayer --> DomainLayer
+InfrastructureLayer --> DomainLayer
+ApplicationLayer --> InfrastructureLayer
+PresentationLayer --> MobileComponents
+PresentationLayer --> MobileHooks
+PresentationLayer --> MobileRedux
+PresentationLayer --> MobileThemeI18n
+ApplicationLayer --> MobileUseCases
+ApplicationLayer --> DependencyContainer
+DomainLayer --> MobileEntities
+DomainLayer --> MobileRepoInterfaces
+InfrastructureLayer --> MobileRepositories
+InfrastructureLayer --> MobileApiClients
+InfrastructureLayer --> MobileServicesUtils
+MobileRepositories --> MobileRepoInterfaces
+MobileUseCases --> MobileRepoInterfaces
+DependencyContainer --> MobileRepositories
+DependencyContainer --> MobileUseCases
+MobileHooks --> DependencyContainer
 
 ' Mobile portfolio native views
 ExpoRN --> StocksScreen

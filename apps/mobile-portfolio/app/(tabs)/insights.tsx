@@ -10,12 +10,13 @@ import {
   View,
 } from "react-native";
 import { BarChart } from "react-native-chart-kit";
-import { MetricCard } from "@/src/components/ui/MetricCard";
-import { RiskMetricDetailDrawer } from "@/src/components/insights";
-import { useComputedVar, useRiskMetrics } from "@/src/hooks";
-import { portfolioApi } from "@/src/api";
-import { useTheme } from "@/src/theme";
-import { useTranslation } from "@/src/i18n";
+import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
+import { RiskMetricDetailDrawer } from "@/src/presentation/components/insights";
+import { useComputedVar } from "@/src/presentation/hooks/useComputedVar";
+import { useRiskMetrics } from "@/src/presentation/hooks/useRiskMetrics";
+import { container } from "@/src/application";
+import { useTheme } from "@/src/presentation/theme";
+import { useTranslation } from "@/src/presentation/i18n";
 
 export default function InsightsScreen() {
   const { colors } = useTheme();
@@ -32,8 +33,9 @@ export default function InsightsScreen() {
   useEffect(() => {
     let active = true;
     const load = async () => {
+      const portfolioRepository = container.getPortfolioRepository();
       const [risk] = await Promise.all([
-        portfolioApi.getRiskSummary(),
+        portfolioRepository.getRiskSummary(),
         computeVar(),
       ]);
       if (!active) return;
@@ -49,8 +51,9 @@ export default function InsightsScreen() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    const portfolioRepository = container.getPortfolioRepository();
     await Promise.all([refresh(), computeVar()]);
-    const risk = await portfolioApi.getRiskSummary();
+    const risk = await portfolioRepository.getRiskSummary();
     setHighRatio(risk.highRatio);
     setTopConcentration(risk.topHoldingsConcentration);
     setRefreshing(false);

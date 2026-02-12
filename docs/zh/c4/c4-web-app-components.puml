@@ -5,16 +5,23 @@
 title Web 应用 - 组件图
 
 Container_Boundary(web_app, "Web 应用 (Angular 21)") {
-    Component(app_router, "应用路由", "Angular Router", "仪表盘、投资组合、交易、报表、客户")
-    Component(dashboard, "仪表盘", "Angular", "投资组合概览、快捷操作、最近交易")
-    Component(portfolio_module, "投资组合模块", "Angular", "投资组合页、资产配置")
-    Component(market_module, "市场模块", "Angular", "市场趋势、自选股、股票图表")
-    Component(risk_module, "风险模块", "Angular", "风险分析组件")
-    Component(transaction_module, "交易模块", "Angular", "交易记录与历史")
-
-    Component(ui_lib, "@fintech/ui", "TypeScript", "Avatar、Badge、Button、Card、Input、Progress")
-    Component(utils_lib, "@fintech/utils", "TypeScript", "共享工具")
-    Component(charts, "图表库", "Chart.js / ng2-charts", "收益图表、金融图表、ag-grid")
+    Boundary(routing_boundary, "路由层") {
+        Component(app_router, "应用路由", "Angular Router", "仪表盘、投资组合、交易、报表、客户")
+    }
+    
+    Boundary(feature_boundary, "功能模块") {
+        Component(dashboard, "仪表盘", "Angular", "投资组合概览、快捷操作、最近交易")
+        Component(portfolio_module, "投资组合模块", "Angular", "投资组合页、资产配置")
+        Component(market_module, "市场模块", "Angular", "市场趋势、自选股、股票图表")
+        Component(risk_module, "风险模块", "Angular", "风险分析组件")
+        Component(transaction_module, "交易模块", "Angular", "交易记录与历史")
+    }
+    
+    Boundary(shared_boundary, "共享库") {
+        Component(ui_lib, "@fintech/ui", "TypeScript", "Avatar、Badge、Button、Card、Input、Progress")
+        Component(utils_lib, "@fintech/utils", "TypeScript", "共享工具")
+        Component(charts, "图表库", "Chart.js / ng2-charts", "收益图表、金融图表、ag-grid")
+    }
 }
 
 Container_Ext(portfolio_api, "投资组合分析 API", "REST", "后端服务")
@@ -37,5 +44,7 @@ Rel(risk_module, charts, "使用", "")
 Rel(portfolio_module, portfolio_api, "HTTP", "REST")
 Rel(market_module, portfolio_api, "HTTP", "REST")
 Rel(market_module, market_api, "HTTP", "REST")
+
+LAYOUT_TOP_DOWN()
 
 @enduml

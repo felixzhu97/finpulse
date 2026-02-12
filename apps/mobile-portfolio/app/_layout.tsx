@@ -18,12 +18,12 @@ import {
   View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { QuoteSocketSubscriber } from "@/src/store/QuoteSocketSubscriber";
-import { store, type RootState } from "@/src/store";
-import { usePreferences } from "@/src/hooks/usePreferences";
-import { DarkColors, LightColors } from "@/src/theme/colors";
-import "@/src/i18n/config";
-import { i18n } from "@/src/i18n";
+import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubscriber";
+import { store, type RootState } from "@/src/presentation/store";
+import { usePreferences } from "@/src/presentation/hooks/usePreferences";
+import { DarkColors, LightColors } from "@/src/presentation/theme/colors";
+import "@/src/presentation/i18n/config";
+import { i18n } from "@/src/presentation/i18n";
 import "react-native-get-random-values";
 
 SplashScreen.preventAutoHideAsync();

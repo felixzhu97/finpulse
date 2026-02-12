@@ -8,14 +8,14 @@ import {
 } from "react-native";
 import { useTheme as useNavTheme } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
-import { NativeLineChart } from "@/src/components/native";
-import { PortfolioSummary } from "@/src/components/portfolio/PortfolioSummary";
-import { MetricCard } from "@/src/components/ui/MetricCard";
-import { AssetAllocationChart } from "@/src/components/portfolio/AssetAllocationChart";
-import { NetWorthLineChart } from "@/src/components/portfolio/NetWorthLineChart";
-import { usePortfolio } from "@/src/hooks/usePortfolio";
-import { useTheme } from "@/src/theme";
-import { useTranslation } from "@/src/i18n";
+import { NativeLineChart } from "@/src/presentation/components/native";
+import { PortfolioSummary } from "@/src/presentation/components/portfolio/PortfolioSummary";
+import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
+import { AssetAllocationChart } from "@/src/presentation/components/portfolio/AssetAllocationChart";
+import { NetWorthLineChart } from "@/src/presentation/components/portfolio/NetWorthLineChart";
+import { usePortfolio } from "@/src/presentation/hooks/usePortfolio";
+import { useTheme } from "@/src/presentation/theme";
+import { useTranslation } from "@/src/presentation/i18n";
 
 export default function DashboardScreen() {
   const { isDark, colors } = useTheme();

@@ -17,4 +17,6 @@ Rel(admin, finpulse, "Administers", "Browser")
 Rel(finpulse, market_api, "Fetches market data", "REST / WebSocket")
 Rel(finpulse, vercel, "Deploys web app", "Vercel platform")
 
+LAYOUT_TOP_DOWN()
+
 @enduml

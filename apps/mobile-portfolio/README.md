@@ -26,27 +26,47 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 | Insights | `/(tabs)/insights` | Risk metrics from API (volatility, Sharpe ratio, VaR, beta) via `GET /api/v1/risk-metrics`; computed VaR via `POST /api/v1/risk-metrics/compute` (useComputedVar hook) |
 | Account | `/(tabs)/account` | Profile (customer from `/api/v1/customers`), account list (from `/api/v1/portfolio`), Actions (Register Customer, New Payment, New Trade, Settings), drawers: RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, SettingsDrawer (theme, language, notifications via `/api/v1/user-preferences`). Uses **useFocusEffect** to load data when tab gains focus. |
 
-## Project Structure (Thin Client)
+## Project Structure (Clean Architecture)
 
-The app is a **thin client**: business logic lives on the server; the mobile app fetches data and renders UI.
+The app follows **Clean Architecture** principles with clear separation of concerns across four layers:
 
-Account and Insights also use `usePreferences` (Redux-backed theme/language/notifications), `useRiskMetrics` and `customersApi`, `userPreferencesApi`, `riskMetricsApi` (REST: customers, user-preferences, risk-metrics). Theme changes apply immediately via Redux state management. **Preferences loading** is component-level: `AppContent` in the root layout uses `usePreferences().loading` and shows a loading spinner until preferences are fetched; no Redux `isLoading`.
+### Architecture Layers
 
-- `app/`: expo-router routes and screens.
-- `src/api/`: data layer—implements backend contracts (single-layer; no subfolders).
-  - `config.ts`: base URL (`EXPO_PUBLIC_PORTFOLIO_API_URL`).
-  - `portfolioApi.ts`: GET portfolio (cached), getAccounts, getAccountById, getHoldingsByAccount, getAssetAllocationByAccountType, getPortfolioHistory, getRiskSummary, invalidateCache, seedPortfolio(POST /api/v1/seed).
-  - `quotes.ts`: `getQuotes(symbols)` (GET /api/v1/quotes).
-  - `quoteSocket.ts`: `createQuoteSocket()` for WebSocket `/ws/quotes`.
-  - `customersApi.ts`, `userPreferencesApi.ts`, `riskMetricsApi.ts`: Profile, Insights, VaR compute.
-  - `accountsApi.ts`, `paymentsApi.ts`, `tradesApi.ts`, `ordersApi.ts`: Account actions (register, payment, trade flows).
-  - `watchlistsApi.ts`, `instrumentsApi.ts`: available for future use.
-- `src/types/`: shared interfaces—`portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`; `index.ts` re-exports all.
-- `src/theme/`: theme system—`colors.ts` (light/dark color schemes), `index.ts` (`useTheme` hook for dynamic theming).
-- `src/i18n/`: internationalization—`config.ts` (i18next setup), `locales/en.json` and `locales/zh.json` (translation resources), `index.ts` (exports `i18n` and `useTranslation` hook).
-- `src/hooks/`: `usePortfolio`, `useSymbolDisplayData` (Redux-backed quotes + history for list/drawer), `useRealtimeQuotes`, `usePerSymbolHistory`, `usePreferences` (Redux-backed user preferences), `useWatchlists`, `useRiskMetrics`, `useComputedVar` (VaR from portfolio history), `useDraggableDrawer`; all consume `api` and `types`.
-- `src/store/`: Redux (quotes slice, preferences slice for theme/language/notifications; loading state is component-level via `usePreferences().loading`, not Redux), selectors, `QuoteSocketSubscriber`), custom portfolio UI store (`usePortfolioStore`).
-- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Account screen: `RegisterCustomerDrawer`, `NewPaymentDrawer`, `NewTradeDrawer`, `SettingsDrawer` (all use `useDraggableDrawer`, background `colors.card`). Watchlist: `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch). All components support light/dark theme via `useTheme` and i18n via `useTranslation`. Code follows clean code principles with simplified logic and optimized performance.
+- **Domain Layer** (`src/domain/`): Core business entities and repository interfaces
+  - `entities/`: Domain models (`portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`, `payment.ts`, `trade.ts`, `order.ts`, `blockchain.ts`, `accountResource.ts`, `varCompute.ts`)
+  - `repositories/`: Abstract repository interfaces (`IPortfolioRepository`, `IQuoteRepository`, `ICustomerRepository`, `IUserPreferenceRepository`, `IWatchlistRepository`, `IInstrumentRepository`, `IRiskMetricsRepository`, `IPaymentRepository`, `ITradeRepository`, `IOrderRepository`, `IBlockchainRepository`)
+
+- **Application Layer** (`src/application/`): Use cases and application services
+  - `usecases/`: Business use cases (`GetPortfolioUseCase`, `GetCustomerUseCase`, `GetQuotesUseCase`)
+  - `services/`: Dependency injection container (`DependencyContainer`) that provides repository instances and use cases
+
+- **Infrastructure Layer** (`src/infrastructure/`): External concerns and implementations
+  - `api/`: HTTP client, WebSocket client, API configuration (`httpClient.ts`, `quoteSocket.ts`, `config.ts`, `accountsApi.ts`)
+  - `repositories/`: Concrete repository implementations that implement domain interfaces (`PortfolioRepository`, `QuoteRepository`, `CustomerRepository`, etc.)
+  - `services/`: External service integrations (`web3Service.ts`)
+  - `utils/`: Utility functions (`formatters.ts`, `stockUtils.ts`, `PeriodDataProcessor.ts`)
+
+- **Presentation Layer** (`src/presentation/`): UI components, hooks, and state management
+  - `components/`: React Native components organized by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
+  - `hooks/`: React hooks for UI logic (`usePortfolio`, `useSymbolDisplayData`, `useRealtimeQuotes`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useDraggableDrawer`, etc.)
+  - `store/`: Redux state management (quotes slice, preferences slice, selectors, `QuoteSocketSubscriber`, custom portfolio store)
+  - `theme/`: Theme system (`colors.ts`, `useTheme` hook)
+  - `i18n/`: Internationalization (`config.ts`, translation resources, `useTranslation` hook)
+
+- `app/`: Expo Router file-based routing and screens
+
+### Dependency Flow
+
+```
+Presentation → Application → Domain
+     ↓              ↑
+Infrastructure ────┘
+```
+
+- Presentation layer depends on Application and Domain layers
+- Application layer depends only on Domain layer
+- Infrastructure layer implements Domain interfaces and is used by Application layer
+- No circular dependencies; clear separation of concerns
 - `ios/mobileportfolio/`: Native iOS code with OOP structure. Chart components inherit from base classes: `BaseChartViewManager` (abstract RCTViewManager), `BaseChartView` (abstract UIView with Metal setup), `BaseChartRenderer` (abstract Metal renderer). Chart components use helper classes: `ChartLayoutCalculator` (layout calculations), `ValueFormatter` (value formatting), `AxisLabelManager` (axis label management), `ChartDataCalculator` (data calculations). ChartSupport provides shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
 - `android/app/src/main/java/com/anonymous/mobileportfolio/view/`: Native Android code with OOP structure. Chart components use helper classes: `ChartLayoutCalculator`, `ValueFormatter`, `AxisLabelManager`, `HistogramRenderer`. Chart package (`view/chart/`) provides ChartGl, ChartCurve, and per-chart themes. Sparkline and democard packages provide specialized components.
 

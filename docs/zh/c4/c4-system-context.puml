@@ -17,4 +17,6 @@ Rel(admin, finpulse, "管理", "浏览器")
 Rel(finpulse, market_api, "获取市场数据", "REST / WebSocket")
 Rel(finpulse, vercel, "部署 Web 应用", "Vercel 平台")
 
+LAYOUT_TOP_DOWN()
+
 @enduml
