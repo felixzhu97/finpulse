@@ -123,9 +123,19 @@ public class NativeBaselineChartView: UIView {
             metalView?.setNeedsDisplay()
             return
         }
-        let base = baselineValue?.doubleValue ?? (arr.map { $0.doubleValue }.reduce(0, +) / Double(arr.count))
+        let values = arr.map { $0.doubleValue }
+        let base: Double
+        if let providedBaseline = baselineValue?.doubleValue {
+            base = providedBaseline
+        } else {
+            let sorted = values.sorted()
+            let mid = sorted.count / 2
+            base = sorted.count % 2 == 0
+                ? (sorted[mid - 1] + sorted[mid]) / 2.0
+                : sorted[mid]
+        }
         let t = BaselineChartTheme.theme(dark: (theme as String?) == "dark")
-        buffers.update(values: arr.map { $0.doubleValue }, baseline: base, device: device, colors: t)
+        buffers.update(values: values, baseline: base, device: device, colors: t)
         metalView?.setNeedsDisplay()
     }
 

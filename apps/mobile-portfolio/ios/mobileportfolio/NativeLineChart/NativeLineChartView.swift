@@ -40,60 +40,6 @@ private final class ValueFormatter {
     }
 }
 
-private final class AxisLabelManager {
-    private let parentView: UIView
-    private var labels: [UILabel] = []
-    private let labelCount: Int
-    private var isDark: Bool
-    
-    init(parentView: UIView, labelCount: Int, isDark: Bool) {
-        self.parentView = parentView
-        self.labelCount = labelCount
-        self.isDark = isDark
-    }
-    
-    func updateTheme(isDark: Bool) {
-        self.isDark = isDark
-        labels.forEach { $0.textColor = labelColor }
-    }
-    
-    func updateLabels(count: Int) {
-        while labels.count < count {
-            let label = createLabel()
-            parentView.addSubview(label)
-            parentView.bringSubviewToFront(label)
-            labels.append(label)
-        }
-        
-        while labels.count > count {
-            let label = labels.removeLast()
-            label.removeFromSuperview()
-        }
-    }
-    
-    func getLabel(at index: Int) -> UILabel? {
-        guard index >= 0 && index < labels.count else { return nil }
-        return labels[index]
-    }
-    
-    func clearLabels() {
-        labels.forEach { $0.removeFromSuperview() }
-        labels.removeAll()
-    }
-    
-    private func createLabel() -> UILabel {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        label.backgroundColor = .clear
-        label.isUserInteractionEnabled = false
-        return label
-    }
-    
-    var labelColor: UIColor {
-        return isDark ? UIColor(white: 1.0, alpha: 0.9) : UIColor(white: 0.0, alpha: 0.7)
-    }
-}
-
 private final class ChartBuffers {
     var line: MTLBuffer?
     var fill: MTLBuffer?
@@ -113,11 +59,15 @@ private final class ChartBuffers {
         let n = values.count
         var raw: [(Float, Float)] = []
         for (i, v) in values.enumerated() {
-            let x = (Float(i) / Float(max(n - 1, 1))) * 2.0 - 1.0
+            let x = Float(i) / Float(max(n - 1, 1))
             let y = Float((v - minVal) * scale) * 2.0 - 1.0
             raw.append((x, y))
         }
-        let pts = ChartCurve.smoothPoints(raw)
+        var pts = ChartCurve.smoothPoints(raw)
+        if !pts.isEmpty {
+            pts[0] = (0.0, pts[0].1)
+            pts[pts.count - 1] = (1.0, pts[pts.count - 1].1)
+        }
         minLineY = pts.map { $0.1 }.min() ?? -1.0
         gradientTopColor = colors.fillTop
         var lineVerts: [Float] = []
@@ -261,8 +211,6 @@ public class NativeLineChartView: UIView {
     private var metalView: MTKView?
     private var device: MTLDevice?
     private var renderer: ChartRenderer?
-    private var yAxisLabelManager: AxisLabelManager?
-    private var xAxisLabelManager: AxisLabelManager?
     private var baselineLayer: CAShapeLayer?
 
     @objc public var data: NSArray? {
@@ -284,7 +232,7 @@ public class NativeLineChartView: UIView {
     }
     
     @objc public var timestamps: NSArray? {
-        didSet { updateXAxisLabels() }
+        didSet { }
     }
     
     @objc public var baselineValue: NSNumber? {
@@ -326,10 +274,6 @@ public class NativeLineChartView: UIView {
         
         renderer = ChartRenderer(device: device, pixelFormat: view.colorPixelFormat)
         
-        let isDark = (theme as String?) == "dark"
-        yAxisLabelManager = AxisLabelManager(parentView: self, labelCount: 6, isDark: isDark)
-        xAxisLabelManager = AxisLabelManager(parentView: self, labelCount: 5, isDark: isDark)
-        
         buildGrid(device: device)
         applyTheme()
     }
@@ -341,23 +285,7 @@ public class NativeLineChartView: UIView {
     }
 
     private func applyTheme() {
-        let trendStr = (trend as String?) ?? "flat"
-        let colors = LineChartTheme.theme(dark: (theme as String?) == "dark", trend: trendStr)
         metalView?.clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
-        
-        let isDark = (theme as String?) == "dark"
-        if yAxisLabelManager == nil {
-            yAxisLabelManager = AxisLabelManager(parentView: self, labelCount: 6, isDark: isDark)
-        } else {
-            yAxisLabelManager?.updateTheme(isDark: isDark)
-        }
-        if xAxisLabelManager == nil {
-            xAxisLabelManager = AxisLabelManager(parentView: self, labelCount: 5, isDark: isDark)
-        } else {
-            xAxisLabelManager?.updateTheme(isDark: isDark)
-        }
-        
-        updateYAxisLabels()
     }
 
     private func buildGrid(device: MTLDevice) {
@@ -370,79 +298,13 @@ public class NativeLineChartView: UIView {
     private func updateBuffers() {
         guard let arr = data as? [NSNumber], !arr.isEmpty,
               let renderer = renderer else {
-            updateYAxisLabels()
             metalView?.setNeedsDisplay()
             return
         }
         let trendStr = (trend as String?) ?? "flat"
         let colors = LineChartTheme.theme(dark: (theme as String?) == "dark", trend: trendStr)
         renderer.updateBuffers(values: arr.map { $0.doubleValue }, colors: colors)
-        updateYAxisLabels()
         metalView?.setNeedsDisplay()
-    }
-    
-    private func updateYAxisLabels() {
-        guard let arr = data as? [NSNumber], !arr.isEmpty,
-              let manager = yAxisLabelManager else {
-            yAxisLabelManager?.clearLabels()
-            return
-        }
-        
-        let values = arr.map { $0.doubleValue }
-        let (minVal, maxVal, range) = ChartDataCalculator.calculateRange(from: values)
-        
-        let labelCount = 6
-        manager.updateLabels(count: labelCount)
-        
-        let chartAreaHeight = ChartLayoutCalculator.calculateChartAreaHeight(totalHeight: bounds.height)
-        
-        for i in 0..<labelCount {
-            guard let label = manager.getLabel(at: i) else { continue }
-            let t = CGFloat(i) / CGFloat(labelCount - 1)
-            let value = maxVal - t * range
-            let yPosition = ChartLayoutCalculator.calculateYPosition(normalizedY: t, chartAreaHeight: chartAreaHeight)
-            
-            label.text = ValueFormatter.format(value)
-            label.textAlignment = .left
-            label.textColor = manager.labelColor
-            label.frame = CGRect(x: bounds.width + 8, y: yPosition - 8, width: 80, height: 16)
-            label.isHidden = false
-            bringSubviewToFront(label)
-        }
-    }
-
-    private func updateXAxisLabels() {
-        guard let arr = data as? [NSNumber], arr.count >= 2,
-              let timestampsArr = timestamps as? [NSNumber], timestampsArr.count == arr.count,
-              let manager = xAxisLabelManager else { return }
-        
-        let labelCount = 5
-        manager.updateLabels(count: labelCount)
-        
-        let chartWidth = bounds.width
-        let startTime = timestampsArr[0].doubleValue
-        let endTime = timestampsArr[timestampsArr.count - 1].doubleValue
-        let duration = endTime - startTime
-        
-        let chartAreaHeight = ChartLayoutCalculator.calculateChartAreaHeight(totalHeight: bounds.height)
-        let bottomSeparatorY = ChartLayoutCalculator.calculateBottomSeparatorY(chartAreaHeight: chartAreaHeight)
-        
-        for i in 0..<labelCount {
-            guard let label = manager.getLabel(at: i) else { continue }
-            let t = CGFloat(i) / CGFloat(labelCount - 1)
-            let timestamp = startTime + t * duration
-            let date = Date(timeIntervalSince1970: timestamp / 1000)
-            let hour = Calendar.current.component(.hour, from: date)
-            
-            let x = t * chartWidth
-            label.text = String(hour)
-            label.textAlignment = .center
-            label.textColor = manager.labelColor
-            let labelWidth: CGFloat = 24
-            label.frame = CGRect(x: x - labelWidth / 2, y: bottomSeparatorY + 4, width: labelWidth, height: 16)
-            label.isHidden = false
-            bringSubviewToFront(label)
-        }
     }
     
     private func updateBaseline() {
@@ -478,9 +340,7 @@ public class NativeLineChartView: UIView {
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        metalView?.frame = bounds
-        updateYAxisLabels()
-        updateXAxisLabels()
+        metalView?.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height)
         updateBaseline()
         metalView?.setNeedsDisplay()
     }

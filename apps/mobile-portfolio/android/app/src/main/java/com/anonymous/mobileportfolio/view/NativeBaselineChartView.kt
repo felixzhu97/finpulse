@@ -86,7 +86,15 @@ class NativeBaselineChartView @JvmOverloads constructor(
             val min = values.minOrNull() ?: 0.0
             val max = values.maxOrNull() ?: 1.0
             val range = (max - min).coerceAtLeast(1e-9)
-            val base = baseline ?: values.average()
+            val base = baseline ?: run {
+                val sorted = values.sorted()
+                val mid = sorted.size / 2
+                if (sorted.size % 2 == 0) {
+                    (sorted[mid - 1] + sorted[mid]) / 2.0
+                } else {
+                    sorted[mid]
+                }
+            }
             val baseNorm = ((base - min) / range).toFloat()
             val n = values.size
             val xIn = FloatArray(n) { it.toFloat() / (n - 1).coerceAtLeast(1) }

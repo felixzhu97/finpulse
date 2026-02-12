@@ -24,7 +24,8 @@ struct Uniforms {
 vertex VertexOut chart_vertex(constant VertexIn* vertices [[buffer(0)]], uint vid [[vertex_id]]) {
     VertexOut out;
     float2 pos = vertices[vid].position;
-    out.position = float4(pos, 0.0, 1.0);
+    float2 clip = float2(pos.x * 2.0 - 1.0, pos.y);
+    out.position = float4(clip, 0.0, 1.0);
     out.color = vertices[vid].color;
     out.yCoord = pos.y;
     return out;

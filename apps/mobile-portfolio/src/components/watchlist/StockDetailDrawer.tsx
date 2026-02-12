@@ -106,10 +106,13 @@ export function StockDetailDrawer({
 
   const baselineValue = useMemo(() => {
     if (!item) return undefined;
-    const open = price - change;
-    if (open > 0) return open;
-    return allChartValues.length > 0 ? allChartValues[0] : price;
-  }, [item, price, change, allChartValues]);
+    if (chartValues.length === 0) return undefined;
+    const sorted = [...chartValues].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0
+      ? (sorted[mid - 1] + sorted[mid]) / 2
+      : sorted[mid];
+  }, [item, chartValues]);
 
   const stats = useMemo(() => {
     if (!item) return null;
@@ -484,13 +487,14 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   chartContainer: {
-    width: CHART_WIDTH,
+    width: CHART_WIDTH + 90,
     height: CHART_HEIGHT,
     alignSelf: "center",
     marginBottom: 8,
     marginTop: 4,
     overflow: "visible",
-    paddingRight: 90,
+    paddingLeft: 0,
+    paddingRight: 0,
     paddingBottom: 30,
   },
   volumeContainer: {

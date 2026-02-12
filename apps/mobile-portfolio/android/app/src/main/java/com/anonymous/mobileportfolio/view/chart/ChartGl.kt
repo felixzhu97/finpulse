@@ -95,15 +95,32 @@ object ChartGl {
         val verticalLines = verticalDivisions - 1
         val verticalDivisionsForLabels = 6
         val extensionLines = verticalDivisionsForLabels
-        val arr = FloatArray((horizontalLines + verticalLines + extensionLines) * 2 * FLOATS_PER_VERTEX)
+        val borderLines = 3
+        val arr = FloatArray((horizontalLines + verticalLines + extensionLines + borderLines) * 2 * FLOATS_PER_VERTEX)
         var idx = 0
         
-        val halfLineLength = 0.5f
+        val halfLineLength = 0.025f
         
         val topY = 1f
         val bottomY = -1f
-        val leftX = -1f
+        val leftX = 0f
         val rightX = 1f
+        val borderOffset = 0.01f
+        
+        val topBorderY = topY - borderOffset
+        val leftBorderX = leftX + borderOffset
+        
+        putVertex(arr, idx * 6, leftBorderX, topBorderY, gridColor)
+        putVertex(arr, idx * 6 + 6, rightX, topBorderY, gridColor)
+        idx += 2
+        
+        putVertex(arr, idx * 6, leftX, bottomY, gridColor)
+        putVertex(arr, idx * 6 + 6, rightX, bottomY, gridColor)
+        idx += 2
+        
+        putVertex(arr, idx * 6, leftBorderX, topBorderY, gridColor)
+        putVertex(arr, idx * 6 + 6, leftBorderX, bottomY, gridColor)
+        idx += 2
         
         for (i in 1 until horizontalDivisions) {
             val y = i / horizontalDivisions.toFloat() * 2f - 1f
@@ -113,13 +130,13 @@ object ChartGl {
         }
         
         for (i in 1 until verticalDivisions) {
-            val x = i / verticalDivisions.toFloat() * 2f - 1f
+            val x = i / verticalDivisions.toFloat()
             putVertex(arr, idx * 6, x, bottomY, gridColor)
             putVertex(arr, idx * 6 + 6, x, topY, gridColor)
             idx += 2
         }
         
-        val extensionLineLength = 0.08f
+        val extensionLineLength = 0.04f
         val verticalDivisionsForLabels = 6
         for (i in 0 until verticalDivisionsForLabels) {
             val y = i / (verticalDivisionsForLabels - 1).toFloat() * 2f - 1f

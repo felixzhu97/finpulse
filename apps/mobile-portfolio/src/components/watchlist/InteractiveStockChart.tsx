@@ -61,9 +61,8 @@ export function InteractiveStockChart({
         trend={trend}
         baselineValue={baselineValue}
         onInteractionEnd={onInteractionEnd}
-        showAxisLabels={true}
         theme={theme}
-        style={StyleSheet.absoluteFill}
+        style={{ width: width + 135, height  }}
       />
     </View>
   );
@@ -73,7 +72,6 @@ const styles = StyleSheet.create({
   container: {
     position: "relative",
     overflow: "visible",
-    paddingRight: 90,
   },
   emptyText: {
     fontSize: 14,

@@ -8,12 +8,25 @@ enum ChartGrid {
         
         let horizontalDivisions = 4
         let verticalDivisions = 6
-        let halfLineLength: Float = 0.5
+        let halfLineLength: Float = 0.025
         
         let topY: Float = 1.0
         let bottomY: Float = -1.0
-        let leftX: Float = -1.0
+        let leftX: Float = 0.0
         let rightX: Float = 1.0
+        let borderOffset: Float = 0.01
+        
+        let topBorderY = topY - borderOffset
+        let leftBorderX = leftX + borderOffset
+        
+        verts.append(contentsOf: ChartVertex.vertex(x: leftBorderX, y: topBorderY, color: gridColor))
+        verts.append(contentsOf: ChartVertex.vertex(x: rightX, y: topBorderY, color: gridColor))
+        
+        verts.append(contentsOf: ChartVertex.vertex(x: leftX, y: bottomY, color: gridColor))
+        verts.append(contentsOf: ChartVertex.vertex(x: rightX, y: bottomY, color: gridColor))
+        
+        verts.append(contentsOf: ChartVertex.vertex(x: leftBorderX, y: topBorderY, color: gridColor))
+        verts.append(contentsOf: ChartVertex.vertex(x: leftBorderX, y: bottomY, color: gridColor))
         
         for i in 1..<horizontalDivisions {
             let y = Float(i) / Float(horizontalDivisions) * 2.0 - 1.0
@@ -21,7 +34,7 @@ enum ChartGrid {
             verts.append(contentsOf: ChartVertex.vertex(x: rightX + halfLineLength, y: y, color: gridColor))
         }
         
-        let extensionLineLength: Float = 0.08
+        let extensionLineLength: Float = 0.04
         let verticalDivisionsForLabels = 6
         for i in 0..<verticalDivisionsForLabels {
             let y = Float(i) / Float(verticalDivisionsForLabels - 1) * 2.0 - 1.0
@@ -30,7 +43,7 @@ enum ChartGrid {
         }
         
         for i in 1..<verticalDivisions {
-            let x = Float(i) / Float(verticalDivisions) * 2.0 - 1.0
+            let x = Float(i) / Float(verticalDivisions)
             verts.append(contentsOf: ChartVertex.vertex(x: x, y: bottomY, color: gridColor))
             verts.append(contentsOf: ChartVertex.vertex(x: x, y: topY, color: gridColor))
         }

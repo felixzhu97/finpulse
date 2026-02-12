@@ -11,8 +11,6 @@ import com.anonymous.mobileportfolio.view.chart.ChartCurve
 import com.anonymous.mobileportfolio.view.chart.ChartGl
 import com.anonymous.mobileportfolio.view.chart.LineChartThemes
 import com.anonymous.mobileportfolio.view.chart.ChartLayoutCalculator
-import com.anonymous.mobileportfolio.view.chart.ValueFormatter
-import com.anonymous.mobileportfolio.view.chart.AxisLabelManager
 import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -25,8 +23,6 @@ class NativeLineChartView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
     
     private val glView: ChartGLSurfaceView
-    private var yAxisLabelManager: AxisLabelManager? = null
-    private var xAxisLabelManager: AxisLabelManager? = null
     private var baselineView: BaselineView? = null
     private var currentData: DoubleArray? = null
     private var currentTimestamps: DoubleArray? = null
@@ -64,8 +60,6 @@ class NativeLineChartView @JvmOverloads constructor(
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         }
         addView(glView)
-        yAxisLabelManager = AxisLabelManager(this, context, isDark)
-        xAxisLabelManager = AxisLabelManager(this, context, isDark)
     }
     
     private inner class ChartGLSurfaceView(context: Context) : GLSurfaceView(context) {
@@ -87,7 +81,7 @@ class NativeLineChartView @JvmOverloads constructor(
             lastData = values
             renderer.setData(values, currentTrend)
             requestRender()
-            updateYAxisLabels()
+            this@NativeLineChartView.currentData = values
         }
 
         fun setTheme(theme: String?) {
@@ -95,7 +89,7 @@ class NativeLineChartView @JvmOverloads constructor(
             renderer.setDark(isDark)
             lastData?.let { renderer.setData(it, currentTrend) }
             requestRender()
-            updateYAxisLabels()
+            this@NativeLineChartView.isDark = isDark
         }
 
         fun setTrend(trend: String?) {
@@ -104,11 +98,6 @@ class NativeLineChartView @JvmOverloads constructor(
             requestRender()
         }
         
-        private fun updateYAxisLabels() {
-            this@NativeLineChartView.currentData = lastData
-            this@NativeLineChartView.isDark = this@ChartGLSurfaceView.isDark
-            this@NativeLineChartView.updateYAxisLabels()
-        }
 
     fun setChartData(values: DoubleArray?) {
         currentData = values
@@ -117,8 +106,6 @@ class NativeLineChartView @JvmOverloads constructor(
 
     fun setTheme(theme: String?) {
         isDark = theme == "dark"
-        yAxisLabelManager?.updateTheme(isDark)
-        xAxisLabelManager?.updateTheme(isDark)
         glView.setTheme(theme)
     }
 
@@ -128,55 +115,11 @@ class NativeLineChartView @JvmOverloads constructor(
     
     fun setTimestamps(timestamps: DoubleArray?) {
         currentTimestamps = timestamps
-        updateXAxisLabels()
     }
     
     fun setBaselineValue(baselineValue: Double?) {
         currentBaselineValue = baselineValue
         updateBaseline()
-    }
-    
-    private fun updateXAxisLabels() {
-        val values = currentData
-        val timestamps = currentTimestamps
-        val manager = xAxisLabelManager
-        if (values == null || timestamps == null || values.size != timestamps.size || values.size < 2 || manager == null) {
-            manager?.clearLabels()
-            return
-        }
-        
-        val labelCount = 5
-        manager.updateLabels(labelCount)
-        
-        val chartWidth = width.toFloat()
-        val startTime = timestamps[0]
-        val endTime = timestamps[timestamps.size - 1]
-        val duration = endTime - startTime
-        
-        val chartAreaHeight = ChartLayoutCalculator.calculateChartAreaHeight(height.toFloat())
-        val bottomSeparatorY = ChartLayoutCalculator.calculateBottomSeparatorY(chartAreaHeight)
-        
-        val calendar = java.util.Calendar.getInstance()
-        for (i in 0 until labelCount) {
-            val label = manager.getLabel(i) ?: continue
-            val t = i / (labelCount - 1).toFloat()
-            val timestamp = startTime + t * duration
-            calendar.timeInMillis = timestamp.toLong()
-            val hour = calendar.get(java.util.Calendar.HOUR_OF_DAY)
-            
-            val x = t * chartWidth
-            label.text = hour.toString()
-            label.gravity = Gravity.CENTER
-            label.setTextColor(manager.labelColor)
-            val labelWidthPx = (24 * resources.displayMetrics.density).toInt()
-            val params = LayoutParams(labelWidthPx, LayoutParams.WRAP_CONTENT).apply {
-                leftMargin = (x - labelWidthPx / 2).toInt()
-                topMargin = (bottomSeparatorY + 4).toInt()
-                gravity = Gravity.LEFT or Gravity.TOP
-            }
-            label.layoutParams = params
-            label.visibility = android.view.View.VISIBLE
-        }
     }
     
     private fun updateBaseline() {
@@ -213,48 +156,9 @@ class NativeLineChartView @JvmOverloads constructor(
         }
     }
     
-    private fun updateYAxisLabels() {
-        val values = currentData
-        val manager = yAxisLabelManager
-        if (values == null || values.isEmpty() || manager == null) {
-            manager?.clearLabels()
-            return
-        }
-        
-        val minVal = values.minOrNull() ?: 0.0
-        val maxVal = values.maxOrNull() ?: 1.0
-        val range = (maxVal - minVal).coerceAtLeast(1e-9)
-        
-        val labelCount = 6
-        manager.updateLabels(labelCount)
-        
-        val chartAreaHeight = ChartLayoutCalculator.calculateChartAreaHeight(height.toFloat())
-        
-        for (i in 0 until labelCount) {
-            val label = manager.getLabel(i) ?: continue
-            val t = i / (labelCount - 1).toFloat()
-            val value = maxVal - t * range
-            val yPosition = ChartLayoutCalculator.calculateYPosition(t, chartAreaHeight)
-            
-            label.text = ValueFormatter.format(value)
-            label.gravity = Gravity.LEFT or Gravity.CENTER_VERTICAL
-            label.setTextColor(manager.labelColor)
-            val labelWidthPx = (80 * resources.displayMetrics.density).toInt()
-            val params = LayoutParams(labelWidthPx, LayoutParams.WRAP_CONTENT).apply {
-                leftMargin = width + 8
-                topMargin = (yPosition - 8).toInt()
-                gravity = Gravity.LEFT or Gravity.TOP
-            }
-            label.layoutParams = params
-            label.visibility = android.view.View.VISIBLE
-        }
-    }
-    
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         if (changed) {
-            updateYAxisLabels()
-            updateXAxisLabels()
             updateBaseline()
         }
     }
@@ -365,8 +269,14 @@ private class LineChartData {
         val n = values.size
         val xIn = FloatArray(n) { it.toFloat() / (n - 1).coerceAtLeast(1) }
         val yIn = FloatArray(n) { ((values[it] - min) / range).toFloat() }
-        val (xOut, yOut) = ChartCurve.smoothPoints(xIn, yIn)
-        val pts = xOut.size
+        val (xOutTemp, yOutTemp) = ChartCurve.smoothPoints(xIn, yIn)
+        val pts = xOutTemp.size
+        val xOut = xOutTemp.copyOf()
+        val yOut = yOutTemp.copyOf()
+        if (pts > 0) {
+            xOut[0] = 0f
+            xOut[pts - 1] = 1f
+        }
         val minY = yOut.minOrNull() ?: 0f
         renderer.setMinLineY((minY * 2.0f - 1.0f))
         

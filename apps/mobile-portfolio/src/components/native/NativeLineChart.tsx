@@ -45,11 +45,16 @@ function formatTimestamp(ts: number): string {
   return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
+function formatHour(ts: number): string {
+  return new Date(ts).getHours().toString();
+}
+
 export function NativeLineChart(props: NativeLineChartProps) {
   const { data = [], onPointSelect, timestamps, theme = "light", trend: trendProp, baselineValue, onInteractionStart, onInteractionEnd, style, ...rest } = props;
   const isDark = theme === "dark";
   const crosshairColor = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)";
   const [layoutWidth, setLayoutWidth] = useState(0);
+  const [layoutHeight, setLayoutHeight] = useState(0);
   const [selected, setSelected] = useState<{ index: number; value: number; x: number; ts?: number } | null>(null);
   
   const trend = useMemo(() => {
@@ -69,11 +74,13 @@ export function NativeLineChart(props: NativeLineChartProps) {
   const updateSelection = useCallback(
     (touchX: number) => {
       if (!data.length || layoutWidth <= 0 || !Number.isFinite(touchX)) return;
-      const t = Math.max(0, Math.min(1, touchX / layoutWidth));
+      const chartWidth = layoutWidth > 90 ? layoutWidth - 90 : layoutWidth;
+      const clampedX = Math.max(0, Math.min(chartWidth, touchX));
+      const t = Math.max(0, Math.min(1, clampedX / chartWidth));
       const index = Math.round(t * (data.length - 1));
       const value = data[index] ?? 0;
       const payload = { index, value, timestamp: timestamps?.[index] };
-      setSelected({ index, value, x: touchX, ts: payload.timestamp });
+      setSelected({ index, value, x: clampedX, ts: payload.timestamp });
       onPointSelect?.(payload);
     },
     [data, layoutWidth, timestamps, onPointSelect]
@@ -107,29 +114,112 @@ export function NativeLineChart(props: NativeLineChartProps) {
 
   const NativeView = NativeLineChartNative as ComponentType<NativeLineChartProps>;
 
-  const onLayout = useCallback((e: { nativeEvent: { layout: { width: number } } }) => {
+  const onLayout = useCallback((e: { nativeEvent: { layout: { width: number; height: number } } }) => {
     setLayoutWidth(e.nativeEvent.layout.width);
+    setLayoutHeight(e.nativeEvent.layout.height);
   }, []);
+
+  const chartWidth = layoutWidth > 90 ? layoutWidth - 90 : layoutWidth;
+  const xAxisLabelHeight = 20;
+  const chartDataHeight = layoutHeight > xAxisLabelHeight ? layoutHeight - xAxisLabelHeight : layoutHeight;
+
+  const yAxisLabels = useMemo(() => {
+    if (data.length === 0 || chartDataHeight === 0) return [];
+    const minVal = Math.min(...data);
+    const maxVal = Math.max(...data);
+    const range = maxVal - minVal || 1;
+    const labelCount = 6;
+    
+    return Array.from({ length: labelCount }, (_, i) => {
+      const t = i / (labelCount - 1);
+      const value = maxVal - t * range;
+      const yPosition = (1.0 - t) * chartDataHeight;
+      return { value, yPosition };
+    });
+  }, [data, chartDataHeight]);
+
+  const xAxisLabels = useMemo(() => {
+    if (!timestamps || timestamps.length === 0 || chartWidth === 0) return [];
+    const labelCount = 5;
+    const startTime = timestamps[0];
+    const endTime = timestamps[timestamps.length - 1];
+    const duration = endTime - startTime;
+    const labelWidth = 24;
+    
+    return Array.from({ length: labelCount }, (_, i) => {
+      const t = i / (labelCount - 1);
+      const timestamp = startTime + t * duration;
+      const hour = formatHour(timestamp);
+      let x: number;
+      let textAlign: "left" | "center" | "right";
+      if (i === 0) {
+        x = 0;
+        textAlign = "left";
+      } else if (i === labelCount - 1) {
+        x = chartWidth - labelWidth;
+        textAlign = "right";
+      } else {
+        x = t * chartWidth - labelWidth / 2;
+        textAlign = "center";
+      }
+      return { hour, x, textAlign, timestamp };
+    });
+  }, [timestamps, chartWidth]);
+
+  const labelColor = isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.7)";
 
   return (
     <View style={[styles.container, style]} onLayout={onLayout}>
-      <NativeView 
-        data={data} 
-        theme={theme} 
-        trend={trend}
-        timestamps={timestamps}
-        baselineValue={baselineValue}
-        style={StyleSheet.absoluteFill} 
-        {...rest} 
-      />
+      <View style={{ width: chartWidth, height: chartDataHeight }}>
+        <NativeView 
+          data={data} 
+          theme={theme} 
+          trend={trend}
+          timestamps={timestamps}
+          baselineValue={baselineValue}
+          style={StyleSheet.absoluteFill} 
+          {...rest} 
+        />
+      </View>
+      {yAxisLabels.map((label, i) => (
+        <Text
+          key={`y-${i}`}
+          style={[
+            styles.yAxisLabel,
+            {
+              color: labelColor,
+              top: label.yPosition - 8,
+              left: chartWidth + 8,
+            },
+          ]}
+        >
+          {formatValue(label.value)}
+        </Text>
+      ))}
+      {xAxisLabels.map((label, i) => (
+        <Text
+          key={`x-${i}`}
+          style={[
+            styles.xAxisLabel,
+            {
+              color: labelColor,
+              left: Math.max(0, label.x),
+              top: chartDataHeight + 4,
+              textAlign: label.textAlign,
+            },
+          ]}
+        >
+          {label.hour}
+        </Text>
+      ))}
       <View
-        style={[StyleSheet.absoluteFill, { pointerEvents: "auto" }]}
+        style={[{ width: chartWidth, height: chartDataHeight, position: "absolute", left: 0, top: 0 }, { pointerEvents: "auto" }]}
         {...pan.panHandlers}
       >
         {selected !== null && (
           <>
             <View style={[styles.crosshair, { left: selected.x, backgroundColor: crosshairColor }]} />
-            <View style={[styles.tooltip, { left: Math.max(8, Math.min(layoutWidth - 8, selected.x - 40)) }]}>
+            <View style={[styles.tooltip, { left: Math.max(8, Math.min(chartWidth - 8, selected.x - 40)) }]}>
               <Text style={styles.tooltipValue}>{formatValue(selected.value)}</Text>
               {selected.ts != null && <Text style={styles.tooltipTime}>{formatTimestamp(selected.ts)}</Text>}
             </View>
@@ -144,12 +234,26 @@ const styles = StyleSheet.create({
   container: {
     overflow: "visible",
     backgroundColor: "transparent",
-    paddingRight: 0,
   },
   webFallback: {
     backgroundColor: "#f7f7fa",
     justifyContent: "center",
     alignItems: "center",
+  },
+  yAxisLabel: {
+    position: "absolute",
+    fontSize: 12,
+    fontWeight: "500",
+    width: 80,
+    pointerEvents: "none",
+  },
+  xAxisLabel: {
+    position: "absolute",
+    fontSize: 12,
+    fontWeight: "500",
+    width: 24,
+    height: 16,
+    pointerEvents: "none",
   },
   crosshair: {
     position: "absolute",
