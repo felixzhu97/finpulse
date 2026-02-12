@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "pnpm --filter finpulse-web dev",
     "dev:mobile-portfolio": "pnpm --filter mobile-portfolio start",
-    "dev:mobile-portfolio:ios": "pnpm --filter mobile-portfolio ios", 
+    "dev:mobile-portfolio:ios": "pnpm --filter mobile-portfolio ios",
     "dev:mobile-portfolio:android": "pnpm --filter mobile-portfolio android",
     "start:backend": "bash scripts/backend/start-backend.sh",
     "start:kafka": "cd services/portfolio-analytics && docker compose up kafka zookeeper -d && sleep 5 && .venv/bin/python scripts/mock_realtime_quotes.py",
@@ -14,6 +14,7 @@
     "start": "pnpm --filter finpulse-web start",
     "test": "pnpm run test:api",
     "test:api": "cd services/portfolio-analytics && .venv/bin/python -m pytest tests -v",
-    "lint": "pnpm --filter finpulse-web lint"
+    "lint": "pnpm --filter finpulse-web lint",
+    "stop:backend": "bash scripts/backend/stop-backend.sh"
   }
 }
