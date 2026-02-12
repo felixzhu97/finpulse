@@ -88,6 +88,12 @@ Technology Architecture
 
 ---
 
-**Version**: 1.2.0  
-**Last updated**: 2025  
+**Version**: 1.3.0  
+**Last updated**: February 2025  
 **Maintained by**: FinPulse team
+
+## Recent Updates
+
+- **OOP Architecture**: Native chart code refactored with OOP helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartRenderer, ChartDataCalculator, HistogramRenderer)
+- **Code Simplification**: Removed unused code, simplified logic, improved maintainability
+- **Chart Layout**: Full-width rendering with optimized layout calculations

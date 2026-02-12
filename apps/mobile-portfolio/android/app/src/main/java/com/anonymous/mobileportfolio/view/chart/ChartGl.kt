@@ -15,11 +15,13 @@ object ChartGl {
         in vec2 a_position;
         in vec4 a_color;
         out vec4 v_color;
+        out float v_yCoord;
         void main() {
             vec2 clip = a_position * 2.0 - 1.0;
             clip.y = -clip.y;
             gl_Position = vec4(clip, 0.0, 1.0);
             v_color = a_color;
+            v_yCoord = clip.y;
         }
     """.trimIndent()
 
@@ -27,8 +29,22 @@ object ChartGl {
         #version 300 es
         precision mediump float;
         in vec4 v_color;
+        in float v_yCoord;
+        uniform float u_minLineY;
+        uniform vec4 u_gradientTopColor;
         out vec4 fragColor;
-        void main() { fragColor = v_color; }
+        void main() {
+            if (v_color.a > 0.5) {
+                fragColor = v_color;
+                return;
+            }
+            float y = v_yCoord;
+            float minY = u_minLineY;
+            float maxY = 1.0;
+            float t = clamp((maxY - y) / (maxY - minY), 0.0, 1.0);
+            float alpha = mix(u_gradientTopColor.a, 0.0, smoothstep(0.0, 1.0, t));
+            fragColor = vec4(u_gradientTopColor.rgb, alpha);
+        }
     """.trimIndent()
 
     fun putVertex(arr: FloatArray, offset: Int, x: Float, y: Float, color: FloatArray) {
@@ -72,13 +88,65 @@ object ChartGl {
         GLES30.glDrawArrays(GLES30.GL_LINES, 0, count)
     }
 
-    fun buildGridBuffer(gridColor: FloatArray): FloatBuffer {
-        val arr = FloatArray(8 * FLOATS_PER_VERTEX)
-        for (i in 1..4) {
-            val y = -i / 5f * 2f + 1f
-            putVertex(arr, (i - 1) * 12, -1f, y, gridColor)
-            putVertex(arr, (i - 1) * 12 + 6, 1f, y, gridColor)
+    fun buildGridBuffer(gridColor: FloatArray, bottomSeparatorColor: FloatArray): Pair<FloatBuffer, FloatBuffer> {
+        val horizontalDivisions = 4
+        val verticalDivisions = 6
+        val horizontalLines = horizontalDivisions - 1
+        val verticalLines = verticalDivisions - 1
+        val verticalDivisionsForLabels = 6
+        val extensionLines = verticalDivisionsForLabels
+        val arr = FloatArray((horizontalLines + verticalLines + extensionLines) * 2 * FLOATS_PER_VERTEX)
+        var idx = 0
+        
+        val halfLineLength = 0.5f
+        
+        val topY = 1f
+        val bottomY = -1f
+        val leftX = -1f
+        val rightX = 1f
+        
+        for (i in 1 until horizontalDivisions) {
+            val y = i / horizontalDivisions.toFloat() * 2f - 1f
+            putVertex(arr, idx * 6, leftX - halfLineLength, y, gridColor)
+            putVertex(arr, idx * 6 + 6, rightX + halfLineLength, y, gridColor)
+            idx += 2
         }
-        return toFloatBuffer(arr)
+        
+        for (i in 1 until verticalDivisions) {
+            val x = i / verticalDivisions.toFloat() * 2f - 1f
+            putVertex(arr, idx * 6, x, bottomY, gridColor)
+            putVertex(arr, idx * 6 + 6, x, topY, gridColor)
+            idx += 2
+        }
+        
+        val extensionLineLength = 0.08f
+        val verticalDivisionsForLabels = 6
+        for (i in 0 until verticalDivisionsForLabels) {
+            val y = i / (verticalDivisionsForLabels - 1).toFloat() * 2f - 1f
+            putVertex(arr, idx * 6, rightX, y, gridColor)
+            putVertex(arr, idx * 6 + 6, rightX + extensionLineLength, y, gridColor)
+            idx += 2
+        }
+        
+        val separatorLineCount = 6
+        val separatorArr = FloatArray(separatorLineCount * FLOATS_PER_VERTEX)
+        var sepIdx = 0
+        
+        putVertex(separatorArr, sepIdx * 6, leftX - halfLineLength, bottomY, bottomSeparatorColor)
+        putVertex(separatorArr, (sepIdx + 1) * 6, rightX + halfLineLength, bottomY, bottomSeparatorColor)
+        sepIdx += 2
+        
+        putVertex(separatorArr, sepIdx * 6, leftX - halfLineLength, topY, bottomSeparatorColor)
+        putVertex(separatorArr, (sepIdx + 1) * 6, rightX + halfLineLength, topY, bottomSeparatorColor)
+        sepIdx += 2
+        
+        putVertex(separatorArr, sepIdx * 6, leftX, bottomY, bottomSeparatorColor)
+        putVertex(separatorArr, (sepIdx + 1) * 6, leftX, topY, bottomSeparatorColor)
+        sepIdx += 2
+        
+        putVertex(separatorArr, sepIdx * 6, rightX, bottomY, bottomSeparatorColor)
+        putVertex(separatorArr, (sepIdx + 1) * 6, rightX, topY, bottomSeparatorColor)
+        
+        return Pair(toFloatBuffer(arr), toFloatBuffer(separatorArr))
     }
 }

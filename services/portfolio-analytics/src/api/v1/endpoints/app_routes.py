@@ -19,12 +19,15 @@ def _quotes_response(svc: MarketDataService, symbols: List[str]) -> Dict[str, Di
         quote = quotes.get(symbol)
         if not quote:
             continue
-        out[symbol] = {
+        quote_dict: Dict[str, float] = {
             "price": quote.price,
             "change": quote.change,
             "changeRate": quote.change_rate,
             "timestamp": quote.timestamp,
         }
+        if quote.volume is not None:
+            quote_dict["volume"] = quote.volume
+        out[symbol] = quote_dict
     return out
 
 

@@ -46,11 +46,14 @@ def main() -> None:
         change_rate = change / last if last else 0.0
         state[symbol] = price
 
+        volume = random.randint(100000, 5000000)
+        
         payload = {
           "symbol": symbol,
           "price": round(price, 2),
           "change": round(change, 2),
           "changeRate": round(change_rate, 4),
+          "volume": volume,
           "ts": now,
         }
         producer.produce(topic, key=symbol.encode("utf-8"), value=json.dumps(payload).encode("utf-8"))

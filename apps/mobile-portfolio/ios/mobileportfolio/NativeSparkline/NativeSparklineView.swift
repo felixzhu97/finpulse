@@ -36,22 +36,6 @@ public class NativeSparklineView: UIView {
         let h = rect.height
         let midY = h / 2
 
-        drawBaseline(context: ctx, width: w, midY: midY)
-        drawLine(context: ctx, width: w, height: h)
-    }
-
-    private func drawBaseline(context: CGContext, width: CGFloat, midY: CGFloat) {
-        context.setStrokeColor(SparklineTheme.baselineColor.cgColor)
-        context.setLineWidth(1)
-        context.setLineDash(phase: 0, lengths: SparklineTheme.baselineDashLengths)
-        context.move(to: CGPoint(x: 0, y: midY))
-        context.addLine(to: CGPoint(x: width, y: midY))
-        context.strokePath()
-    }
-
-    private func drawLine(context: CGContext, width: CGFloat, height: CGFloat) {
-        context.setLineDash(phase: 0, lengths: [])
-
         let doubleData = (data as? [NSNumber])?.map { $0.doubleValue }
         let fallback = (trend as String?) ?? "flat"
         let pts: [CGPoint]
@@ -63,14 +47,68 @@ public class NativeSparklineView: UIView {
         guard pts.count >= 2 else { return }
 
         let resolvedTrend = SparklinePoints.resolvedTrend(data: doubleData, fallback: fallback)
-        context.setStrokeColor(SparklineTheme.lineColor(for: resolvedTrend).cgColor)
-        context.setLineWidth(1.5)
+        let lineColor = SparklineTheme.lineColor(for: resolvedTrend)
+
+        drawGradient(context: ctx, width: w, height: h, points: pts, lineColor: lineColor)
+        drawBaseline(context: ctx, width: w, midY: midY, trend: resolvedTrend)
+        drawLine(context: ctx, width: w, height: h, points: pts, lineColor: lineColor)
+    }
+
+    private func drawGradient(context: CGContext, width: CGFloat, height: CGFloat, points: [CGPoint], lineColor: UIColor) {
+        guard points.count >= 2 else { return }
+        
+        let doubleData = (data as? [NSNumber])?.map { $0.doubleValue }
+        let fallback = (trend as String?) ?? "flat"
+        let resolvedTrend = SparklinePoints.resolvedTrend(data: doubleData, fallback: fallback)
+        let gradientColors = SparklineTheme.gradientColors(for: resolvedTrend)
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let cgColors = gradientColors.map { $0.cgColor }
+        guard let gradient = CGGradient(colorsSpace: colorSpace, colors: cgColors as CFArray, locations: [0.0, 1.0]) else { return }
+        
+        let path = CGMutablePath()
+        let firstPoint = CGPoint(x: points[0].x * width, y: points[0].y * height)
+        path.move(to: CGPoint(x: 0, y: height))
+        path.addLine(to: firstPoint)
+        
+        for i in 1..<points.count {
+            path.addLine(to: CGPoint(x: points[i].x * width, y: points[i].y * height))
+        }
+        
+        let lastPoint = CGPoint(x: points[points.count - 1].x * width, y: points[points.count - 1].y * height)
+        path.addLine(to: CGPoint(x: width, y: height))
+        path.closeSubpath()
+        
+        context.saveGState()
+        context.addPath(path)
+        context.clip()
+        
+        let minY = points.map { $0.y * height }.min() ?? 0
+        let startPoint = CGPoint(x: width / 2, y: minY)
+        let endPoint = CGPoint(x: width / 2, y: height)
+        context.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: [])
+        context.restoreGState()
+    }
+
+    private func drawBaseline(context: CGContext, width: CGFloat, midY: CGFloat, trend: String) {
+        let baselineColor = SparklineTheme.baselineColor(for: trend)
+        context.setStrokeColor(baselineColor.cgColor)
+        context.setLineWidth(1)
+        context.setLineDash(phase: 0, lengths: SparklineTheme.baselineDashLengths)
+        context.move(to: CGPoint(x: 0, y: midY))
+        context.addLine(to: CGPoint(x: width, y: midY))
+        context.strokePath()
+    }
+
+    private func drawLine(context: CGContext, width: CGFloat, height: CGFloat, points: [CGPoint], lineColor: UIColor) {
+        context.setLineDash(phase: 0, lengths: [])
+        context.setStrokeColor(lineColor.cgColor)
+        context.setLineWidth(2.0)
         context.setLineCap(.round)
         context.setLineJoin(.round)
         context.beginPath()
-        context.move(to: CGPoint(x: pts[0].x * width, y: pts[0].y * height))
-        for i in 1..<pts.count {
-            context.addLine(to: CGPoint(x: pts[i].x * width, y: pts[i].y * height))
+        context.move(to: CGPoint(x: points[0].x * width, y: points[0].y * height))
+        for i in 1..<points.count {
+            context.addLine(to: CGPoint(x: points[i].x * width, y: points[i].y * height))
         }
         context.strokePath()
     }

@@ -42,7 +42,7 @@ export function WatchlistItemRow({
         <Text style={styles.price}>{formatPrice(price)}</Text>
         <View style={styles.changeContainer}>
           <Text style={[styles.change, { color: changeColor }]}>
-            {isUp ? "+" : ""}{formatSigned(change)}
+            {formatSigned(change)}
           </Text>
           <Text style={[styles.changePercent, { color: changeColor }]}>
             {isUp ? "+" : ""}{changePercent}%

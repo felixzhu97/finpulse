@@ -9,3 +9,4 @@ export * from "./payment";
 export * from "./trade";
 export * from "./order";
 export * from "./varCompute";
+export * from "./blockchain";

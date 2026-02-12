@@ -13,7 +13,7 @@ data class HistogramChartTheme(
 
 object HistogramChartThemes {
     fun theme(dark: Boolean): HistogramChartTheme = if (dark)
-        HistogramChartTheme(0f, 0f, 0f, floatArrayOf(0.22f, 0.22f, 0.26f, 1f), floatArrayOf(0.25f, 0.41f, 0.88f, 0.9f))
+        HistogramChartTheme(0f, 0f, 0f, floatArrayOf(0.22f, 0.22f, 0.26f, 1f), floatArrayOf(0.5f, 0.5f, 0.55f, 0.6f))
     else
-        HistogramChartTheme(0.97f, 0.97f, 0.98f, floatArrayOf(0.85f, 0.85f, 0.88f, 1f), floatArrayOf(0.2f, 0.4f, 0.85f, 0.9f))
+        HistogramChartTheme(0f, 0f, 0f, floatArrayOf(0.85f, 0.85f, 0.88f, 1f), floatArrayOf(0.5f, 0.5f, 0.55f, 0.5f))
 }

@@ -20,8 +20,9 @@ export type NativeLineChartProps = {
   data?: number[];
   onPointSelect?: (point: PointSelectPayload) => void;
   timestamps?: number[];
-  showAxisLabels?: boolean;
   theme?: "light" | "dark";
+  trend?: "up" | "down" | "flat";
+  baselineValue?: number;
   onInteractionStart?: () => void;
   onInteractionEnd?: () => void;
 } & ViewProps;
@@ -32,57 +33,51 @@ const NativeLineChartNative =
     : null;
 
 function formatValue(value: number): string {
-  if (value >= 1e9) return (value / 1e9).toFixed(2) + "B";
-  if (value >= 1e6) return (value / 1e6).toFixed(2) + "M";
-  if (value >= 1e3) return (value / 1e3).toFixed(2) + "K";
-  return value.toFixed(2);
+  if (value >= 1e9) return `${(value / 1e9).toFixed(2)}B`;
+  if (value >= 1e6) return `${(value / 1e6).toFixed(2)}M`;
+  if (value >= 1e3) return `${(value / 1e3).toFixed(2)}K`;
+  if (value >= 1) return value.toFixed(2);
+  if (value >= 0.01) return value.toFixed(4);
+  return value.toFixed(6);
 }
 
 function formatTimestamp(ts: number): string {
-  const d = new Date(ts);
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
-const Y_LABELS = 4;
-const X_LABELS = 5;
-
 export function NativeLineChart(props: NativeLineChartProps) {
-  const { data = [], onPointSelect, timestamps, showAxisLabels = true, theme = "light", onInteractionStart, onInteractionEnd, style, ...rest } = props;
+  const { data = [], onPointSelect, timestamps, theme = "light", trend: trendProp, baselineValue, onInteractionStart, onInteractionEnd, style, ...rest } = props;
   const isDark = theme === "dark";
-  const axisColor = isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.55)";
   const crosshairColor = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)";
   const [layoutWidth, setLayoutWidth] = useState(0);
-  const [layoutHeight, setLayoutHeight] = useState(0);
   const [selected, setSelected] = useState<{ index: number; value: number; x: number; ts?: number } | null>(null);
-
-  const minVal = data.length ? Math.min(...data) : 0;
-  const maxVal = data.length ? Math.max(...data) : 1;
-  const range = maxVal - minVal || 1;
-  const yTicks = Array.from({ length: Y_LABELS }, (_, i) => {
-    const t = i / (Y_LABELS - 1);
-    return maxVal - t * range;
-  });
-  const xTickIndices = Array.from({ length: X_LABELS }, (_, i) =>
-    data.length > 1 ? Math.round((i / (X_LABELS - 1)) * (data.length - 1)) : 0
-  );
+  
+  const trend = useMemo(() => {
+    if (trendProp !== undefined) return trendProp;
+    if (baselineValue !== undefined && data.length > 0) {
+      const latestValue = data[data.length - 1];
+      const diff = latestValue - baselineValue;
+      const range = Math.max(...data) - Math.min(...data) || 1;
+      const threshold = range * 0.001;
+      if (diff > threshold) return "up";
+      if (diff < -threshold) return "down";
+      return "flat";
+    }
+    return "flat";
+  }, [trendProp, baselineValue, data]);
 
   const updateSelection = useCallback(
     (touchX: number) => {
-      const x = Number(touchX);
-      if (!data.length || layoutWidth <= 0 || !Number.isFinite(x)) return;
-      const t = Math.max(0, Math.min(1, x / layoutWidth));
+      if (!data.length || layoutWidth <= 0 || !Number.isFinite(touchX)) return;
+      const t = Math.max(0, Math.min(1, touchX / layoutWidth));
       const index = Math.round(t * (data.length - 1));
       const value = data[index] ?? 0;
-      setSelected({ index, value, x, ts: timestamps?.[index] });
-      onPointSelect?.({ index, value, timestamp: timestamps?.[index] });
+      const payload = { index, value, timestamp: timestamps?.[index] };
+      setSelected({ index, value, x: touchX, ts: payload.timestamp });
+      onPointSelect?.(payload);
     },
-    [data.length, layoutWidth, timestamps, onPointSelect]
+    [data, layoutWidth, timestamps, onPointSelect]
   );
-
-  const endInteraction = useCallback(() => {
-    setSelected(null);
-    onInteractionEnd?.();
-  }, [onInteractionEnd]);
 
   const pan = useMemo(
     () =>
@@ -94,10 +89,16 @@ export function NativeLineChart(props: NativeLineChartProps) {
           updateSelection(evt.nativeEvent.locationX);
         },
         onPanResponderMove: (evt) => updateSelection(evt.nativeEvent.locationX),
-        onPanResponderRelease: endInteraction,
-        onPanResponderTerminate: endInteraction,
+        onPanResponderRelease: () => {
+          setSelected(null);
+          onInteractionEnd?.();
+        },
+        onPanResponderTerminate: () => {
+          setSelected(null);
+          onInteractionEnd?.();
+        },
       }),
-    [updateSelection, onInteractionStart, endInteraction]
+    [updateSelection, onInteractionStart, onInteractionEnd]
   );
 
   if (Platform.OS === "web") {
@@ -106,46 +107,21 @@ export function NativeLineChart(props: NativeLineChartProps) {
 
   const NativeView = NativeLineChartNative as ComponentType<NativeLineChartProps>;
 
-  const onLayout = useCallback((e: { nativeEvent: { layout: { width: number; height: number } } }) => {
-    const { width, height } = e.nativeEvent.layout;
-    setLayoutWidth(width);
-    setLayoutHeight(height);
+  const onLayout = useCallback((e: { nativeEvent: { layout: { width: number } } }) => {
+    setLayoutWidth(e.nativeEvent.layout.width);
   }, []);
 
   return (
     <View style={[styles.container, style]} onLayout={onLayout}>
-      <NativeView data={data} theme={theme} style={StyleSheet.absoluteFill} {...rest} />
-      {showAxisLabels && data.length >= 2 && layoutHeight > 0 && layoutWidth > 0 && (
-        <>
-          <View style={styles.yAxis} pointerEvents="none">
-            {yTicks.map((val, i) => (
-              <Text
-                key={i}
-                style={[
-                  styles.axisLabel,
-                  styles.yLabel,
-                  { top: 8 + (i / (Y_LABELS - 1)) * (layoutHeight - 24), color: axisColor },
-                ]}
-              >
-                {formatValue(val)}
-              </Text>
-            ))}
-          </View>
-          <View style={[styles.xAxis, { bottom: 4 }]} pointerEvents="none">
-            {xTickIndices.map((idx, i) => {
-              const x = data.length > 1 ? (idx / (data.length - 1)) * layoutWidth : layoutWidth / 2;
-              const left = Math.max(0, Math.min(layoutWidth - 24, x - 12));
-              return (
-                <Text key={i} style={[styles.axisLabel, { left, color: axisColor }]}>
-                  {timestamps != null && timestamps[idx] != null
-                    ? new Date(timestamps[idx]).toLocaleDateString(undefined, { month: "numeric", day: "numeric" })
-                    : String(idx + 1)}
-                </Text>
-              );
-            })}
-          </View>
-        </>
-      )}
+      <NativeView 
+        data={data} 
+        theme={theme} 
+        trend={trend}
+        timestamps={timestamps}
+        baselineValue={baselineValue}
+        style={StyleSheet.absoluteFill} 
+        {...rest} 
+      />
       <View
         style={[StyleSheet.absoluteFill, { pointerEvents: "auto" }]}
         {...pan.panHandlers}
@@ -166,28 +142,9 @@ export function NativeLineChart(props: NativeLineChartProps) {
 
 const styles = StyleSheet.create({
   container: {
-    overflow: "hidden",
-  },
-  axisLabel: {
-    position: "absolute",
-    fontSize: 10,
-    color: "rgba(0,0,0,0.55)",
-  },
-  yAxis: {
-    position: "absolute",
-    top: 0,
-    right: 4,
-    bottom: 20,
-    left: 0,
-  },
-  yLabel: {
-    right: 0,
-  },
-  xAxis: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    height: 16,
+    overflow: "visible",
+    backgroundColor: "transparent",
+    paddingRight: 0,
   },
   webFallback: {
     backgroundColor: "#f7f7fa",

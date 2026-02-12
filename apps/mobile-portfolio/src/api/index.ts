@@ -17,3 +17,4 @@ export { paymentsApi } from "./paymentsApi";
 export { tradesApi } from "./tradesApi";
 export { ordersApi } from "./ordersApi";
 export { accountsApi, type AccountResource } from "./accountsApi";
+export { blockchainApi } from "./blockchainApi";

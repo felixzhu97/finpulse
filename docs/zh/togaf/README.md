@@ -73,6 +73,12 @@ plantuml -tsvg *.puml
 
 ---
 
-**文档版本**：1.2.0  
-**最后更新**：2025  
+**文档版本**：1.3.0  
+**最后更新**：2025年2月  
 **维护**：FinPulse 开发团队
+
+## 最近更新
+
+- **OOP 架构**：原生图表代码重构，使用 OOP 辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartRenderer、ChartDataCalculator、HistogramRenderer）
+- **代码简化**：移除未使用代码，简化逻辑，提升可维护性
+- **图表布局**：全宽渲染，优化布局计算

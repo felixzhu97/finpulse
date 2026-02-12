@@ -71,7 +71,21 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
     }
     component "Native OOP support" as NativeOOPSupport {
         component "iOS ChartSupport" as IOSChartSupportTech
+        component "iOS OOP Helpers" as IOSOOPHelpersTech {
+            component "ChartLayoutCalculator" as IOSLayoutCalcTech
+            component "ValueFormatter" as IOSValueFormatterTech
+            component "AxisLabelManager" as IOSAxisManagerTech
+            component "ChartRenderer" as IOSChartRendererTech
+            component "ChartDataCalculator" as IOSDataCalcTech
+            component "HistogramRenderer" as IOSHistRendererTech
+        }
         component "Android view/chart, sparkline, democard" as AndroidPkgsTech
+        component "Android OOP Helpers" as AndroidOOPHelpersTech {
+            component "ChartLayoutCalculator" as AndroidLayoutCalcTech
+            component "ValueFormatter" as AndroidValueFormatterTech
+            component "AxisLabelManager" as AndroidAxisManagerTech
+            component "HistogramRenderer" as AndroidHistRendererTech
+        }
     }
     component "Shared chart logic" as SharedChartLogicTech {
         component "useScrollableChart" as UseScrollableChartTech
@@ -82,7 +96,7 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
     note right of RN: React Native core\nrequireNativeComponent\nView managers
     note right of NativeDemoCardTech: apps/mobile-portfolio\nDemo native card
     note right of NativeChartsTech: LineChart, CandleChart\nAmericanLineChart, BaselineChart\nHistogramChart, LineOnlyChart\nTheme light/dark, tooltips\nx-axis, drag-to-scroll
-    note right of NativeOOPSupport: iOS: ChartCurve, ChartVertex,\nChartPipeline, ChartGrid, ChartThemes\nAndroid: ChartGl, ChartCurve,\n*ChartTheme; sparkline/; democard/
+    note right of NativeOOPSupport: iOS: ChartCurve, ChartVertex,\nChartPipeline, ChartGrid, ChartThemes\nOOP Helpers: ChartLayoutCalculator,\nValueFormatter, AxisLabelManager,\nChartRenderer, ChartDataCalculator,\nHistogramRenderer\nAndroid: ChartGl, ChartCurve,\n*ChartTheme; OOP Helpers:\nChartLayoutCalculator, ValueFormatter,\nAxisLabelManager, HistogramRenderer\nsparkline/; democard/
     note right of RNWagmi: mobile-portfolio: default dark theme\nblack (#000000) background
 }
 
@@ -198,7 +212,19 @@ NativeChartsTech --> NativeChartsIOSTech
 NativeChartsTech --> NativeChartsAndroidTech
 NativeChartsTech --> NativeOOPSupport
 NativeOOPSupport --> IOSChartSupportTech
+NativeOOPSupport --> IOSOOPHelpersTech
+IOSOOPHelpersTech --> IOSLayoutCalcTech
+IOSOOPHelpersTech --> IOSValueFormatterTech
+IOSOOPHelpersTech --> IOSAxisManagerTech
+IOSOOPHelpersTech --> IOSChartRendererTech
+IOSOOPHelpersTech --> IOSDataCalcTech
+IOSOOPHelpersTech --> IOSHistRendererTech
 NativeOOPSupport --> AndroidPkgsTech
+NativeOOPSupport --> AndroidOOPHelpersTech
+AndroidOOPHelpersTech --> AndroidLayoutCalcTech
+AndroidOOPHelpersTech --> AndroidValueFormatterTech
+AndroidOOPHelpersTech --> AndroidAxisManagerTech
+AndroidOOPHelpersTech --> AndroidHistRendererTech
 RN --> SharedChartLogicTech
 NativeChartsTech --> SharedChartLogicTech
 RN --> RNWagmi

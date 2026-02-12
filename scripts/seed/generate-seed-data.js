@@ -190,16 +190,48 @@ const seedPortfolio = {
     todayChange: 1862,
     weekChange: 4200,
   },
-  history: [
-    { date: "2024-09-01", value: 185000 },
-    { date: "2024-09-02", value: 186200 },
-    { date: "2024-09-03", value: 184800 },
-    { date: "2024-09-04", value: 187500 },
-    { date: "2024-09-05", value: 189200 },
-    { date: "2024-09-06", value: 191000 },
-    { date: "2024-09-07", value: 192500 },
-  ],
+  history: (() => {
+    const history = [];
+    const today = new Date();
+    const endDate = new Date(today);
+    endDate.setDate(endDate.getDate() - 1);
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - 90);
+    
+    const baseValue = 175000;
+    const targetValue = 198950;
+    let currentValue = baseValue;
+    let tradingDays = 0;
+    const totalDays = 90;
+    
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+      if (d.getDay() === 0 || d.getDay() === 6) continue;
+      
+      tradingDays++;
+      const progress = tradingDays / totalDays;
+      const trend = (targetValue - baseValue) * progress;
+      const volatility = Math.sin(tradingDays * 0.1) * 2000 + (Math.random() - 0.5) * 1500;
+      currentValue = baseValue + trend + volatility;
+      
+      const dateStr = d.toISOString().split("T")[0];
+      history.push({ date: dateStr, value: Math.round(currentValue) });
+    }
+    
+    return history;
+  })(),
 };
+
+async function get(path) {
+  const res = await fetch(api(path), {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`GET ${path} failed: ${res.status} ${text.slice(0, 300)}`);
+  }
+  return res.json();
+}
 
 async function post(path, body) {
   const res = await fetch(api(path), {
@@ -414,11 +446,34 @@ async function seedResources() {
   ];
   await postBatch("/api/v1/market-data/batch", marketDataItems);
 
-  await postBatch("/api/v1/risk-metrics/batch", [
-    { portfolio_id: portfolioIds[0], risk_level: "balanced", volatility: 0.18, sharpe_ratio: 1.25, var: 2500, beta: 1.05 },
-    { portfolio_id: portfolioIds[1], risk_level: "moderate", volatility: 0.12, sharpe_ratio: 1.1, var: 1800, beta: 0.95 },
-    { portfolio_id: portfolioIds[3], risk_level: "conservative", volatility: 0.08, sharpe_ratio: 0.95, var: 1200, beta: 0.88 },
-  ]);
+  const riskMetricsData = [
+    { portfolio_id: portfolioIds[0], risk_level: "balanced", volatility: 0.18, sharpe_ratio: 1.25, var: -0.0039, beta: 1.05 },
+    { portfolio_id: portfolioIds[1], risk_level: "moderate", volatility: 0.12, sharpe_ratio: 1.1, var: -0.0025, beta: 0.95 },
+    { portfolio_id: portfolioIds[3], risk_level: "conservative", volatility: 0.08, sharpe_ratio: 0.95, var: -0.0018, beta: 0.88 },
+  ];
+  
+  try {
+    const demoPortfolioRecord = await post("/api/v1/portfolios", {
+      account_id: accountIds[0],
+      name: "BlackRock Model Portfolio",
+      base_currency: "USD",
+    });
+    if (demoPortfolioRecord && demoPortfolioRecord.portfolio_id) {
+      riskMetricsData.push({
+        portfolio_id: demoPortfolioRecord.portfolio_id,
+        risk_level: "balanced",
+        volatility: 0.18,
+        sharpe_ratio: 1.25,
+        var: -0.0039,
+        beta: 1.05,
+      });
+    }
+  } catch (err) {
+  }
+  
+  if (riskMetricsData.length > 0) {
+    await postBatch("/api/v1/risk-metrics/batch", riskMetricsData);
+  }
 
   const valuationItems = [
     { instrument_id: inst1.instrument_id, method: "DCF", ev: 2.8e11, equity_value: 2.75e11, target_price: 230, discount_rate: 0.08, growth_rate: 0.05 },
@@ -429,21 +484,23 @@ async function seedResources() {
   ];
   await postBatch("/api/v1/valuations/batch", valuationItems);
 
-  console.log("[seed] Domain resources seeded via batch APIs: customers(3), user-preferences(3), accounts(5), instruments(10), portfolios(4), watchlists(3), watchlist-items(9), positions(10), bonds(2), options(1), orders(4), trades(4), cash-transactions(4), payments(4), settlements(4), blockchain(seed-balance + transfers), market-data(7), risk-metrics(3), valuations(5).");
+  const riskMetricsCount = riskMetricsData.length;
+  console.log("[seed] Domain resources seeded via batch APIs: customers(3), user-preferences(3), accounts(5), instruments(10), portfolios(4), watchlists(3), watchlist-items(9), positions(10), bonds(2), options(1), orders(4), trades(4), cash-transactions(4), payments(4), settlements(4), blockchain(all accounts seeded with SIM_COIN balance + transfers), market-data(7), risk-metrics(" + riskMetricsCount + "), valuations(5).");
 }
 
 async function seedBlockchain(accountIds) {
   const currency = "SIM_COIN";
-  const initialBalance = 10000;
+  const amounts = [10000, 15000, 12000, 8000, 20000];
 
-  for (let i = 0; i < Math.min(3, accountIds.length); i++) {
+  for (let i = 0; i < accountIds.length; i++) {
+    const amount = amounts[i % amounts.length] || 10000;
     await post("/api/v1/blockchain/seed-balance", {
       account_id: accountIds[i],
       currency,
-      amount: initialBalance,
+      amount,
     });
   }
-  console.log("[seed] Blockchain: seeded SIM_COIN balance for 3 accounts");
+  console.log(`[seed] Blockchain: seeded SIM_COIN balance for ${accountIds.length} accounts`);
 
   await post("/api/v1/blockchain/transfers", {
     sender_account_id: accountIds[0],
@@ -467,7 +524,6 @@ async function seedBlockchain(accountIds) {
 }
 
 async function main() {
-  console.error("[seed] baseUrl:", baseUrl);
   try {
     await seedLegacyPortfolio();
     await seedResources();

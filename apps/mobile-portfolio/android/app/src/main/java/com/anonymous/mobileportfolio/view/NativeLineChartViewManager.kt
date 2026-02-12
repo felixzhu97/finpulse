@@ -32,4 +32,27 @@ class NativeLineChartViewManager(reactContext: ReactApplicationContext) :
     fun setTheme(view: NativeLineChartView, theme: String?) {
         view.setTheme(theme)
     }
+
+    @ReactProp(name = "trend")
+    fun setTrend(view: NativeLineChartView, trend: String?) {
+        view.setTrend(trend)
+    }
+
+    @ReactProp(name = "timestamps")
+    fun setTimestamps(view: NativeLineChartView, timestamps: ReadableArray?) {
+        if (timestamps == null) {
+            view.setTimestamps(null)
+            return
+        }
+        val arr = DoubleArray(timestamps.size())
+        for (i in 0 until timestamps.size()) {
+            arr[i] = timestamps.getDouble(i)
+        }
+        view.setTimestamps(arr)
+    }
+
+    @ReactProp(name = "baselineValue")
+    fun setBaselineValue(view: NativeLineChartView, baselineValue: Double?) {
+        view.setBaselineValue(baselineValue)
+    }
 }

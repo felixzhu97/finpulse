@@ -80,11 +80,15 @@ public class NativeCandleChartView: UIView {
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = .clear
+        isOpaque = false
         setupMetal()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        backgroundColor = .clear
+        isOpaque = false
         setupMetal()
     }
 
@@ -95,6 +99,9 @@ public class NativeCandleChartView: UIView {
         let view = MTKView(frame: bounds, device: device)
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.delegate = self
+        view.isOpaque = false
+        view.backgroundColor = .clear
+        view.colorPixelFormat = .bgra8Unorm
         applyTheme()
         view.isPaused = true
         view.enableSetNeedsDisplay = true
@@ -109,8 +116,9 @@ public class NativeCandleChartView: UIView {
     }
 
     private func buildGrid(device: MTLDevice) {
-        let grid = CandleChartTheme.theme(dark: (theme as String?) == "dark").grid
-        let result = ChartGrid.build(device: device, gridColor: grid)
+        let colors = CandleChartTheme.theme(dark: (theme as String?) == "dark")
+        let bottomSeparatorColor: (Float, Float, Float, Float) = colors.grid
+        let result = ChartGrid.build(device: device, gridColor: colors.grid, bottomSeparatorColor: bottomSeparatorColor)
         gridBuffer = result.buffer
         gridCount = result.count
     }

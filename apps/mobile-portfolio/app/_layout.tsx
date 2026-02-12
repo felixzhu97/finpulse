@@ -24,6 +24,7 @@ import { usePreferences } from "@/src/hooks/usePreferences";
 import { DarkColors, LightColors } from "@/src/theme/colors";
 import "@/src/i18n/config";
 import { i18n } from "@/src/i18n";
+import "react-native-get-random-values";
 
 SplashScreen.preventAutoHideAsync();
 

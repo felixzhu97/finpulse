@@ -2,6 +2,7 @@ export interface QuoteData {
   price: number;
   change: number;
   changeRate: number;
+  volume?: number;
   timestamp: number;
 }
 

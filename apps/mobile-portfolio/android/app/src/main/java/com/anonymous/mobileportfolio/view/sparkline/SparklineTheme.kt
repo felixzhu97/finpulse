@@ -4,13 +4,9 @@ import android.graphics.Color
 
 object SparklineTheme {
 
-    private const val UP_COLOR = "#ef4444"
-    private const val DOWN_COLOR = "#22c55e"
-    private const val FLAT_COLOR = "#6b7280"
-    private const val BASELINE_ALPHA = 102
-    private const val BASELINE_RED = 156
-    private const val BASELINE_GREEN = 163
-    private const val BASELINE_BLUE = 175
+    private const val UP_COLOR = "#ff3b30"
+    private const val DOWN_COLOR = "#34c759"
+    private const val FLAT_COLOR = "#8e8e93"
 
     fun lineColorForTrend(trend: String): Int = when (trend) {
         "up" -> Color.parseColor(UP_COLOR)
@@ -18,10 +14,33 @@ object SparklineTheme {
         else -> Color.parseColor(FLAT_COLOR)
     }
 
-    fun baselineColor(): Int = Color.argb(
-        BASELINE_ALPHA,
-        BASELINE_RED,
-        BASELINE_GREEN,
-        BASELINE_BLUE
-    )
+    fun baselineColor(trend: String): Int {
+        val baseColor = lineColorForTrend(trend)
+        return Color.argb(
+            (Color.alpha(baseColor) * 0.3).toInt(),
+            Color.red(baseColor),
+            Color.green(baseColor),
+            Color.blue(baseColor)
+        )
+    }
+
+    fun gradientStartColor(trend: String): Int {
+        val baseColor = lineColorForTrend(trend)
+        return Color.argb(
+            (Color.alpha(baseColor) * 0.15).toInt(),
+            Color.red(baseColor),
+            Color.green(baseColor),
+            Color.blue(baseColor)
+        )
+    }
+
+    fun gradientEndColor(trend: String): Int {
+        val baseColor = lineColorForTrend(trend)
+        return Color.argb(
+            0,
+            Color.red(baseColor),
+            Color.green(baseColor),
+            Color.blue(baseColor)
+        )
+    }
 }

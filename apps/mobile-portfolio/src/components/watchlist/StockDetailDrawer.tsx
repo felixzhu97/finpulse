@@ -1,5 +1,5 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -17,8 +17,10 @@ import { useRealtimeQuotes } from "@/src/hooks/useRealtimeQuotes";
 import type { SymbolDisplayData } from "@/src/hooks/useSymbolDisplayData";
 import { formatPrice, formatSigned } from "@/src/utils";
 import { getStockChangeInfo } from "@/src/utils/stockUtils";
-import { Sparkline } from "../ui/Sparkline";
+import { PeriodDataProcessor } from "@/src/utils/PeriodDataProcessor";
+import { InteractiveStockChart } from "./InteractiveStockChart";
 import { useTheme } from "@/src/theme";
+import { NativeHistogramChart } from "@/src/components/native/NativeHistogramChart";
 
 export interface StockDetailItem {
   symbol: string;
@@ -50,8 +52,9 @@ interface StockDetailDrawerProps {
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const DRAWER_HEIGHT = Math.min(Dimensions.get("window").height * 0.88, 680);
-const CHART_WIDTH = SCREEN_WIDTH - 32;
-const CHART_HEIGHT = 200;
+const CHART_WIDTH = SCREEN_WIDTH - 32 - 90;
+const CHART_HEIGHT = 280;
+const VOLUME_HEIGHT = 60;
 
 const PERIODS = ["1D", "1W", "1M", "3M", "1Y"] as const;
 
@@ -62,35 +65,66 @@ export function StockDetailDrawer({
   displayData,
   watchlistContext,
 }: StockDetailDrawerProps) {
-  const { colors } = useTheme();
+  const { isDark, colors } = useTheme();
   const [selectedPeriod, setSelectedPeriod] = useState<typeof PERIODS[number]>("1D");
   const [showAddToWatchlist, setShowAddToWatchlist] = useState(false);
 
-  const drawerSymbols = useMemo(
-    () => (item && !displayData ? [item.symbol] : []),
-    [item?.symbol, displayData]
-  );
+  const drawerSymbols = useMemo(() => (item && !displayData ? [item.symbol] : []), [item?.symbol, displayData]);
   const { quotes } = useRealtimeQuotes(drawerSymbols);
 
   const fallbackQuote = item ? quotes[item.symbol.toUpperCase()] : undefined;
   const price = displayData?.price ?? fallbackQuote?.price ?? item?.price ?? 0;
   const change = displayData?.change ?? fallbackQuote?.change ?? item?.change ?? 0;
+  const realtimeVolume = fallbackQuote?.volume;
 
-  const chartValues = useMemo(() => {
+  const allChartValues = useMemo(() => {
     if (displayData?.history?.length) return displayData.history;
     const history = item?.historyValues ?? [];
-    if (price > 0) return [...history, price];
-    return history.length > 0 ? history : [];
+    return price > 0 ? [...history, price] : history;
   }, [displayData?.history, item?.historyValues, price]);
+  
+  const volumeHistoryRef = useRef<Array<{ price: number; volume: number; timestamp: number }>>([]);
+  
+  useEffect(() => {
+    if (realtimeVolume !== undefined && realtimeVolume > 0 && price > 0) {
+      const current = volumeHistoryRef.current;
+      const lastEntry = current[current.length - 1];
+      if (!lastEntry || lastEntry.price !== price || lastEntry.volume !== realtimeVolume) {
+        volumeHistoryRef.current = [...current, { price, volume: realtimeVolume, timestamp: Date.now() }].slice(-100);
+      }
+    }
+  }, [realtimeVolume, price]);
+
+  const { data: chartValues, timestamps: chartTimestamps, volume: volumeData } = useMemo(() => {
+    const result = PeriodDataProcessor.process(selectedPeriod, allChartValues, volumeHistoryRef.current);
+    return {
+      data: result.data,
+      timestamps: result.timestamps,
+      volume: result.volume.length === result.data.length ? result.volume : result.data.map(() => 750000),
+    };
+  }, [selectedPeriod, allChartValues]);
+
+  const baselineValue = useMemo(() => {
+    if (!item) return undefined;
+    const open = price - change;
+    if (open > 0) return open;
+    return allChartValues.length > 0 ? allChartValues[0] : price;
+  }, [item, price, change, allChartValues]);
 
   const stats = useMemo(() => {
     if (!item) return null;
-    const open = price - change;
+    const open = baselineValue ?? price - change;
     const allPrices = chartValues.length > 0 ? chartValues : [price];
-    const high = Math.max(...allPrices);
-    const low = Math.min(...allPrices);
-    return { open, high, low };
-  }, [item, price, change, chartValues]);
+    return { open, high: Math.max(...allPrices), low: Math.min(...allPrices) };
+  }, [item, price, change, chartValues, baselineValue]);
+
+  const chartTrend = useMemo(() => {
+    if (chartValues.length === 0 || baselineValue === undefined) return "flat";
+    const latestValue = chartValues[chartValues.length - 1];
+    if (latestValue > baselineValue) return "up";
+    if (latestValue < baselineValue) return "down";
+    return "flat";
+  }, [chartValues, baselineValue]);
 
   const { slideAnim, dragOffset, panHandlers, backdropOpacity, closeWithAnimation } =
     useDraggableDrawer({ visible, drawerHeight: DRAWER_HEIGHT, onClose });
@@ -173,42 +207,63 @@ export function StockDetailDrawer({
               <Text style={[styles.price, { color: colors.text }]}>{formatPrice(price)}</Text>
               <View style={styles.changeRow}>
                 <Text style={[styles.changeText, { color: changeColor }]}>
-                  {isUp ? "+" : ""}{formatSigned(change)} ({isUp ? "+" : ""}
-                  {changePercent}%)
+                  {formatSigned(change)} ({isUp ? "+" : ""}{changePercent}%)
                 </Text>
-                <Text style={[styles.todayLabel, { color: colors.textSecondary }]}>Today</Text>
+                <Text style={[styles.todayLabel, { color: colors.textSecondary }]}>
+                  {selectedPeriod === "1D" ? "Today" : selectedPeriod}
+                </Text>
               </View>
               <View style={styles.periodRow}>
-                {PERIODS.map((p) => (
-                  <Pressable
-                    key={p}
-                    onPress={() => setSelectedPeriod(p)}
-                    style={[
-                      styles.periodPill,
-                      {
-                        backgroundColor: selectedPeriod === p ? colors.primaryLight : colors.surface,
-                        borderColor: selectedPeriod === p ? colors.primary : colors.border,
-                      },
-                    ]}
-                  >
-                    <Text
+                {PERIODS.map((p) => {
+                  const isSelected = selectedPeriod === p;
+                  return (
+                    <Pressable
+                      key={p}
+                      onPress={() => setSelectedPeriod(p)}
                       style={[
-                        styles.periodText,
+                        styles.periodPill,
                         {
-                          color: selectedPeriod === p ? colors.primary : colors.textSecondary,
-                          fontWeight: selectedPeriod === p ? "600" : "400",
+                          backgroundColor: isSelected
+                            ? isDark
+                              ? "rgba(0, 122, 255, 0.15)"
+                              : "rgba(0, 122, 255, 0.1)"
+                            : isDark
+                            ? "rgba(255, 255, 255, 0.05)"
+                            : "rgba(0, 0, 0, 0.04)",
+                          borderColor: isSelected
+                            ? isDark
+                              ? "rgba(0, 122, 255, 0.4)"
+                              : "rgba(0, 122, 255, 0.3)"
+                            : "transparent",
                         },
                       ]}
                     >
-                      {p}
-                    </Text>
-                  </Pressable>
-                ))}
+                      <Text
+                        style={[
+                          styles.periodText,
+                          {
+                            color: isSelected
+                              ? isDark
+                                ? "#5AC8FA"
+                                : "#007AFF"
+                              : isDark
+                              ? "rgba(255, 255, 255, 0.6)"
+                              : "rgba(0, 0, 0, 0.6)",
+                            fontWeight: isSelected ? "600" : "500",
+                          },
+                        ]}
+                      >
+                        {p}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
               </View>
               <View style={styles.chartContainer}>
-                <Sparkline
+                <InteractiveStockChart
                   data={chartValues}
-                  trend={trend}
+                  timestamps={chartTimestamps}
+                  baselineValue={baselineValue}
                   width={CHART_WIDTH}
                   height={CHART_HEIGHT}
                 />
@@ -386,24 +441,25 @@ const styles = StyleSheet.create({
   },
   companyName: {
     fontSize: 15,
-    marginBottom: 4,
+    marginBottom: 6,
+    fontWeight: "400",
   },
   price: {
-    fontSize: 34,
+    fontSize: 36,
     fontWeight: "700",
-    letterSpacing: -0.8,
-    marginBottom: 4,
+    letterSpacing: -0.5,
+    marginBottom: 6,
   },
   changeRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    marginBottom: 24,
+    gap: 10,
+    marginBottom: 28,
   },
   changeText: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: "600",
-    letterSpacing: -0.4,
+    letterSpacing: -0.3,
   },
   todayLabel: {
     fontSize: 15,
@@ -411,35 +467,49 @@ const styles = StyleSheet.create({
   },
   periodRow: {
     flexDirection: "row",
-    gap: 8,
-    marginBottom: 16,
+    gap: 6,
+    marginBottom: 20,
   },
   periodPill: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
     borderWidth: StyleSheet.hairlineWidth,
+    minHeight: 32,
+    justifyContent: "center",
+    alignItems: "center",
   },
   periodText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "500",
   },
   chartContainer: {
     width: CHART_WIDTH,
     height: CHART_HEIGHT,
     alignSelf: "center",
-    marginBottom: 28,
+    marginBottom: 8,
+    marginTop: 4,
+    overflow: "visible",
+    paddingRight: 90,
+    paddingBottom: 30,
+  },
+  volumeContainer: {
+    width: CHART_WIDTH,
+    height: VOLUME_HEIGHT,
+    alignSelf: "center",
+    marginBottom: 24,
   },
   statsSection: {
     borderTopWidth: StyleSheet.hairlineWidth,
     paddingTop: 20,
+    marginTop: 4,
   },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "600",
     textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 12,
+    letterSpacing: 0.8,
+    marginBottom: 16,
   },
   statsTable: {
     gap: 0,
@@ -452,12 +522,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   statsLabel: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "400",
   },
   statsValue: {
-    fontSize: 17,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "500",
   },
   watchlistSection: {
     borderTopWidth: StyleSheet.hairlineWidth,

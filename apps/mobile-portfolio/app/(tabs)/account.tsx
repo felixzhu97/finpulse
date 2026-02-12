@@ -11,13 +11,15 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { customersApi, portfolioApi } from "@/src/api";
+import { accountsApi, customersApi, portfolioApi } from "@/src/api";
 import type { Account, Customer } from "@/src/types";
+import type { AccountResource } from "@/src/api";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SettingsDrawer } from "@/src/components/account/SettingsDrawer";
 import { RegisterCustomerDrawer } from "@/src/components/account/RegisterCustomerDrawer";
 import { NewPaymentDrawer } from "@/src/components/account/NewPaymentDrawer";
 import { NewTradeDrawer } from "@/src/components/account/NewTradeDrawer";
+import { BlockchainBalanceCard, BlockchainTransferDrawer } from "@/src/components/blockchain";
 import { formatBalance } from "@/src/utils";
 import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/i18n";
@@ -44,6 +46,7 @@ export default function AccountScreen() {
   const { t } = useTranslation();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accountResources, setAccountResources] = useState<AccountResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -51,42 +54,32 @@ export default function AccountScreen() {
   const [registerVisible, setRegisterVisible] = useState(false);
   const [paymentVisible, setPaymentVisible] = useState(false);
   const [tradeVisible, setTradeVisible] = useState(false);
+  const [blockchainTransferVisible, setBlockchainTransferVisible] = useState(false);
 
   const loadData = useCallback(async () => {
-    const tag = "[AccountTab]";
-    console.log(`${tag} loadData start`);
     setLoading(true);
     setError(false);
     try {
-      console.log(`${tag} calling customersApi.getFirst()`);
       const customerPromise = customersApi.getFirst();
-      console.log(`${tag} calling portfolioApi.getAccounts()`);
       const accountsPromise = portfolioApi.getAccounts();
+      const accountResourcesPromise = accountsApi.list(100, 0);
 
-      const [customerData, accountList] = await Promise.all([
+      const [customerData, accountList, accountResourcesList] = await Promise.all([
         customerPromise,
         accountsPromise,
+        accountResourcesPromise,
       ]);
 
-      console.log(`${tag} customersApi.getFirst() resolved:`, customerData != null);
-      console.log(`${tag} portfolioApi.getAccounts() resolved:`, accountList?.length ?? 0, "accounts");
-
-      const data = { customer: customerData, accounts: accountList ?? [] };
+      const data = { customer: customerData, accounts: accountList ?? [], accountResources: accountResourcesList ?? [] };
       InteractionManager.runAfterInteractions(() => {
         setCustomer(data.customer);
         setAccounts(data.accounts);
+        setAccountResources(data.accountResources);
         setLoading(false);
       });
-      console.log(`${tag} loadData success state:`, {
-        hasCustomer: !!customerData,
-        accountsLength: data.accounts.length,
-      });
     } catch (e) {
-      console.log(`${tag} loadData error:`, e);
       setError(true);
       InteractionManager.runAfterInteractions(() => setLoading(false));
-    } finally {
-      console.log(`${tag} loadData done`);
     }
   }, []);
 
@@ -104,8 +97,18 @@ export default function AccountScreen() {
 
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 
+  const groupedAccounts = accounts.reduce((groups, account) => {
+    const type = account.type;
+    if (!groups[type]) {
+      groups[type] = [];
+    }
+    groups[type].push(account);
+    return groups;
+  }, {} as Record<Account["type"], Account[]>);
+
+  const accountTypeOrder: Account["type"][] = ["brokerage", "saving", "checking", "cash", "creditCard"];
+
   const showLoading = loading && !customer && accounts.length === 0;
-  console.log("[AccountTab] render:", { loading, hasCustomer: !!customer, accountsLength: accounts.length, showLoading });
 
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]} edges={["top"]}>
@@ -142,7 +145,7 @@ export default function AccountScreen() {
                     <View style={[styles.avatar, { backgroundColor: colors.surface }]}>
                       <MaterialIcons
                         name="person"
-                        size={32}
+                        size={24}
                         color={colors.text}
                       />
                     </View>
@@ -181,58 +184,101 @@ export default function AccountScreen() {
                     {formatBalance(totalBalance)}
                   </Text>
                 </View>
-                <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                  {accounts.map((account, index) => (
-                    <View key={account.id}>
-                      <TouchableOpacity
-                        style={styles.accountRow}
-                        activeOpacity={0.7}
-                      >
-                        <View style={styles.accountLeft}>
-                          <View style={[styles.accountIcon, { backgroundColor: colors.surface }]}>
-                            <MaterialIcons
-                              name="account-balance-wallet"
-                              size={20}
-                              color={colors.text}
-                            />
-                          </View>
-                          <View style={styles.accountInfo}>
-                            <Text style={[styles.accountName, { color: colors.text }]}>
-                              {account.name}
-                            </Text>
-                            <Text style={[styles.accountType, { color: colors.textSecondary }]}>
-                              {getAccountTypeLabel(account.type, t)}
-                            </Text>
-                          </View>
-                        </View>
-                        <View style={styles.accountRight}>
-                          <Text style={[styles.accountBalance, { color: colors.text }]}>
-                            {formatBalance(account.balance)}
-                          </Text>
-                          {account.todayChange !== 0 && (
-                            <Text
-                              style={[
-                                styles.accountChange,
-                                {
-                                  color:
-                                    account.todayChange > 0
-                                      ? colors.success
-                                      : colors.error,
-                                },
-                              ]}
-                            >
-                              {account.todayChange > 0 ? "+" : ""}
-                              {formatBalance(account.todayChange)}
-                            </Text>
-                          )}
-                        </View>
-                      </TouchableOpacity>
-                      {index < accounts.length - 1 && (
-                        <View style={[styles.separator, { backgroundColor: colors.border }]} />
-                      )}
+                {accountTypeOrder.map((type) => {
+                  const typeAccounts = groupedAccounts[type] || [];
+                  if (typeAccounts.length === 0) return null;
+
+                  const getAccountUuid = (account: Account, index: number): string => {
+                    const accountTypeMap: Record<string, string[]> = {
+                      brokerage: ["brokerage"],
+                      saving: ["saving", "cash"],
+                      checking: ["checking", "cash"],
+                      creditCard: ["creditCard", "cash"],
+                      cash: ["cash", "saving"],
+                    };
+                    const possibleTypes = accountTypeMap[account.type] || [account.type];
+                    let accountResource = accountResources.find(
+                      (ar) => possibleTypes.includes(ar.account_type)
+                    );
+                    if (!accountResource && accountResources.length > index) {
+                      accountResource = accountResources[index];
+                    }
+                    return accountResource?.account_id || account.id;
+                  };
+
+                  return (
+                    <View key={type} style={styles.categorySection}>
+                      <Text style={[styles.categoryTitle, { color: colors.textSecondary }]}>
+                        {getAccountTypeLabel(type, t)}
+                      </Text>
+                      {typeAccounts.map((account, accountIndex) => {
+                        const accountIdToUse = getAccountUuid(account, accountIndex);
+                        return (
+                          <BlockchainBalanceCard
+                            key={`blockchain-${account.id}`}
+                            accountId={accountIdToUse}
+                            currency="SIM_COIN"
+                          />
+                        );
+                      })}
+                      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                        {typeAccounts.map((account, accountIndex) => {
+                          const accountIdToUse = getAccountUuid(account, accountIndex);
+                          return (
+                            <View key={account.id}>
+                              <TouchableOpacity
+                                style={styles.accountRow}
+                                activeOpacity={0.7}
+                              >
+                                <View style={styles.accountLeft}>
+                                  <View style={[styles.accountIcon, { backgroundColor: colors.surface }]}>
+                                    <MaterialIcons
+                                      name="account-balance-wallet"
+                                      size={20}
+                                      color={colors.text}
+                                    />
+                                  </View>
+                                  <View style={styles.accountInfo}>
+                                    <Text style={[styles.accountName, { color: colors.text }]}>
+                                      {account.name}
+                                    </Text>
+                                    <Text style={[styles.accountType, { color: colors.textSecondary }]}>
+                                      {getAccountTypeLabel(account.type, t)}
+                                    </Text>
+                                  </View>
+                                </View>
+                                <View style={styles.accountRight}>
+                                  <Text style={[styles.accountBalance, { color: colors.text }]}>
+                                    {formatBalance(account.balance)}
+                                  </Text>
+                                  {account.todayChange !== 0 && (
+                                    <Text
+                                      style={[
+                                        styles.accountChange,
+                                        {
+                                          color:
+                                            account.todayChange > 0
+                                              ? colors.success
+                                              : colors.error,
+                                        },
+                                      ]}
+                                    >
+                                      {account.todayChange > 0 ? "+" : ""}
+                                      {formatBalance(account.todayChange)}
+                                    </Text>
+                                  )}
+                                </View>
+                              </TouchableOpacity>
+                              {accountIndex < typeAccounts.length - 1 && (
+                                <View style={[styles.separator, { backgroundColor: colors.border }]} />
+                              )}
+                            </View>
+                          );
+                        })}
+                      </View>
                     </View>
-                  ))}
-                </View>
+                  );
+                })}
               </View>
             )}
 
@@ -247,46 +293,58 @@ export default function AccountScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={styles.settingsLeft}>
-                    <MaterialIcons name="person-add" size={22} color={colors.text} />
+                    <MaterialIcons name="person-add" size={20} color={colors.text} />
                     <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.register")}</Text>
                   </View>
-                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
+                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
                 </TouchableOpacity>
-                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 54 }]} />
+                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 52 }]} />
                 <TouchableOpacity
                   style={styles.actionRow}
                   onPress={() => setPaymentVisible(true)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.settingsLeft}>
-                    <MaterialIcons name="payment" size={22} color={colors.text} />
+                    <MaterialIcons name="payment" size={20} color={colors.text} />
                     <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.newPayment")}</Text>
                   </View>
-                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
+                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
                 </TouchableOpacity>
-                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 54 }]} />
+                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 52 }]} />
                 <TouchableOpacity
                   style={styles.actionRow}
                   onPress={() => setTradeVisible(true)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.settingsLeft}>
-                    <MaterialIcons name="trending-up" size={22} color={colors.text} />
+                    <MaterialIcons name="trending-up" size={20} color={colors.text} />
                     <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.newTrade")}</Text>
                   </View>
-                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
+                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
                 </TouchableOpacity>
-                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 54 }]} />
+                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 52 }]} />
+                <TouchableOpacity
+                  style={styles.actionRow}
+                  onPress={() => setBlockchainTransferVisible(true)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.settingsLeft}>
+                    <MaterialIcons name="swap-horiz" size={20} color={colors.text} />
+                    <Text style={[styles.settingsText, { color: colors.text }]}>{t("blockchain.transfer")}</Text>
+                  </View>
+                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
+                </TouchableOpacity>
+                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 52 }]} />
                 <TouchableOpacity
                   style={styles.actionRow}
                   onPress={() => setSettingsVisible(true)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.settingsLeft}>
-                    <MaterialIcons name="settings" size={22} color={colors.text} />
+                    <MaterialIcons name="settings" size={20} color={colors.text} />
                     <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.settings")}</Text>
                   </View>
-                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
+                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -311,6 +369,12 @@ export default function AccountScreen() {
         visible={tradeVisible}
         onClose={() => setTradeVisible(false)}
       />
+      <BlockchainTransferDrawer
+        visible={blockchainTransferVisible}
+        onClose={() => setBlockchainTransferVisible(false)}
+        accounts={accounts}
+        accountResources={accountResources}
+      />
     </SafeAreaView>
   );
 }
@@ -323,32 +387,43 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingTop: 8,
+    paddingTop: 12,
     paddingBottom: 40,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 28,
     paddingHorizontal: 16,
   },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 10,
+    paddingHorizontal: 4,
+  },
+  categorySection: {
+    marginBottom: 24,
+  },
+  categoryTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
     marginBottom: 8,
     paddingHorizontal: 4,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "600",
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
   },
   totalBalance: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "600",
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
   },
   card: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: "hidden",
     borderWidth: StyleSheet.hairlineWidth,
   },
@@ -358,9 +433,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -369,13 +444,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userName: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: "600",
-    marginBottom: 4,
-    letterSpacing: -0.3,
+    marginBottom: 3,
+    letterSpacing: -0.4,
   },
   userEmail: {
-    fontSize: 15,
+    fontSize: 14,
     letterSpacing: -0.2,
   },
   userDetailRow: {
@@ -383,23 +458,25 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingBottom: 16,
-    paddingTop: 8,
+    paddingBottom: 14,
+    paddingTop: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   userDetailLabel: {
-    fontSize: 15,
+    fontSize: 14,
+    letterSpacing: -0.2,
   },
   userDetailValue: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "500",
+    letterSpacing: -0.2,
   },
   accountRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 16,
-    minHeight: 64,
+    padding: 14,
+    minHeight: 60,
   },
   accountLeft: {
     flexDirection: "row",
@@ -408,9 +485,9 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   accountIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -420,46 +497,46 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   accountName: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "500",
-    marginBottom: 4,
+    marginBottom: 3,
     letterSpacing: -0.3,
   },
   accountType: {
-    fontSize: 14,
+    fontSize: 13,
     letterSpacing: -0.2,
   },
   accountRight: {
     alignItems: "flex-end",
   },
   accountBalance: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "600",
-    marginBottom: 4,
+    marginBottom: 3,
     letterSpacing: -0.3,
   },
   accountChange: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "500",
     letterSpacing: -0.2,
   },
   separator: {
     height: StyleSheet.hairlineWidth,
-    marginLeft: 68,
+    marginLeft: 60,
   },
   actionRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 16,
-    minHeight: 56,
+    padding: 14,
+    minHeight: 52,
   },
   settingsRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 16,
-    minHeight: 56,
+    padding: 14,
+    minHeight: 52,
   },
   settingsLeft: {
     flexDirection: "row",
@@ -467,7 +544,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   settingsText: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "400",
     letterSpacing: -0.3,
   },

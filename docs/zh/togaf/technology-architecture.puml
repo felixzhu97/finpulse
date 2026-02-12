@@ -109,7 +109,21 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
     }
     component "原生 OOP 支持" as NativeOOPSupport {
         component "iOS ChartSupport" as IOSChartSupportTech
+        component "iOS OOP 辅助类" as IOSOOPHelpersTech {
+            component "ChartLayoutCalculator" as IOSLayoutCalcTech
+            component "ValueFormatter" as IOSValueFormatterTech
+            component "AxisLabelManager" as IOSAxisManagerTech
+            component "ChartRenderer" as IOSChartRendererTech
+            component "ChartDataCalculator" as IOSDataCalcTech
+            component "HistogramRenderer" as IOSHistRendererTech
+        }
         component "Android view/chart, sparkline, democard" as AndroidPkgsTech
+        component "Android OOP 辅助类" as AndroidOOPHelpersTech {
+            component "ChartLayoutCalculator" as AndroidLayoutCalcTech
+            component "ValueFormatter" as AndroidValueFormatterTech
+            component "AxisLabelManager" as AndroidAxisManagerTech
+            component "HistogramRenderer" as AndroidHistRendererTech
+        }
     }
     component "Shared chart logic" as SharedChartLogicTech {
         component "useScrollableChart" as UseScrollableChartTech

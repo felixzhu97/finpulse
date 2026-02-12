@@ -21,3 +21,5 @@ export type {
 } from "./useSymbolDisplayData";
 export { usePreferences } from "./usePreferences";
 export { useDraggableDrawer } from "./useDraggableDrawer";
+export { useWeb3 } from "./useWeb3";
+export { useBlockchain } from "./useBlockchain";

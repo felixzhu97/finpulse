@@ -28,6 +28,7 @@ type ScrollableChartContainerProps = {
   formatXLabel: (idx: number) => string;
   selected: ScrollableChartSelection | null;
   theme: "light" | "dark";
+  showXAxisLabels?: boolean;
   renderChart: (chartProps: { width: number; minHeight: number; fill: boolean }) => ReactNode;
   containerStyle?: StyleProp<ViewStyle>;
 };
@@ -47,6 +48,7 @@ export function ScrollableChartContainer({
   formatXLabel,
   selected,
   theme,
+  showXAxisLabels = true,
   renderChart,
   containerStyle,
 }: ScrollableChartContainerProps) {
@@ -74,7 +76,7 @@ export function ScrollableChartContainer({
           chart
         )}
       </View>
-      {layoutHeight > X_AXIS_HEIGHT && xLabelIndices.length > 0 && (
+      {showXAxisLabels && layoutHeight > X_AXIS_HEIGHT && xLabelIndices.length > 0 && (
         <View style={[styles.xAxisRow, { pointerEvents: "none" }]}>
           {xLabelIndices.map((idx, i) => {
             const left = layoutWidth * (i / (X_LABEL_COUNT - 1)) - 16;

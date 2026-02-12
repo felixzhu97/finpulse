@@ -39,6 +39,9 @@ class HttpClient {
       }
 
       if (!response.ok) {
+        if (isDev) {
+          console.error(`[API] ${method} ${path} -> Error ${response.status}`);
+        }
         return null;
       }
 

@@ -52,7 +52,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-mobile-portfolio-components.puml`
 
-**Description**: Mobile Portfolio app (Expo + React Native): thin client with AppContent (preferences loading spinner), tabs/screens; types (Portfolio, QuoteSnapshot); api layer (portfolioApi, getQuotes, createQuoteSocket); hooks (usePortfolio, useRealtimeQuotes, usePerSymbolHistory, usePreferences with component-level loading); Account screen uses useFocusEffect for load on tab focus; native charts and portfolio/account components; backend: GET /api/v1/portfolio, GET /api/v1/quotes, WS /ws/quotes.
+**Description**: Mobile Portfolio app (Expo + React Native): thin client with AppContent (preferences loading spinner), tabs/screens; types (Portfolio, QuoteSnapshot); api layer (portfolioApi, getQuotes, createQuoteSocket); hooks (usePortfolio, useRealtimeQuotes, usePerSymbolHistory, usePreferences with component-level loading); Account screen uses useFocusEffect for load on tab focus; native charts and portfolio/account components; backend: GET /api/v1/portfolio, GET /api/v1/quotes, WS /ws/quotes. Native code follows OOP principles with helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartRenderer, ChartDataCalculator, HistogramRenderer). Code simplified with removed unused code and optimized logic. Charts render full-width with no left padding.
 
 ### Mobile Demo Components
 
@@ -83,6 +83,13 @@ After setup, diagrams render without network access.
 
 ---
 
-**Version**: 1.0.0  
-**Last updated**: 2025  
+**Version**: 1.1.0  
+**Last updated**: February 2025  
 **Maintained by**: FinPulse team
+
+## Recent Updates
+
+- **OOP Optimization**: Native chart code refactored with helper classes following OOP principles (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartRenderer, ChartDataCalculator, HistogramRenderer)
+- **Code Simplification**: Removed unused code, simplified logic, optimized performance
+- **Chart Layout**: Charts now render full-width with no left padding, extending to the far left edge
+- **Period Data Processing**: PeriodDataProcessor class encapsulates period filtering and volume matching logic

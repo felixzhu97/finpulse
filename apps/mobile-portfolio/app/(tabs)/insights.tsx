@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
 } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import { MetricCard } from "@/src/components/ui/MetricCard";
+import { RiskMetricDetailDrawer } from "@/src/components/insights";
 import { useComputedVar, useRiskMetrics } from "@/src/hooks";
 import { portfolioApi } from "@/src/api";
 import { useTheme } from "@/src/theme";
@@ -24,6 +26,8 @@ export default function InsightsScreen() {
   const [topConcentration, setTopConcentration] = useState(0);
   const [localLoading, setLocalLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [detailDrawerVisible, setDetailDrawerVisible] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState<{ key: string; value: number } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -65,7 +69,8 @@ export default function InsightsScreen() {
       ? t("insights.highConcentrationText")
       : t("insights.balancedConcentrationText");
 
-  const width = Dimensions.get("window").width - 32;
+  const screenWidth = Dimensions.get("window").width;
+  const chartWidth = screenWidth - 80;
 
   if (error && !metrics && !localLoading) {
     return (
@@ -105,41 +110,73 @@ export default function InsightsScreen() {
         </View>
       ) : (
         <View style={styles.block}>
-          <MetricCard
-            label={t("insights.highRiskExposure")}
-            value={`${highRiskPercent}%`}
-            helper={highRiskText}
-            tone={highRatio > 0.4 ? "negative" : "default"}
-          />
-          <MetricCard
-            label={t("insights.top5HoldingsConcentration")}
-            value={`${concentrationPercent}%`}
-            helper={concentrationText}
-            tone={topConcentration > 0.5 ? "negative" : "default"}
-          />
-          {(computedVar?.var != null || hasApiMetrics) ? (
-            <View style={styles.apiSection}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("insights.riskMetricsApi")}</Text>
-              {computedVar?.var != null && (
+          <View style={styles.overviewSection}>
+            <Text style={[styles.sectionHeader, { color: colors.text }]}>
+              {t("insights.overview")}
+            </Text>
+            <View style={styles.overviewGrid}>
+              <View style={styles.overviewCard}>
                 <MetricCard
-                  label={t("insights.computedVar")}
-                  value={computedVar.var.toFixed(4)}
-                  helper={computedVar.interpretation ?? t("insights.varHelper")}
+                  label={t("insights.highRiskExposure")}
+                  value={`${highRiskPercent}%`}
+                  tone={highRatio > 0.4 ? "negative" : "default"}
                 />
-              )}
-              {[
-                { key: "volatility", val: metrics?.volatility, fmt: (v: number) => v.toFixed(4), helper: "volatilityHelper" },
-                { key: "sharpeRatio", val: metrics?.sharpe_ratio, fmt: (v: number) => v.toFixed(2), helper: "sharpeRatioHelper" },
-                { key: "var", val: metrics?.var, fmt: (v: number) => v.toFixed(2), helper: "varHelper" },
-                { key: "beta", val: metrics?.beta, fmt: (v: number) => v.toFixed(2), helper: "betaHelper" },
-              ]
-                .filter((m) => m.val != null)
-                .map((m) => (
-                  <MetricCard key={m.key} label={t(`insights.${m.key}`)} value={m.fmt(m.val!)} helper={t(`insights.${m.helper}`)} />
-                ))}
+              </View>
+              <View style={styles.overviewCard}>
+                <MetricCard
+                  label={t("insights.top5HoldingsConcentration")}
+                  value={`${concentrationPercent}%`}
+                  tone={topConcentration > 0.5 ? "negative" : "default"}
+                />
+              </View>
+            </View>
+          </View>
+
+          {(computedVar?.var != null || hasApiMetrics) ? (
+            <View style={styles.metricsSection}>
+              <Text style={[styles.sectionHeader, { color: colors.text }]}>
+                {t("insights.riskMetricsApi")}
+              </Text>
+              <View style={styles.metricsGrid}>
+                {computedVar?.var != null && (
+                  <View style={styles.metricCard}>
+                    <MetricCard
+                      label={t("insights.computedVar")}
+                      value={computedVar.var.toFixed(4)}
+                      onInfoPress={() => {
+                        setSelectedMetric({ key: "computedVar", value: computedVar.var! });
+                        setDetailDrawerVisible(true);
+                      }}
+                    />
+                  </View>
+                )}
+                {[
+                  { key: "volatility", val: metrics?.volatility, fmt: (v: number) => v.toFixed(4) },
+                  { key: "sharpeRatio", val: metrics?.sharpe_ratio, fmt: (v: number) => v.toFixed(2) },
+                  { key: "var", val: metrics?.var, fmt: (v: number) => v.toFixed(2) },
+                  { key: "beta", val: metrics?.beta, fmt: (v: number) => v.toFixed(2) },
+                ]
+                  .filter((m) => m.val != null)
+                  .map((m) => (
+                    <View key={m.key} style={styles.metricCard}>
+                      <MetricCard
+                        label={t(`insights.${m.key}`)}
+                        value={m.fmt(m.val!)}
+                        onInfoPress={() => {
+                          setSelectedMetric({ key: m.key, value: m.val! });
+                          setDetailDrawerVisible(true);
+                        }}
+                      />
+                    </View>
+                  ))}
+              </View>
             </View>
           ) : null}
-          <View style={[styles.chartCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.chartSection}>
+            <Text style={[styles.sectionHeader, { color: colors.text }]}>
+              {t("insights.riskOverview")}
+            </Text>
+            <View style={[styles.chartCard, { backgroundColor: colors.card }]}>
             <BarChart
               data={{
                 labels: ["High risk", "Top 5"],
@@ -152,34 +189,65 @@ export default function InsightsScreen() {
                   },
                 ],
               }}
-              width={width}
-              height={200}
+              width={chartWidth}
+              height={220}
               fromZero
               yAxisLabel=""
               yAxisSuffix="%"
               chartConfig={{
-                backgroundGradientFrom: colors.background,
-                backgroundGradientTo: colors.background,
-                color: () => colors.primary,
-                labelColor: () => colors.textSecondary,
+                backgroundGradientFrom: colors.card,
+                backgroundGradientTo: colors.card,
+                color: (opacity = 1) => {
+                  if (Platform.OS === "ios") {
+                    return `rgba(0, 122, 255, ${opacity})`;
+                  }
+                  return colors.primary;
+                },
+                labelColor: (opacity = 1) => {
+                  const textColor = colors.textSecondary;
+                  if (typeof textColor === "string" && textColor.startsWith("rgba")) {
+                    return textColor;
+                  }
+                  return `rgba(142, 142, 147, ${opacity})`;
+                },
                 decimalPlaces: 1,
+                barPercentage: 0.6,
                 propsForBackgroundLines: {
                   strokeWidth: 0,
+                },
+                propsForLabels: {
+                  fontSize: 12,
+                  fontWeight: "500",
                 },
               }}
               withInnerLines={false}
               showBarTops={false}
               style={styles.barChart}
+              verticalLabelRotation={0}
             />
+            </View>
           </View>
-          <View style={[styles.summaryCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.summaryTitle, { color: colors.text }]}>{t("insights.summary")}</Text>
-            <Text style={[styles.summaryBody, { color: colors.textSecondary }]}>
-              {t("insights.summaryBody")}
+          <View style={styles.summarySection}>
+            <Text style={[styles.sectionHeader, { color: colors.text }]}>
+              {t("insights.summary")}
             </Text>
+            <View style={[styles.summaryCard, { backgroundColor: colors.card }]}>
+              <Text style={[styles.summaryBody, { color: colors.textSecondary }]}>
+                {t("insights.summaryBody")}
+              </Text>
+            </View>
           </View>
         </View>
       )}
+      <RiskMetricDetailDrawer
+        visible={detailDrawerVisible}
+        metricKey={selectedMetric?.key ?? null}
+        metricValue={selectedMetric?.value ?? null}
+        onClose={() => {
+          setDetailDrawerVisible(false);
+          setSelectedMetric(null);
+        }}
+      />
     </ScrollView>
   );
 }
@@ -189,11 +257,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 16,
-    paddingBottom: 32,
+    padding: 20,
+    paddingBottom: 40,
   },
   block: {
-    gap: 16,
+    gap: 24,
+  },
+  overviewSection: {
+    gap: 12,
+  },
+  sectionHeader: {
+    fontSize: 17,
+    fontWeight: "600",
+    letterSpacing: -0.3,
+    marginBottom: 4,
+  },
+  overviewGrid: {
+    flexDirection: "row",
+    gap: 12,
+    alignItems: "stretch",
+  },
+  overviewCard: {
+    flex: 1,
+  },
+  metricsSection: {
+    gap: 12,
+  },
+  metricsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+    alignItems: "stretch",
+  },
+  metricCard: {
+    width: "48%",
   },
   loadingContainer: {
     flex: 1,
@@ -211,40 +308,61 @@ const styles = StyleSheet.create({
   },
   errorText: {
     textAlign: "center",
+    fontSize: 17,
+    fontWeight: "400",
   },
   retryText: {
-    marginTop: 12,
+    marginTop: 16,
+    fontSize: 17,
+    fontWeight: "500",
   },
-  apiSection: {
+  chartSection: {
     gap: 12,
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
   chartCard: {
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingVertical: 8,
+    borderRadius: 16,
+    padding: 20,
+    paddingBottom: 12,
     overflow: "hidden",
     width: "100%",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  summarySection: {
+    gap: 12,
   },
   barChart: {
-    marginLeft: -16,
+    marginLeft: -8,
+    marginRight: -8,
   },
   summaryCard: {
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  summaryTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 8,
+    padding: 20,
+    borderRadius: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   summaryBody: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: "400",
+    letterSpacing: -0.2,
   },
 });

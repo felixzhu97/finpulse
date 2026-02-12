@@ -22,6 +22,7 @@ type UseScrollableChartParams = {
   timestamps?: number[];
   theme: "light" | "dark";
   getTooltipPayload: (index: number) => TooltipPayload;
+  showXAxisLabels?: boolean;
 };
 
 export function useScrollableChart({
@@ -30,6 +31,7 @@ export function useScrollableChart({
   timestamps,
   theme,
   getTooltipPayload,
+  showXAxisLabels = true,
 }: UseScrollableChartParams) {
   const [layoutWidth, setLayoutWidth] = useState(0);
   const [layoutHeight, setLayoutHeight] = useState(0);
@@ -149,6 +151,7 @@ export function useScrollableChart({
     flatData,
     count,
     theme,
+    showXAxisLabels,
   };
 }
 

@@ -19,8 +19,8 @@ private final class HistogramBuffers {
         let barW = (2.0 / Float(max(n, 1))) * 0.7
         var barVerts: [Float] = []
         for (i, v) in values.enumerated() {
-            let x0 = (Float(i) / Float(n)) * 2.0 - 1.0
-            let x1 = x0 + barW
+            let x1 = (Float(i + 1) / Float(n)) * 2.0 - 1.0
+            let x0 = x1 - barW
             let y = Float((v - minVal) * scale) * 2.0 - 1.0
             barVerts.append(contentsOf: ChartVertex.vertex(x: x0, y: -1.0, color: colors.bar))
             barVerts.append(contentsOf: ChartVertex.vertex(x: x1, y: -1.0, color: colors.bar))
@@ -34,15 +34,50 @@ private final class HistogramBuffers {
     }
 }
 
+private final class HistogramRenderer {
+    private let device: MTLDevice
+    private let commandQueue: MTLCommandQueue
+    private let pipeline: MTLRenderPipelineState?
+    private let buffers = HistogramBuffers()
+    
+    init(device: MTLDevice, pixelFormat: MTLPixelFormat) {
+        self.device = device
+        self.commandQueue = device.makeCommandQueue()!
+        self.pipeline = ChartPipeline.make(device: device, pixelFormat: pixelFormat)
+    }
+    
+    func updateBuffers(values: [Double], colors: HistogramChartTheme.Colors) {
+        buffers.update(values: values, device: device, colors: colors)
+    }
+    
+    func draw(in view: MTKView) {
+        guard let drawable = view.currentDrawable,
+              let pass = view.currentRenderPassDescriptor,
+              let pipeline = pipeline,
+              let commandBuffer = commandQueue.makeCommandBuffer(),
+              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: pass) else { return }
+        encoder.setRenderPipelineState(pipeline)
+        
+        if let bars = buffers.bars, buffers.barsCount >= 3 {
+            encoder.setVertexBuffer(bars, offset: 0, index: 0)
+            encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: buffers.barsCount)
+        }
+        
+        encoder.endEncoding()
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
+    }
+    
+    var needsDisplay: Bool {
+        return buffers.barsCount > 0
+    }
+}
+
 @objc(NativeHistogramChartView)
 public class NativeHistogramChartView: UIView {
     private var metalView: MTKView?
     private var device: MTLDevice?
-    private var commandQueue: MTLCommandQueue?
-    private var pipeline: MTLRenderPipelineState?
-    private var gridBuffer: MTLBuffer?
-    private var gridCount = 0
-    private let buffers = HistogramBuffers()
+    private var renderer: HistogramRenderer?
 
     @objc public var data: NSArray? {
         didSet { updateBuffers() }
@@ -51,55 +86,55 @@ public class NativeHistogramChartView: UIView {
     @objc public var theme: NSString? {
         didSet {
             applyTheme()
-            if let d = device { buildGrid(device: d); updateBuffers() }
+            if device != nil { updateBuffers() }
         }
     }
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = .clear
+        isOpaque = false
         setupMetal()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        backgroundColor = .clear
+        isOpaque = false
         setupMetal()
     }
 
     private func setupMetal() {
         guard let device = MTLCreateSystemDefaultDevice() else { return }
         self.device = device
-        commandQueue = device.makeCommandQueue()
+        
         let view = MTKView(frame: bounds, device: device)
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.delegate = self
+        view.isOpaque = false
+        view.backgroundColor = .clear
+        view.colorPixelFormat = .bgra8Unorm
         view.clearColor = HistogramChartTheme.theme(dark: (theme as String?) == "dark").clear
         view.isPaused = true
         view.enableSetNeedsDisplay = true
         addSubview(view)
         metalView = view
-        pipeline = ChartPipeline.make(device: device, pixelFormat: view.colorPixelFormat)
-        buildGrid(device: device)
+        
+        renderer = HistogramRenderer(device: device, pixelFormat: view.colorPixelFormat)
     }
 
     private func applyTheme() {
         metalView?.clearColor = HistogramChartTheme.theme(dark: (theme as String?) == "dark").clear
     }
 
-    private func buildGrid(device: MTLDevice) {
-        let grid = HistogramChartTheme.theme(dark: (theme as String?) == "dark").grid
-        let result = ChartGrid.build(device: device, gridColor: grid)
-        gridBuffer = result.buffer
-        gridCount = result.count
-    }
-
     private func updateBuffers() {
-        guard let arr = data as? [NSNumber], !arr.isEmpty, let device = device else {
-            buffers.barsCount = 0
+        guard let arr = data as? [NSNumber], !arr.isEmpty,
+              let renderer = renderer else {
             metalView?.setNeedsDisplay()
             return
         }
         let t = HistogramChartTheme.theme(dark: (theme as String?) == "dark")
-        buffers.update(values: arr.map { $0.doubleValue }, device: device, colors: t)
+        renderer.updateBuffers(values: arr.map { $0.doubleValue }, colors: t)
         metalView?.setNeedsDisplay()
     }
 
@@ -113,22 +148,6 @@ extension NativeHistogramChartView: MTKViewDelegate {
     public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {}
 
     public func draw(in view: MTKView) {
-        guard let drawable = view.currentDrawable,
-              let pass = view.currentRenderPassDescriptor,
-              let pipeline = pipeline,
-              let commandBuffer = commandQueue?.makeCommandBuffer(),
-              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: pass) else { return }
-        encoder.setRenderPipelineState(pipeline)
-        if let grid = gridBuffer, gridCount > 0 {
-            encoder.setVertexBuffer(grid, offset: 0, index: 0)
-            encoder.drawPrimitives(type: .line, vertexStart: 0, vertexCount: gridCount)
-        }
-        if let bars = buffers.bars, buffers.barsCount >= 3 {
-            encoder.setVertexBuffer(bars, offset: 0, index: 0)
-            encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: buffers.barsCount)
-        }
-        encoder.endEncoding()
-        commandBuffer.present(drawable)
-        commandBuffer.commit()
+        renderer?.draw(in: view)
     }
 }

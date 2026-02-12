@@ -51,7 +51,7 @@ export function AccountListItem({ account, historyValues }: AccountListItemProps
         <Text style={[styles.price, { color: colors.text }]}>{formatBalance(account.balance)}</Text>
         <View style={styles.changeContainer}>
           <Text style={[styles.change, { color: changeColor }]}>
-            {isUp ? "+" : ""}{formatSigned(account.todayChange, 0)}
+            {formatSigned(account.todayChange, 0)}
           </Text>
           <Text style={[styles.changePercent, { color: changeColor }]}>
             {isUp ? "+" : ""}{changePercent}%

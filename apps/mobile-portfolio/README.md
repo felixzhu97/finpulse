@@ -15,7 +15,7 @@ Portfolio management mobile app for viewing investment accounts, performance cha
 | UI | expo-blur (Liquid Glass), useDraggableDrawer (bottom sheets) |
 | Internationalization | i18next, react-i18next (English, Chinese) |
 
-Native chart components: line, candlestick (K-line), American OHLC, baseline, histogram, line-only, with horizontal scroll and tooltips.
+Native chart components: line, candlestick (K-line), American OHLC, baseline, histogram, line-only, with horizontal scroll and tooltips. Native code follows OOP principles with helper classes for layout calculation, value formatting, axis label management, and rendering logic.
 
 ## Main Screens
 
@@ -46,7 +46,9 @@ Account and Insights also use `usePreferences` (Redux-backed theme/language/noti
 - `src/i18n/`: internationalization—`config.ts` (i18next setup), `locales/en.json` and `locales/zh.json` (translation resources), `index.ts` (exports `i18n` and `useTranslation` hook).
 - `src/hooks/`: `usePortfolio`, `useSymbolDisplayData` (Redux-backed quotes + history for list/drawer), `useRealtimeQuotes`, `usePerSymbolHistory`, `usePreferences` (Redux-backed user preferences), `useWatchlists`, `useRiskMetrics`, `useComputedVar` (VaR from portfolio history), `useDraggableDrawer`; all consume `api` and `types`.
 - `src/store/`: Redux (quotes slice, preferences slice for theme/language/notifications; loading state is component-level via `usePreferences().loading`, not Redux), selectors, `QuoteSocketSubscriber`), custom portfolio UI store (`usePortfolioStore`).
-- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Account screen: `RegisterCustomerDrawer`, `NewPaymentDrawer`, `NewTradeDrawer`, `SettingsDrawer` (all use `useDraggableDrawer`, background `colors.card`). Watchlist: `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch). All components support light/dark theme via `useTheme` and i18n via `useTranslation`.
+- `src/components/`: UI by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`). Account screen: `RegisterCustomerDrawer`, `NewPaymentDrawer`, `NewTradeDrawer`, `SettingsDrawer` (all use `useDraggableDrawer`, background `colors.card`). Watchlist: `AccountListItem`, `StockListItem`, `StockDetailDrawer` (draggable), `SortMenu`, bottom search bar (`GlassView`), `useFocusEffect` (close search on tab switch). All components support light/dark theme via `useTheme` and i18n via `useTranslation`. Code follows clean code principles with simplified logic and optimized performance.
+- `ios/mobileportfolio/`: Native iOS code with OOP structure. Chart components use helper classes: `ChartLayoutCalculator` (layout calculations), `ValueFormatter` (value formatting), `AxisLabelManager` (axis label management), `ChartRenderer` (Metal rendering), `ChartDataCalculator` (data calculations), `HistogramRenderer` (histogram rendering). ChartSupport provides shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
+- `android/app/src/main/java/com/anonymous/mobileportfolio/view/`: Native Android code with OOP structure. Chart components use helper classes: `ChartLayoutCalculator`, `ValueFormatter`, `AxisLabelManager`, `HistogramRenderer`. Chart package (`view/chart/`) provides ChartGl, ChartCurve, and per-chart themes. Sparkline and democard packages provide specialized components.
 
 ### Diagrams
 

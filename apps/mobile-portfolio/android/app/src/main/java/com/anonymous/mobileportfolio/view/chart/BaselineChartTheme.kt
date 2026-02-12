@@ -18,5 +18,5 @@ object BaselineChartThemes {
     fun theme(dark: Boolean): BaselineChartTheme = if (dark)
         BaselineChartTheme(0f, 0f, 0f, floatArrayOf(0.9f, 0.9f, 0.92f, 1f), floatArrayOf(0.22f, 0.22f, 0.26f, 1f), floatArrayOf(0.2f, 0.72f, 0.45f, 0.5f), floatArrayOf(1f, 0.3f, 0.25f, 0.5f))
     else
-        BaselineChartTheme(0.97f, 0.97f, 0.98f, floatArrayOf(0.2f, 0.2f, 0.2f, 1f), floatArrayOf(0.85f, 0.85f, 0.88f, 1f), floatArrayOf(0.2f, 0.7f, 0.4f, 0.4f), floatArrayOf(1f, 0.2f, 0.2f, 0.4f))
+        BaselineChartTheme(0f, 0f, 0f, floatArrayOf(0.2f, 0.2f, 0.2f, 1f), floatArrayOf(0.85f, 0.85f, 0.88f, 1f), floatArrayOf(0.2f, 0.7f, 0.4f, 0.4f), floatArrayOf(1f, 0.2f, 0.2f, 0.4f))
 }

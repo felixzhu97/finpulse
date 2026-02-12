@@ -22,13 +22,22 @@ export function useRiskMetrics(): UseRiskMetricsResult {
         portfolioApi.getPortfolio(),
         riskMetricsApi.list(),
       ]);
+      
+      if (list.length === 0) {
+        setMetrics(null);
+        return;
+      }
+      
       const portfolioId = portfolio?.id ?? null;
       if (portfolioId) {
         const m = riskMetricsApi.findForPortfolio(list, portfolioId);
-        setMetrics(m);
-      } else {
-        setMetrics(list.length > 0 ? list[0] : null);
+        if (m) {
+          setMetrics(m);
+          return;
+        }
       }
+      
+      setMetrics(list[0]);
     } catch {
       setError(true);
     } finally {

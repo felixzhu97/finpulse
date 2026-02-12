@@ -21,7 +21,9 @@ class NativeCandleChartView @JvmOverloads constructor(
 
     init {
         setEGLContextClientVersion(3)
-        setEGLConfigChooser(8, 8, 8, 8, 16, 0)
+        setEGLConfigChooser(8, 8, 8, 8, 0, 0)
+        setZOrderOnTop(false)
+        holder.setFormat(android.graphics.PixelFormat.TRANSLUCENT)
         setRenderer(renderer)
     }
 
@@ -106,17 +108,21 @@ class NativeCandleChartView @JvmOverloads constructor(
             program = ChartGl.loadProgram(ChartGl.VERTEX_SHADER, ChartGl.FRAGMENT_SHADER)
             posLoc = GLES30.glGetAttribLocation(program, "a_position")
             colorLoc = GLES30.glGetAttribLocation(program, "a_color")
-            val t = CandleChartThemes.theme(isDark)
-            GLES30.glClearColor(t.r, t.g, t.b, 1f)
+            GLES30.glEnable(GLES30.GL_BLEND)
+            GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA)
+            GLES30.glClearColor(0f, 0f, 0f, 0f)
         }
 
         override fun onSurfaceChanged(gl: GL10?, w: Int, h: Int) {
+            GLES30.glEnable(GLES30.GL_BLEND)
+            GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA)
             GLES30.glViewport(0, 0, w.coerceAtLeast(1), h.coerceAtLeast(1))
         }
 
         override fun onDrawFrame(gl: GL10?) {
-            val t = CandleChartThemes.theme(isDark)
-            GLES30.glClearColor(t.r, t.g, t.b, 1f)
+            GLES30.glEnable(GLES30.GL_BLEND)
+            GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA)
+            GLES30.glClearColor(0f, 0f, 0f, 0f)
             GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT)
             GLES30.glUseProgram(program)
             gridBuffer?.let { ChartGl.drawLines(it, 8, 1f, posLoc, colorLoc) }

@@ -48,10 +48,11 @@
     }
   },
   "insights": {
-    "computedVar": "Computed VaR (AI)",
+    "overview": "Overview",
+    "computedVar": "Computed VaR",
     "highRiskExposure": "High-risk exposure",
     "top5HoldingsConcentration": "Top 5 holdings concentration",
-    "riskMetricsApi": "Risk metrics (API)",
+    "riskMetricsApi": "Risk metrics",
     "volatility": "Volatility",
     "volatilityHelper": "Annualized volatility",
     "sharpeRatio": "Sharpe ratio",
@@ -61,11 +62,19 @@
     "beta": "Beta",
     "betaHelper": "Market sensitivity",
     "summary": "Summary",
-    "summaryBody": "Portfolio risk and concentration from holdings. When available, server risk metrics (volatility, Sharpe, VaR, beta) are shown above.",
+    "summaryBody": "This page displays comprehensive risk analysis for your portfolio. The Overview section shows high-risk asset exposure and holdings concentration. The Risk Metrics section provides professional indicators including volatility, Sharpe ratio, Value at Risk (VaR), and beta coefficient, helping you understand your portfolio's risk profile. Tap the info icon on metric cards to view detailed explanations and examples.",
     "highExposureText": "High exposure to high-risk assets.",
     "moderateExposureText": "High-risk exposure is moderate.",
     "highConcentrationText": "Portfolio is highly concentrated in top holdings.",
     "balancedConcentrationText": "Portfolio concentration looks balanced.",
+    "varExplanation": "At 95% confidence, portfolio daily loss may exceed this percentage. For example, -0.39% means there's a 5% chance of losing more than 0.39% in a single day.",
+    "riskOverview": "Risk Overview",
+    "currentValue": "Current Value",
+    "volatilityDescription": "Volatility measures the degree of variation in portfolio or asset prices over time. Annualized volatility is typically expressed as a percentage, with higher values indicating greater price fluctuations and higher risk. Lower volatility generally means more stable returns but may also imply lower potential gains.\n\nExample: If a portfolio has an annualized volatility of 18%, it means the portfolio's value may fluctuate within ±18% of its average over a year. For instance, if a portfolio is worth $100,000 with 18% volatility, its value could range between $82,000 and $118,000 over the year.",
+    "sharpeRatioDescription": "The Sharpe ratio is a key metric for measuring risk-adjusted returns of a portfolio. It calculates the excess return per unit of risk taken. A higher Sharpe ratio indicates better returns for the same level of risk. Generally, a Sharpe ratio above 1 is considered good, and above 2 is considered excellent.\n\nExample: If a portfolio has a Sharpe ratio of 1.25, it means for every 1% of risk taken, the portfolio earns 1.25% in excess returns. For instance, if the risk-free rate is 3%, portfolio return is 15%, and volatility is 10%, then Sharpe ratio = (15% - 3%) / 10% = 1.2.",
+    "varDescription": "Value at Risk (VaR) is a statistical measure that quantifies the maximum potential loss a portfolio might suffer within a given time period at a specific confidence level. For example, a VaR of -2% at 95% confidence means there's 95% certainty that losses won't exceed 2%, but a 5% chance that losses could exceed this value. VaR helps investors understand their portfolio's potential risk exposure.\n\nExample: If a portfolio has a VaR of $2,500 at 95% confidence, it means in 95% of cases, daily losses won't exceed $2,500. For instance, if a portfolio is worth $100,000 with a VaR of $2,500, there's a 95% probability that daily losses won't exceed 2.5%, but a 5% chance losses could exceed this amount.",
+    "betaDescription": "Beta measures a portfolio's sensitivity to overall market movements. A beta of 1 means the portfolio moves in sync with the market; beta greater than 1 indicates higher volatility than the market (higher risk and potential returns); beta less than 1 indicates lower volatility than the market (lower risk and returns). A beta of 0 means no correlation with the market, and negative beta indicates inverse movement relative to the market.\n\nExample: If a portfolio has a beta of 1.05, when the market rises 10%, the portfolio may rise 10.5%; when the market falls 10%, the portfolio may fall 10.5%. For instance, if the market index rises 5%, a portfolio with beta 1.05 may rise 5.25%. If beta is 0.8, when the market rises 10%, the portfolio may only rise 8%.",
+    "computedVarDescription": "Computed VaR is a risk value calculated using statistical methods based on the portfolio's historical data. This value reflects the portfolio's risk characteristics over a past period and helps predict potential future loss ranges. The calculation method considers the distribution and volatility of historical returns, providing a more accurate risk assessment.\n\nExample: If the computed VaR is -0.0039 (i.e., -0.39%), at 95% confidence, it means there's a 95% probability that daily losses won't exceed 0.39%. For instance, if a portfolio is worth $100,000 with a VaR of -0.39%, there's a 95% probability that daily losses won't exceed $390, but a 5% chance losses could exceed this amount. This value is calculated based on the past 90 days of historical data.",
     "unableToLoad": "Unable to load analytics. Start the backend and try again.",
     "tapToRetry": "Tap to retry"
   },
@@ -116,5 +125,24 @@
       "cash": "Cash",
       "account": "Account"
     }
+  },
+  "blockchain": {
+    "connectWallet": "Connect Wallet",
+    "disconnect": "Disconnect",
+    "blockchainBalance": "Blockchain Balance",
+    "noBalance": "No balance",
+    "transfer": "Transfer",
+    "senderAccount": "Sender Account",
+    "receiverAccount": "Receiver Account",
+    "amount": "Amount",
+    "amountPlaceholder": "Enter amount",
+    "currency": "Currency",
+    "submitTransfer": "Submit Transfer",
+    "transferSuccess": "Transfer successful",
+    "transferFailed": "Transfer failed",
+    "error": "Error",
+    "success": "Success",
+    "fillAllFields": "Please fill all fields",
+    "invalidAmount": "Invalid amount"
   }
 }

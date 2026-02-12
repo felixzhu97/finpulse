@@ -15,5 +15,5 @@ object LineOnlyChartThemes {
     fun theme(dark: Boolean): LineOnlyChartTheme = if (dark)
         LineOnlyChartTheme(0f, 0f, 0f, floatArrayOf(1f, 0.25f, 0.25f, 1f), floatArrayOf(0.22f, 0.22f, 0.26f, 1f))
     else
-        LineOnlyChartTheme(0.97f, 0.97f, 0.98f, floatArrayOf(0.2f, 0.4f, 0.9f, 1f), floatArrayOf(0.85f, 0.85f, 0.88f, 1f))
+        LineOnlyChartTheme(0f, 0f, 0f, floatArrayOf(0.2f, 0.4f, 0.9f, 1f), floatArrayOf(0.85f, 0.85f, 0.88f, 1f))
 }

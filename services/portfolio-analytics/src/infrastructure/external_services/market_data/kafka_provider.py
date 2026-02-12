@@ -53,12 +53,15 @@ def _start_consumer() -> None:
           price = float(payload.get("price", 0.0))
           change = float(payload.get("change", 0.0))
           change_rate = float(payload.get("changeRate", 0.0))
+          volume = payload.get("volume")
+          volume_float = float(volume) if volume is not None else None
           timestamp = float(payload.get("ts", time.time()))
           quote = Quote(
             symbol=symbol,
             price=price,
             change=change,
             change_rate=change_rate,
+            volume=volume_float,
             timestamp=timestamp,
           )
           with _quotes_lock:

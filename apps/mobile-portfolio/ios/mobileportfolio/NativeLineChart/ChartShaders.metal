@@ -10,15 +10,39 @@ struct VertexIn {
 struct VertexOut {
     float4 position [[position]];
     float4 color;
+    float yCoord;
+};
+
+struct Uniforms {
+    float minLineY;
+    float gradientTopR;
+    float gradientTopG;
+    float gradientTopB;
+    float gradientTopA;
 };
 
 vertex VertexOut chart_vertex(constant VertexIn* vertices [[buffer(0)]], uint vid [[vertex_id]]) {
     VertexOut out;
-    out.position = float4(vertices[vid].position, 0.0, 1.0);
+    float2 pos = vertices[vid].position;
+    out.position = float4(pos, 0.0, 1.0);
     out.color = vertices[vid].color;
+    out.yCoord = pos.y;
     return out;
 }
 
-fragment float4 chart_fragment(VertexOut in [[stage_in]]) {
-    return in.color;
+fragment float4 chart_fragment(VertexOut in [[stage_in]], constant Uniforms& uniforms [[buffer(0)]]) {
+    float4 lineColor = in.color;
+    if (lineColor.a > 0.5) {
+        return lineColor;
+    }
+    
+    float y = in.yCoord;
+    float minY = uniforms.minLineY;
+    float maxY = 1.0;
+    
+    float t = clamp((maxY - y) / (maxY - minY), 0.0, 1.0);
+    float alpha = mix(uniforms.gradientTopA, 0.0, smoothstep(0.0, 1.0, t));
+    float4 gradientColor = float4(uniforms.gradientTopR, uniforms.gradientTopG, uniforms.gradientTopB, alpha);
+    
+    return gradientColor;
 }

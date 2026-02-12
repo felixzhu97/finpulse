@@ -86,7 +86,21 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
         }
         component "原生图表支持 (OOP)" as NativeChartSupport {
             component "iOS ChartSupport" as IOSChartSupport
+            component "iOS OOP 辅助类" as IOSOOPHelpers {
+                component "ChartLayoutCalculator" as IOSLayoutCalc
+                component "ValueFormatter" as IOSValueFormatter
+                component "AxisLabelManager" as IOSAxisManager
+                component "ChartRenderer" as IOSChartRenderer
+                component "ChartDataCalculator" as IOSDataCalc
+                component "HistogramRenderer" as IOSHistRenderer
+            }
             component "Android view/chart/" as AndroidChartPkg
+            component "Android OOP 辅助类" as AndroidOOPHelpers {
+                component "ChartLayoutCalculator" as AndroidLayoutCalc
+                component "ValueFormatter" as AndroidValueFormatter
+                component "AxisLabelManager" as AndroidAxisManager
+                component "HistogramRenderer" as AndroidHistRenderer
+            }
         }
         component "Shared chart logic" as SharedChartLogic {
             component "useScrollableChart" as UseScrollableChart

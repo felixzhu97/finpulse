@@ -11,7 +11,8 @@ class Quote:
     price: float
     change: float
     change_rate: float
-    timestamp: float
+    volume: float | None = None
+    timestamp: float = 0.0
 
 
 @dataclass

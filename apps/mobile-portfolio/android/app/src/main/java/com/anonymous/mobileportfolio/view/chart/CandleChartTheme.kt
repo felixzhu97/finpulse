@@ -16,5 +16,5 @@ object CandleChartThemes {
     fun theme(dark: Boolean): CandleChartTheme = if (dark)
         CandleChartTheme(0f, 0f, 0f, floatArrayOf(0.22f, 0.22f, 0.26f, 1f), floatArrayOf(0.2f, 0.75f, 0.85f, 1f), floatArrayOf(1f, 0.3f, 0.25f, 1f))
     else
-        CandleChartTheme(0.97f, 0.97f, 0.98f, floatArrayOf(0.85f, 0.85f, 0.88f, 1f), floatArrayOf(0.2f, 0.6f, 0.85f, 1f), floatArrayOf(0.9f, 0.25f, 0.2f, 1f))
+        CandleChartTheme(0f, 0f, 0f, floatArrayOf(0.85f, 0.85f, 0.88f, 1f), floatArrayOf(0.2f, 0.6f, 0.85f, 1f), floatArrayOf(0.9f, 0.25f, 0.2f, 1f))
 }

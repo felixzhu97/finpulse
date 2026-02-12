@@ -68,7 +68,21 @@ package "Presentation Layer" <<Presentation>> {
         }
         component "Native chart support (OOP)" as NativeChartSupport {
             component "iOS ChartSupport" as IOSChartSupport
+            component "iOS OOP Helpers" as IOSOOPHelpers {
+                component "ChartLayoutCalculator" as IOSLayoutCalc
+                component "ValueFormatter" as IOSValueFormatter
+                component "AxisLabelManager" as IOSAxisManager
+                component "ChartRenderer" as IOSChartRenderer
+                component "ChartDataCalculator" as IOSDataCalc
+                component "HistogramRenderer" as IOSHistRenderer
+            }
             component "Android view/chart/" as AndroidChartPkg
+            component "Android OOP Helpers" as AndroidOOPHelpers {
+                component "ChartLayoutCalculator" as AndroidLayoutCalc
+                component "ValueFormatter" as AndroidValueFormatter
+                component "AxisLabelManager" as AndroidAxisManager
+                component "HistogramRenderer" as AndroidHistRenderer
+            }
         }
         component "Shared chart logic" as SharedChartLogic {
             component "useScrollableChart" as UseScrollableChart
@@ -179,7 +193,19 @@ NativeDemoCard --> NativeDemoCardAndroid
 ExpoRN --> NativeCharts
 NativeCharts --> NativeChartSupport
 NativeChartSupport --> IOSChartSupport
+NativeChartSupport --> IOSOOPHelpers
+IOSOOPHelpers --> IOSLayoutCalc
+IOSOOPHelpers --> IOSValueFormatter
+IOSOOPHelpers --> IOSAxisManager
+IOSOOPHelpers --> IOSChartRenderer
+IOSOOPHelpers --> IOSDataCalc
+IOSOOPHelpers --> IOSHistRenderer
 NativeChartSupport --> AndroidChartPkg
+NativeChartSupport --> AndroidOOPHelpers
+AndroidOOPHelpers --> AndroidLayoutCalc
+AndroidOOPHelpers --> AndroidValueFormatter
+AndroidOOPHelpers --> AndroidAxisManager
+AndroidOOPHelpers --> AndroidHistRenderer
 NativeCharts --> NLC
 NativeCharts --> NCC
 NativeCharts --> NALC
