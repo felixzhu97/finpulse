@@ -1,13 +1,13 @@
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Dimensions, Platform } from "react-native";
 import { BarChart } from "react-native-chart-kit";
-import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
-import { RiskMetricDetailDrawer } from "@/src/presentation/components/insights";
-import { useComputedVar } from "@/src/presentation/hooks/useComputedVar";
-import { useRiskMetrics } from "@/src/presentation/hooks/useRiskMetrics";
-import { useRiskSummary } from "@/src/presentation/hooks/useRiskSummary";
-import { useTheme } from "@/src/presentation/theme";
-import { useTranslation } from "@/src/presentation/i18n";
+import { MetricCard } from "@/src/components/ui/MetricCard";
+import { RiskMetricDetailDrawer } from "@/src/components/insights";
+import { useComputedVar } from "@/src/hooks/useComputedVar";
+import { useRiskMetrics } from "@/src/hooks/useRiskMetrics";
+import { useRiskSummary } from "@/src/hooks/useRiskSummary";
+import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/lib/i18n";
 import {
   InsightsScrollView,
   InsightsBlock,
@@ -24,7 +24,7 @@ import {
   InsightsRetryText,
   InsightsCentered,
   InsightsLoadingContainer,
-} from "@/src/presentation/theme/primitives";
+} from "@/src/theme/primitives";
 
 export default function InsightsScreen() {
   const { colors } = useTheme();

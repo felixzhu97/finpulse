@@ -49,7 +49,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(theme_primitives, "Theme Primitives", "styled-components/native", "ScreenRoot, ListRow, CardBordered, LabelText, ValueText, withTheme")
         Component(i18n_config, "i18n Config", "TypeScript", "i18next setup, translations")
         Component(use_translation, "useTranslation", "Hook", "Translation hook")
-        Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "presentation/utils: period filtering")
+        Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "lib/utils: period filtering")
         Component(storybook_ui_root, "StorybookUIRoot", "Storybook React Native", "On-device catalog of native and RN components")
     }
 
@@ -83,7 +83,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(other_repo_impls, "Other Repositories", "TypeScript", "UserPreference, Watchlist, etc.")
         
         Component(web3_service, "web3Service", "TypeScript", "Web3 integration")
-        Component(utils, "Utils", "TypeScript", "infrastructure utils")
+        Component(utils, "Utils", "TypeScript", "lib/utils")
     }
 
     ' Native Components

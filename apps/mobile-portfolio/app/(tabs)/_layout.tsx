@@ -3,8 +3,8 @@ import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useTheme } from "@/src/presentation/theme";
-import { useTranslation } from "@/src/presentation/i18n";
+import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/lib/i18n";
 
 export default function Layout() {
   const { colors } = useTheme();

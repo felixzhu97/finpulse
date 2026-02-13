@@ -14,13 +14,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ActivityIndicator, useColorScheme } from "react-native";
 import styled from "styled-components/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubscriber";
-import { store } from "@/src/presentation/store";
-import { usePreferences } from "@/src/presentation/hooks/usePreferences";
-import { DarkColors, LightColors } from "@/src/presentation/theme/colors";
-import { StyledThemeProvider } from "@/src/presentation/theme/StyledThemeProvider";
-import "@/src/presentation/i18n/config";
-import { i18n } from "@/src/presentation/i18n";
+import { QuoteSocketSubscriber } from "@/src/store/QuoteSocketSubscriber";
+import { store } from "@/src/store";
+import { usePreferences } from "@/src/hooks/usePreferences";
+import { DarkColors, LightColors } from "@/src/theme/colors";
+import { StyledThemeProvider } from "@/src/theme/StyledThemeProvider";
+import "@/src/lib/i18n/config";
+import { i18n } from "@/src/lib/i18n";
 import "react-native-get-random-values";
 
 const LoadingRoot = styled.View<{ bg: string }>`
@@ -98,7 +98,7 @@ function AppContent() {
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    SpaceMono: require("@/src/presentation/assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require("@/src/assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   useEffect(() => {
