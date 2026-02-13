@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import type { WalletInfo, Web3Config } from "@/src/features/blockchain/entities/blockchain";
+import type { WalletInfo, Web3Config } from "../../domain/entities/blockchain";
 
 class Web3Service {
   private provider: ethers.JsonRpcProvider | null = null;

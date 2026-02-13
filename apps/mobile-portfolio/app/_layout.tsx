@@ -14,13 +14,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ActivityIndicator, useColorScheme } from "react-native";
 import styled from "styled-components/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { QuoteSocketSubscriber } from "@/src/shared/store/QuoteSocketSubscriber";
-import { store } from "@/src/shared/store";
-import { usePreferences } from "@/src/shared/hooks/usePreferences";
-import { DarkColors, LightColors } from "@/src/shared/theme/colors";
-import { StyledThemeProvider } from "@/src/shared/theme/StyledThemeProvider";
-import "@/src/shared/i18n/config";
-import { i18n } from "@/src/shared/i18n";
+import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubscriber";
+import { store } from "@/src/presentation/store";
+import { usePreferences } from "@/src/presentation/hooks/usePreferences";
+import { DarkColors, LightColors } from "@/src/presentation/theme/colors";
+import { StyledThemeProvider } from "@/src/presentation/theme/StyledThemeProvider";
+import "@/src/presentation/i18n/config";
+import { i18n } from "@/src/presentation/i18n";
 import "react-native-get-random-values";
 
 const LoadingRoot = styled.View<{ bg: string }>`

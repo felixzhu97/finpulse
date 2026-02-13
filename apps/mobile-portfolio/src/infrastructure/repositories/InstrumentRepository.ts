@@ -1,5 +1,5 @@
-import type { Instrument } from "@/src/features/core/entities/instrument";
-import type { IInstrumentRepository } from "@/src/features/account/repositories/IInstrumentRepository";
+import type { Instrument } from "../../domain/entities/instrument";
+import type { IInstrumentRepository } from "../../domain/repositories/IInstrumentRepository";
 import { httpClient } from "../api/httpClient";
 
 export class InstrumentRepository implements IInstrumentRepository {

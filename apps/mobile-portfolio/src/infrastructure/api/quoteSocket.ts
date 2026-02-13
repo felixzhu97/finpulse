@@ -1,4 +1,4 @@
-import type { QuoteConnectionStatus, QuoteSnapshot } from "@/src/features/core/entities/quotes";
+import type { QuoteConnectionStatus, QuoteSnapshot } from "../../domain/entities/quotes";
 import { getBaseUrl } from "./config";
 
 export type { QuoteConnectionStatus, QuoteSnapshot };

@@ -1,5 +1,5 @@
-import type { Payment, PaymentCreate } from "@/src/features/account/entities/payment";
-import type { IPaymentRepository } from "@/src/features/account/repositories/IPaymentRepository";
+import type { Payment, PaymentCreate } from "../../domain/entities/payment";
+import type { IPaymentRepository } from "../../domain/repositories/IPaymentRepository";
 import { httpClient } from "../api/httpClient";
 
 export class PaymentRepository implements IPaymentRepository {

@@ -94,8 +94,8 @@ Technology Architecture
 
 ## Recent Updates
 
-- **Feature-Sliced (Mobile Portfolio)**: core, portfolio, account, quotes, risk, watchlist, preferences, blockchain; shared layer; DependencyContainer.
 - **Redux optimization (Mobile Portfolio)**: Unified quotes via Redux; `extraSubscribedSymbols` for drawer symbols; single WebSocket; useAppSelector/useAppDispatch throughout.
 - **Redux + styled-components (Mobile Portfolio)**: Portfolio state in Redux (portfolio slice); main screens and list components use styled-components primitives (ScreenRoot, ListRow, CardBordered, SafeAreaScreen, etc.) for theme-aware UI.
+- **Clean Architecture (Mobile Portfolio)**: Presentation → Application → Domain; Infrastructure only in DependencyContainer. Shared hooks: **useAsyncLoad**, **runWithLoading**, **useRefreshControl**, **useAccountData**.
 - **OOP Architecture**: Native chart code refactored with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
 - **Code Simplification**: Removed unused code (usePerSymbolHistory, duplicate PeriodDataProcessor), simplified logic, improved maintainability through inheritance and abstraction

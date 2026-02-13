@@ -13,8 +13,8 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
     Component(account_screen, "账户屏幕", "React Native", "个人资料、账户列表、操作；useAccountData 在标签聚焦时加载")
     Component(storybook_screen, "Storybook 屏幕", "React Native", "仅开发环境的 /storybook 路由；包裹 StorybookUIRoot 并提供返回栏")
 
-    ' Shared Layer
-    Boundary(presentation_layer, "Shared 层") {
+    ' Presentation Layer
+    Boundary(presentation_layer, "展示层") {
         Component(portfolio_summary, "PortfolioSummary", "React Native", "净资产、当日变动")
         Component(asset_allocation_chart, "AssetAllocationChart", "React Native", "按账户类型饼图")
         Component(net_worth_chart, "NetWorthLineChart", "React Native", "净资产趋势")
@@ -53,36 +53,22 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(storybook_ui_root, "StorybookUIRoot", "Storybook React Native", "原生组件和 React Native 组件的设备端目录")
     }
 
-    ' Features Layer
-    Boundary(features_layer, "Features 层") {
-        Component(dependency_container, "DependencyContainer", "TypeScript", "装配 feature use cases 与 infrastructure")
-        Boundary(portfolio_feature, "portfolio") {
-            Component(get_portfolio_usecase, "GetPortfolioUseCase", "TypeScript", "组合用例")
-        }
-        Boundary(account_feature, "account") {
-            Component(get_account_data_usecase, "GetAccountDataUseCase", "TypeScript", "客户、账户、accountResources")
-            Component(register_customer_usecase, "RegisterCustomerUseCase", "TypeScript", "注册客户")
-            Component(payment_usecase, "PaymentUseCase", "TypeScript", "创建支付")
-            Component(trade_usecase, "TradeUseCase", "TypeScript", "创建交易")
-        }
-        Boundary(quotes_feature, "quotes") {
-            Component(get_quotes_usecase, "GetQuotesUseCase", "TypeScript", "报价用例")
-        }
-        Boundary(risk_feature, "risk") {
-            Component(risk_metrics_usecase, "RiskMetricsUseCase", "TypeScript", "风险指标、VaR 计算")
-        }
-        Component(other_usecases, "WatchlistUseCase, UserPreferenceUseCase, BlockchainUseCase", "TypeScript", "watchlist、preferences、blockchain")
+    ' Application Layer
+    Boundary(application_layer, "应用层") {
+        Component(dependency_container, "DependencyContainer", "TypeScript", "依赖注入容器")
+        Component(get_portfolio_usecase, "GetPortfolioUseCase", "TypeScript", "组合用例")
+        Component(get_customer_usecase, "GetCustomerUseCase", "TypeScript", "客户用例")
+        Component(get_quotes_usecase, "GetQuotesUseCase", "TypeScript", "报价用例")
+        Component(risk_metrics_usecase, "RiskMetricsUseCase", "TypeScript", "风险指标、风险摘要、VaR 计算用例")
     }
 
     ' Domain Layer
-    Boundary(domain_layer, "领域层（Feature Entities）") {
-        Component(core_entities, "Core Entities", "TypeScript", "instrument、quotes（共享）")
-        Component(portfolio_entities, "Portfolio Entities", "TypeScript", "Portfolio、Account、Holding")
-        Component(account_entities, "Account Entities", "TypeScript", "Customer、Payment、Trade、Order、AccountResource")
+    Boundary(domain_layer, "领域层") {
+        Component(domain_entities, "领域实体", "TypeScript", "Portfolio、Quote、Customer 等")
         Component(portfolio_repo_interface, "IPortfolioRepository", "TypeScript", "组合仓库接口")
         Component(quote_repo_interface, "IQuoteRepository", "TypeScript", "报价仓库接口")
         Component(customer_repo_interface, "ICustomerRepository", "TypeScript", "客户仓库接口")
-        Component(other_repo_interfaces, "其他仓库接口", "TypeScript", "UserPreference、Watchlist、Instrument、RiskMetrics、Blockchain 等")
+        Component(other_repo_interfaces, "其他仓库接口", "TypeScript", "UserPreference、Watchlist、Instrument 等")
     }
 
     ' Infrastructure Layer
@@ -122,21 +108,13 @@ Rel(use_risk_summary_hook, dependency_container, "获取用例", "")
 Rel(use_computed_var_hook, dependency_container, "获取用例", "")
 Rel(use_account_data_hook, dependency_container, "获取用例", "")
 
-' Features to Domain
+' Application to Domain
 Rel(dependency_container, get_portfolio_usecase, "提供", "")
-Rel(dependency_container, get_account_data_usecase, "提供", "")
-Rel(dependency_container, register_customer_usecase, "提供", "")
-Rel(dependency_container, payment_usecase, "提供", "")
-Rel(dependency_container, trade_usecase, "提供", "")
+Rel(dependency_container, get_customer_usecase, "提供", "")
 Rel(dependency_container, get_quotes_usecase, "提供", "")
 Rel(dependency_container, risk_metrics_usecase, "提供", "")
-Rel(dependency_container, other_usecases, "提供", "")
 Rel(get_portfolio_usecase, portfolio_repo_interface, "使用", "")
-Rel(get_account_data_usecase, customer_repo_interface, "使用", "")
-Rel(get_account_data_usecase, portfolio_repo_interface, "使用", "")
-Rel(register_customer_usecase, customer_repo_interface, "使用", "")
-Rel(payment_usecase, other_repo_interfaces, "使用", "")
-Rel(trade_usecase, other_repo_interfaces, "使用", "")
+Rel(get_customer_usecase, customer_repo_interface, "使用", "")
 Rel(get_quotes_usecase, quote_repo_interface, "使用", "")
 Rel(risk_metrics_usecase, portfolio_repo_interface, "使用", "")
 
@@ -233,9 +211,9 @@ Rel(stock_detail_drawer, period_data_processor, "使用", "")
 Rel(storybook_screen, storybook_ui_root, "渲染", "")
 
 ' Domain entities
-Rel(portfolio_repo_interface, portfolio_entities, "返回", "")
-Rel(quote_repo_interface, core_entities, "返回", "")
-Rel(customer_repo_interface, account_entities, "返回", "")
+Rel(portfolio_repo_interface, domain_entities, "返回", "")
+Rel(quote_repo_interface, domain_entities, "返回", "")
+Rel(customer_repo_interface, domain_entities, "返回", "")
 
 LAYOUT_TOP_DOWN()
 

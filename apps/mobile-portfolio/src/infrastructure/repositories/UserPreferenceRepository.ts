@@ -1,5 +1,5 @@
-import type { UserPreference, UserPreferenceCreate } from "@/src/features/preferences/entities/userPreference";
-import type { IUserPreferenceRepository } from "@/src/features/preferences/repositories/IUserPreferenceRepository";
+import type { UserPreference, UserPreferenceCreate } from "../../domain/entities/userPreference";
+import type { IUserPreferenceRepository } from "../../domain/repositories/IUserPreferenceRepository";
 import { httpClient } from "../api/httpClient";
 
 export class UserPreferenceRepository implements IUserPreferenceRepository {

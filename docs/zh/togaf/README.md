@@ -79,8 +79,8 @@ plantuml -tsvg *.puml
 
 ## 最近更新
 
-- **Feature-Sliced（移动端投资组合）**：core、portfolio、account、quotes、risk、watchlist、preferences、blockchain；shared 层；DependencyContainer。
 - **Redux 优化（移动端投资组合）**：报价统一走 Redux；`extraSubscribedSymbols` 支持抽屉符号；单 WebSocket；统一使用 useAppSelector/useAppDispatch。
 - **Redux + styled-components（移动端投资组合）**：Portfolio 状态迁至 Redux（portfolio slice）；主屏与列表组件统一使用 styled-components 基元（ScreenRoot、ListRow、CardBordered、SafeAreaScreen 等）实现主题 UI。
+- **整洁架构（移动端投资组合）**：Presentation → Application → Domain；Infrastructure 仅由 DependencyContainer 注入。共享 hooks：**useAsyncLoad**、**runWithLoading**、**useRefreshControl**、**useAccountData**。
 - **OOP 架构**：原生图表代码重构，使用抽象基类（`BaseChartViewManager`、`BaseChartView`、`BaseChartRenderer`）和辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartDataCalculator）。共享工具：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes。
 - **代码简化**：移除未使用代码（usePerSymbolHistory、重复 PeriodDataProcessor），简化逻辑，提升可维护性

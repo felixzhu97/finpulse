@@ -51,7 +51,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-mobile-portfolio-components.puml`
 
-**Description**: Mobile Portfolio (Expo + React Native): feature-sliced (core, portfolio, account, quotes, risk, watchlist, preferences, blockchain); shared layer; Redux (quotes, preferences, portfolio); styled-components; hooks (usePortfolio, useAccountData, useSymbolDisplayData, etc.); native charts; backend REST + WebSocket.
+**Description**: Mobile Portfolio app (Expo + React Native): thin client with AppContent (preferences loading spinner), tabs/screens; **Redux Toolkit** (quotes with subscribedSymbols + extraSubscribedSymbols, preferences, portfolio); **styled-components** for theme-aware UI (primitives: ScreenRoot, ListRow, CardBordered, etc.); hooks (usePortfolio, useSymbolDisplayData, usePreferences, useRiskMetrics, useRiskSummary, useComputedVar); QuoteSocketSubscriber subscribes to merged symbols; StockDetailDrawer adds symbol via setExtraSubscribedSymbols; Account screen uses useFocusEffect; native charts; backend: GET /api/v1/portfolio, GET /api/v1/portfolio/risk-summary, GET /api/v1/portfolio/asset-allocation-by-account-type, GET /api/v1/quotes, WS /ws/quotes.
 
 ## How to View Diagrams
 
@@ -82,7 +82,6 @@ After setup, diagrams render without network access.
 
 ## Recent Updates
 
-- **Feature-Sliced (Mobile)**: core, portfolio, account, quotes, risk, watchlist, preferences, blockchain; shared layer; DependencyContainer.
 - **Redux optimization (Mobile)**: Unified quotes via Redux; extraSubscribedSymbols for drawer; single WebSocket; useAppSelector/useAppDispatch; removed useRealtimeQuotes.
 - **Redux + styled-components (Mobile)**: Portfolio state in Redux; main screens and list components use styled-components primitives.
 - **OOP Architecture**: Native chart code refactored with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.

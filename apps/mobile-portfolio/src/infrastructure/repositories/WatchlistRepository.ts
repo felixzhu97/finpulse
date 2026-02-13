@@ -3,8 +3,8 @@ import type {
   WatchlistItem,
   WatchlistCreate,
   WatchlistItemCreate,
-} from "@/src/features/watchlist/entities/watchlist";
-import type { IWatchlistRepository } from "@/src/features/watchlist/repositories/IWatchlistRepository";
+} from "../../domain/entities/watchlist";
+import type { IWatchlistRepository } from "../../domain/repositories/IWatchlistRepository";
 import { httpClient } from "../api/httpClient";
 
 export class WatchlistRepository implements IWatchlistRepository {

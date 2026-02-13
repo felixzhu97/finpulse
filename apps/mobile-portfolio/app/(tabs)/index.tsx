@@ -2,15 +2,15 @@ import { useMemo, useState, useCallback } from "react";
 import { ActivityIndicator, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import { NativeLineChart } from "@/src/shared/components/native";
-import { PortfolioSummary } from "@/src/shared/components/portfolio/PortfolioSummary";
-import { MetricCard } from "@/src/shared/components/ui/MetricCard";
-import { AssetAllocationChart } from "@/src/shared/components/portfolio/AssetAllocationChart";
-import { NetWorthLineChart } from "@/src/shared/components/portfolio/NetWorthLineChart";
-import { usePortfolio } from "@/src/shared/hooks";
-import { useTheme } from "@/src/shared/theme";
-import { getCurrencySymbol } from "@/src/shared/utils";
-import { useTranslation } from "@/src/shared/i18n";
+import { NativeLineChart } from "@/src/presentation/components/native";
+import { PortfolioSummary } from "@/src/presentation/components/portfolio/PortfolioSummary";
+import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
+import { AssetAllocationChart } from "@/src/presentation/components/portfolio/AssetAllocationChart";
+import { NetWorthLineChart } from "@/src/presentation/components/portfolio/NetWorthLineChart";
+import { usePortfolio } from "@/src/presentation/hooks";
+import { useTheme } from "@/src/presentation/theme";
+import { getCurrencySymbol } from "@/src/presentation/utils";
+import { useTranslation } from "@/src/presentation/i18n";
 import {
   ScreenRoot,
   CenteredContainer,
@@ -25,7 +25,7 @@ import {
   HeaderTitleBlock,
   ScreenTitle,
   ScreenDate,
-} from "@/src/shared/theme/primitives";
+} from "@/src/presentation/theme/primitives";
 import styled from "styled-components/native";
 
 const StyledScrollView = styled(ScrollView)`

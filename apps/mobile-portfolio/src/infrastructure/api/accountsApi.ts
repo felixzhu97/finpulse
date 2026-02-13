@@ -1,5 +1,5 @@
 import { httpClient } from "./httpClient";
-import type { AccountResource } from "@/src/features/account/entities/accountResource";
+import type { AccountResource } from "../../domain/entities/accountResource";
 
 class AccountsApi {
   async list(limit = 100, offset = 0): Promise<AccountResource[]> {

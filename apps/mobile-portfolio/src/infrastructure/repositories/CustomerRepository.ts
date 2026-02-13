@@ -1,5 +1,5 @@
-import type { Customer, CustomerCreate } from "@/src/features/account/entities/customer";
-import type { ICustomerRepository } from "@/src/features/account/repositories/ICustomerRepository";
+import type { Customer, CustomerCreate } from "../../domain/entities/customer";
+import type { ICustomerRepository } from "../../domain/repositories/ICustomerRepository";
 import { httpClient } from "../api/httpClient";
 
 export class CustomerRepository implements ICustomerRepository {
