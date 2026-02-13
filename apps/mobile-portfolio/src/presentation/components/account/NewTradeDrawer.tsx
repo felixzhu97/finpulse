@@ -10,10 +10,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { container } from "@/src/core/application";
-import type { Instrument } from "@/src/core/domain/entities/instrument";
-import type { Order } from "@/src/core/domain/entities/order";
-import type { Trade } from "@/src/core/domain/entities/trade";
+import { container } from "@/src/application";
+import type { Instrument } from "@/src/domain/entities/instrument";
+import type { Order } from "@/src/domain/entities/order";
+import type { Trade } from "@/src/domain/entities/trade";
 import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
 import { useTheme } from "@/src/presentation/theme";
 import {

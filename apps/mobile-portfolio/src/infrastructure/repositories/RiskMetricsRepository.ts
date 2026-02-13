@@ -1,6 +1,6 @@
-import type { RiskMetrics } from "@/src/core/domain/entities/riskMetrics";
-import type { VarComputeRequest, VarComputeResult } from "@/src/core/domain/entities/varCompute";
-import type { IRiskMetricsRepository } from "@/src/core/domain/repositories/IRiskMetricsRepository";
+import type { RiskMetrics } from "../../domain/entities/riskMetrics";
+import type { VarComputeRequest, VarComputeResult } from "../../domain/entities/varCompute";
+import type { IRiskMetricsRepository } from "../../domain/repositories/IRiskMetricsRepository";
 import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class RiskMetricsRepository implements IRiskMetricsRepository {

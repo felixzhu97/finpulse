@@ -5,8 +5,8 @@ import type {
   BlockchainTransaction,
   TransferRequest,
   SeedBalanceRequest,
-} from "@/src/core/domain/entities/blockchain";
-import type { IBlockchainRepository } from "@/src/core/domain/repositories/IBlockchainRepository";
+} from "../../domain/entities/blockchain";
+import type { IBlockchainRepository } from "../../domain/repositories/IBlockchainRepository";
 import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class BlockchainRepository implements IBlockchainRepository {

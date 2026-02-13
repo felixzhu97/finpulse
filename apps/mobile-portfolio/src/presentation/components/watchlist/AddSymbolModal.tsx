@@ -12,7 +12,7 @@ import {
   View,
 } from "react-native";
 import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
-import type { Instrument } from "@/src/core/domain/entities/instrument";
+import type { Instrument } from "@/src/domain/entities/instrument";
 import {
   AbsoluteFill,
   DrawerModalRoot,

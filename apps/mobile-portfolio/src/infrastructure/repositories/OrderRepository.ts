@@ -1,5 +1,5 @@
-import type { Order, OrderCreate } from "@/src/core/domain/entities/order";
-import type { IOrderRepository } from "@/src/core/domain/repositories/IOrderRepository";
+import type { Order, OrderCreate } from "../../domain/entities/order";
+import type { IOrderRepository } from "../../domain/repositories/IOrderRepository";
 import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class OrderRepository implements IOrderRepository {

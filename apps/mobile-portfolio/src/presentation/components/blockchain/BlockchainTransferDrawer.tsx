@@ -30,8 +30,8 @@ import {
 import { useBlockchain } from "@/src/presentation/hooks/useBlockchain";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
-import type { Account } from "@/src/core/domain/entities/portfolio";
-import type { AccountResource } from "@/src/core/domain/entities/accountResource";
+import type { Account } from "@/src/domain/entities/portfolio";
+import type { AccountResource } from "@/src/domain/entities/accountResource";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const DRAWER_HEIGHT = Math.min(SCREEN_HEIGHT * 0.75, 600);

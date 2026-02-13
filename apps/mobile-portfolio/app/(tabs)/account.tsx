@@ -3,7 +3,7 @@ import { ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import styled from "styled-components/native";
-import type { Account } from "@/src/core/domain/entities";
+import type { Account } from "@/src/domain/entities";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useAccountData } from "@/src/presentation/hooks";
 import { SettingsDrawer } from "@/src/presentation/components/account/SettingsDrawer";

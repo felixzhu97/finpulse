@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
-import type { QuoteStreamHandle } from "@/src/core/domain/services/IQuoteStreamService";
+import type { QuoteStreamHandle } from "../../domain/services/IQuoteStreamService";
 import { useAppDispatch, useAppSelector } from "./useAppStore";
 import { setSnapshot, setStatus } from "./quotesSlice";
 import { selectMergedSubscribedSymbols } from "./quotesSelectors";
-import { container } from "../../core/application";
+import { container } from "../../application";
 
 export function QuoteSocketSubscriber() {
   const dispatch = useAppDispatch();

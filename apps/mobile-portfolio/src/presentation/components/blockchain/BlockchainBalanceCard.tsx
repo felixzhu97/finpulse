@@ -5,7 +5,7 @@ import { useBlockchain } from "@/src/presentation/hooks/useBlockchain";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
 import { formatBalance } from "@/src/presentation/utils";
-import type { BlockchainBalance } from "@/src/core/domain/entities/blockchain";
+import type { BlockchainBalance } from "@/src/domain/entities/blockchain";
 import {
   CardBordered,
   RowTitle,

@@ -1,4 +1,4 @@
-import type { QuoteSnapshot } from "@/src/core/domain/entities/quotes";
+import type { QuoteSnapshot } from "@/src/domain/entities/quotes";
 import { createSelector } from "@reduxjs/toolkit";
 import type { RootState } from "./storeInstance";
 

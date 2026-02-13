@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import type { RiskMetrics } from "@/src/core/domain/entities/riskMetrics";
-import { container } from "../../core/application";
+import type { RiskMetrics } from "../../domain/entities/riskMetrics";
+import { container } from "../../application";
 import { useAsyncLoad } from "./useAsyncLoad";
 
 export interface UseRiskMetricsResult {

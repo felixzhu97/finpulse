@@ -1,5 +1,5 @@
-import type { Instrument } from "@/src/core/domain/entities/instrument";
-import type { IInstrumentRepository } from "@/src/core/domain/repositories/IInstrumentRepository";
+import type { Instrument } from "../../domain/entities/instrument";
+import type { IInstrumentRepository } from "../../domain/repositories/IInstrumentRepository";
 import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class InstrumentRepository implements IInstrumentRepository {
