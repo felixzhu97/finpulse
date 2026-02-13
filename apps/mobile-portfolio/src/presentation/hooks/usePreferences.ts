@@ -8,9 +8,9 @@ import {
   type ThemePreference,
 } from "../store/preferencesSlice";
 import { useUserPreferences } from "./useUserPreferences";
-import { container } from "../../application";
+import { container } from "../../core/application";
 import { i18n } from "../i18n";
-import type { UpdatePreferenceInput } from "../../application/usecases/UserPreferenceUseCase";
+import type { UpdatePreferenceInput } from "@/src/core/application/usecases/UserPreferenceUseCase";
 
 export function usePreferences() {
   const dispatch = useAppDispatch();

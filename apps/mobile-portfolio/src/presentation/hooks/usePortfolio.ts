@@ -3,8 +3,8 @@ import type {
   AssetAllocationItem,
   Portfolio,
   PortfolioHistoryPoint,
-} from "../../domain/entities/portfolio";
-import { container } from "../../application";
+} from "@/src/core/domain/entities/portfolio";
+import { container } from "../../core/application";
 import { useAsyncLoad } from "./useAsyncLoad";
 
 export interface UsePortfolioResult {

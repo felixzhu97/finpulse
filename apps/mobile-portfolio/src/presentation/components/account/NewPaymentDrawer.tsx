@@ -11,9 +11,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { container } from "@/src/application";
-import type { AccountResource } from "@/src/domain/entities/accountResource";
-import type { Payment } from "@/src/domain/entities/payment";
+import { container } from "@/src/core/application";
+import type { AccountResource } from "@/src/core/domain/entities/accountResource";
+import type { Payment } from "@/src/core/domain/entities/payment";
 import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
 import { useTheme } from "@/src/presentation/theme";
 import {

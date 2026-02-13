@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { UserPreference } from "../../domain/entities/userPreference";
-import { container } from "../../application";
+import type { UserPreference } from "@/src/core/domain/entities/userPreference";
+import { container } from "../../core/application";
 
 export interface UseUserPreferencesResult {
   preference: UserPreference | null;

@@ -1,9 +1,9 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-import type { Account } from "../../domain/entities/portfolio";
-import type { AccountResource } from "../../domain/entities/accountResource";
-import type { Customer } from "../../domain/entities/customer";
-import { container } from "../../application";
+import type { Account } from "@/src/core/domain/entities/portfolio";
+import type { AccountResource } from "@/src/core/domain/entities/accountResource";
+import type { Customer } from "@/src/core/domain/entities/customer";
+import { container } from "../../core/application";
 import { useAsyncLoad } from "./useAsyncLoad";
 
 export interface UseAccountDataResult {

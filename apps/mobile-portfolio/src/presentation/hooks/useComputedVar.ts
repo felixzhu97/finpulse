@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
-import type { VarComputeResult } from "../../domain/entities/varCompute";
-import { container } from "../../application";
+import type { VarComputeResult } from "@/src/core/domain/entities/varCompute";
+import { container } from "../../core/application";
 
 export interface UseComputedVarResult {
   computedVar: VarComputeResult | null;

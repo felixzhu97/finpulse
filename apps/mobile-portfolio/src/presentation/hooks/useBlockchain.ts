@@ -5,8 +5,8 @@ import type {
   BlockchainBlockWithTransactions,
   BlockchainTransaction,
   TransferRequest,
-} from "../../domain/entities/blockchain";
-import { container } from "../../application";
+} from "@/src/core/domain/entities/blockchain";
+import { container } from "../../core/application";
 
 export function useBlockchain() {
   const [loading, setLoading] = useState(false);

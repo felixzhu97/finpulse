@@ -1,5 +1,5 @@
 import { memo } from "react";
-import type { Portfolio } from "@/src/domain/entities/portfolio";
+import type { Portfolio } from "@/src/core/domain/entities/portfolio";
 import { formatCurrency, formatSignedPercent } from "@/src/presentation/utils";
 import { useTranslation } from "@/src/presentation/i18n";
 import { MetricCard } from "../ui/MetricCard";

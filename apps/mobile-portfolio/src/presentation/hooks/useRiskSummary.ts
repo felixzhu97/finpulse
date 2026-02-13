@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import type { RiskSummary } from "../../domain/entities/portfolio";
-import { container } from "../../application";
+import type { RiskSummary } from "@/src/core/domain/entities/portfolio";
+import { container } from "../../core/application";
 import { useAsyncLoad } from "./useAsyncLoad";
 
 export interface UseRiskSummaryResult {

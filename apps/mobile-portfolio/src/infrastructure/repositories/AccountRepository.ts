@@ -1,5 +1,5 @@
-import type { IAccountRepository } from "../../domain/repositories/IAccountRepository";
-import type { AccountResource } from "../../domain/entities/accountResource";
+import type { IAccountRepository } from "@/src/core/domain/repositories/IAccountRepository";
+import type { AccountResource } from "@/src/core/domain/entities/accountResource";
 import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class AccountRepository implements IAccountRepository {

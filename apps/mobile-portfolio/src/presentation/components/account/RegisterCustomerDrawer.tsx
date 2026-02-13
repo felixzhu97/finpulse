@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
-import { container } from "@/src/application";
+import { container } from "@/src/core/application";
 import { useTheme, withTheme } from "@/src/presentation/theme";
-import type { Customer } from "@/src/domain/entities/customer";
+import type { Customer } from "@/src/core/domain/entities/customer";
 import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "@/src/presentation/i18n";

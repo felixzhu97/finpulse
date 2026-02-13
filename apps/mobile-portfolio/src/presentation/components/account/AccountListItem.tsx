@@ -1,5 +1,5 @@
 import { memo } from "react";
-import type { Account } from "@/src/domain/entities/portfolio";
+import type { Account } from "@/src/core/domain/entities/portfolio";
 import { formatBalance, formatSigned, getStockChangeInfo } from "@/src/presentation/utils";
 import { Sparkline } from "../ui/Sparkline";
 import {

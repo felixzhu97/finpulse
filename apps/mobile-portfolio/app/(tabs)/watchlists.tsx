@@ -19,8 +19,8 @@ import {
 import { GlassView } from "@/src/presentation/components/ui/GlassView";
 import { SortMenu, type SortOption } from "@/src/presentation/components/ui/SortMenu";
 import { useSymbolDisplayData } from "@/src/presentation/hooks/useSymbolDisplayData";
-import type { Account, Holding } from "@/src/domain/entities/portfolio";
-import { container } from "@/src/application";
+import type { Account, Holding } from "@/src/core/domain/entities/portfolio";
+import { container } from "@/src/core/application";
 import { usePortfolio } from "@/src/presentation/hooks";
 import { useAppDispatch } from "@/src/presentation/store";
 import { setHistory, setSnapshot } from "@/src/presentation/store/quotesSlice";

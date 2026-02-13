@@ -1,4 +1,4 @@
-import type { IQuoteStreamService } from "../../domain/services/IQuoteStreamService";
+import type { IQuoteStreamService } from "@/src/core/domain/services/IQuoteStreamService";
 import { createQuoteSocket } from "@/src/infrastructure/network/quoteSocket";
 
 export class QuoteStreamService implements IQuoteStreamService {
