@@ -1,13 +1,13 @@
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Dimensions, Platform } from "react-native";
 import { BarChart } from "react-native-chart-kit";
-import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
-import { RiskMetricDetailDrawer } from "@/src/presentation/components/insights";
-import { useComputedVar } from "@/src/presentation/hooks/useComputedVar";
-import { useRiskMetrics } from "@/src/presentation/hooks/useRiskMetrics";
-import { useRiskSummary } from "@/src/presentation/hooks/useRiskSummary";
-import { useTheme } from "@/src/presentation/theme";
-import { useTranslation } from "@/src/presentation/i18n";
+import { MetricCard } from "@/src/shared/components/ui/MetricCard";
+import { RiskMetricDetailDrawer } from "@/src/shared/components/insights";
+import { useComputedVar } from "@/src/shared/hooks/useComputedVar";
+import { useRiskMetrics } from "@/src/shared/hooks/useRiskMetrics";
+import { useRiskSummary } from "@/src/shared/hooks/useRiskSummary";
+import { useTheme } from "@/src/shared/theme";
+import { useTranslation } from "@/src/shared/i18n";
 import {
   InsightsScrollView,
   InsightsBlock,
@@ -24,7 +24,7 @@ import {
   InsightsRetryText,
   InsightsCentered,
   InsightsLoadingContainer,
-} from "@/src/presentation/theme/primitives";
+} from "@/src/shared/theme/primitives";
 
 export default function InsightsScreen() {
   const { colors } = useTheme();

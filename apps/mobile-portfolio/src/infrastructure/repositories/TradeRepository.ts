@@ -1,5 +1,5 @@
-import type { Trade, TradeCreate } from "../../domain/entities/trade";
-import type { ITradeRepository } from "../../domain/repositories/ITradeRepository";
+import type { Trade, TradeCreate } from "@/src/features/account/entities/trade";
+import type { ITradeRepository } from "@/src/features/account/repositories/ITradeRepository";
 import { httpClient } from "../api/httpClient";
 
 export class TradeRepository implements ITradeRepository {

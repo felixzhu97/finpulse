@@ -19,7 +19,7 @@
 
 **文件**：`c4-mobile-portfolio-components.puml`
 
-**说明**：移动端投资组合应用（Expo + React Native）薄客户端：AppContent（偏好加载 spinner）、标签/屏幕；**Redux Toolkit**（quotes 含 subscribedSymbols + extraSubscribedSymbols、preferences、portfolio）；**styled-components** 主题 UI（基元 ScreenRoot、ListRow、CardBordered 等）；hooks（usePortfolio、useSymbolDisplayData、usePreferences、useRiskMetrics、useRiskSummary、useComputedVar）；QuoteSocketSubscriber 订阅合并符号；StockDetailDrawer 通过 setExtraSubscribedSymbols 添加符号；账户屏 useFocusEffect；原生图表；后端 GET /api/v1/portfolio、GET /api/v1/portfolio/risk-summary、GET /api/v1/portfolio/asset-allocation-by-account-type、GET /api/v1/quotes、WS /ws/quotes。
+**说明**：移动端投资组合（Expo + React Native）：feature-sliced（core、portfolio、account、quotes、risk、watchlist、preferences、blockchain）；shared 层；Redux；styled-components；hooks；原生图表；后端 REST + WebSocket。
 
 ### 投资组合分析 API 组件
 
@@ -62,6 +62,7 @@ git clone https://github.com/plantuml-stdlib/C4-PlantUML.git .
 
 ## 最近更新
 
+- **Feature-Sliced（移动端）**：core、portfolio、account、quotes、risk、watchlist、preferences、blockchain；shared 层；DependencyContainer。
 - **Redux 优化（移动端）**：报价统一 Redux；extraSubscribedSymbols 支持抽屉；单 WebSocket；useAppSelector/useAppDispatch；移除 useRealtimeQuotes。
 - **Redux + styled-components（移动端）**：Portfolio 状态迁至 Redux；主屏与列表组件使用 styled-components 基元。
 - **OOP 架构**：原生图表代码重构，使用抽象基类（`BaseChartViewManager`、`BaseChartView`、`BaseChartRenderer`）和辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartDataCalculator）。共享工具：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes。

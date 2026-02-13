@@ -3,7 +3,7 @@ import type {
   AssetAllocationItem,
   Portfolio,
   RiskSummary,
-} from "../../domain/entities/portfolio";
+} from "@/src/features/portfolio/entities/portfolio";
 
 class PortfolioApi {
   async getPortfolio(): Promise<Portfolio | null> {

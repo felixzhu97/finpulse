@@ -10,22 +10,22 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AccountListItem } from "@/src/presentation/components/account/AccountListItem";
-import { StockListItem } from "@/src/presentation/components/account/StockListItem";
+import { AccountListItem } from "@/src/shared/components/account/AccountListItem";
+import { StockListItem } from "@/src/shared/components/account/StockListItem";
 import {
   StockDetailDrawer,
   type StockDetailItem,
-} from "@/src/presentation/components/watchlist";
-import { GlassView } from "@/src/presentation/components/ui/GlassView";
-import { SortMenu, type SortOption } from "@/src/presentation/components/ui/SortMenu";
-import { useSymbolDisplayData } from "@/src/presentation/hooks/useSymbolDisplayData";
-import type { Account, Holding } from "@/src/domain/entities/portfolio";
-import { container } from "@/src/application";
-import { usePortfolio } from "@/src/presentation/hooks";
-import { useAppDispatch } from "@/src/presentation/store";
-import { setHistory, setSnapshot } from "@/src/presentation/store/quotesSlice";
-import { useTheme } from "@/src/presentation/theme";
-import { useTranslation } from "@/src/presentation/i18n";
+} from "@/src/shared/components/watchlist";
+import { GlassView } from "@/src/shared/components/ui/GlassView";
+import { SortMenu, type SortOption } from "@/src/shared/components/ui/SortMenu";
+import { useSymbolDisplayData } from "@/src/shared/hooks/useSymbolDisplayData";
+import type { Account, Holding } from "@/src/features/portfolio/entities/portfolio";
+import { container } from "@/src/features";
+import { usePortfolio } from "@/src/shared/hooks";
+import { useAppDispatch } from "@/src/shared/store";
+import { setHistory, setSnapshot } from "@/src/shared/store/quotesSlice";
+import { useTheme } from "@/src/shared/theme";
+import { useTranslation } from "@/src/shared/i18n";
 import {
   SafeAreaScreen,
   ScreenHeader,
@@ -42,7 +42,7 @@ import {
   EmptyText,
   EmptySubtext,
   LoadingWrap,
-} from "@/src/presentation/theme/primitives";
+} from "@/src/shared/theme/primitives";
 import styled from "styled-components/native";
 
 const SearchBarContainer = styled(Animated.View)`

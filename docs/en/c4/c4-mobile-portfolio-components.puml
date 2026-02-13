@@ -13,8 +13,8 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(account_screen, "Account Screen", "React Native", "Profile, account list, Actions; useAccountData loads on tab focus via useFocusEffect")
     Component(storybook_screen, "Storybook Screen", "React Native", "Dev-only /storybook route; wraps StorybookUIRoot with back bar")
 
-    ' Presentation Layer
-    Boundary(presentation_layer, "Presentation Layer") {
+    ' Shared Layer (Presentation)
+    Boundary(presentation_layer, "Shared Layer") {
         Component(portfolio_summary, "PortfolioSummary", "React Native", "Net worth, today change")
         Component(asset_allocation_chart, "AssetAllocationChart", "React Native", "Pie by account type")
         Component(net_worth_chart, "NetWorthLineChart", "React Native", "Net worth trend")
@@ -53,22 +53,36 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(storybook_ui_root, "StorybookUIRoot", "Storybook React Native", "On-device catalog of native and RN components")
     }
 
-    ' Application Layer
-    Boundary(application_layer, "Application Layer") {
-        Component(dependency_container, "DependencyContainer", "TypeScript", "Dependency injection container")
-        Component(get_portfolio_usecase, "GetPortfolioUseCase", "TypeScript", "Portfolio use case")
-        Component(get_customer_usecase, "GetCustomerUseCase", "TypeScript", "Customer use case")
-        Component(get_quotes_usecase, "GetQuotesUseCase", "TypeScript", "Quotes use case")
-        Component(risk_metrics_usecase, "RiskMetricsUseCase", "TypeScript", "Risk metrics, risk summary, VaR computation")
+    ' Features Layer (Application)
+    Boundary(features_layer, "Features Layer") {
+        Component(dependency_container, "DependencyContainer", "TypeScript", "Wires feature use cases with infrastructure")
+        Boundary(portfolio_feature, "portfolio") {
+            Component(get_portfolio_usecase, "GetPortfolioUseCase", "TypeScript", "Portfolio use case")
+        }
+        Boundary(account_feature, "account") {
+            Component(get_account_data_usecase, "GetAccountDataUseCase", "TypeScript", "Customer, accounts, accountResources")
+            Component(register_customer_usecase, "RegisterCustomerUseCase", "TypeScript", "Register customer")
+            Component(payment_usecase, "PaymentUseCase", "TypeScript", "Create payment")
+            Component(trade_usecase, "TradeUseCase", "TypeScript", "Create trade")
+        }
+        Boundary(quotes_feature, "quotes") {
+            Component(get_quotes_usecase, "GetQuotesUseCase", "TypeScript", "Quotes use case")
+        }
+        Boundary(risk_feature, "risk") {
+            Component(risk_metrics_usecase, "RiskMetricsUseCase", "TypeScript", "Risk metrics, VaR computation")
+        }
+        Component(other_usecases, "WatchlistUseCase, UserPreferenceUseCase, BlockchainUseCase", "TypeScript", "watchlist, preferences, blockchain")
     }
 
-    ' Domain Layer
-    Boundary(domain_layer, "Domain Layer") {
-        Component(domain_entities, "Domain Entities", "TypeScript", "Portfolio, Quote, Customer, etc.")
+    ' Domain Layer (Feature Entities + Repository Interfaces)
+    Boundary(domain_layer, "Domain Layer (Feature Entities)") {
+        Component(core_entities, "Core Entities", "TypeScript", "instrument, quotes (shared)")
+        Component(portfolio_entities, "Portfolio Entities", "TypeScript", "Portfolio, Account, Holding")
+        Component(account_entities, "Account Entities", "TypeScript", "Customer, Payment, Trade, Order, AccountResource")
         Component(portfolio_repo_interface, "IPortfolioRepository", "TypeScript", "Portfolio repository interface")
         Component(quote_repo_interface, "IQuoteRepository", "TypeScript", "Quote repository interface")
         Component(customer_repo_interface, "ICustomerRepository", "TypeScript", "Customer repository interface")
-        Component(other_repo_interfaces, "Other Repository Interfaces", "TypeScript", "UserPreference, Watchlist, Instrument, etc.")
+        Component(other_repo_interfaces, "Other Repository Interfaces", "TypeScript", "UserPreference, Watchlist, Instrument, RiskMetrics, Blockchain, etc.")
     }
 
     ' Infrastructure Layer
@@ -108,13 +122,21 @@ Rel(use_risk_summary_hook, dependency_container, "Gets use case", "")
 Rel(use_computed_var_hook, dependency_container, "Gets use case", "")
 Rel(use_account_data_hook, dependency_container, "Gets use case", "")
 
-' Application to Domain
+' Features to Domain
 Rel(dependency_container, get_portfolio_usecase, "Provides", "")
-Rel(dependency_container, get_customer_usecase, "Provides", "")
+Rel(dependency_container, get_account_data_usecase, "Provides", "")
+Rel(dependency_container, register_customer_usecase, "Provides", "")
+Rel(dependency_container, payment_usecase, "Provides", "")
+Rel(dependency_container, trade_usecase, "Provides", "")
 Rel(dependency_container, get_quotes_usecase, "Provides", "")
 Rel(dependency_container, risk_metrics_usecase, "Provides", "")
+Rel(dependency_container, other_usecases, "Provides", "")
 Rel(get_portfolio_usecase, portfolio_repo_interface, "Uses", "")
-Rel(get_customer_usecase, customer_repo_interface, "Uses", "")
+Rel(get_account_data_usecase, customer_repo_interface, "Uses", "")
+Rel(get_account_data_usecase, portfolio_repo_interface, "Uses", "")
+Rel(register_customer_usecase, customer_repo_interface, "Uses", "")
+Rel(payment_usecase, other_repo_interfaces, "Uses", "")
+Rel(trade_usecase, other_repo_interfaces, "Uses", "")
 Rel(get_quotes_usecase, quote_repo_interface, "Uses", "")
 Rel(risk_metrics_usecase, portfolio_repo_interface, "Uses", "")
 
@@ -211,9 +233,9 @@ Rel(stock_detail_drawer, period_data_processor, "Uses", "")
 Rel(storybook_screen, storybook_ui_root, "Renders", "")
 
 ' Domain entities
-Rel(portfolio_repo_interface, domain_entities, "Returns", "")
-Rel(quote_repo_interface, domain_entities, "Returns", "")
-Rel(customer_repo_interface, domain_entities, "Returns", "")
+Rel(portfolio_repo_interface, portfolio_entities, "Returns", "")
+Rel(quote_repo_interface, core_entities, "Returns", "")
+Rel(customer_repo_interface, account_entities, "Returns", "")
 
 LAYOUT_TOP_DOWN()
 
