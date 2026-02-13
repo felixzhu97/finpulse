@@ -98,7 +98,7 @@ function AppContent() {
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    SpaceMono: require("@/src/assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require("@/src/presentation/assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   useEffect(() => {
