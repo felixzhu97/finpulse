@@ -5,7 +5,7 @@ import type {
   WatchlistItemCreate,
 } from "@/src/types/watchlist";
 import type { IWatchlistRepository } from "@/src/types/IWatchlistRepository";
-import { httpClient } from "@/src/lib/network/httpClient";
+import { httpClient } from "@/src/lib/api/client/httpClient";
 
 export class WatchlistRepository implements IWatchlistRepository {
   async listWatchlists(limit = 100, offset = 0): Promise<Watchlist[]> {

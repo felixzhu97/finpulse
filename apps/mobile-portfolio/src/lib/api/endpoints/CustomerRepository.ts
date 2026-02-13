@@ -1,6 +1,6 @@
 import type { Customer, CustomerCreate } from "@/src/types/customer";
 import type { ICustomerRepository } from "@/src/types/ICustomerRepository";
-import { httpClient } from "@/src/lib/network/httpClient";
+import { httpClient } from "@/src/lib/api/client/httpClient";
 
 export class CustomerRepository implements ICustomerRepository {
   async getFirst(): Promise<Customer | null> {

@@ -71,16 +71,16 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(other_repo_interfaces, "Other Repository Interfaces", "TypeScript", "UserPreference, Watchlist, Instrument, etc.")
     }
 
-    ' Infrastructure Layer
+    ' Infrastructure Layer (lib/api/client, lib/api/endpoints, lib/utils)
     Boundary(infrastructure_layer, "Infrastructure Layer") {
-        Component(http_client, "HttpClient", "TypeScript", "HTTP client wrapper")
-        Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes")
-        Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL")
+        Component(http_client, "HttpClient", "TypeScript", "lib/api/client: HTTP client wrapper")
+        Component(quote_socket, "createQuoteSocket", "TypeScript", "lib/api/client: WebSocket /ws/quotes")
+        Component(api_config, "API Config", "TypeScript", "lib/api/client: EXPO_PUBLIC_PORTFOLIO_API_URL")
         
-        Component(portfolio_repo_impl, "PortfolioRepository", "TypeScript", "Implements IPortfolioRepository (thin client; delegates portfolio and risk logic to API)")
-        Component(quote_repo_impl, "QuoteRepository", "TypeScript", "Implements IQuoteRepository")
-        Component(customer_repo_impl, "CustomerRepository", "TypeScript", "Implements ICustomerRepository")
-        Component(other_repo_impls, "Other Repositories", "TypeScript", "UserPreference, Watchlist, etc.")
+        Component(portfolio_repo_impl, "PortfolioRepository", "TypeScript", "lib/api/endpoints: implements IPortfolioRepository (thin client; delegates to API)")
+        Component(quote_repo_impl, "QuoteRepository", "TypeScript", "lib/api/endpoints: IQuoteRepository")
+        Component(customer_repo_impl, "CustomerRepository", "TypeScript", "lib/api/endpoints: ICustomerRepository")
+        Component(other_repo_impls, "Other Repositories", "TypeScript", "lib/api/endpoints: UserPreference, Watchlist, etc.")
         
         Component(web3_service, "web3Service", "TypeScript", "Web3 integration")
         Component(utils, "Utils", "TypeScript", "lib/utils")

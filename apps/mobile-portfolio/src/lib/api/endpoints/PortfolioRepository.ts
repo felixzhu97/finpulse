@@ -6,7 +6,7 @@ import type {
   RiskSummary,
 } from "@/src/types/portfolio";
 import type { IPortfolioRepository } from "@/src/types/IPortfolioRepository";
-import { httpClient } from "@/src/lib/network/httpClient";
+import { httpClient } from "@/src/lib/api/client/httpClient";
 
 export class PortfolioRepository implements IPortfolioRepository {
   private cache: Portfolio | null = null;

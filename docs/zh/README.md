@@ -122,7 +122,7 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 
 - **apps/web** - 基于 Angular 的金融分析 Web 控制台。
 - **apps/mobile** - React Native 演示移动应用。
-- **apps/mobile-portfolio** - React Native（Expo）组合应用；扁平化 `src/`：`src/types/`、`src/lib/`（services、api、network、i18n、utils）、`src/hooks/`、`src/components/`、`src/styles/`、`src/store/`。Stocks 屏实时报价与 sparkline；原生图表（Metal/OpenGL ES）；主题、提示、拖拽滚动。
+- **apps/mobile-portfolio** - React Native（Expo）组合应用；扁平化 `src/`：`src/types/`、`src/lib/`（services、api/client、api/endpoints、i18n、utils）、`src/hooks/`、`src/components/`、`src/styles/`、`src/store/`。Stocks 屏实时报价与 sparkline；原生图表（Metal/OpenGL ES）；主题、提示、拖拽滚动。
 - **services/portfolio-analytics** - Python FastAPI 后端（Clean Architecture）；PostgreSQL；Kafka；AI/ML 融入 payments、trades、customers、risk-metrics；配置见 `.env.example`；`pnpm run start:backend`；API 测试 `pnpm run test:api`。
 - **packages/ui** - 共享 UI 组件库。
 - **packages/utils** - 共享工具函数库。
