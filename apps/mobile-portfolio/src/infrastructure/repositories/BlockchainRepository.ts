@@ -7,7 +7,7 @@ import type {
   SeedBalanceRequest,
 } from "../../domain/entities/blockchain";
 import type { IBlockchainRepository } from "../../domain/repositories/IBlockchainRepository";
-import { httpClient } from "../api/httpClient";
+import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class BlockchainRepository implements IBlockchainRepository {
   async getBlocks(limit = 100, offset = 0): Promise<BlockchainBlock[]> {

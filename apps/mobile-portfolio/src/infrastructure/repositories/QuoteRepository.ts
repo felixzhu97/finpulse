@@ -1,6 +1,6 @@
 import type { QuoteData } from "../../domain/entities/quotes";
 import type { IQuoteRepository } from "../../domain/repositories/IQuoteRepository";
-import { httpClient } from "../api/httpClient";
+import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class QuoteRepository implements IQuoteRepository {
   async getQuotes(symbols: string[]): Promise<Record<string, QuoteData>> {

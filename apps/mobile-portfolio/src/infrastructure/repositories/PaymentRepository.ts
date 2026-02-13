@@ -1,6 +1,6 @@
 import type { Payment, PaymentCreate } from "../../domain/entities/payment";
 import type { IPaymentRepository } from "../../domain/repositories/IPaymentRepository";
-import { httpClient } from "../api/httpClient";
+import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class PaymentRepository implements IPaymentRepository {
   async list(limit = 100, offset = 0): Promise<Payment[]> {

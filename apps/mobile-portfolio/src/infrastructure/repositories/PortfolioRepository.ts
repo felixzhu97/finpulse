@@ -6,8 +6,7 @@ import type {
   RiskSummary,
 } from "../../domain/entities/portfolio";
 import type { IPortfolioRepository } from "../../domain/repositories/IPortfolioRepository";
-import { httpClient } from "../api/httpClient";
-import { portfolioApi } from "../api/portfolioApi";
+import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class PortfolioRepository implements IPortfolioRepository {
   private cache: Portfolio | null = null;
@@ -51,7 +50,10 @@ export class PortfolioRepository implements IPortfolioRepository {
   }
 
   async getAssetAllocationByAccountType(): Promise<AssetAllocationItem[]> {
-    return portfolioApi.getAssetAllocationByAccountType();
+    const result = await httpClient.get<AssetAllocationItem[]>(
+      "/api/v1/portfolio/asset-allocation-by-account-type"
+    );
+    return result ?? [];
   }
 
   async getPortfolioHistory(): Promise<PortfolioHistoryPoint[]> {
@@ -60,7 +62,9 @@ export class PortfolioRepository implements IPortfolioRepository {
   }
 
   async getRiskSummary(): Promise<RiskSummary> {
-    const summary = await portfolioApi.getRiskSummary();
+    const summary = await httpClient.get<RiskSummary>(
+      "/api/v1/portfolio/risk-summary"
+    );
     if (!summary) {
       return { highRatio: 0, topHoldingsConcentration: 0 };
     }
@@ -68,6 +72,6 @@ export class PortfolioRepository implements IPortfolioRepository {
   }
 
   private async fetchFromApi(): Promise<Portfolio | null> {
-    return portfolioApi.getPortfolio();
+    return httpClient.get<Portfolio>("/api/v1/portfolio");
   }
 }

@@ -1,6 +1,6 @@
 import type { UserPreference, UserPreferenceCreate } from "../../domain/entities/userPreference";
 import type { IUserPreferenceRepository } from "../../domain/repositories/IUserPreferenceRepository";
-import { httpClient } from "../api/httpClient";
+import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class UserPreferenceRepository implements IUserPreferenceRepository {
   async getByCustomerId(customerId: string): Promise<UserPreference | null> {

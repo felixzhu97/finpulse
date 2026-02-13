@@ -81,8 +81,6 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(quote_repo_impl, "QuoteRepository", "TypeScript", "Implements IQuoteRepository")
         Component(customer_repo_impl, "CustomerRepository", "TypeScript", "Implements ICustomerRepository")
         Component(other_repo_impls, "Other Repositories", "TypeScript", "UserPreference, Watchlist, etc.")
-        Component(accounts_api, "accountsApi", "TypeScript", "Accounts API client")
-        Component(portfolio_api_client, "PortfolioApi", "TypeScript", "Portfolio API client (portfolio, risk summary, asset allocation)")
         
         Component(web3_service, "web3Service", "TypeScript", "Web3 integration")
         Component(utils, "Utils", "TypeScript", "infrastructure utils")
@@ -136,10 +134,7 @@ Rel(quote_repo_impl, http_client, "Uses", "")
 Rel(customer_repo_impl, http_client, "Uses", "")
 Rel(http_client, api_config, "Uses", "")
 Rel(http_client, portfolio_api, "HTTP", "")
-Rel(portfolio_api_client, portfolio_api, "HTTP", "/api/v1/portfolio, /api/v1/portfolio/risk-summary, /api/v1/portfolio/asset-allocation-by-account-type")
 Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
-Rel(accounts_api, http_client, "Uses", "")
-Rel(accounts_api, portfolio_api, "HTTP", "")
 
 ' Presentation UI
 Rel(app_content, use_preferences_hook, "Uses", "")

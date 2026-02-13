@@ -81,8 +81,6 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(quote_repo_impl, "QuoteRepository", "TypeScript", "实现 IQuoteRepository")
         Component(customer_repo_impl, "CustomerRepository", "TypeScript", "实现 ICustomerRepository")
         Component(other_repo_impls, "其他仓库", "TypeScript", "UserPreference、Watchlist 等")
-        Component(accounts_api, "accountsApi", "TypeScript", "账户 API 客户端")
-        Component(portfolio_api_client, "PortfolioApi", "TypeScript", "组合 API 客户端（组合、风险摘要、资产配置）")
         
         Component(web3_service, "web3Service", "TypeScript", "Web3 集成")
         Component(utils, "工具函数", "TypeScript", "infrastructure utils")
@@ -136,10 +134,7 @@ Rel(quote_repo_impl, http_client, "使用", "")
 Rel(customer_repo_impl, http_client, "使用", "")
 Rel(http_client, api_config, "使用", "")
 Rel(http_client, portfolio_api, "HTTP", "")
-Rel(portfolio_api_client, portfolio_api, "HTTP", "/api/v1/portfolio, /api/v1/portfolio/risk-summary, /api/v1/portfolio/asset-allocation-by-account-type")
 Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
-Rel(accounts_api, http_client, "使用", "")
-Rel(accounts_api, portfolio_api, "HTTP", "")
 
 ' Presentation UI
 Rel(app_content, use_preferences_hook, "使用", "")

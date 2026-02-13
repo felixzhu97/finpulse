@@ -1,13 +1,13 @@
 import type { IAccountRepository } from "../../domain/repositories/IAccountRepository";
 import type { AccountResource } from "../../domain/entities/accountResource";
-import { accountsApi } from "../api/accountsApi";
+import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class AccountRepository implements IAccountRepository {
   async list(limit = 100, offset = 0): Promise<AccountResource[]> {
-    return accountsApi.list(limit, offset);
+    return httpClient.getList<AccountResource>("accounts", limit, offset);
   }
 
   async getById(accountId: string): Promise<AccountResource | null> {
-    return accountsApi.getById(accountId);
+    return httpClient.getById<AccountResource>("accounts", accountId);
   }
 }

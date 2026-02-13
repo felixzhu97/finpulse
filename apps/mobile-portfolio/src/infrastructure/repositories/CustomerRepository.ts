@@ -1,6 +1,6 @@
 import type { Customer, CustomerCreate } from "../../domain/entities/customer";
 import type { ICustomerRepository } from "../../domain/repositories/ICustomerRepository";
-import { httpClient } from "../api/httpClient";
+import { httpClient } from "@/src/infrastructure/network/httpClient";
 
 export class CustomerRepository implements ICustomerRepository {
   async getFirst(): Promise<Customer | null> {

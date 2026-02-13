@@ -41,7 +41,7 @@ The app follows **Clean Architecture** principles with clear separation of conce
   - `services/`: Dependency injection container (`DependencyContainer`) that provides repository instances and use cases
 
 - **Infrastructure Layer** (`src/infrastructure/`): External concerns and implementations
-  - `api/`: HTTP client, WebSocket client, API configuration (`httpClient.ts`, `quoteSocket.ts`, `config.ts`, `accountsApi.ts`)
+  - `api/`: HTTP client, WebSocket client, API configuration (`httpClient.ts`, `quoteSocket.ts`, `config.ts`)
   - `repositories/`: Concrete repository implementations that implement domain interfaces (`PortfolioRepository`, `QuoteRepository`, `CustomerRepository`, etc.)
   - `services/`: External service integrations (`QuoteStreamService`, `web3Service`)
   - `utils/`: Utility exports (`index.ts`)
@@ -130,9 +130,9 @@ The app is a thin client: all portfolio and risk business logic runs on the Port
 
 | Endpoint | Usage |
 |----------|--------|
-| `GET /api/v1/portfolio` | Aggregated portfolio (Overview, Accounts, Analytics) used by `PortfolioApi.getPortfolio()` |
-| `GET /api/v1/portfolio/risk-summary` | Portfolio risk summary (high risk ratio, top holdings concentration) used by `PortfolioApi.getRiskSummary()` and `useRiskSummary` |
-| `GET /api/v1/portfolio/asset-allocation-by-account-type` | Asset allocation grouped by account type used by `PortfolioApi.getAssetAllocationByAccountType()` and `GetPortfolioUseCase` |
+| `GET /api/v1/portfolio` | Aggregated portfolio (Overview, Accounts, Analytics) used by `PortfolioRepository.getPortfolio()` |
+| `GET /api/v1/portfolio/risk-summary` | Portfolio risk summary (high risk ratio, top holdings concentration) used by `PortfolioRepository.getRiskSummary()` and `useRiskSummary` |
+| `GET /api/v1/portfolio/asset-allocation-by-account-type` | Asset allocation grouped by account type used by `PortfolioRepository.getAssetAllocationByAccountType()` and `GetPortfolioUseCase` |
 | `GET /api/v1/quotes?symbols=...` | One-off quote fetch via `getQuotes(symbols)` |
 | `WS /ws/quotes` | Real-time quotes via `createQuoteSocket` (Watchlist screen) |
 | `POST /api/v1/seed` | Seed portfolio via `PortfolioRepository.seedPortfolio(payload)` |
