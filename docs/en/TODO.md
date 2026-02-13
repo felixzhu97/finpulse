@@ -48,20 +48,29 @@ Chinese version: [docs_ch/TODO.md](../docs_ch/TODO.md).
 - [ ] Define alerting rules for API down, DB/Kafka unreachable, and high error rate.
 - [ ] Add or document a simple dashboard for API and dependency health.
 
-## Security
+## Risk Management
 
-- [ ] Review and harden authentication, authorization, and session handling logic for security risks.
-- [ ] Scan and update third-party dependencies to address known security vulnerabilities.
+- [ ] Clarify risk domains (market, credit, liquidity, operational) and keep `docs/en/domain` and `docs/en/togaf` aligned with portfolio and analytics flows.
+- [ ] Define core risk measures (e.g. VaR, stress tests, scenario analysis) and document inputs/outputs and assumptions in `services/portfolio-analytics` API docs.
+- [ ] Ensure risk calculations are reproducible and backtestable; document data lineage and sources used for risk metrics.
 
 ## Compliance
 
-- [ ] Ensure logging and audit trails meet compliance requirements and avoid sensitive data exposure.
-- [ ] Define and implement data retention and deletion policies aligned with applicable regulations.
+- [ ] Identify key compliance use cases (e.g. trade surveillance, KYC/AML, sanctions screening) and reflect them in domain diagrams and service boundaries.
+- [ ] Document regulatory-driven requirements for logging, retention, and audit (e.g. MiFID II, Dodd-Frank, GDPR) and ensure they are covered by monitoring and data architecture docs.
+- [ ] Align data classification, access control, and retention policies with compliance requirements and capture them in `docs/en/togaf` and security-related docs.
+
+## Security
+
+- [ ] Define security architecture (authentication, authorization, secrets management, network boundaries) and keep it documented in `docs/en/togaf` and relevant C4 diagrams.
+- [ ] Document secure coding and data protection practices for web, mobile, and backend (e.g. input validation, encryption in transit/at rest, key rotation, secrets storage).
+- [ ] Ensure logging and monitoring capture security-relevant events (auth failures, privilege changes, suspicious activity) and align with incident response processes.
 
 ## Performance & Scalability
 
-- [ ] Profile critical user flows to identify performance bottlenecks in backend and frontend.
-- [ ] Design and implement caching and query optimizations for high-traffic endpoints.
+- [ ] Define non-functional performance targets (P95/P99 latency, throughput) for critical web and API flows and record them in architecture docs.
+- [ ] Add basic performance tests or benchmarks for high-traffic endpoints in `services/portfolio-analytics` and key UI interactions in `apps/web`.
+- [ ] Document scaling strategies (horizontal/vertical, caching, queueing) and capacity planning assumptions in `docs/en/togaf` and service READMEs.
 
 ## Artificial Intelligence & ML
 
