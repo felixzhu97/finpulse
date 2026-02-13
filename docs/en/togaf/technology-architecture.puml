@@ -92,6 +92,8 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
         component "ScrollableChartContainer" as ScrollableChartContainerTech
         component "chartTooltip" as ChartTooltipTech
     }
+    component "styled-components" as StyledComponentsTech
+    note right of StyledComponentsTech: Theme-aware UI\nStyledThemeProvider, primitives\nuseTheme (useTheme.ts)
     note right of Expo: Expo SDK\nMetro, prebuild\niOS/Android
     note right of RN: React Native core\nrequireNativeComponent\nView managers
     note right of NativeDemoCardTech: apps/mobile-portfolio\nDemo native card

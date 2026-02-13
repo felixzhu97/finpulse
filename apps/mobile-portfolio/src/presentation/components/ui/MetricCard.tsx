@@ -1,7 +1,37 @@
 import { ReactNode } from "react";
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Platform } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import styled from "styled-components/native";
+import { Card, LabelText, ValueText, HelperText } from "@/src/presentation/theme/primitives";
 import { useTheme } from "@/src/presentation/theme";
+
+const cardShadow = Platform.select({
+  ios: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  android: { elevation: 2 },
+});
+
+const Header = styled.View`
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  min-height: 36px;
+`;
+
+const HeaderRight = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
+const InfoButton = styled.TouchableOpacity`
+  padding: 4px;
+`;
 
 interface MetricCardProps {
   label: string;
@@ -21,83 +51,23 @@ export function MetricCard({
   onInfoPress,
 }: MetricCardProps) {
   const { colors } = useTheme();
-  
-  const toneColorMap: Record<NonNullable<MetricCardProps["tone"]>, string> = {
-    default: colors.text,
-    positive: colors.success,
-    negative: colors.error,
-  };
-
   return (
-    <View style={[styles.card, { backgroundColor: colors.card }]}>
-      <View style={styles.header}>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
-        <View style={styles.headerRight}>
+    <Card style={cardShadow}>
+      <Header>
+        <LabelText style={styles.labelFlex}>{label}</LabelText>
+        <HeaderRight>
           {icon}
           {onInfoPress && (
-            <TouchableOpacity onPress={onInfoPress} style={styles.infoButton}>
+            <InfoButton onPress={onInfoPress}>
               <MaterialIcons name="info-outline" size={18} color={colors.textSecondary} />
-            </TouchableOpacity>
+            </InfoButton>
           )}
-        </View>
-      </View>
-      <Text style={[styles.value, { color: toneColorMap[tone] }]}>{value}</Text>
-      {helper ? <Text style={[styles.helper, { color: colors.textSecondary }]}>{helper}</Text> : null}
-    </View>
+        </HeaderRight>
+      </Header>
+      <ValueText tone={tone}>{value}</ValueText>
+      {helper ? <HelperText>{helper}</HelperText> : null}
+    </Card>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    padding: 16,
-    borderRadius: 16,
-    minWidth: 120,
-    minHeight: 100,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    marginBottom: 8,
-    minHeight: 36,
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  infoButton: {
-    padding: 4,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: "500",
-    letterSpacing: -0.1,
-    flex: 1,
-    lineHeight: 18,
-  },
-  value: {
-    fontSize: 24,
-    fontWeight: "600",
-    letterSpacing: -0.5,
-    marginTop: 4,
-  },
-  helper: {
-    marginTop: 8,
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "400",
-    letterSpacing: -0.1,
-  },
-});
+const styles = { labelFlex: { flex: 1 as const } };

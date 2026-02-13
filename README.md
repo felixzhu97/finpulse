@@ -93,6 +93,7 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 - **Chart.js + ng2-charts + chartjs-chart-financial** - Web charts and financial (candlestick) charts
 - **react-native-wagmi-charts** - Professional mobile stock charts (line, candlestick, crosshair)
 - **react-native-chart-kit** - Lightweight mobile charts for portfolio metrics
+- **styled-components** - Theme-aware styled components for mobile (Expo/React Native); `StyledThemeProvider`, primitives (Card, LabelText, ValueText, HelperText), `withTheme` for type-safe theme access
 
 ### Utility Libraries
 

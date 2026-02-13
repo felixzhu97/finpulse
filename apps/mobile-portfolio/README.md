@@ -12,7 +12,7 @@ Portfolio management mobile app for viewing investment accounts, performance cha
 | Charts | react-native-wagmi-charts, react-native-chart-kit, react-native-svg |
 | Native Charts | iOS Metal (Swift), Android (Kotlin) |
 | Navigation | React Navigation (bottom-tabs) |
-| UI | expo-blur (Liquid Glass), useDraggableDrawer (bottom sheets) |
+| UI | styled-components (theme-aware), expo-blur (Liquid Glass), useDraggableDrawer (bottom sheets) |
 | Internationalization | i18next, react-i18next (English, Chinese) |
 
 Native chart components: line, candlestick (K-line), American OHLC, baseline, histogram, line-only, with horizontal scroll and tooltips. Native code follows OOP principles with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes for layout calculation, value formatting, axis label management, and rendering logic.
@@ -50,7 +50,7 @@ The app follows **Clean Architecture** principles with clear separation of conce
   - `components/`: React Native components organized by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
   - `hooks/`: React hooks for UI logic (`usePortfolio`, `useSymbolDisplayData`, `useRealtimeQuotes`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useDraggableDrawer`, etc.)
   - `store/`: Redux state management (quotes slice, preferences slice, selectors, `QuoteSocketSubscriber`, custom portfolio store)
-  - `theme/`: Theme system (`colors.ts`, `useTheme` hook)
+  - `theme/`: Theme system (`colors.ts`, `useTheme.ts` hook, `StyledThemeProvider`, `primitives.ts` styled components, `themeTypes.ts` AppTheme)
   - `i18n/`: Internationalization (`config.ts`, translation resources, `useTranslation` hook)
 
 - `app/`: Expo Router file-based routing and screens
@@ -148,11 +148,11 @@ The Watchlist screen uses a single Redux-backed flow:
 
 ## Theming
 
-The app supports light and dark themes with automatic system theme detection:
+The app supports light and dark themes with automatic system theme detection and **styled-components** for theme-aware UI:
 
-- **Theme System**: `src/theme/colors.ts` defines color schemes for light and dark modes. `src/theme/index.ts` provides `useTheme()` hook that returns current theme colors based on user preference and system settings.
+- **Theme System**: `src/presentation/theme/colors.ts` defines light/dark color schemes. `useTheme.ts` provides the `useTheme()` hook (no circular dependency with `StyledThemeProvider`). `theme/index.ts` re-exports theme APIs; `themeTypes.ts` defines `AppTheme` and augments styled-components `DefaultTheme`.
+- **Styled Components**: Root layout wraps the app with `StyledThemeProvider`, which reads `useTheme()` and injects `{ colors }` into styled-components. Primitives (`primitives.ts`) include `Card`, `LabelText`, `ValueText`, `HelperText` and `withTheme()` for type-safe theme access. Components such as `MetricCard` and `RegisterCustomerDrawer` use these styled components for consistent, theme-driven styling.
 - **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Initial loading is component-level: `AppContent` shows a spinner until `usePreferences().loading` is false. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
-- **Components**: All UI components use `useTheme()` hook to dynamically adapt colors. Cards have rounded corners (`borderRadius: 16`) and support theme-aware backgrounds.
 - **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.
 
 ## Internationalization

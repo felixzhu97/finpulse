@@ -45,7 +45,7 @@ package "Presentation Layer" <<Presentation>> {
                 component "Components" as MobileComponents
                 component "Hooks" as MobileHooks
                 component "Redux Store" as MobileRedux
-                component "Theme & i18n" as MobileThemeI18n
+                component "Theme & i18n (styled-components, useTheme, primitives)" as MobileThemeI18n
             }
             component "Application Layer" as ApplicationLayer {
                 component "Use Cases" as MobileUseCases
@@ -114,7 +114,7 @@ package "Presentation Layer" <<Presentation>> {
         }
         component "react-native-wagmi-charts" as RNCharts
     }
-    note right of MobilePortfolio: Clean Architecture: Presentation → Application → Domain.\nInfrastructure implements Domain interfaces.\nDependency injection via DependencyContainer.\nThin client: business logic on server.
+    note right of MobilePortfolio: Clean Architecture: Presentation → Application → Domain.\nInfrastructure implements Domain interfaces.\nDependency injection via DependencyContainer.\nThin client: business logic on server.\nTheme: styled-components (StyledThemeProvider, primitives, useTheme from useTheme.ts).
 }
 
 package "Business Layer" <<Business>> {

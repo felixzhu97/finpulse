@@ -35,7 +35,7 @@
 
 **文件**：`application-architecture.puml`
 
-**描述**：分层应用组件及其交互。
+**描述**：分层应用组件及其交互。展示层包含移动端投资组合（含 styled-components 主题 UI：StyledThemeProvider、useTheme、基元）。
 
 ### 数据架构图 (Data Architecture)
 
@@ -79,6 +79,7 @@ plantuml -tsvg *.puml
 
 ## 最近更新
 
+- **Styled Components（移动端投资组合）**：主题 UI 使用 styled-components/native；StyledThemeProvider 从 useTheme（useTheme.ts，避免 require 循环）注入 theme；基元（Card、LabelText、ValueText、HelperText、withTheme）；MetricCard、RegisterCustomerDrawer 等使用 styled 组件。
 - **OOP 架构**：原生图表代码重构，使用抽象基类（`BaseChartViewManager`、`BaseChartView`、`BaseChartRenderer`）和辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartDataCalculator）。共享工具：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes。
 - **代码简化**：通过继承和抽象移除未使用代码，简化逻辑，提升可维护性
 - **图表布局**：全宽渲染，优化布局计算

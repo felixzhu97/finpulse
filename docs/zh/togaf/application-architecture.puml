@@ -63,7 +63,7 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
                 component "组件" as MobileComponents
                 component "Hooks" as MobileHooks
                 component "Redux Store" as MobileRedux
-                component "主题和国际化" as MobileThemeI18n
+                component "主题和国际化 (styled-components、useTheme、基元)" as MobileThemeI18n
             }
             component "应用层" as ApplicationLayer {
                 component "用例" as MobileUseCases
@@ -132,7 +132,7 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
         }
         component "react-native-wagmi-charts" as RNCharts
     }
-    note right of MobilePortfolio: 整洁架构：展示层 → 应用层 → 领域层。\n基础设施层实现领域接口。\n通过 DependencyContainer 进行依赖注入。\n薄客户端：业务逻辑在服务器端。
+    note right of MobilePortfolio: 整洁架构：展示层 → 应用层 → 领域层。\n基础设施层实现领域接口。\n通过 DependencyContainer 进行依赖注入。\n薄客户端：业务逻辑在服务器端。\n主题：styled-components（StyledThemeProvider、基元、useTheme 来自 useTheme.ts）。
 }
 
 package "业务逻辑层 (Business Layer)" <<Business>> {

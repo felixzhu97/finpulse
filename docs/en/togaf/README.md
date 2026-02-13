@@ -45,7 +45,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 **Description**: Layered application components and their interactions.
 
 **Layers**:
-1. **Presentation**: Web (apps/web), mobile (apps/mobile, apps/mobile-portfolio), UI library (packages/ui), charts
+1. **Presentation**: Web (apps/web), mobile (apps/mobile, apps/mobile-portfolio with styled-components for theme-aware UI), UI library (packages/ui), charts
 2. **Business Layer**: Portfolio, market data, transaction, risk, user modules
 3. **Data Access**: Data services (DAO, cache), state management
 4. **External Services**: Portfolio Analytics API, Vercel Analytics, market data API, big data service layer
@@ -94,6 +94,7 @@ Technology Architecture
 
 ## Recent Updates
 
+- **Styled Components (Mobile Portfolio)**: Theme-aware UI with styled-components/native; StyledThemeProvider injects theme from useTheme (useTheme.ts to avoid require cycle); primitives (Card, LabelText, ValueText, HelperText, withTheme); MetricCard and RegisterCustomerDrawer use styled components.
 - **OOP Architecture**: Native chart code refactored with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
 - **Code Simplification**: Removed unused code, simplified logic, improved maintainability through inheritance and abstraction
 - **Chart Layout**: Full-width rendering with optimized layout calculations

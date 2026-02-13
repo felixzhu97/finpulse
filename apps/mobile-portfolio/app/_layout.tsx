@@ -22,6 +22,7 @@ import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubsc
 import { store, type RootState } from "@/src/presentation/store";
 import { usePreferences } from "@/src/presentation/hooks/usePreferences";
 import { DarkColors, LightColors } from "@/src/presentation/theme/colors";
+import { StyledThemeProvider } from "@/src/presentation/theme/StyledThemeProvider";
 import "@/src/presentation/i18n/config";
 import { i18n } from "@/src/presentation/i18n";
 import "react-native-get-random-values";
@@ -77,20 +78,22 @@ function AppContent() {
 
   return (
     <ThemeProvider value={theme}>
-      <StatusBar style={statusBarStyle} translucent />
-      <GestureHandlerRootView
-        style={[styles.root, { backgroundColor: theme.colors.background }]}
-      >
-        <SafeAreaView
+      <StyledThemeProvider>
+        <StatusBar style={statusBarStyle} translucent />
+        <GestureHandlerRootView
           style={[styles.root, { backgroundColor: theme.colors.background }]}
         >
-          <QuoteSocketSubscriber />
-          <Stack initialRouteName="(tabs)">
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-        </SafeAreaView>
-      </GestureHandlerRootView>
+          <SafeAreaView
+            style={[styles.root, { backgroundColor: theme.colors.background }]}
+          >
+            <QuoteSocketSubscriber />
+            <Stack initialRouteName="(tabs)">
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          </SafeAreaView>
+        </GestureHandlerRootView>
+      </StyledThemeProvider>
     </ThemeProvider>
   );
 }
