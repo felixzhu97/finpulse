@@ -48,6 +48,21 @@ Chinese version: [docs_ch/TODO.md](../docs_ch/TODO.md).
 - [ ] Define alerting rules for API down, DB/Kafka unreachable, and high error rate.
 - [ ] Add or document a simple dashboard for API and dependency health.
 
+## Security
+
+- [ ] Review and harden authentication, authorization, and session handling logic for security risks.
+- [ ] Scan and update third-party dependencies to address known security vulnerabilities.
+
+## Compliance
+
+- [ ] Ensure logging and audit trails meet compliance requirements and avoid sensitive data exposure.
+- [ ] Define and implement data retention and deletion policies aligned with applicable regulations.
+
+## Performance & Scalability
+
+- [ ] Profile critical user flows to identify performance bottlenecks in backend and frontend.
+- [ ] Design and implement caching and query optimizations for high-traffic endpoints.
+
 ## Artificial Intelligence & ML
 
 - [ ] Extend ML Risk/VaR, Fraud, Surveillance, and Sentiment; define model serving, versioning, and monitoring for production.
