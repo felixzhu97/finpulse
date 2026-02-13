@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { ViewProps } from "react-native";
-import { Platform, requireNativeComponent, StyleSheet, View } from "react-native";
+import { Platform, requireNativeComponent, View } from "react-native";
 
 export type NativeHistogramChartProps = {
   data?: number[];
@@ -19,7 +19,7 @@ export function NativeHistogramChart(props: NativeHistogramChartProps) {
   const flatData = Array.isArray(data) ? data : [];
 
   if (Platform.OS === "web") {
-    return <View style={[styles.webFallback, style]} {...rest} />;
+    return <View style={[{ backgroundColor: "#000", minHeight: 160 }, style]} {...rest} />;
   }
 
   const NativeView = NativeHistogramChartNative as ComponentType<NativeHistogramChartProps>;
@@ -28,14 +28,8 @@ export function NativeHistogramChart(props: NativeHistogramChartProps) {
     <NativeView
       data={flatData}
       theme={theme}
-      style={[style, styles.chart]}
+      style={[style, { minHeight: 160 }]}
       {...rest}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  fill: { flex: 1 },
-  chart: { minHeight: 160 },
-  webFallback: { backgroundColor: "#000", minHeight: 160 },
-});

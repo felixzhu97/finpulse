@@ -1,6 +1,7 @@
 import { BlurView } from "expo-blur";
 import type { ReactNode } from "react";
-import { Platform, StyleSheet, type StyleProp, type ViewStyle, View } from "react-native";
+import { Platform, type StyleProp, type ViewStyle } from "react-native";
+import styled from "styled-components/native";
 
 interface GlassViewProps {
   style?: StyleProp<ViewStyle>;
@@ -9,28 +10,22 @@ interface GlassViewProps {
   children?: ReactNode;
 }
 
-export function GlassView({
-  style,
-  intensity = 60,
-  tint = "dark",
-  children,
-}: GlassViewProps) {
+const BlurBase = styled(BlurView)`
+  overflow: hidden;
+`;
+
+const Fallback = styled.View`
+  background-color: rgba(30,30,30,0.72);
+`;
+
+export function GlassView({ style, intensity = 60, tint = "dark", children }: GlassViewProps) {
   if (Platform.OS === "web") {
-    return <View style={[styles.fallback, style]}>{children}</View>;
+    return <Fallback style={style}>{children}</Fallback>;
   }
 
   return (
-    <BlurView intensity={intensity} tint={tint} style={[styles.blur, style]}>
+    <BlurBase intensity={intensity} tint={tint} style={style}>
       {children}
-    </BlurView>
+    </BlurBase>
   );
 }
-
-const styles = StyleSheet.create({
-  blur: {
-    overflow: "hidden",
-  },
-  fallback: {
-    backgroundColor: "rgba(30,30,30,0.72)",
-  },
-});

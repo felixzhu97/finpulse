@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { ViewProps } from "react-native";
-import { Platform, requireNativeComponent, StyleSheet, View } from "react-native";
+import { Platform, requireNativeComponent, View } from "react-native";
 
 export type NativeSparklineProps = {
   trend?: "up" | "down" | "flat";
@@ -15,20 +15,8 @@ const NativeSparklineNative =
 
 export function NativeSparkline({ trend = "flat", data, style, ...rest }: NativeSparklineProps) {
   if (Platform.OS === "web" || !NativeSparklineNative) {
-    return <View style={[styles.fallback, style]} {...rest} />;
+    return <View style={[{ width: 60, height: 32, backgroundColor: "transparent" }, style]} {...rest} />;
   }
   const NativeView = NativeSparklineNative as ComponentType<NativeSparklineProps>;
-  return <NativeView trend={trend} data={data} style={[styles.chart, style]} {...rest} />;
+  return <NativeView trend={trend} data={data} style={[{ width: 60, height: 32 }, style]} {...rest} />;
 }
-
-const styles = StyleSheet.create({
-  chart: {
-    width: 60,
-    height: 32,
-  },
-  fallback: {
-    width: 60,
-    height: 32,
-    backgroundColor: "transparent",
-  },
-});

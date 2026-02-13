@@ -1,14 +1,7 @@
 import type { ComponentType } from "react";
 import { useCallback, useMemo, useState } from "react";
 import type { ViewProps } from "react-native";
-import {
-  Platform,
-  requireNativeComponent,
-  StyleSheet,
-  Text,
-  View,
-  PanResponder,
-} from "react-native";
+import { Platform, requireNativeComponent, Text, View, PanResponder } from "react-native";
 
 export type PointSelectPayload = {
   index: number;
@@ -109,7 +102,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
   );
 
   if (Platform.OS === "web") {
-    return <View {...rest} style={[styles.webFallback, style]} />;
+    return <View {...rest} style={[{ backgroundColor: "#f7f7fa", justifyContent: "center", alignItems: "center" }, style]} />;
   }
 
   const NativeView = NativeLineChartNative as ComponentType<NativeLineChartProps>;
@@ -169,7 +162,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
   const labelColor = isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.7)";
 
   return (
-    <View style={[styles.container, style]} onLayout={onLayout}>
+    <View style={[{ overflow: "visible", backgroundColor: "transparent" }, style]} onLayout={onLayout}>
       <View style={{ width: chartWidth, height: chartDataHeight }}>
         <NativeView 
           data={data} 
@@ -177,21 +170,23 @@ export function NativeLineChart(props: NativeLineChartProps) {
           trend={trend}
           timestamps={timestamps}
           baselineValue={baselineValue}
-          style={StyleSheet.absoluteFill} 
+          style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} 
           {...rest} 
         />
       </View>
       {yAxisLabels.map((label, i) => (
         <Text
           key={`y-${i}`}
-          style={[
-            styles.yAxisLabel,
-            {
-              color: labelColor,
-              top: label.yPosition - 8,
-              left: chartWidth + 8,
-            },
-          ]}
+          style={{
+            position: "absolute",
+            fontSize: 12,
+            fontWeight: "500",
+            width: 80,
+            pointerEvents: "none",
+            color: labelColor,
+            top: label.yPosition - 8,
+            left: chartWidth + 8,
+          }}
         >
           {formatValue(label.value)}
         </Text>
@@ -199,15 +194,18 @@ export function NativeLineChart(props: NativeLineChartProps) {
       {xAxisLabels.map((label, i) => (
         <Text
           key={`x-${i}`}
-          style={[
-            styles.xAxisLabel,
-            {
-              color: labelColor,
-              left: Math.max(0, label.x),
-              top: chartDataHeight + 4,
-              textAlign: label.textAlign,
-            },
-          ]}
+          style={{
+            position: "absolute",
+            fontSize: 12,
+            fontWeight: "500",
+            width: 24,
+            height: 16,
+            pointerEvents: "none",
+            color: labelColor,
+            left: Math.max(0, label.x),
+            top: chartDataHeight + 4,
+            textAlign: label.textAlign,
+          }}
         >
           {label.hour}
         </Text>
@@ -218,10 +216,35 @@ export function NativeLineChart(props: NativeLineChartProps) {
       >
         {selected !== null && (
           <>
-            <View style={[styles.crosshair, { left: selected.x, backgroundColor: crosshairColor }]} />
-            <View style={[styles.tooltip, { left: Math.max(8, Math.min(chartWidth - 8, selected.x - 40)) }]}>
-              <Text style={styles.tooltipValue}>{formatValue(selected.value)}</Text>
-              {selected.ts != null && <Text style={styles.tooltipTime}>{formatTimestamp(selected.ts)}</Text>}
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                width: 1,
+                backgroundColor: crosshairColor,
+                marginLeft: -0.5,
+                left: selected.x,
+              }}
+            />
+            <View
+              style={{
+                position: "absolute",
+                top: 8,
+                width: 80,
+                paddingVertical: 6,
+                paddingHorizontal: 8,
+                backgroundColor: "rgba(30,30,34,0.95)",
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: "rgba(255,255,255,0.12)",
+                left: Math.max(8, Math.min(chartWidth - 8, selected.x - 40)),
+              }}
+            >
+              <Text style={{ fontSize: 14, fontWeight: "600", color: "#fff" }}>{formatValue(selected.value)}</Text>
+              {selected.ts != null && (
+                <Text style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", marginTop: 2 }}>{formatTimestamp(selected.ts)}</Text>
+              )}
             </View>
           </>
         )}
@@ -229,59 +252,3 @@ export function NativeLineChart(props: NativeLineChartProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    overflow: "visible",
-    backgroundColor: "transparent",
-  },
-  webFallback: {
-    backgroundColor: "#f7f7fa",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  yAxisLabel: {
-    position: "absolute",
-    fontSize: 12,
-    fontWeight: "500",
-    width: 80,
-    pointerEvents: "none",
-  },
-  xAxisLabel: {
-    position: "absolute",
-    fontSize: 12,
-    fontWeight: "500",
-    width: 24,
-    height: 16,
-    pointerEvents: "none",
-  },
-  crosshair: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    width: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
-    marginLeft: -0.5,
-  },
-  tooltip: {
-    position: "absolute",
-    top: 8,
-    width: 80,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    backgroundColor: "rgba(30,30,34,0.95)",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
-  },
-  tooltipValue: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  tooltipTime: {
-    fontSize: 11,
-    color: "rgba(255,255,255,0.7)",
-    marginTop: 2,
-  },
-});

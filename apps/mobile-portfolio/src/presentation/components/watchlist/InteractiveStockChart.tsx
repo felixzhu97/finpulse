@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useCallback } from "react";
+import { Text } from "react-native";
 import { NativeLineChart } from "@/src/presentation/components/native/NativeLineChart";
 import { useTheme } from "@/src/presentation/theme";
-import { formatPrice } from "@/src/presentation/utils";
+import styled from "styled-components/native";
 
 interface InteractiveStockChartProps {
   data: number[];
@@ -13,22 +13,17 @@ interface InteractiveStockChartProps {
   height: number;
 }
 
-function formatTimestamp(ts: number): string {
-  const d = new Date(ts);
-  const now = new Date();
-  const diffMs = now.getTime() - ts;
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+const Container = styled.View`
+  position: relative;
+  overflow: visible;
+`;
 
-  if (diffDays === 0) {
-    return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
-  } else if (diffDays === 1) {
-    return "Yesterday";
-  } else if (diffDays < 7) {
-    return d.toLocaleDateString(undefined, { weekday: "short" });
-  } else {
-    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-  }
-}
+const EmptyText = styled.Text`
+  font-size: 14px;
+  text-align: center;
+  margin-top: 50px;
+  color: ${(p) => p.theme.colors.textSecondary};
+`;
 
 export function InteractiveStockChart({
   data,
@@ -38,23 +33,21 @@ export function InteractiveStockChart({
   width,
   height,
 }: InteractiveStockChartProps) {
-  const { isDark, colors } = useTheme();
+  const { isDark } = useTheme();
   const theme = isDark ? "dark" : "light";
 
-  const onInteractionEnd = useCallback(() => {
-    // Interaction ended - NativeLineChart handles clearing selection
-  }, []);
+  const onInteractionEnd = useCallback(() => {}, []);
 
   if (data.length === 0) {
     return (
-      <View style={[styles.container, { width, height }]}>
-        <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No data</Text>
-      </View>
+      <Container style={{ width, height }}>
+        <EmptyText>No data</EmptyText>
+      </Container>
     );
   }
 
   return (
-    <View style={[styles.container, { width, height }]}>
+    <Container style={{ width, height }}>
       <NativeLineChart
         data={data}
         timestamps={timestamps}
@@ -62,46 +55,8 @@ export function InteractiveStockChart({
         baselineValue={baselineValue}
         onInteractionEnd={onInteractionEnd}
         theme={theme}
-        style={{ width: width + 135, height  }}
+        style={{ width: width + 135, height }}
       />
-    </View>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    position: "relative",
-    overflow: "visible",
-  },
-  emptyText: {
-    fontSize: 14,
-    textAlign: "center",
-    marginTop: 50,
-  },
-  tooltipContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    pointerEvents: "none",
-  },
-  tooltip: {
-    position: "absolute",
-    top: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    minWidth: 80,
-    alignItems: "center",
-  },
-  tooltipValue: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  tooltipTime: {
-    fontSize: 11,
-    marginTop: 2,
-  },
-});

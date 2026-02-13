@@ -48,7 +48,7 @@ The app follows **Clean Architecture** principles with clear separation of conce
 
 - **Presentation Layer** (`src/presentation/`): UI components, hooks, and state management
   - `components/`: React Native components organized by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
-  - `hooks/`: React hooks for UI logic (`usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `useRealtimeQuotes`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useRefreshControl`, `useDraggableDrawer`, etc.); shared utilities (`useAsyncLoad`, `runWithLoading`)
+  - `hooks/`: React hooks for UI logic (`usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useRefreshControl`, `useDraggableDrawer`, etc.); shared utilities (`useAsyncLoad`, `runWithLoading`)
   - `utils/`: Presentation utilities (`format.ts`, `stockDisplay.ts`, `PeriodDataProcessor.ts`)
   - `store/`: Redux state management (quotes slice, preferences slice, portfolio slice, selectors, `QuoteSocketSubscriber`)
   - `theme/`: Theme system (`colors.ts`, `useTheme.ts` hook, `StyledThemeProvider`, `primitives.ts` styled components, `themeTypes.ts` AppTheme)
@@ -141,10 +141,11 @@ The app connects only to the backend; there is no in-app mock data.
 
 ### Real-time quotes and sparklines
 
-The Watchlist screen uses a single Redux-backed flow:
+Single Redux-backed flow, one WebSocket:
 
-- **QuoteSocketSubscriber** (in root layout) reads `subscribedSymbols` from the store, opens one WebSocket to `/ws/quotes`, and dispatches `setSnapshot` / `setStatus`. The Stocks screen calls **useSymbolDisplayData(symbols)** to set subscribed symbols and read `bySymbol`, `quoteMap`, `historyBySymbol` from the store (with memoized selectors).
-- **StockDetailDrawer** uses **useDraggableDrawer** for slide-up/drag-to-close animation; close button and backdrop use the same close animation; share action is available in the drawer header.
+- **QuoteSocketSubscriber** reads merged symbols (`subscribedSymbols` + `extraSubscribedSymbols`) from the store, subscribes to `/ws/quotes`, dispatches `setSnapshot` / `setStatus`.
+- **useSymbolDisplayData(symbols)** sets `subscribedSymbols` and reads `bySymbol`, `quoteMap`, `historyBySymbol` (memoized selectors).
+- **StockDetailDrawer** dispatches `setExtraSubscribedSymbols([symbol])` when open, reads quotes from Redux.
 - **StockListItem** shows sparkline (history from `useSymbolDisplayData`), current price, and daily change. Tapping a row opens **StockDetailDrawer** with live price and chart. **SortMenu** (name, price, change, change %) and a **bottom search bar** (opened by header search icon, **GlassView**; closes when opening detail drawer, sort menu, or switching tab) are on the Watchlist screen. Tab bar uses **expo-blur** (Liquid Glass) background.
 
 ## Theming

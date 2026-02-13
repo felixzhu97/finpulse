@@ -1,14 +1,11 @@
 import { useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../store/useAppStore";
 import { useColorScheme as useSystemColorScheme } from "react-native";
-import type { RootState } from "@/src/presentation/store";
 import { LightColors, DarkColors, type ColorScheme } from "./colors";
 
 export function useTheme() {
   const systemColorScheme = useSystemColorScheme();
-  const themePreference = useSelector(
-    (state: RootState) => state.preferences.theme
-  );
+  const themePreference = useAppSelector((s) => s.preferences.theme);
 
   const isDark = useMemo(() => {
     if (themePreference === "light") return false;

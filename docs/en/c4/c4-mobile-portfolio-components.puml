@@ -21,7 +21,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(stock_list_item, "StockListItem", "React Native", "Holding row, price, sparkline, opens detail drawer")
         Component(metric_card, "MetricCard", "React Native", "Label, value, helper")
         Component(native_sparkline, "NativeSparkline", "Native View", "Per-stock sparkline")
-        Component(stock_detail_drawer, "StockDetailDrawer", "React Native", "Draggable drawer, live price/chart, share")
+        Component(stock_detail_drawer, "StockDetailDrawer", "React Native", "Draggable drawer, setExtraSubscribedSymbols, Redux quotes, share")
         Component(account_drawers, "Account Drawers", "React Native", "RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, SettingsDrawer")
         Component(sort_menu, "SortMenu", "React Native", "Sort by name, price, change, change %")
         Component(glass_search_bar, "Bottom search bar", "React Native", "GlassView, opens on search icon")
@@ -37,9 +37,9 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(use_risk_metrics_hook, "useRiskMetrics", "Hook", "Risk metrics API")
         Component(use_computed_var_hook, "useComputedVar", "Hook", "VaR computation")
         
-        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes, history, subscribedSymbols")
+        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes, history, subscribedSymbols, extraSubscribedSymbols")
         Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme, language, notifications")
-        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "WebSocket subscriber")
+        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "Subscribes to merged symbols")
         Component(redux_portfolio, "Redux portfolio slice", "Redux Toolkit", "selectedAccountId")
         
         Component(theme_system, "Theme System", "TypeScript", "Light/dark colors; useTheme (useTheme.ts)")

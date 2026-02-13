@@ -1,43 +1,40 @@
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Dimensions } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 import { useTheme } from "@/src/presentation/theme";
+import styled from "styled-components/native";
 
-type AllocationItem = {
-  label: string;
-  value: number;
-};
+type AllocationItem = { label: string; value: number };
 
 interface AssetAllocationChartProps {
   items: AllocationItem[];
 }
 
+const Container = styled.View`
+  border-radius: 12px;
+  border-width: 1px;
+  border-color: ${(p) => p.theme.colors.border};
+  padding-vertical: 8px;
+  background-color: ${(p) => p.theme.colors.card};
+`;
+
 export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
   const { colors } = useTheme();
   const total = items.reduce((sum, item) => sum + item.value, 0);
 
-  if (!total) {
-    return null;
-  }
+  if (!total) return null;
 
   const width = Dimensions.get("window").width - 32;
 
   const chartData = items.map((item, index) => ({
     name: item.label,
     value: item.value,
-    color:
-      [
-        "#818cf8",
-        "#38bdf8",
-        "#4ade80",
-        "#fb923c",
-        "#a78bfa",
-      ][index % 5],
+    color: ["#818cf8", "#38bdf8", "#4ade80", "#fb923c", "#a78bfa"][index % 5],
     legendFontColor: colors.textSecondary,
     legendFontSize: 12,
   }));
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <Container>
       <PieChart
         data={chartData}
         width={width}
@@ -54,14 +51,6 @@ export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
         }}
         hasLegend
       />
-    </View>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingVertical: 8,
-  },
-});

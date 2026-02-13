@@ -1,3 +1,5 @@
+import { Animated, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
 import type { AppTheme } from "./themeTypes";
 
@@ -441,4 +443,133 @@ export const InsightsLoadingContainer = styled.View`
 export const InsightsScrollView = styled.ScrollView`
   flex: 1;
   background-color: ${withTheme((t) => t.colors.background)};
+`;
+
+export const AbsoluteFill = styled.Pressable`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+`;
+
+export const AbsoluteFillView = styled.View`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+`;
+
+export const DrawerModalRoot = styled.View`
+  flex: 1;
+  justify-content: flex-end;
+`;
+
+export const DrawerBackdrop = styled(Animated.View)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: ${withTheme((t) => t.colors.backdrop)};
+`;
+
+export const DrawerSheet = styled(Animated.View)`
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  overflow: hidden;
+  background-color: ${withTheme((t) => t.colors.cardSolid)};
+`;
+
+export const DrawerSafe = styled(SafeAreaView)`
+  flex: 1;
+`;
+
+export const DrawerDragArea = styled.View`
+  padding-top: 8px;
+  padding-bottom: 8px;
+  align-items: center;
+  min-height: 40px;
+`;
+
+export const DrawerHandle = styled.View`
+  width: 36px;
+  height: 5px;
+  border-radius: 2.5px;
+  background-color: ${withTheme((t) => t.colors.textTertiary)};
+`;
+
+export const DrawerHeader = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-horizontal: 20px;
+  padding-vertical: 16px;
+  border-bottom-width: 1px;
+  border-bottom-color: ${withTheme((t) => t.colors.border)};
+`;
+
+export const DrawerHeaderTitle = styled.Text`
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: ${withTheme((t) => t.colors.text)};
+`;
+
+export const DrawerCloseButton = styled(TouchableOpacity)`
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const DrawerContent = styled.View`
+  flex: 1;
+  padding-horizontal: 20px;
+  padding-top: 20px;
+  padding-bottom: 40px;
+`;
+
+export const DrawerFieldGroup = styled.View`
+  margin-bottom: 16px;
+`;
+
+export const DrawerLabel = styled.Text`
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: ${withTheme((t) => t.colors.textSecondary)};
+`;
+
+export const DrawerInput = styled.TextInput`
+  border-width: 1px;
+  border-radius: 10px;
+  padding-horizontal: 14px;
+  padding-vertical: 12px;
+  font-size: 16px;
+  border-color: ${withTheme((t) => t.colors.border)};
+  background-color: ${withTheme((t) => t.colors.surface)};
+  color: ${withTheme((t) => t.colors.text)};
+`;
+
+export const DrawerSubmitButton = styled(TouchableOpacity)`
+  padding-vertical: 14px;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  background-color: ${withTheme((t) => t.colors.primary)};
+`;
+
+export const DrawerSubmitButtonText = styled.Text`
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+`;
+
+export const DrawerErrorText = styled.Text`
+  font-size: 13px;
+  margin-bottom: 12px;
+  color: ${withTheme((t) => t.colors.error)};
 `;

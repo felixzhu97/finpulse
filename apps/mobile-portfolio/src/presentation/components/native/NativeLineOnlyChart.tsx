@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 import { useCallback } from "react";
 import type { ViewProps } from "react-native";
-import { Platform, requireNativeComponent, StyleSheet, View } from "react-native";
+import { Platform, requireNativeComponent, View } from "react-native";
 import { ScrollableChartContainer } from "./ScrollableChartContainer";
 import { useScrollableChart } from "./useScrollableChart";
 
@@ -39,7 +39,7 @@ export function NativeLineOnlyChart(props: NativeLineOnlyChartProps) {
   });
 
   if (Platform.OS === "web") {
-    return <View style={[styles.webFallback, style]} {...rest} />;
+    return <View style={[{ backgroundColor: "#000", minHeight: 160 }, style]} {...rest} />;
   }
 
   const NativeView = NativeLineOnlyChartNative as ComponentType<NativeLineOnlyChartProps>;
@@ -52,16 +52,10 @@ export function NativeLineOnlyChart(props: NativeLineOnlyChartProps) {
         <NativeView
           data={flatData}
           theme={theme}
-          style={[fill ? styles.fill : { width }, { minHeight }, styles.chart]}
+          style={[fill ? { flex: 1 } : { width }, { minHeight: 160 }]}
           {...rest}
         />
       )}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  fill: { flex: 1 },
-  chart: { minHeight: 160 },
-  webFallback: { backgroundColor: "#000", minHeight: 160 },
-});

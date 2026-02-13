@@ -4,17 +4,26 @@ import {
   Animated,
   Dimensions,
   Modal,
-  Pressable,
-  StyleSheet,
   Switch,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
 import { usePreferences } from "@/src/presentation/hooks/usePreferences";
 import { useTheme } from "@/src/presentation/theme";
+import {
+  AbsoluteFill,
+  DrawerModalRoot,
+  DrawerBackdrop,
+  DrawerSheet,
+  DrawerSafe,
+  DrawerDragArea,
+  DrawerHandle,
+  DrawerHeader,
+  DrawerHeaderTitle,
+  DrawerCloseButton,
+} from "@/src/presentation/theme/primitives";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "@/src/presentation/i18n";
 
@@ -104,73 +113,65 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
 
   return (
     <Modal visible={visible} animationType="none" transparent onRequestClose={closeWithAnimation}>
-      <View style={styles.modalRoot}>
-        <Animated.View
-          style={[styles.backdrop, { opacity: backdropOpacity, backgroundColor: colors.backdrop }]}
-          pointerEvents="box-none"
-        >
-          <Pressable style={StyleSheet.absoluteFill} onPress={closeWithAnimation} />
-        </Animated.View>
+      <DrawerModalRoot>
+        <DrawerBackdrop style={{ opacity: backdropOpacity }} pointerEvents="box-none">
+          <AbsoluteFill onPress={closeWithAnimation} />
+        </DrawerBackdrop>
 
-        <Animated.View
-          style={[
-            styles.drawer,
-            {
-              height: DRAWER_HEIGHT,
-              transform: [{ translateY }],
-              backgroundColor: colors.cardSolid,
-            },
-          ]}
+        <DrawerSheet
+          style={{
+            height: DRAWER_HEIGHT,
+            transform: [{ translateY }],
+          }}
         >
-          <SafeAreaView style={styles.safe} edges={["top"]}>
-            <View style={styles.dragArea} {...panHandlers}>
-              <View style={[styles.dragHandle, { backgroundColor: colors.textTertiary }]} />
-            </View>
-            <View style={[styles.header, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>{t("common.settings")}</Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={closeWithAnimation}
-            >
-              <MaterialIcons name="close" size={24} color={colors.text} />
-            </TouchableOpacity>
-          </View>
+          <DrawerSafe edges={["top"]}>
+            <DrawerDragArea {...panHandlers}>
+              <DrawerHandle />
+            </DrawerDragArea>
+            <DrawerHeader>
+              <DrawerHeaderTitle>{t("common.settings")}</DrawerHeaderTitle>
+              <DrawerCloseButton onPress={closeWithAnimation}>
+                <MaterialIcons name="close" size={24} color={colors.text} />
+              </DrawerCloseButton>
+            </DrawerHeader>
 
-          <View style={styles.content}>
+          <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40 }}>
             {isLoading ? (
-              <View style={styles.loadingContainer}>
+              <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 60 }}>
                 <ActivityIndicator size="small" color={colors.textSecondary} />
               </View>
             ) : (
-              <View style={styles.settingsContent}>
-                <View style={styles.settingGroup}>
-                  <Text style={[styles.groupTitle, { color: colors.textTertiary }]}>{t("common.theme")}</Text>
-                  <View style={styles.optionsContainer}>
+              <View style={{ gap: 32 }}>
+                <View style={{ gap: 12 }}>
+                  <Text style={{ fontSize: 13, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.5, color: colors.textTertiary }}>{t("common.theme")}</Text>
+                  <View style={{ flexDirection: "row", gap: 8 }}>
                     {THEME_OPTIONS.map((option) => {
                       const isSelected = theme === option.value;
                       return (
                         <TouchableOpacity
                           key={option.value}
-                          style={[
-                            styles.optionButton,
-                            {
-                              backgroundColor: isSelected ? colors.primaryLight : colors.surface,
-                              borderColor: isSelected ? colors.primary : colors.border,
-                            },
-                            saving && styles.optionButtonDisabled,
-                          ]}
+                          style={{
+                            flex: 1,
+                            paddingVertical: 10,
+                            paddingHorizontal: 16,
+                            borderRadius: 10,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderWidth: 1,
+                            backgroundColor: isSelected ? colors.primaryLight : colors.surface,
+                            borderColor: isSelected ? colors.primary : colors.border,
+                            opacity: saving ? 0.5 : 1,
+                          }}
                           onPress={() => handleThemeSelect(option.value)}
                           disabled={saving}
                           activeOpacity={0.7}
                         >
                           <Text
-                            style={[
-                              styles.optionText,
-                              {
-                                color: isSelected ? colors.primary : colors.textSecondary,
-                                fontWeight: isSelected ? "600" : "400",
-                              },
-                            ]}
+                            style={{
+                              fontSize: 15,
+                              color: isSelected ? colors.primary : colors.textSecondary,
+                              fontWeight: isSelected ? "600" : "400",
+                            }}
                           >
                             {option.label}
                           </Text>
@@ -180,34 +181,36 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                   </View>
                 </View>
 
-                <View style={styles.settingGroup}>
-                  <Text style={[styles.groupTitle, { color: colors.textTertiary }]}>{t("common.language")}</Text>
-                  <View style={styles.optionsContainer}>
+                <View style={{ gap: 12 }}>
+                  <Text style={{ fontSize: 13, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.5, color: colors.textTertiary }}>{t("common.language")}</Text>
+                  <View style={{ flexDirection: "row", gap: 8 }}>
                     {LANGUAGE_OPTIONS.map((option) => {
                       const isSelected = language === option.value;
                       return (
                         <TouchableOpacity
                           key={option.value}
-                          style={[
-                            styles.optionButton,
-                            {
-                              backgroundColor: isSelected ? colors.primaryLight : colors.surface,
-                              borderColor: isSelected ? colors.primary : colors.border,
-                            },
-                            saving && styles.optionButtonDisabled,
-                          ]}
+                          style={{
+                            flex: 1,
+                            paddingVertical: 10,
+                            paddingHorizontal: 16,
+                            borderRadius: 10,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderWidth: 1,
+                            backgroundColor: isSelected ? colors.primaryLight : colors.surface,
+                            borderColor: isSelected ? colors.primary : colors.border,
+                            opacity: saving ? 0.5 : 1,
+                          }}
                           onPress={() => handleLanguageSelect(option.value)}
                           disabled={saving}
                           activeOpacity={0.7}
                         >
                           <Text
-                            style={[
-                              styles.optionText,
-                              {
-                                color: isSelected ? colors.primary : colors.textSecondary,
-                                fontWeight: isSelected ? "600" : "400",
-                              },
-                            ]}
+                            style={{
+                              fontSize: 15,
+                              color: isSelected ? colors.primary : colors.textSecondary,
+                              fontWeight: isSelected ? "600" : "400",
+                            }}
                           >
                             {option.label}
                           </Text>
@@ -217,9 +220,9 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                   </View>
                 </View>
 
-                <View style={styles.settingGroup}>
-                  <View style={styles.switchRow}>
-                    <Text style={[styles.groupTitle, { color: colors.textTertiary }]}>{t("common.notifications")}</Text>
+                <View style={{ gap: 12 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <Text style={{ fontSize: 13, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.5, color: colors.textTertiary }}>{t("common.notifications")}</Text>
                     <Switch
                       value={notificationsEnabled}
                       onValueChange={handleNotificationsChange}
@@ -231,102 +234,17 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                 </View>
 
                 {saving && (
-                  <View style={styles.savingRow}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 }}>
                     <ActivityIndicator size="small" color={colors.primary} />
-                    <Text style={[styles.savingText, { color: colors.textSecondary }]}>{t("common.saving")}</Text>
+                    <Text style={{ fontSize: 13, color: colors.textSecondary }}>{t("common.saving")}</Text>
                   </View>
                 )}
               </View>
             )}
           </View>
-          </SafeAreaView>
-        </Animated.View>
-      </View>
+          </DrawerSafe>
+        </DrawerSheet>
+      </DrawerModalRoot>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  modalRoot: { flex: 1, justifyContent: "flex-end" },
-  backdrop: { ...StyleSheet.absoluteFillObject },
-  drawer: { borderTopLeftRadius: 14, borderTopRightRadius: 14, overflow: "hidden" },
-  safe: { flex: 1 },
-  dragArea: { paddingTop: 8, paddingBottom: 8, alignItems: "center", minHeight: 40 },
-  dragHandle: { width: 36, height: 5, borderRadius: 2.5 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    letterSpacing: -0.3,
-  },
-  closeButton: {
-    width: 32,
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 40,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 60,
-  },
-  settingsContent: {
-    gap: 32,
-  },
-  settingGroup: {
-    gap: 12,
-  },
-  groupTitle: {
-    fontSize: 13,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  optionsContainer: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  optionButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-  },
-  optionButtonDisabled: {
-    opacity: 0.5,
-  },
-  optionText: {
-    fontSize: 15,
-  },
-  switchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  savingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginTop: 8,
-  },
-  savingText: {
-    fontSize: 13,
-  },
-});

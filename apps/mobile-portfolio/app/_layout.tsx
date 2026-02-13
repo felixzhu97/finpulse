@@ -9,13 +9,13 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo } from "react";
 import "react-native-reanimated";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ActivityIndicator, useColorScheme } from "react-native";
 import styled from "styled-components/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubscriber";
-import { store, type RootState } from "@/src/presentation/store";
+import { store } from "@/src/presentation/store";
 import { usePreferences } from "@/src/presentation/hooks/usePreferences";
 import { DarkColors, LightColors } from "@/src/presentation/theme/colors";
 import { StyledThemeProvider } from "@/src/presentation/theme/StyledThemeProvider";
@@ -33,14 +33,8 @@ const LoadingRoot = styled.View<{ bg: string }>`
 SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
-  const { loading } = usePreferences();
+  const { loading, theme: themePreference, language } = usePreferences();
   const systemColorScheme = useColorScheme();
-  const themePreference = useSelector(
-    (state: RootState) => state.preferences.theme
-  );
-  const language = useSelector(
-    (state: RootState) => state.preferences.language
-  );
 
   useEffect(() => {
     if (language) {

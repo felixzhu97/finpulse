@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  StyleSheet,
   Text,
   View,
   TextInput,
@@ -11,11 +10,23 @@ import {
   Animated,
   Dimensions,
   Modal,
-  Pressable,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
+import {
+  AbsoluteFill,
+  DrawerModalRoot,
+  DrawerBackdrop,
+  DrawerSheet,
+  DrawerSafe,
+  DrawerDragArea,
+  DrawerHandle,
+  DrawerFieldGroup,
+  DrawerLabel,
+  DrawerInput,
+  DrawerSubmitButton,
+  DrawerSubmitButtonText,
+} from "@/src/presentation/theme/primitives";
 import { useBlockchain } from "@/src/presentation/hooks/useBlockchain";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
@@ -123,58 +134,50 @@ export function BlockchainTransferDrawer({
 
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={handleClose}>
-      <Pressable style={styles.modalBackdrop} onPress={handleClose}>
-        <Animated.View
-          style={[
-            styles.backdrop,
-            {
-              opacity: backdropOpacity,
-            },
-          ]}
-        />
-      </Pressable>
-      <Animated.View
-        style={[
-          styles.drawer,
-          {
-            backgroundColor: colors.background,
+      <DrawerModalRoot>
+        <DrawerBackdrop style={{ opacity: backdropOpacity }} pointerEvents="box-none">
+          <AbsoluteFill onPress={handleClose} />
+        </DrawerBackdrop>
+        <DrawerSheet
+          style={{
             height: DRAWER_HEIGHT,
             transform: [{ translateY }],
-          },
-        ]}
-        {...panHandlers}
-      >
-        <SafeAreaView edges={["bottom"]} style={styles.safeArea}>
-          <View style={styles.handleContainer}>
-            <View style={[styles.handle, { backgroundColor: colors.border }]} />
-          </View>
-          <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
+          }}
+        >
+          <DrawerSafe edges={["top"]}>
+            <DrawerDragArea {...panHandlers}>
+              <DrawerHandle />
+            </DrawerDragArea>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+          <Text style={{ fontSize: 24, fontWeight: "700", color: colors.text }}>
             {t("blockchain.transfer")}
           </Text>
-          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+          <TouchableOpacity onPress={handleClose} style={{ padding: 4 }}>
             <MaterialIcons name="close" size={24} color={colors.text} />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.text }]}>
-            {t("blockchain.senderAccount")}
-          </Text>
-          <View style={[styles.picker, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <DrawerFieldGroup>
+          <DrawerLabel>{t("blockchain.senderAccount")}</DrawerLabel>
+          <View style={{ borderWidth: 1, borderRadius: 10, overflow: "hidden", backgroundColor: colors.surface, borderColor: colors.border }}>
             {accounts.map((account, index) => {
               const accountUuid = getAccountUuid(account, index);
               return (
                 <TouchableOpacity
                   key={account.id}
-                  style={[
-                    styles.pickerOption,
-                    selectedSender === accountUuid && { backgroundColor: colors.primary + "20" },
-                  ]}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: 12,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.border,
+                    backgroundColor: selectedSender === accountUuid ? colors.primary + "20" : undefined,
+                  }}
                   onPress={() => setSelectedSender(accountUuid)}
                 >
-                  <Text style={[styles.pickerOptionText, { color: colors.text }]}>
+                  <Text style={{ fontSize: 16, color: colors.text }}>
                     {account.name}
                   </Text>
                   {selectedSender === accountUuid && (
@@ -184,25 +187,28 @@ export function BlockchainTransferDrawer({
               );
             })}
           </View>
-        </View>
+        </DrawerFieldGroup>
 
-        <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.text }]}>
-            {t("blockchain.receiverAccount")}
-          </Text>
-          <View style={[styles.picker, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <DrawerFieldGroup>
+          <DrawerLabel>{t("blockchain.receiverAccount")}</DrawerLabel>
+          <View style={{ borderWidth: 1, borderRadius: 10, overflow: "hidden", backgroundColor: colors.surface, borderColor: colors.border }}>
             {accounts.map((account, index) => {
               const accountUuid = getAccountUuid(account, index);
               return (
                 <TouchableOpacity
                   key={account.id}
-                  style={[
-                    styles.pickerOption,
-                    selectedReceiver === accountUuid && { backgroundColor: colors.primary + "20" },
-                  ]}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: 12,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.border,
+                    backgroundColor: selectedReceiver === accountUuid ? colors.primary + "20" : undefined,
+                  }}
                   onPress={() => setSelectedReceiver(accountUuid)}
                 >
-                  <Text style={[styles.pickerOptionText, { color: colors.text }]}>
+                  <Text style={{ fontSize: 16, color: colors.text }}>
                     {account.name}
                   </Text>
                   {selectedReceiver === accountUuid && (
@@ -212,141 +218,40 @@ export function BlockchainTransferDrawer({
               );
             })}
           </View>
-        </View>
+        </DrawerFieldGroup>
 
-        <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.text }]}>
-            {t("blockchain.amount")}
-          </Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+        <DrawerFieldGroup>
+          <DrawerLabel>{t("blockchain.amount")}</DrawerLabel>
+          <DrawerInput
             value={amount}
             onChangeText={setAmount}
             placeholder={t("blockchain.amountPlaceholder")}
             placeholderTextColor={colors.textSecondary}
             keyboardType="decimal-pad"
           />
-        </View>
+        </DrawerFieldGroup>
 
-        <View style={styles.section}>
-          <Text style={[styles.label, { color: colors.text }]}>
-            {t("blockchain.currency")}
-          </Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+        <DrawerFieldGroup>
+          <DrawerLabel>{t("blockchain.currency")}</DrawerLabel>
+          <DrawerInput
             value={currency}
             onChangeText={setCurrency}
             placeholder="SIM_COIN"
             placeholderTextColor={colors.textSecondary}
           />
-        </View>
+        </DrawerFieldGroup>
 
-        <TouchableOpacity
-          style={[styles.submitButton, { backgroundColor: colors.primary }]}
-          onPress={handleSubmit}
-          disabled={loading}
-        >
+        <DrawerSubmitButton onPress={handleSubmit} disabled={loading}>
           {loading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Text style={styles.submitButtonText}>{t("blockchain.submitTransfer")}</Text>
+            <DrawerSubmitButtonText>{t("blockchain.submitTransfer")}</DrawerSubmitButtonText>
           )}
-        </TouchableOpacity>
+        </DrawerSubmitButton>
       </ScrollView>
-        </SafeAreaView>
-      </Animated.View>
+          </DrawerSafe>
+        </DrawerSheet>
+      </DrawerModalRoot>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  modalBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#000",
-  },
-  drawer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  handleContainer: {
-    alignItems: "center",
-    paddingTop: 8,
-    paddingBottom: 4,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-  },
-  closeButton: {
-    padding: 4,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 12,
-    fontSize: 16,
-  },
-  picker: {
-    borderWidth: 1,
-    borderRadius: 10,
-    overflow: "hidden",
-  },
-  pickerOption: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e0e0e0",
-  },
-  pickerOptionText: {
-    fontSize: 16,
-  },
-  submitButton: {
-    paddingVertical: 16,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  submitButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});

@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { AbsoluteFillView } from "@/src/presentation/theme/primitives";
 
 export function formatChartValue(value: number): string {
   if (value >= 1e9) return (value / 1e9).toFixed(2) + "B";
@@ -12,45 +13,9 @@ export function formatChartTimestamp(ts: number): string {
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
-export const chartTooltipStyles = StyleSheet.create({
-  crosshair: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    width: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
-    marginLeft: -0.5,
-  },
-  crosshairDark: {
-    backgroundColor: "rgba(255,255,255,0.4)",
-  },
-  tooltip: {
-    position: "absolute",
-    top: 8,
-    width: 80,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    backgroundColor: "rgba(30,30,34,0.95)",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
-  },
-  tooltipValue: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  tooltipTime: {
-    fontSize: 11,
-    color: "rgba(255,255,255,0.7)",
-    marginTop: 2,
-  },
-  tooltipRow: {
-    fontSize: 11,
-    color: "rgba(255,255,255,0.85)",
-    marginTop: 2,
-  },
-});
+const tooltipValueStyle = { fontSize: 14, fontWeight: "600" as const, color: "#fff" };
+const tooltipTimeStyle = { fontSize: 11, color: "rgba(255,255,255,0.7)", marginTop: 2 };
+const tooltipRowStyle = { fontSize: 11, color: "rgba(255,255,255,0.85)", marginTop: 2 };
 
 type TooltipContentProps = {
   value?: number;
@@ -62,33 +27,17 @@ export function ChartTooltipContent({ value, ohlc, timestamp }: TooltipContentPr
   if (ohlc != null) {
     return (
       <>
-        <Text style={chartTooltipStyles.tooltipValue}>
-          C {formatChartValue(ohlc.c)}
-        </Text>
-        <Text style={chartTooltipStyles.tooltipRow}>
-          O {formatChartValue(ohlc.o)} H {formatChartValue(ohlc.h)}
-        </Text>
-        <Text style={chartTooltipStyles.tooltipRow}>
-          L {formatChartValue(ohlc.l)}
-        </Text>
-        {timestamp != null && (
-          <Text style={chartTooltipStyles.tooltipTime}>
-            {formatChartTimestamp(timestamp)}
-          </Text>
-        )}
+        <Text style={tooltipValueStyle}>C {formatChartValue(ohlc.c)}</Text>
+        <Text style={tooltipRowStyle}>O {formatChartValue(ohlc.o)} H {formatChartValue(ohlc.h)}</Text>
+        <Text style={tooltipRowStyle}>L {formatChartValue(ohlc.l)}</Text>
+        {timestamp != null && <Text style={tooltipTimeStyle}>{formatChartTimestamp(timestamp)}</Text>}
       </>
     );
   }
   return (
     <>
-      <Text style={chartTooltipStyles.tooltipValue}>
-        {value != null ? formatChartValue(value) : "—"}
-      </Text>
-      {timestamp != null && (
-        <Text style={chartTooltipStyles.tooltipTime}>
-          {formatChartTimestamp(timestamp)}
-        </Text>
-      )}
+      <Text style={tooltipValueStyle}>{value != null ? formatChartValue(value) : "—"}</Text>
+      {timestamp != null && <Text style={tooltipTimeStyle}>{formatChartTimestamp(timestamp)}</Text>}
     </>
   );
 }
@@ -114,17 +63,34 @@ export function ChartTooltipOverlay({
   const tooltipW = ohlc ? 100 : 80;
   const tooltipLeft = Math.max(8, Math.min(layoutWidth - tooltipW - 8, x - tooltipW / 2));
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+    <AbsoluteFillView pointerEvents="none">
       <View
-        style={[
-          chartTooltipStyles.crosshair,
-          isDark && chartTooltipStyles.crosshairDark,
-          { left: x },
-        ]}
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          width: 1,
+          marginLeft: -0.5,
+          left: x,
+          backgroundColor: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)",
+        }}
       />
-      <View style={[chartTooltipStyles.tooltip, { left: tooltipLeft, width: ohlc ? 100 : 80 }]}>
+      <View
+        style={{
+          position: "absolute",
+          top: 8,
+          width: tooltipW,
+          paddingVertical: 6,
+          paddingHorizontal: 8,
+          backgroundColor: "rgba(30,30,34,0.95)",
+          borderRadius: 8,
+          borderWidth: 1,
+          borderColor: "rgba(255,255,255,0.12)",
+          left: tooltipLeft,
+        }}
+      >
         <ChartTooltipContent value={value} ohlc={ohlc} timestamp={timestamp} />
       </View>
-    </View>
+    </AbsoluteFillView>
   );
 }

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../store";
+import { useAppDispatch, useAppSelector } from "../store/useAppStore";
 import {
   setPreferences,
   setTheme,
@@ -14,8 +13,8 @@ import { i18n } from "../i18n";
 import type { UpdatePreferenceInput } from "../../application/usecases/UserPreferenceUseCase";
 
 export function usePreferences() {
-  const dispatch = useDispatch();
-  const preferences = useSelector((state: RootState) => state.preferences);
+  const dispatch = useAppDispatch();
+  const preferences = useAppSelector((s) => s.preferences);
   const {
     preference: apiPreference,
     customerId,

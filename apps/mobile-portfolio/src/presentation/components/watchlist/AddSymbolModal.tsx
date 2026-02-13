@@ -7,14 +7,21 @@ import {
   FlatList,
   Modal,
   Pressable,
-  StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
 import type { Instrument } from "@/src/domain/entities/instrument";
+import {
+  AbsoluteFill,
+  DrawerModalRoot,
+  DrawerBackdrop,
+  DrawerSheet,
+  DrawerSafe,
+  DrawerDragArea,
+  DrawerHandle,
+} from "@/src/presentation/theme/primitives";
 
 interface AddSymbolModalProps {
   visible: boolean;
@@ -56,157 +63,65 @@ export function AddSymbolModal({
     closeWithAnimation();
   };
 
+  const translateY = Animated.add(slideAnim, dragOffset);
+
   return (
     <Modal visible={visible} animationType="none" transparent onRequestClose={closeWithAnimation}>
-      <View style={styles.modalRoot}>
-        <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]} pointerEvents="box-none">
-          <Pressable style={StyleSheet.absoluteFill} onPress={closeWithAnimation} />
-        </Animated.View>
-        <Animated.View
-          style={[
-            styles.drawer,
-            {
-              height: DRAWER_HEIGHT,
-              backgroundColor: colors.cardSolid,
-              transform: [
-                { translateY: Animated.add(slideAnim, dragOffset) },
-              ],
-            },
-          ]}
+      <DrawerModalRoot>
+        <DrawerBackdrop style={{ opacity: backdropOpacity }} pointerEvents="box-none">
+          <AbsoluteFill onPress={closeWithAnimation} />
+        </DrawerBackdrop>
+        <DrawerSheet
+          style={{
+            height: DRAWER_HEIGHT,
+            transform: [{ translateY }],
+          }}
         >
-          <SafeAreaView style={styles.safe} edges={["top"]}>
-            <View style={styles.dragArea} {...panHandlers}>
-              <View style={styles.dragHandle} />
-            </View>
-            <View style={styles.header}>
-              <Text style={styles.title}>Add symbol</Text>
-              <Pressable onPress={closeWithAnimation} hitSlop={12} style={styles.closeBtn}>
-                <MaterialIcons name="close" size={22} color="#fff" />
+          <DrawerSafe edges={["top"]}>
+            <DrawerDragArea {...panHandlers}>
+              <DrawerHandle />
+            </DrawerDragArea>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingBottom: 12 }}>
+              <Text style={{ fontSize: 18, fontWeight: "600", color: colors.text }}>Add symbol</Text>
+              <Pressable onPress={closeWithAnimation} hitSlop={12} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.surface, alignItems: "center", justifyContent: "center" }}>
+                <MaterialIcons name="close" size={22} color={colors.text} />
               </Pressable>
             </View>
             <TextInput
-              style={styles.input}
+              style={{ marginHorizontal: 16, marginBottom: 12, backgroundColor: colors.surface, borderRadius: 10, padding: 12, fontSize: 16, color: colors.text }}
               value={search}
               onChangeText={setSearch}
               placeholder="Search by symbol or name"
-              placeholderTextColor="rgba(255,255,255,0.4)"
+              placeholderTextColor={colors.textTertiary}
               autoCapitalize="characters"
             />
             <FlatList
               data={filtered}
               keyExtractor={(item) => item.instrument_id}
-              style={styles.list}
+              style={{ flex: 1 }}
               keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (
                 <Pressable
-                  style={styles.row}
+                  style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: colors.border }}
                   onPress={() => handleSelect(item.instrument_id)}
                 >
-                  <Text style={styles.symbol}>{item.symbol}</Text>
+                  <Text style={{ fontSize: 16, fontWeight: "600", color: colors.text, width: 72 }}>{item.symbol}</Text>
                   {item.name ? (
-                    <Text style={styles.name} numberOfLines={1}>
+                    <Text style={{ flex: 1, fontSize: 14, color: colors.textSecondary }} numberOfLines={1}>
                       {item.name}
                     </Text>
                   ) : null}
                 </Pressable>
               )}
               ListEmptyComponent={
-                <Text style={styles.empty}>
+                <Text style={{ padding: 20, fontSize: 14, color: colors.textSecondary, textAlign: "center" }}>
                   {search.trim() ? "No instruments found." : "Loading..."}
                 </Text>
               }
             />
-          </SafeAreaView>
-        </Animated.View>
-      </View>
+          </DrawerSafe>
+        </DrawerSheet>
+      </DrawerModalRoot>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  modalRoot: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#000",
-  },
-  drawer: {
-    borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
-    overflow: "hidden",
-  },
-  safe: {
-    flex: 1,
-  },
-  dragArea: {
-    paddingTop: 8,
-    paddingBottom: 4,
-    alignItems: "center",
-    minHeight: 32,
-  },
-  dragHandle: {
-    width: 36,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: "rgba(255,255,255,0.3)",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  input: {
-    marginHorizontal: 16,
-    marginBottom: 12,
-    backgroundColor: "rgba(255,255,255,0.08)",
-    borderRadius: 10,
-    padding: 12,
-    fontSize: 16,
-    color: "#fff",
-  },
-  list: {
-    flex: 1,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(255,255,255,0.08)",
-  },
-  symbol: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-    width: 72,
-  },
-  name: {
-    flex: 1,
-    fontSize: 14,
-    color: "rgba(255,255,255,0.6)",
-  },
-  empty: {
-    padding: 20,
-    fontSize: 14,
-    color: "rgba(255,255,255,0.5)",
-    textAlign: "center",
-  },
-});

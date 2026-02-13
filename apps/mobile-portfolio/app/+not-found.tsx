@@ -1,17 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text } from "react-native";
+import { CenteredContainer } from "@/src/presentation/theme/primitives";
 
 export default function NotFoundScreen() {
   return (
-    <View style={styles.centered}>
+    <CenteredContainer>
       <Text>Screen not found.</Text>
-    </View>
+    </CenteredContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

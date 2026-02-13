@@ -8,6 +8,7 @@ interface QuotesState {
   history: Record<string, number[]>;
   status: QuoteConnectionStatus;
   subscribedSymbols: string[];
+  extraSubscribedSymbols: string[];
 }
 
 const initialState: QuotesState = {
@@ -15,6 +16,7 @@ const initialState: QuotesState = {
   history: {},
   status: "idle",
   subscribedSymbols: [],
+  extraSubscribedSymbols: [],
 };
 
 function appendHistory(prev: number[] | undefined, price: number): number[] {
@@ -51,8 +53,11 @@ const quotesSlice = createSlice({
         }
       }
     },
+    setExtraSubscribedSymbols(state, action: { payload: string[] }) {
+      state.extraSubscribedSymbols = action.payload.map((s) => s.toUpperCase()).filter(Boolean);
+    },
   },
 });
 
-export const { setSubscribedSymbols, setSnapshot, setStatus, setHistory } = quotesSlice.actions;
+export const { setSubscribedSymbols, setSnapshot, setStatus, setHistory, setExtraSubscribedSymbols } = quotesSlice.actions;
 export default quotesSlice.reducer;

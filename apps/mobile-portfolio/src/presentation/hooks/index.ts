@@ -2,8 +2,6 @@ export { usePortfolio } from "./usePortfolio";
 export type { UsePortfolioResult } from "./usePortfolio";
 export { useAccountData } from "./useAccountData";
 export type { UseAccountDataResult } from "./useAccountData";
-export { useRealtimeQuotes } from "./useRealtimeQuotes";
-export type { UseRealtimeQuotesResult } from "./useRealtimeQuotes";
 export { useSymbolDisplayData } from "./useSymbolDisplayData";
 export type {
   SymbolDisplayData,

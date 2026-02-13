@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
 import type { WatchlistItem } from "@/src/domain/entities/watchlist";
 import type { Instrument } from "@/src/domain/entities/instrument";
 import type { StockDetailItem } from "./StockDetailDrawer";
 import { WatchlistItemRow } from "./WatchlistItemRow";
+import styled from "styled-components/native";
 
 interface WatchlistCardProps {
   title: string;
@@ -13,21 +13,41 @@ interface WatchlistCardProps {
   onItemPress?: (item: StockDetailItem) => void;
 }
 
-function getSymbolForInstrument(
-  instruments: Instrument[],
-  instrumentId: string
-): string {
+function getSymbolForInstrument(instruments: Instrument[], instrumentId: string): string {
   const inst = instruments.find((i) => i.instrument_id === instrumentId);
   return inst?.symbol ?? instrumentId.slice(0, 8);
 }
 
-function getNameForInstrument(
-  instruments: Instrument[],
-  instrumentId: string
-): string | null {
+function getNameForInstrument(instruments: Instrument[], instrumentId: string): string | null {
   const inst = instruments.find((i) => i.instrument_id === instrumentId);
   return inst?.name ?? null;
 }
+
+const Card = styled.View`
+  background-color: rgba(255,255,255,0.03);
+  border-radius: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  border-width: 0;
+`;
+
+const Title = styled.Text`
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  padding-horizontal: 16px;
+  padding-top: 20px;
+  padding-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+const Empty = styled.Text`
+  font-size: 15px;
+  color: rgba(255,255,255,0.4);
+  padding: 20px;
+  text-align: center;
+`;
 
 export function WatchlistCard({
   title,
@@ -38,10 +58,10 @@ export function WatchlistCard({
   onItemPress,
 }: WatchlistCardProps) {
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>{title}</Text>
+    <Card>
+      <Title>{title}</Title>
       {items.length === 0 ? (
-        <Text style={styles.empty}>No symbols added yet.</Text>
+        <Empty>No symbols added yet.</Empty>
       ) : (
         items.map((item) => {
           const symbol = getSymbolForInstrument(instruments, item.instrument_id);
@@ -70,32 +90,6 @@ export function WatchlistCard({
           );
         })
       )}
-    </View>
+    </Card>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "rgba(255,255,255,0.03)",
-    borderRadius: 0,
-    marginBottom: 0,
-    overflow: "hidden",
-    borderWidth: 0,
-  },
-  title: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "rgba(255,255,255,0.6)",
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    paddingBottom: 8,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  empty: {
-    fontSize: 15,
-    color: "rgba(255,255,255,0.4)",
-    padding: 20,
-    textAlign: "center",
-  },
-});

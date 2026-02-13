@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import { LineChart, CandlestickChart } from "react-native-wagmi-charts";
+import styled from "styled-components/native";
 
 type LinePoint = { timestamp: number; value: number };
 type CandlePoint = { timestamp: number; open: number; high: number; low: number; close: number };
@@ -10,6 +11,35 @@ interface ProfessionalStockChartProps {
   candlePoints: CandlePoint[];
 }
 
+const Wrapper = styled.View`
+  gap: 12px;
+  width: 100%;
+  overflow: hidden;
+`;
+
+const Card = styled.View`
+  border-radius: 12px;
+  background-color: #000000;
+  border-width: 1px;
+  border-color: rgba(255,255,255,0.08);
+  padding-vertical: 12px;
+  padding-horizontal: 8px;
+  overflow: hidden;
+`;
+
+const Label = styled.Text`
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 8px;
+`;
+
+const Footer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 8px;
+`;
+
 export function ProfessionalStockChart({ linePoints, candlePoints }: ProfessionalStockChartProps) {
   const [width, setWidth] = useState(0);
   const chartWidth = width > 0 ? width - 16 : undefined;
@@ -17,70 +47,33 @@ export function ProfessionalStockChart({ linePoints, candlePoints }: Professiona
   if (!linePoints.length || !candlePoints.length) return null;
 
   return (
-    <View style={styles.wrapper} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
-      <View style={styles.card}>
-        <Text style={styles.label}>Price line</Text>
+    <Wrapper onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+      <Card>
+        <Label>Price line</Label>
         <LineChart.Provider data={linePoints}>
           <LineChart height={160} width={chartWidth}>
             <LineChart.Path color="#6366f1" />
             <LineChart.CursorCrosshair />
           </LineChart>
-          <View style={styles.footer}>
-            <LineChart.PriceText style={styles.priceText} />
-            <LineChart.DatetimeText style={styles.timeText} />
-          </View>
+          <Footer>
+            <LineChart.PriceText style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", fontWeight: "500" }} />
+            <LineChart.DatetimeText style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }} />
+          </Footer>
         </LineChart.Provider>
-      </View>
-      <View style={styles.card}>
-        <Text style={styles.label}>Candlestick</Text>
+      </Card>
+      <Card>
+        <Label>Candlestick</Label>
         <CandlestickChart.Provider data={candlePoints}>
           <CandlestickChart height={200} width={chartWidth}>
             <CandlestickChart.Candles />
             <CandlestickChart.Crosshair />
           </CandlestickChart>
-          <View style={styles.footer}>
-            <CandlestickChart.PriceText type="close" style={styles.priceText} />
-            <CandlestickChart.DatetimeText style={styles.timeText} />
-          </View>
+          <Footer>
+            <CandlestickChart.PriceText type="close" style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", fontWeight: "500" }} />
+            <CandlestickChart.DatetimeText style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }} />
+          </Footer>
         </CandlestickChart.Provider>
-      </View>
-    </View>
+      </Card>
+    </Wrapper>
   );
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    gap: 12,
-    width: "100%",
-    overflow: "hidden",
-  },
-  card: {
-    borderRadius: 12,
-    backgroundColor: "#000000",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    overflow: "hidden",
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "rgba(255,255,255,0.9)",
-    marginBottom: 8,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 8,
-  },
-  priceText: {
-    fontSize: 13,
-    color: "rgba(255,255,255,0.9)",
-    fontWeight: "500",
-  },
-  timeText: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.5)",
-  },
-});

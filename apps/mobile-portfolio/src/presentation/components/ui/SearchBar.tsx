@@ -1,11 +1,7 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, TextInput } from "react-native";
+import styled from "styled-components/native";
 
 interface SearchBarProps {
   placeholder?: string;
@@ -14,6 +10,31 @@ interface SearchBarProps {
   onFocus?: () => void;
   onBlur?: () => void;
 }
+
+const Container = styled.View<{ focused: boolean }>`
+  flex-direction: row;
+  align-items: center;
+  background-color: ${(p) =>
+    p.focused ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.08)"};
+  border-radius: 10px;
+  padding-horizontal: 12px;
+  padding-vertical: 10px;
+  margin-horizontal: 16px;
+  margin-vertical: 8px;
+`;
+
+const SearchInput = styled.TextInput`
+  flex: 1;
+  font-size: 17px;
+  color: #fff;
+  padding: 0;
+  margin-left: 8px;
+`;
+
+const ClearBtn = styled(Pressable)`
+  padding: 4px;
+  margin-left: 8px;
+`;
 
 export function SearchBar({
   placeholder = "Search",
@@ -39,15 +60,13 @@ export function SearchBar({
   };
 
   return (
-    <View style={[styles.container, focused && styles.containerFocused]}>
+    <Container focused={focused}>
       <MaterialIcons
         name="search"
         size={20}
         color={focused ? "#fff" : "rgba(255,255,255,0.5)"}
-        style={styles.icon}
       />
-      <TextInput
-        style={styles.input}
+      <SearchInput
         placeholder={placeholder}
         placeholderTextColor="rgba(255,255,255,0.4)"
         value={value}
@@ -59,39 +78,10 @@ export function SearchBar({
         returnKeyType="search"
       />
       {value.length > 0 && (
-        <Pressable onPress={handleClear} hitSlop={8} style={styles.clearBtn}>
+        <ClearBtn onPress={handleClear} hitSlop={8}>
           <MaterialIcons name="close" size={18} color="rgba(255,255,255,0.5)" />
-        </Pressable>
+        </ClearBtn>
       )}
-    </View>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.08)",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginHorizontal: 16,
-    marginVertical: 8,
-  },
-  containerFocused: {
-    backgroundColor: "rgba(255,255,255,0.12)",
-  },
-  icon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    fontSize: 17,
-    color: "#fff",
-    padding: 0,
-  },
-  clearBtn: {
-    padding: 4,
-    marginLeft: 8,
-  },
-});

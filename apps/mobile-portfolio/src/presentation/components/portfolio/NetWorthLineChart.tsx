@@ -1,12 +1,23 @@
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import type { PortfolioHistoryPoint } from "@/src/domain/entities/portfolio";
 import { useTheme } from "@/src/presentation/theme";
+import styled from "styled-components/native";
 
 interface NetWorthLineChartProps {
   points: PortfolioHistoryPoint[];
 }
+
+const Container = styled.View`
+  border-radius: 12px;
+  border-width: 1px;
+  border-color: ${(p) => p.theme.colors.border};
+  padding-vertical: 8px;
+  overflow: hidden;
+  width: 100%;
+  background-color: ${(p) => p.theme.colors.card};
+`;
 
 export function NetWorthLineChart({ points }: NetWorthLineChartProps) {
   const { colors } = useTheme();
@@ -21,7 +32,7 @@ export function NetWorthLineChart({ points }: NetWorthLineChartProps) {
   });
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.card, borderColor: colors.border }]} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+    <Container onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       {width > 0 && (
         <LineChart
           data={{ labels, datasets: [{ data }] }}
@@ -41,22 +52,9 @@ export function NetWorthLineChart({ points }: NetWorthLineChartProps) {
             decimalPlaces: 0,
             propsForBackgroundLines: { strokeWidth: 0 },
           }}
-          style={styles.chart}
+          style={{ marginHorizontal: 0 }}
         />
       )}
-    </View>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingVertical: 8,
-    overflow: "hidden",
-    width: "100%",
-  },
-  chart: {
-    marginHorizontal: 0,
-  },
-});

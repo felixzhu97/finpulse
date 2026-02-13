@@ -4,21 +4,37 @@ import {
   Animated,
   Dimensions,
   Modal,
-  Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { container } from "@/src/application";
 import type { Instrument } from "@/src/domain/entities/instrument";
 import type { Order } from "@/src/domain/entities/order";
 import type { Trade } from "@/src/domain/entities/trade";
 import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
 import { useTheme } from "@/src/presentation/theme";
+import {
+  AbsoluteFill,
+  BlockRowHalf,
+  DrawerModalRoot,
+  DrawerBackdrop,
+  DrawerSheet,
+  DrawerSafe,
+  DrawerDragArea,
+  DrawerHandle,
+  DrawerHeader,
+  DrawerHeaderTitle,
+  DrawerCloseButton,
+  DrawerFieldGroup,
+  DrawerLabel,
+  DrawerInput,
+  DrawerSubmitButton,
+  DrawerSubmitButtonText,
+  DrawerErrorText,
+} from "@/src/presentation/theme/primitives";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "@/src/presentation/i18n";
 
@@ -129,133 +145,142 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
 
   return (
     <Modal visible={visible} animationType="none" transparent onRequestClose={handleClose}>
-      <View style={styles.modalRoot}>
-        <Animated.View
-          style={[styles.backdrop, { opacity: backdropOpacity, backgroundColor: colors.backdrop }]}
-          pointerEvents="box-none"
-        >
-          <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
-        </Animated.View>
+      <DrawerModalRoot>
+        <DrawerBackdrop style={{ opacity: backdropOpacity }} pointerEvents="box-none">
+          <AbsoluteFill onPress={handleClose} />
+        </DrawerBackdrop>
 
-        <Animated.View
-          style={[
-            styles.drawer,
-            {
-              height: DRAWER_HEIGHT,
-              transform: [{ translateY }],
-              backgroundColor: colors.cardSolid,
-            },
-          ]}
+        <DrawerSheet
+          style={{
+            height: DRAWER_HEIGHT,
+            transform: [{ translateY }],
+          }}
         >
-          <SafeAreaView style={styles.safe} edges={["top"]}>
-            <View style={styles.dragArea} {...panHandlers}>
-              <View style={[styles.dragHandle, { backgroundColor: colors.textTertiary }]} />
-            </View>
-            <View style={[styles.header, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>
-              {step === "order" ? t("account.createOrder") : t("account.executeTrade")}
-            </Text>
-            <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-              <MaterialIcons name="close" size={24} color={colors.text} />
-            </TouchableOpacity>
-          </View>
+          <DrawerSafe edges={["top"]}>
+            <DrawerDragArea {...panHandlers}>
+              <DrawerHandle />
+            </DrawerDragArea>
+            <DrawerHeader>
+              <DrawerHeaderTitle>
+                {step === "order" ? t("account.createOrder") : t("account.executeTrade")}
+              </DrawerHeaderTitle>
+              <DrawerCloseButton onPress={handleClose}>
+                <MaterialIcons name="close" size={24} color={colors.text} />
+              </DrawerCloseButton>
+            </DrawerHeader>
 
-          <ScrollView style={styles.content} contentContainerStyle={styles.contentInner} keyboardShouldPersistTaps="handled">
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
             {result ? (
-              <View style={styles.resultSection}>
+              <View style={{ alignItems: "center", paddingTop: 20 }}>
                 <MaterialIcons name="check-circle" size={48} color={colors.success} />
-                <Text style={[styles.resultTitle, { color: colors.text }]}>{t("account.tradeSuccess")}</Text>
+                <Text style={{ fontSize: 18, fontWeight: "600", marginTop: 16, color: colors.text }}>{t("account.tradeSuccess")}</Text>
                 {(result.surveillance_alert != null || result.surveillance_score != null) && (
-                  <View style={[styles.surveillanceRow, { backgroundColor: colors.surface }]}>
-                    <Text style={[styles.surveillanceLabel, { color: colors.textSecondary }]}>
+                  <View style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10, alignSelf: "stretch", backgroundColor: colors.surface }}>
+                    <Text style={{ fontSize: 13, marginBottom: 4, color: colors.textSecondary }}>
                       {t("account.surveillanceAlert")}
                     </Text>
-                    <Text style={[styles.surveillanceValue, { color: colors.text }]}>
+                    <Text style={{ fontSize: 15, fontWeight: "600", color: colors.text }}>
                       {result.surveillance_alert ?? "-"}
                       {result.surveillance_score != null && ` (${result.surveillance_score.toFixed(2)})`}
                     </Text>
                   </View>
                 )}
-                <TouchableOpacity style={[styles.doneButton, { backgroundColor: colors.primary }]} onPress={handleClose}>
-                  <Text style={styles.doneButtonText}>{t("common.close")}</Text>
+                <TouchableOpacity style={{ marginTop: 24, paddingVertical: 12, paddingHorizontal: 32, borderRadius: 10, backgroundColor: colors.primary }} onPress={handleClose}>
+                  <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>{t("common.close")}</Text>
                 </TouchableOpacity>
               </View>
             ) : step === "order" ? (
               <>
-                <View style={styles.fieldGroup}>
-                  <Text style={[styles.label, { color: colors.textSecondary }]}>{t("account.side")}</Text>
-                  <View style={styles.sideRow}>
+                <DrawerFieldGroup>
+                  <DrawerLabel>{t("account.side")}</DrawerLabel>
+                  <BlockRowHalf>
                     <TouchableOpacity
-                      style={[
-                        styles.sideButton,
-                        { backgroundColor: side === "buy" ? colors.primaryLight : colors.surface, borderColor: colors.border },
-                      ]}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 12,
+                        borderRadius: 10,
+                        alignItems: "center",
+                        borderWidth: 1,
+                        backgroundColor: side === "buy" ? colors.primaryLight : colors.surface,
+                        borderColor: colors.border,
+                      }}
                       onPress={() => setSide("buy")}
                     >
                       <Text style={{ color: side === "buy" ? colors.primary : colors.text }}>{t("account.buy")}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[
-                        styles.sideButton,
-                        {
-                          backgroundColor: side === "sell" ? "rgba(255,59,48,0.15)" : colors.surface,
-                          borderColor: side === "sell" ? colors.error : colors.border,
-                        },
-                      ]}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 12,
+                        borderRadius: 10,
+                        alignItems: "center",
+                        borderWidth: 1,
+                        backgroundColor: side === "sell" ? "rgba(255,59,48,0.15)" : colors.surface,
+                        borderColor: side === "sell" ? colors.error : colors.border,
+                      }}
                       onPress={() => setSide("sell")}
                     >
                       <Text style={{ color: side === "sell" ? colors.error : colors.text }}>{t("account.sell")}</Text>
                     </TouchableOpacity>
-                  </View>
-                </View>
-                <View style={styles.fieldGroup}>
-                  <Text style={[styles.label, { color: colors.textSecondary }]}>{t("account.selectAccount")}</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
+                  </BlockRowHalf>
+                </DrawerFieldGroup>
+                <DrawerFieldGroup>
+                  <DrawerLabel>{t("account.selectAccount")}</DrawerLabel>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }}>
                     {accounts.map((acc) => {
                       const selected = accountId === acc.account_id;
                       return (
                         <TouchableOpacity
                           key={acc.account_id}
-                          style={[
-                            styles.chip,
-                            { backgroundColor: selected ? colors.primaryLight : colors.surface, borderColor: colors.border },
-                          ]}
+                          style={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 16,
+                            borderRadius: 10,
+                            marginRight: 8,
+                            borderWidth: 1,
+                            backgroundColor: selected ? colors.primaryLight : colors.surface,
+                            borderColor: colors.border,
+                          }}
                           onPress={() => setAccountId(acc.account_id)}
                         >
-                          <Text style={[styles.chipText, { color: selected ? colors.primary : colors.text }]}>
+                          <Text style={{ fontSize: 14, color: selected ? colors.primary : colors.text }}>
                             {acc.account_type}
                           </Text>
                         </TouchableOpacity>
                       );
                     })}
                   </ScrollView>
-                </View>
-                <View style={styles.fieldGroup}>
-                  <Text style={[styles.label, { color: colors.textSecondary }]}>{t("account.selectInstrument")}</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
+                </DrawerFieldGroup>
+                <DrawerFieldGroup>
+                  <DrawerLabel>{t("account.selectInstrument")}</DrawerLabel>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }}>
                     {instruments.slice(0, 20).map((i) => {
                       const selected = instrumentId === i.instrument_id;
                       return (
                         <TouchableOpacity
                           key={i.instrument_id}
-                          style={[
-                            styles.chip,
-                            { backgroundColor: selected ? colors.primaryLight : colors.surface, borderColor: colors.border },
-                          ]}
+                          style={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 16,
+                            borderRadius: 10,
+                            marginRight: 8,
+                            borderWidth: 1,
+                            backgroundColor: selected ? colors.primaryLight : colors.surface,
+                            borderColor: colors.border,
+                          }}
                           onPress={() => setInstrumentId(i.instrument_id)}
                         >
-                          <Text style={[styles.chipText, { color: selected ? colors.primary : colors.text }]}>
+                          <Text style={{ fontSize: 14, color: selected ? colors.primary : colors.text }}>
                             {i.symbol}
                           </Text>
                         </TouchableOpacity>
                       );
                     })}
                   </ScrollView>
-                </View>
-                <View style={styles.fieldGroup}>
-                  <Text style={[styles.label, { color: colors.textSecondary }]}>{t("account.quantity")}</Text>
-                  <TextInput
-                    style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface }]}
+                </DrawerFieldGroup>
+                <DrawerFieldGroup>
+                  <DrawerLabel>{t("account.quantity")}</DrawerLabel>
+                  <DrawerInput
                     value={quantity}
                     onChangeText={setQuantity}
                     placeholder="0"
@@ -263,30 +288,25 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
                     keyboardType="decimal-pad"
                     editable={!submitting}
                   />
-                </View>
-                {error && <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>}
-                <TouchableOpacity
-                  style={[
-                    styles.submitButton,
-                    { backgroundColor: colors.primary },
-                    (submitting || !accountId || !instrumentId || !quantity) && styles.submitButtonDisabled,
-                  ]}
+                </DrawerFieldGroup>
+                {error && <DrawerErrorText>{error}</DrawerErrorText>}
+                <DrawerSubmitButton
+                  style={{ opacity: (submitting || !accountId || !instrumentId || !quantity) ? 0.5 : 1 }}
                   onPress={handleCreateOrder}
                   disabled={submitting || !accountId || !instrumentId || !quantity}
                 >
                   {submitting ? (
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
-                    <Text style={styles.submitButtonText}>{t("account.next")}</Text>
+                    <DrawerSubmitButtonText>{t("account.next")}</DrawerSubmitButtonText>
                   )}
-                </TouchableOpacity>
+                </DrawerSubmitButton>
               </>
             ) : (
               <>
-                <View style={styles.fieldGroup}>
-                  <Text style={[styles.label, { color: colors.textSecondary }]}>{t("account.orderQuantity")}</Text>
-                  <TextInput
-                    style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface }]}
+                <DrawerFieldGroup>
+                  <DrawerLabel>{t("account.orderQuantity")}</DrawerLabel>
+                  <DrawerInput
                     value={quantity}
                     onChangeText={setQuantity}
                     placeholder="0"
@@ -294,11 +314,10 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
                     keyboardType="decimal-pad"
                     editable={!submitting}
                   />
-                </View>
-                <View style={styles.fieldGroup}>
-                  <Text style={[styles.label, { color: colors.textSecondary }]}>{t("account.price")}</Text>
-                  <TextInput
-                    style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface }]}
+                </DrawerFieldGroup>
+                <DrawerFieldGroup>
+                  <DrawerLabel>{t("account.price")}</DrawerLabel>
+                  <DrawerInput
                     value={price}
                     onChangeText={setPrice}
                     placeholder="0.00"
@@ -306,114 +325,39 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
                     keyboardType="decimal-pad"
                     editable={!submitting}
                   />
-                </View>
-                {error && <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>}
+                </DrawerFieldGroup>
+                {error && <DrawerErrorText>{error}</DrawerErrorText>}
                 <TouchableOpacity
-                  style={[styles.backButton, { borderColor: colors.border }]}
+                  style={{
+                    paddingVertical: 12,
+                    borderRadius: 10,
+                    alignItems: "center",
+                    borderWidth: 1,
+                    marginTop: 8,
+                    borderColor: colors.border,
+                  }}
                   onPress={() => setStep("order")}
                   disabled={submitting}
                 >
-                  <Text style={[styles.backButtonText, { color: colors.text }]}>{t("account.back")}</Text>
+                  <Text style={{ fontSize: 16, color: colors.text }}>{t("account.back")}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.submitButton,
-                    { backgroundColor: colors.primary },
-                    (submitting || !price) && styles.submitButtonDisabled,
-                  ]}
+                <DrawerSubmitButton
+                  style={{ opacity: (submitting || !price) ? 0.5 : 1 }}
                   onPress={handleCreateTrade}
                   disabled={submitting || !price}
                 >
                   {submitting ? (
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
-                    <Text style={styles.submitButtonText}>{t("account.executeTrade")}</Text>
+                    <DrawerSubmitButtonText>{t("account.executeTrade")}</DrawerSubmitButtonText>
                   )}
-                </TouchableOpacity>
+                </DrawerSubmitButton>
               </>
             )}
           </ScrollView>
-          </SafeAreaView>
-        </Animated.View>
-      </View>
+          </DrawerSafe>
+        </DrawerSheet>
+      </DrawerModalRoot>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  modalRoot: { flex: 1, justifyContent: "flex-end" },
-  backdrop: { ...StyleSheet.absoluteFillObject },
-  drawer: { borderTopLeftRadius: 14, borderTopRightRadius: 14, overflow: "hidden" },
-  safe: { flex: 1 },
-  dragArea: { paddingTop: 8, paddingBottom: 8, alignItems: "center", minHeight: 40 },
-  dragHandle: { width: 36, height: 5, borderRadius: 2.5 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  headerTitle: { fontSize: 20, fontWeight: "600", letterSpacing: -0.3 },
-  closeButton: { width: 32, height: 32, alignItems: "center", justifyContent: "center" },
-  content: { flex: 1 },
-  contentInner: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40 },
-  fieldGroup: { marginBottom: 16 },
-  label: { fontSize: 13, fontWeight: "600", marginBottom: 6 },
-  input: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-  },
-  sideRow: { flexDirection: "row", gap: 12 },
-  sideButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    borderWidth: 1,
-  },
-  chipScroll: { flexGrow: 0 },
-  chip: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    marginRight: 8,
-    borderWidth: 1,
-  },
-  chipText: { fontSize: 14 },
-  errorText: { fontSize: 13, marginBottom: 12 },
-  submitButton: {
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 8,
-  },
-  submitButtonDisabled: { opacity: 0.5 },
-  submitButtonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  backButton: {
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    borderWidth: 1,
-    marginTop: 8,
-  },
-  backButtonText: { fontSize: 16 },
-  resultSection: { alignItems: "center", paddingTop: 20 },
-  resultTitle: { fontSize: 18, fontWeight: "600", marginTop: 16 },
-  surveillanceRow: {
-    marginTop: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignSelf: "stretch",
-  },
-  surveillanceLabel: { fontSize: 13, marginBottom: 4 },
-  surveillanceValue: { fontSize: 15, fontWeight: "600" },
-  doneButton: { marginTop: 24, paddingVertical: 12, paddingHorizontal: 32, borderRadius: 10 },
-  doneButtonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-});

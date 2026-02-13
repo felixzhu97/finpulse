@@ -1,13 +1,10 @@
 import { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "./useAppStore";
 import { setSelectedAccountId } from "./portfolioSlice";
-import type { RootState } from "./index";
 
 export function usePortfolioStore() {
-  const selectedAccountId = useSelector(
-    (state: RootState) => state.portfolio.selectedAccountId
-  );
-  const dispatch = useDispatch();
+  const selectedAccountId = useAppSelector((s) => s.portfolio.selectedAccountId);
+  const dispatch = useAppDispatch();
 
   return {
     selectedAccountId,

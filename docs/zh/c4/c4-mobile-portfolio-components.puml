@@ -21,7 +21,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(stock_list_item, "StockListItem", "React Native", "持仓行、价格、迷你图、打开详情抽屉")
         Component(metric_card, "MetricCard", "React Native", "标签、数值、说明")
         Component(native_sparkline, "NativeSparkline", "原生视图", "每股迷你图")
-        Component(stock_detail_drawer, "StockDetailDrawer", "React Native", "可拖拽抽屉、实时价/图、分享")
+        Component(stock_detail_drawer, "StockDetailDrawer", "React Native", "可拖拽抽屉、setExtraSubscribedSymbols、Redux 报价、分享")
         Component(account_drawers, "账户抽屉", "React Native", "RegisterCustomerDrawer、NewPaymentDrawer、NewTradeDrawer、SettingsDrawer")
         Component(sort_menu, "SortMenu", "React Native", "按名称、价格、涨跌、涨跌幅排序")
         Component(glass_search_bar, "底部搜索栏", "React Native", "GlassView，点击搜索图标打开")
@@ -37,9 +37,9 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(use_risk_metrics_hook, "useRiskMetrics", "Hook", "风险指标 API")
         Component(use_computed_var_hook, "useComputedVar", "Hook", "VaR 计算")
         
-        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes、history、subscribedSymbols")
+        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes、history、subscribedSymbols、extraSubscribedSymbols")
         Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme、language、notifications")
-        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "WebSocket 订阅者")
+        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "订阅合并符号")
         Component(redux_portfolio, "Redux portfolio slice", "Redux Toolkit", "selectedAccountId")
         
         Component(theme_system, "主题系统", "TypeScript", "浅色/深色配色；useTheme (useTheme.ts)")

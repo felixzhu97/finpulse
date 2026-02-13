@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef } from "react";
 import type { QuoteStreamHandle } from "../../domain/services/IQuoteStreamService";
 import { useAppDispatch, useAppSelector } from "./useAppStore";
 import { setSnapshot, setStatus } from "./quotesSlice";
-import { selectSubscribedSymbols } from "./quotesSelectors";
+import { selectMergedSubscribedSymbols } from "./quotesSelectors";
 import { container } from "../../application";
 
 export function QuoteSocketSubscriber() {
   const dispatch = useAppDispatch();
-  const subscribedSymbols = useAppSelector(selectSubscribedSymbols);
+  const subscribedSymbols = useAppSelector(selectMergedSubscribedSymbols);
   const handleRef = useRef<QuoteStreamHandle | null>(null);
   const service = useMemo(() => container.getQuoteStreamService(), []);
 

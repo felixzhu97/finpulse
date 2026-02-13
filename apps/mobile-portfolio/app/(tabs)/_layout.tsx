@@ -1,7 +1,7 @@
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Platform } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
@@ -18,7 +18,7 @@ export default function Layout() {
         tabBarInactiveTintColor: colors.tabIconInactive,
         tabBarStyle: {
           backgroundColor: colors.tabBar,
-          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopWidth: Platform.OS === "ios" ? 0.5 : 1,
           borderTopColor: colors.tabBarBorder,
         },
       }}

@@ -1,9 +1,21 @@
-import { Animated, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Animated, Modal, ScrollView, Text } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
+import {
+  AbsoluteFill,
+  DrawerModalRoot,
+  DrawerBackdrop,
+  DrawerSheet,
+  DrawerSafe,
+  DrawerDragArea,
+  DrawerHandle,
+  DrawerHeader,
+  DrawerHeaderTitle,
+  DrawerCloseButton,
+} from "@/src/presentation/theme/primitives";
+import styled from "styled-components/native";
 
 interface RiskMetricDetailDrawerProps {
   visible: boolean;
@@ -13,6 +25,42 @@ interface RiskMetricDetailDrawerProps {
 }
 
 const DRAWER_HEIGHT = 500;
+
+const Content = styled.ScrollView`
+  flex: 1;
+  padding: 20px;
+  padding-bottom: 40px;
+`;
+
+const ValueContainer = styled.View`
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  background-color: ${(p) => p.theme.colors.surface};
+`;
+
+const ValueLabel = styled.Text`
+  font-size: 13px;
+  color: ${(p) => p.theme.colors.textSecondary};
+  margin-bottom: 4px;
+`;
+
+const ValueText = styled.Text`
+  font-size: 24px;
+  font-weight: 600;
+  color: ${(p) => p.theme.colors.text};
+`;
+
+const Description = styled.Text`
+  font-size: 15px;
+  line-height: 22px;
+  color: ${(p) => p.theme.colors.text};
+`;
+
+const DrawerSheetRounded = styled(DrawerSheet)`
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+`;
 
 export function RiskMetricDetailDrawer({
   visible,
@@ -32,35 +80,17 @@ export function RiskMetricDetailDrawer({
   const getMetricInfo = () => {
     switch (metricKey) {
       case "volatility":
-        return {
-          title: t("insights.volatility"),
-          description: t("insights.volatilityDescription"),
-        };
+        return { title: t("insights.volatility"), description: t("insights.volatilityDescription") };
       case "sharpeRatio":
-        return {
-          title: t("insights.sharpeRatio"),
-          description: t("insights.sharpeRatioDescription"),
-        };
+        return { title: t("insights.sharpeRatio"), description: t("insights.sharpeRatioDescription") };
       case "var":
-        return {
-          title: t("insights.var"),
-          description: t("insights.varDescription"),
-        };
+        return { title: t("insights.var"), description: t("insights.varDescription") };
       case "beta":
-        return {
-          title: t("insights.beta"),
-          description: t("insights.betaDescription"),
-        };
+        return { title: t("insights.beta"), description: t("insights.betaDescription") };
       case "computedVar":
-        return {
-          title: t("insights.computedVar"),
-          description: t("insights.computedVarDescription"),
-        };
+        return { title: t("insights.computedVar"), description: t("insights.computedVarDescription") };
       default:
-        return {
-          title: metricKey,
-          description: "",
-        };
+        return { title: metricKey, description: "" };
     }
   };
 
@@ -68,140 +98,44 @@ export function RiskMetricDetailDrawer({
 
   return (
     <Modal visible={visible} animationType="none" transparent onRequestClose={closeWithAnimation}>
-      <View style={styles.modalRoot}>
-        <Animated.View
-          style={[styles.backdrop, { opacity: backdropOpacity, backgroundColor: colors.backdrop }]}
-          pointerEvents="box-none"
-        >
-          <Pressable style={StyleSheet.absoluteFill} onPress={closeWithAnimation} />
-        </Animated.View>
+      <DrawerModalRoot>
+        <DrawerBackdrop style={{ opacity: backdropOpacity }} pointerEvents="box-none">
+          <AbsoluteFill onPress={closeWithAnimation} />
+        </DrawerBackdrop>
 
-        <Animated.View
-          style={[
-            styles.drawer,
-            {
-              height: DRAWER_HEIGHT,
-              transform: [{ translateY }],
-              backgroundColor: colors.cardSolid,
-            },
-          ]}
+        <DrawerSheetRounded
+          style={{
+            height: DRAWER_HEIGHT,
+            transform: [{ translateY }],
+          }}
         >
-          <SafeAreaView style={styles.safe} edges={["top"]}>
-            <View style={styles.dragArea} {...panHandlers}>
-              <View style={[styles.dragHandle, { backgroundColor: colors.textTertiary }]} />
-            </View>
-            <View style={[styles.header, { borderBottomColor: colors.border }]}>
-              <Text style={[styles.headerTitle, { color: colors.text }]}>{title}</Text>
-              <TouchableOpacity style={styles.closeButton} onPress={closeWithAnimation}>
+          <DrawerSafe edges={["top"]}>
+            <DrawerDragArea {...panHandlers}>
+              <DrawerHandle />
+            </DrawerDragArea>
+            <DrawerHeader>
+              <DrawerHeaderTitle>{title}</DrawerHeaderTitle>
+              <DrawerCloseButton onPress={closeWithAnimation}>
                 <MaterialIcons name="close" size={24} color={colors.text} />
-              </TouchableOpacity>
-            </View>
+              </DrawerCloseButton>
+            </DrawerHeader>
 
-            <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+            <Content>
               {metricValue !== null && (
-                <View style={[styles.valueContainer, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.valueLabel, { color: colors.textSecondary }]}>
-                    {t("insights.currentValue")}
-                  </Text>
-                  <Text style={[styles.valueText, { color: colors.text }]}>
+                <ValueContainer>
+                  <ValueLabel>{t("insights.currentValue")}</ValueLabel>
+                  <ValueText>
                     {metricKey === "volatility" || metricKey === "var" || metricKey === "computedVar"
                       ? metricValue.toFixed(4)
                       : metricValue.toFixed(2)}
-                  </Text>
-                </View>
+                  </ValueText>
+                </ValueContainer>
               )}
-              <Text style={[styles.description, { color: colors.text }]}>
-                {description.split('\n\n').map((paragraph, index) => (
-                  <Text key={index}>
-                    {paragraph}
-                    {index < description.split('\n\n').length - 1 && '\n\n'}
-                  </Text>
-                ))}
-              </Text>
-            </ScrollView>
-          </SafeAreaView>
-        </Animated.View>
-      </View>
+              <Description>{description}</Description>
+            </Content>
+          </DrawerSafe>
+        </DrawerSheetRounded>
+      </DrawerModalRoot>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  modalRoot: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  drawer: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    overflow: "hidden",
-  },
-  safe: {
-    flex: 1,
-  },
-  dragArea: {
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  dragHandle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    letterSpacing: -0.3,
-  },
-  closeButton: {
-    padding: 4,
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: 20,
-  },
-  valueContainer: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 20,
-  },
-  valueLabel: {
-    fontSize: 13,
-    fontWeight: "500",
-    marginBottom: 8,
-    letterSpacing: -0.1,
-  },
-  valueText: {
-    fontSize: 32,
-    fontWeight: "600",
-    letterSpacing: -0.5,
-  },
-  description: {
-    fontSize: 15,
-    lineHeight: 22,
-    fontWeight: "400",
-    letterSpacing: -0.2,
-  },
-  example: {
-    fontSize: 15,
-    lineHeight: 22,
-    fontWeight: "400",
-    letterSpacing: -0.2,
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-});
