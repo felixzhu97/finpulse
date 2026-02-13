@@ -24,7 +24,7 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 | Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native line chart |
 | Watchlist | `/(tabs)/watchlists` | Stock list (portfolio holdings) with real-time prices, sparklines, account rows; search (bottom sheet, closes on drawer/sort/tab), sort menu; pull-to-refresh; stock detail drawer (draggable, share) |
 | Insights | `/(tabs)/insights` | Risk metrics from API (volatility, Sharpe ratio, VaR, beta) via `GET /api/v1/risk-metrics`; computed VaR via `POST /api/v1/risk-metrics/compute` (useComputedVar hook) |
-| Account | `/(tabs)/account` | Profile, account list, Actions (Register Customer, New Payment, New Trade, Settings), drawers. **useAccountData** loads customer, accounts, accountResources on tab focus via useFocusEffect. |
+| Account | `/(tabs)/account` | Profile, account list, Actions (Register Customer, New Payment, New Trade, Settings), drawers. **useAccountData** loads customer, accounts, accountResources on tab focus via useFocusEffect. In development, Actions include a **Storybook** entry that navigates to `/storybook`. |
 
 ## Project Structure (Clean Architecture)
 
@@ -76,14 +76,25 @@ Infrastructure ────┘
 - **C4 component diagram** (en): `docs/en/c4/c4-mobile-portfolio-components.puml`
 - **C4 component diagram** (zh): `docs/zh/c4/c4-mobile-portfolio-components.puml`
 
+## Storybook (native component catalog)
+
+This app uses **Storybook for React Native** to document and exercise native and React Native components (especially the Metal/Kotlin chart bridges in `src/presentation/components/native`).
+
+- **Stories**: Live under `src/presentation/components/**\/*.stories.tsx`, including the native chart components (`NativeLineChart`, `NativeCandleChart`, `NativeBaselineChart`, `NativeHistogramChart`, `NativeLineOnlyChart`, `NativeSparkline`, `NativeDemoCard`).
+- **Route**: `/storybook` implemented by `app/storybook.tsx`, which wraps `StorybookUIRoot` (from `.rnstorybook`) and adds a simple back bar.
+- **Entry point in UI** (dev only): On the **Account** tab, the **Actions** card shows a `Storybook` row when `__DEV__` is true; tapping it navigates to `/storybook`.
+
+Because the app relies on native chart views, Storybook must run inside the **dev build client**, not inside Expo Go.
+
 ## Getting Started
 
 ```bash
 pnpm install
 pnpm start
+pnpm --filter mobile-portfolio storybook
 ```
 
-For native charts, use development builds:
+For native charts and Storybook, use development builds:
 
 ```bash
 pnpm run ios

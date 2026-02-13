@@ -11,6 +11,8 @@
 		21CCF3A165B4C7F5E4A57441 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791AE892EE02334B2542C4AD /* ExpoModulesProvider.swift */; };
 		27CEAD1C11822712D9BEE726 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9676CC8D5258CC9EF2C9A18E /* PrivacyInfo.xcprivacy */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
+		6336D17A2F0249C6A61059E0 /* BaseChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0545BAFD86C246588CA6E8C3 /* BaseChartViewManager.swift */; };
+		73BA577EA0C3447AB2531A8A /* BaseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB613D815646FEA2F23252 /* BaseChartView.swift */; };
 		A1B2C3D62E0307B40044C1D9 /* NativeDemoCardViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D52E0307B40044C1D9 /* NativeDemoCardViewManager.m */; };
 		A5B8C9DA7F0842090088060E /* NativeLineOnlyChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B8C9DB7F0842090088060E /* NativeLineOnlyChartViewManager.m */; };
 		A5B8C9DC7F0842090088060E /* NativeLineOnlyChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5B8C9DD7F0842090088060E /* NativeLineOnlyChartViewManager.swift */; };
@@ -20,9 +22,6 @@
 		A7D8E1F62F19542B0099082F /* ChartPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8E1F72F19542B0099082F /* ChartPipeline.swift */; };
 		A7D8E1F82F19542B0099082F /* ChartGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8E1F92F19542B0099082F /* ChartGrid.swift */; };
 		A7D8E1FA2F19542B0099082F /* ChartThemes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D8E1FB2F19542B0099082F /* ChartThemes.swift */; };
-		6336D17A2F0249C6A61059E0 /* BaseChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0545BAFD86C246588CA6E8C3 /* BaseChartViewManager.swift */; };
-		73BA577EA0C3447AB2531A8A /* BaseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB613D815646FEA2F23252 /* BaseChartView.swift */; };
-		D58A091D29A248A486A9CEB6 /* BaseChartRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06CD3EF3A725491E8F469D9C /* BaseChartRenderer.swift */; };
 		B1C2D3E42E0307B40044C1D9 /* NativeLineChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E52E0307B40044C1D9 /* NativeLineChartViewManager.m */; };
 		B1C2D3E62E0307B40044C1D9 /* NativeLineChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E72E0307B40044C1D9 /* NativeLineChartViewManager.swift */; };
 		B1C2D3E82E0307B40044C1D9 /* NativeLineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E92E0307B40044C1D9 /* NativeLineChartView.swift */; };
@@ -39,6 +38,7 @@
 		D2E5F6A74F0519D60055D3FB /* NativeAmericanLineChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D2E5F6A84F0519D60055D3FB /* NativeAmericanLineChartViewManager.m */; };
 		D2E5F6A94F0519D60055D3FB /* NativeAmericanLineChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E5F6AA4F0519D60055D3FB /* NativeAmericanLineChartViewManager.swift */; };
 		D2E5F6AB4F0519D60055D3FB /* NativeAmericanLineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E5F6AC4F0519D60055D3FB /* NativeAmericanLineChartView.swift */; };
+		D58A091D29A248A486A9CEB6 /* BaseChartRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06CD3EF3A725491E8F469D9C /* BaseChartRenderer.swift */; };
 		E3F6A7B85F0620E70066E4FC /* NativeBaselineChartViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E3F6A7B95F0620E70066E4FC /* NativeBaselineChartViewManager.m */; };
 		E3F6A7BA5F0620E70066E4FC /* NativeBaselineChartViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F6A7BB5F0620E70066E4FC /* NativeBaselineChartViewManager.swift */; };
 		E3F6A7BC5F0620E70066E4FC /* NativeBaselineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F6A7BD5F0620E70066E4FC /* NativeBaselineChartView.swift */; };
@@ -50,10 +50,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0545BAFD86C246588CA6E8C3 /* BaseChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseChartViewManager.swift; sourceTree = "<group>"; };
+		06CD3EF3A725491E8F469D9C /* BaseChartRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseChartRenderer.swift; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* mobileportfolio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mobileportfolio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = mobileportfolio/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = mobileportfolio/Info.plist; sourceTree = "<group>"; };
 		2411B4102198302FF7E98B20 /* Pods-mobileportfolio.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mobileportfolio.release.xcconfig"; path = "Target Support Files/Pods-mobileportfolio/Pods-mobileportfolio.release.xcconfig"; sourceTree = "<group>"; };
+		5ADB613D815646FEA2F23252 /* BaseChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseChartView.swift; sourceTree = "<group>"; };
 		6B5F2E0CE6B8BCF3A9C403D0 /* Pods-mobileportfolio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mobileportfolio.debug.xcconfig"; path = "Target Support Files/Pods-mobileportfolio/Pods-mobileportfolio.debug.xcconfig"; sourceTree = "<group>"; };
 		791AE892EE02334B2542C4AD /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-mobileportfolio/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		9676CC8D5258CC9EF2C9A18E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = mobileportfolio/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -67,9 +70,6 @@
 		A7D8E1F72F19542B0099082F /* ChartPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPipeline.swift; sourceTree = "<group>"; };
 		A7D8E1F92F19542B0099082F /* ChartGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartGrid.swift; sourceTree = "<group>"; };
 		A7D8E1FB2F19542B0099082F /* ChartThemes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartThemes.swift; sourceTree = "<group>"; };
-		0545BAFD86C246588CA6E8C3 /* BaseChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseChartViewManager.swift; sourceTree = "<group>"; };
-		5ADB613D815646FEA2F23252 /* BaseChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseChartView.swift; sourceTree = "<group>"; };
-		06CD3EF3A725491E8F469D9C /* BaseChartRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseChartRenderer.swift; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = mobileportfolio/SplashScreen.storyboard; sourceTree = "<group>"; };
 		B1C2D3E52E0307B40044C1D9 /* NativeLineChartViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeLineChartViewManager.m; sourceTree = "<group>"; };
 		B1C2D3E72E0307B40044C1D9 /* NativeLineChartViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLineChartViewManager.swift; sourceTree = "<group>"; };

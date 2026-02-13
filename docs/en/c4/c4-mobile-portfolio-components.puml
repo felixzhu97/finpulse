@@ -6,11 +6,12 @@ title Mobile Portfolio App - Component Diagram (Clean Architecture)
 
 Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(app_content, "AppContent", "React Native", "Root layout: uses usePreferences().loading, shows spinner until preferences fetched, then renders tabs")
-    Component(tabs_router, "Tabs Router", "Expo Router", "Dashboard, Watchlist, Insights, Account")
+    Component(tabs_router, "Tabs Router", "Expo Router", "Dashboard, Watchlist, Insights, Account, Storybook (dev)")
     Component(overview_screen, "Dashboard Screen", "React Native", "Portfolio summary, native charts, net worth, allocation")
     Component(watchlist_screen, "Watchlist Screen", "React Native", "Stocks list (portfolio), search (bottom), sort, detail drawer")
     Component(analytics_screen, "Insights Screen", "React Native", "Risk metrics (volatility, Sharpe, VaR, beta), computed VaR from portfolio history")
     Component(account_screen, "Account Screen", "React Native", "Profile, account list, Actions; useAccountData loads on tab focus via useFocusEffect")
+    Component(storybook_screen, "Storybook Screen", "React Native", "Dev-only /storybook route; wraps StorybookUIRoot with back bar")
 
     ' Presentation Layer
     Boundary(presentation_layer, "Presentation Layer") {
@@ -49,6 +50,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(i18n_config, "i18n Config", "TypeScript", "i18next setup, translations")
         Component(use_translation, "useTranslation", "Hook", "Translation hook")
         Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "presentation/utils: period filtering")
+        Component(storybook_ui_root, "StorybookUIRoot", "Storybook React Native", "On-device catalog of native and RN components")
     }
 
     ' Application Layer
@@ -146,6 +148,7 @@ Rel(tabs_router, overview_screen, "Routes to", "")
 Rel(tabs_router, watchlist_screen, "Routes to", "")
 Rel(tabs_router, analytics_screen, "Routes to", "")
 Rel(tabs_router, account_screen, "Routes to", "")
+Rel(tabs_router, storybook_screen, "Routes to (dev)", "")
 
 Rel(overview_screen, use_portfolio_hook, "Uses", "")
 Rel(overview_screen, use_refresh_control_hook, "Uses", "")
@@ -173,6 +176,7 @@ Rel(account_screen, use_account_data_hook, "Uses", "")
 Rel(account_screen, use_refresh_control_hook, "Uses", "")
 Rel(account_screen, account_drawers, "Uses", "")
 Rel(account_screen, use_preferences_hook, "Uses", "")
+Rel(account_screen, storybook_screen, "Navigates to (dev Storybook entry)", "")
 
 ' Redux and State
 Rel(use_symbol_display_hook, redux_quotes, "Dispatches, selects", "")
@@ -204,6 +208,7 @@ Rel(native_line_chart, base_chart_view, "Inherits from", "")
 Rel(native_line_chart, base_chart_renderer, "Uses", "")
 Rel(base_chart_view_manager, base_chart_view, "Creates", "")
 Rel(stock_detail_drawer, period_data_processor, "Uses", "")
+Rel(storybook_screen, storybook_ui_root, "Renders", "")
 
 ' Domain entities
 Rel(portfolio_repo_interface, domain_entities, "Returns", "")

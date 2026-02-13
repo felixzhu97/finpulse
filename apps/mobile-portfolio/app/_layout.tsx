@@ -86,6 +86,7 @@ function AppContent() {
             <QuoteSocketSubscriber />
             <Stack initialRouteName="(tabs)">
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="storybook" options={{ headerShown: false }} />
               <Stack.Screen name="+not-found" />
             </Stack>
           </SafeAreaView>

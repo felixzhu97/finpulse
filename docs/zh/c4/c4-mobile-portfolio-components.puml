@@ -6,11 +6,12 @@ title 移动端投资组合应用 - 组件图（整洁架构）
 
 Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native)") {
     Component(app_content, "AppContent", "React Native", "根布局：使用 usePreferences().loading，偏好加载完成前显示 spinner，随后渲染标签")
-    Component(tabs_router, "标签路由", "Expo Router", "仪表板、自选、洞察、账户")
+    Component(tabs_router, "标签路由", "Expo Router", "仪表板、自选、洞察、账户、Storybook（开发）")
     Component(overview_screen, "仪表板屏幕", "React Native", "组合摘要、原生图表、净资产、资产配置")
     Component(watchlist_screen, "自选屏幕", "React Native", "股票列表（组合）、底部搜索、排序、详情抽屉")
     Component(analytics_screen, "洞察屏幕", "React Native", "风险指标（波动率、夏普比率、VaR、Beta）、根据组合历史计算的 VaR")
     Component(account_screen, "账户屏幕", "React Native", "个人资料、账户列表、操作；useAccountData 在标签聚焦时加载")
+    Component(storybook_screen, "Storybook 屏幕", "React Native", "仅开发环境的 /storybook 路由；包裹 StorybookUIRoot 并提供返回栏")
 
     ' Presentation Layer
     Boundary(presentation_layer, "展示层") {
@@ -49,6 +50,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(i18n_config, "i18n 配置", "TypeScript", "i18next 设置、翻译资源")
         Component(use_translation, "useTranslation", "Hook", "翻译 Hook")
         Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "presentation/utils 周期过滤")
+        Component(storybook_ui_root, "StorybookUIRoot", "Storybook React Native", "原生组件和 React Native 组件的设备端目录")
     }
 
     ' Application Layer
@@ -146,6 +148,7 @@ Rel(tabs_router, overview_screen, "路由到", "")
 Rel(tabs_router, watchlist_screen, "路由到", "")
 Rel(tabs_router, analytics_screen, "路由到", "")
 Rel(tabs_router, account_screen, "路由到", "")
+Rel(tabs_router, storybook_screen, "路由到（开发）", "")
 
 Rel(overview_screen, use_portfolio_hook, "使用", "")
 Rel(overview_screen, use_refresh_control_hook, "使用", "")
@@ -173,6 +176,7 @@ Rel(account_screen, use_account_data_hook, "使用", "")
 Rel(account_screen, use_refresh_control_hook, "使用", "")
 Rel(account_screen, account_drawers, "使用", "")
 Rel(account_screen, use_preferences_hook, "使用", "")
+Rel(account_screen, storybook_screen, "跳转到（开发 Storybook 入口）", "")
 
 ' Redux and State
 Rel(use_symbol_display_hook, redux_quotes, "派发、选择", "")
@@ -204,6 +208,7 @@ Rel(native_line_chart, base_chart_view, "继承自", "")
 Rel(native_line_chart, base_chart_renderer, "使用", "")
 Rel(base_chart_view_manager, base_chart_view, "创建", "")
 Rel(stock_detail_drawer, period_data_processor, "使用", "")
+Rel(storybook_screen, storybook_ui_root, "渲染", "")
 
 ' Domain entities
 Rel(portfolio_repo_interface, domain_entities, "返回", "")

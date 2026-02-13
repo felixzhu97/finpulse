@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import styled from "styled-components/native";
 import type { Account } from "@/src/domain/entities";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -272,6 +273,7 @@ function getAccountTypeLabel(type: Account["type"], t: (key: string) => string) 
 }
 
 export default function AccountScreen() {
+  const router = useRouter();
   const { colors } = useTheme();
   const { t } = useTranslation();
   const { customer, accounts, accountResources, loading, error, refresh } = useAccountData();
@@ -464,6 +466,18 @@ export default function AccountScreen() {
                   </ActionLeft>
                   <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
                 </ActionRow>
+                {__DEV__ && (
+                  <>
+                    <Separator indent={52} />
+                    <ActionRow onPress={() => router.push("/storybook")} activeOpacity={0.7}>
+                      <ActionLeft>
+                        <MaterialIcons name="developer-mode" size={20} color={colors.text} />
+                        <ActionText>Storybook</ActionText>
+                      </ActionLeft>
+                      <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
+                    </ActionRow>
+                  </>
+                )}
               </CardBordered>
             </Section>
           </>
