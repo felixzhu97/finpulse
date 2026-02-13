@@ -34,7 +34,7 @@ const Sheet = styled.View`
   padding-horizontal: 16px;
   padding-top: 16px;
   padding-bottom: 8px;
-  background-color: ${(p) => p.theme.colors.card};
+  background-color: ${(p) => p.theme.colors.cardSolid};
 `;
 
 const Header = styled.View`

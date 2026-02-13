@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
-import { ActivityIndicator, RefreshControl } from "react-native";
+import { ActivityIndicator } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { NativeLineChart } from "@/src/presentation/components/native";
 import { PortfolioSummary } from "@/src/presentation/components/portfolio/PortfolioSummary";
 import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
 import { AssetAllocationChart } from "@/src/presentation/components/portfolio/AssetAllocationChart";
 import { NetWorthLineChart } from "@/src/presentation/components/portfolio/NetWorthLineChart";
-import { usePortfolio, useRefreshControl } from "@/src/presentation/hooks";
+import { usePortfolio } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
 import {
@@ -44,7 +44,6 @@ export default function DashboardScreen() {
   } = usePortfolio();
   const chartTheme = isDark ? "dark" : "light";
   const [chartScrollLock, setChartScrollLock] = useState(false);
-  const { refreshing, onRefresh } = useRefreshControl(refresh);
 
   const fallbackTimestamps = useMemo(() => {
     const base = Date.now() - 5 * 24 * 60 * 60 * 1000;
@@ -80,13 +79,6 @@ export default function DashboardScreen() {
     <StyledScrollView
       contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
       scrollEnabled={!chartScrollLock}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor={colors.primary}
-        />
-      }
     >
       <PortfolioSummary portfolio={portfolio} />
       <BlockWithGap>

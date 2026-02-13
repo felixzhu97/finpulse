@@ -1,16 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Dimensions,
-  Platform,
-  RefreshControl,
-} from "react-native";
+import { ActivityIndicator, Dimensions, Platform } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
 import { RiskMetricDetailDrawer } from "@/src/presentation/components/insights";
 import { useComputedVar } from "@/src/presentation/hooks/useComputedVar";
 import { useRiskMetrics } from "@/src/presentation/hooks/useRiskMetrics";
-import { useRefreshControl } from "@/src/presentation/hooks/useRefreshControl";
 import { container } from "@/src/application";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
@@ -69,7 +63,6 @@ export default function InsightsScreen() {
     setHighRatio(risk.highRatio);
     setTopConcentration(risk.topHoldingsConcentration);
   }, [refresh, computeVar, riskUseCase]);
-  const { refreshing, onRefresh } = useRefreshControl(handleRefresh);
 
   const highRiskPercent = (highRatio * 100).toFixed(1);
   const concentrationPercent = (topConcentration * 100).toFixed(1);
@@ -91,7 +84,7 @@ export default function InsightsScreen() {
     return (
       <InsightsCentered>
         <InsightsErrorText>{t("insights.unableToLoad")}</InsightsErrorText>
-        <InsightsRetryText onPress={onRefresh}>{t("insights.tapToRetry")}</InsightsRetryText>
+        <InsightsRetryText onPress={handleRefresh}>{t("insights.tapToRetry")}</InsightsRetryText>
       </InsightsCentered>
     );
   }
@@ -106,13 +99,6 @@ export default function InsightsScreen() {
   return (
     <InsightsScrollView
       contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor={colors.primary}
-        />
-      }
     >
       {loading && !metrics && localLoading ? (
         <InsightsLoadingContainer>

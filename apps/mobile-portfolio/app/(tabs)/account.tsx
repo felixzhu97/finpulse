@@ -1,15 +1,10 @@
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
 import type { Account } from "@/src/domain/entities";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useAccountData, useRefreshControl } from "@/src/presentation/hooks";
+import { useAccountData } from "@/src/presentation/hooks";
 import { SettingsDrawer } from "@/src/presentation/components/account/SettingsDrawer";
 import { RegisterCustomerDrawer } from "@/src/presentation/components/account/RegisterCustomerDrawer";
 import { NewPaymentDrawer } from "@/src/presentation/components/account/NewPaymentDrawer";
@@ -278,7 +273,6 @@ export default function AccountScreen() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const { customer, accounts, accountResources, loading, error, refresh } = useAccountData();
-  const { refreshing, onRefresh } = useRefreshControl(refresh);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [registerVisible, setRegisterVisible] = useState(false);
   const [paymentVisible, setPaymentVisible] = useState(false);
@@ -304,13 +298,6 @@ export default function AccountScreen() {
     <StyledSafeArea edges={["top"]}>
       <StyledScrollView
         contentContainerStyle={{ paddingTop: 12, paddingBottom: 40 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.primary}
-          />
-        }
       >
         {showLoading ? (
           <LoadingWrap>

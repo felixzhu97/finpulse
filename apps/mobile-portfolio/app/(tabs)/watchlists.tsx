@@ -6,7 +6,6 @@ import {
   Animated,
   FlatList,
   Pressable,
-  RefreshControl,
   TextInput,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -22,7 +21,7 @@ import { SortMenu, type SortOption } from "@/src/presentation/components/ui/Sort
 import { useSymbolDisplayData } from "@/src/presentation/hooks/useSymbolDisplayData";
 import type { Account, Holding } from "@/src/domain/entities/portfolio";
 import { container } from "@/src/application";
-import { usePortfolio, useRefreshControl } from "@/src/presentation/hooks";
+import { usePortfolio } from "@/src/presentation/hooks";
 import { useAppDispatch } from "@/src/presentation/store";
 import { setHistory, setSnapshot } from "@/src/presentation/store/quotesSlice";
 import { useTheme } from "@/src/presentation/theme";
@@ -245,7 +244,6 @@ export default function WatchlistsScreen() {
     await refresh();
     await fetchQuotesAndHistory();
   }, [refresh, fetchQuotesAndHistory]);
-  const { refreshing, onRefresh } = useRefreshControl(handleRefresh);
 
   const closeSearchBar = useCallback(() => {
     if (!showSearchBar) return;
@@ -317,7 +315,7 @@ export default function WatchlistsScreen() {
           </ScreenHeader>
           <CenteredContainer>
             <EmptyText>{t("watchlist.startBackendFirst")}</EmptyText>
-            <RetryButton onPress={onRefresh}>
+            <RetryButton onPress={handleRefresh}>
               <RetryButtonText>{t("common.retry")}</RetryButtonText>
             </RetryButton>
           </CenteredContainer>
@@ -353,13 +351,6 @@ export default function WatchlistsScreen() {
           maxToRenderPerBatch={10}
           keyExtractor={(item) =>
             item.type === "stock" ? item.holding.id : item.account.id
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={colors.primary}
-            />
           }
           renderItem={({ item }) =>
             item.type === "stock" ? (

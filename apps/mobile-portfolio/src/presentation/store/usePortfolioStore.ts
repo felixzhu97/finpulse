@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useAppDispatch, useAppSelector } from "./index";
+import { useAppDispatch, useAppSelector } from "./useAppStore";
 import { setSelectedAccountId } from "./portfolioSlice";
 
 export function usePortfolioStore() {

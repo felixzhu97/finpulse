@@ -1,6 +1,6 @@
 import type { QuoteSnapshot } from "@/src/domain/entities/quotes";
 import { createSelector } from "@reduxjs/toolkit";
-import type { RootState } from "./index";
+import type { RootState } from "./storeInstance";
 
 const selectQuotes = (s: RootState) => s.quotes.quotes;
 const selectHistory = (s: RootState) => s.quotes.history;

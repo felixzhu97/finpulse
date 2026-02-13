@@ -20,6 +20,5 @@ export { useUserPreferences } from "./useUserPreferences";
 export type { UseUserPreferencesResult } from "./useUserPreferences";
 export { useBlockchain } from "./useBlockchain";
 export { useDraggableDrawer } from "./useDraggableDrawer";
-export { useRefreshControl } from "./useRefreshControl";
 export { useWeb3 } from "./useWeb3";
 export { usePreferences } from "./usePreferences";
