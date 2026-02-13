@@ -1,28 +1,261 @@
-import { useCallback, useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import { useState } from "react";
 import {
   ActivityIndicator,
-  InteractionManager,
   RefreshControl,
   ScrollView,
-  StyleSheet,
-  Text,
   TouchableOpacity,
-  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import type { Account, Customer } from "@/src/domain/entities";
-import { container } from "@/src/application";
-import type { AccountResource } from "@/src/domain/entities/accountResource";
+import styled from "styled-components/native";
+import type { Account } from "@/src/domain/entities";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useAccountData, useRefreshControl } from "@/src/presentation/hooks";
 import { SettingsDrawer } from "@/src/presentation/components/account/SettingsDrawer";
 import { RegisterCustomerDrawer } from "@/src/presentation/components/account/RegisterCustomerDrawer";
 import { NewPaymentDrawer } from "@/src/presentation/components/account/NewPaymentDrawer";
 import { NewTradeDrawer } from "@/src/presentation/components/account/NewTradeDrawer";
 import { BlockchainBalanceCard, BlockchainTransferDrawer } from "@/src/presentation/components/blockchain";
-import { formatBalance } from "@/src/infrastructure/utils";
+import { formatBalance } from "@/src/presentation/utils";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
+import { CardBordered } from "@/src/presentation/theme/primitives";
+
+const StyledSafeArea = styled(SafeAreaView)`
+  flex: 1;
+  background-color: ${(p) => p.theme.colors.background};
+`;
+
+const StyledScrollView = styled(ScrollView)`
+  flex: 1;
+`;
+
+const Section = styled.View`
+  margin-bottom: 28px;
+  padding-horizontal: 16px;
+`;
+
+const SectionHeader = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-horizontal: 4px;
+`;
+
+const SectionTitle = styled.Text`
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  color: ${(p) => p.theme.colors.text};
+`;
+
+const TotalBalance = styled.Text`
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  color: ${(p) => p.theme.colors.text};
+`;
+
+const CategorySection = styled.View`
+  margin-bottom: 24px;
+`;
+
+const CategoryTitle = styled.Text`
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  padding-horizontal: 4px;
+  color: ${(p) => p.theme.colors.textSecondary};
+`;
+
+const UserHeader = styled.View`
+  flex-direction: row;
+  align-items: center;
+  padding: 16px;
+`;
+
+const Avatar = styled.View`
+  width: 52px;
+  height: 52px;
+  border-radius: 26px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  background-color: ${(p) => p.theme.colors.surface};
+`;
+
+const UserInfo = styled.View`
+  flex: 1;
+`;
+
+const UserName = styled.Text`
+  font-size: 19px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  letter-spacing: -0.4px;
+  color: ${(p) => p.theme.colors.text};
+`;
+
+const UserEmail = styled.Text`
+  font-size: 14px;
+  letter-spacing: -0.2px;
+  color: ${(p) => p.theme.colors.textSecondary};
+`;
+
+const UserDetailRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-horizontal: 16px;
+  padding-bottom: 14px;
+  padding-top: 12px;
+  border-top-width: 1px;
+  border-top-color: ${(p) => p.theme.colors.border};
+`;
+
+const UserDetailLabel = styled.Text`
+  font-size: 14px;
+  letter-spacing: -0.2px;
+  color: ${(p) => p.theme.colors.textSecondary};
+`;
+
+const UserDetailValue = styled.Text`
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  color: ${(p) => p.theme.colors.text};
+`;
+
+const AccountRow = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+  min-height: 60px;
+`;
+
+const AccountLeft = styled.View`
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+  margin-right: 12px;
+`;
+
+const AccountIcon = styled.View`
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  background-color: ${(p) => p.theme.colors.surface};
+`;
+
+const AccountInfo = styled.View`
+  flex: 1;
+  min-width: 0;
+`;
+
+const AccountName = styled.Text`
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 3px;
+  letter-spacing: -0.3px;
+  color: ${(p) => p.theme.colors.text};
+`;
+
+const AccountType = styled.Text`
+  font-size: 13px;
+  letter-spacing: -0.2px;
+  color: ${(p) => p.theme.colors.textSecondary};
+`;
+
+const AccountRight = styled.View`
+  align-items: flex-end;
+`;
+
+const AccountBalance = styled.Text`
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  letter-spacing: -0.3px;
+  color: ${(p) => p.theme.colors.text};
+`;
+
+const AccountChange = styled.Text<{ positive: boolean }>`
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  color: ${(p) => (p.positive ? p.theme.colors.success : p.theme.colors.error)};
+`;
+
+const Separator = styled.View<{ indent?: number }>`
+  height: 1px;
+  margin-left: ${(p) => p.indent ?? 60}px;
+  background-color: ${(p) => p.theme.colors.border};
+`;
+
+const ActionRow = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+  min-height: 52px;
+`;
+
+const ActionLeft = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+`;
+
+const ActionText = styled.Text`
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+  color: ${(p) => p.theme.colors.text};
+`;
+
+const LoadingWrap = styled.View`
+  flex: 1;
+  min-height: 400px;
+  align-items: center;
+  justify-content: center;
+  padding-vertical: 60px;
+`;
+
+const CenteredWrap = styled.View`
+  flex: 1;
+  min-height: 300px;
+  align-items: center;
+  justify-content: center;
+  padding-vertical: 40px;
+`;
+
+const ErrorText = styled.Text`
+  text-align: center;
+  font-size: 15px;
+  margin-bottom: 16px;
+  padding-horizontal: 32px;
+  color: ${(p) => p.theme.colors.error};
+`;
+
+const RetryButton = styled(TouchableOpacity)`
+  padding-horizontal: 24px;
+  padding-vertical: 12px;
+  border-radius: 10px;
+  background-color: ${(p) => p.theme.colors.primary};
+`;
+
+const RetryButtonText = styled.Text`
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+`;
+
+const AccountItemWrap = styled.View``;
 
 function getAccountTypeLabel(type: Account["type"], t: (key: string) => string) {
   switch (type) {
@@ -44,59 +277,13 @@ function getAccountTypeLabel(type: Account["type"], t: (key: string) => string) 
 export default function AccountScreen() {
   const { colors } = useTheme();
   const { t } = useTranslation();
-  const [customer, setCustomer] = useState<Customer | null>(null);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [accountResources, setAccountResources] = useState<AccountResource[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const { customer, accounts, accountResources, loading, error, refresh } = useAccountData();
+  const { refreshing, onRefresh } = useRefreshControl(refresh);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [registerVisible, setRegisterVisible] = useState(false);
   const [paymentVisible, setPaymentVisible] = useState(false);
   const [tradeVisible, setTradeVisible] = useState(false);
   const [blockchainTransferVisible, setBlockchainTransferVisible] = useState(false);
-
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const customerUseCase = container.getCustomerUseCase();
-      const portfolioUseCase = container.getPortfolioUseCase();
-      const customerPromise = customerUseCase.execute();
-      const accountsPromise = portfolioUseCase.getAccounts();
-      const accountsApi = container.getAccountsApi();
-      const accountResourcesPromise = accountsApi.list(100, 0);
-
-      const [customerData, accountList, accountResourcesList] = await Promise.all([
-        customerPromise,
-        accountsPromise,
-        accountResourcesPromise,
-      ]);
-
-      const data = { customer: customerData, accounts: accountList ?? [], accountResources: accountResourcesList ?? [] };
-      InteractionManager.runAfterInteractions(() => {
-        setCustomer(data.customer);
-        setAccounts(data.accounts);
-        setAccountResources(data.accountResources);
-        setLoading(false);
-      });
-    } catch (e) {
-      setError(true);
-      InteractionManager.runAfterInteractions(() => setLoading(false));
-    }
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadData();
-    }, [loadData])
-  );
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await loadData();
-    setRefreshing(false);
-  }, [loadData]);
 
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 
@@ -114,10 +301,9 @@ export default function AccountScreen() {
   const showLoading = loading && !customer && accounts.length === 0;
 
   return (
-    <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]} edges={["top"]}>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.content}
+    <StyledSafeArea edges={["top"]}>
+      <StyledScrollView
+        contentContainerStyle={{ paddingTop: 12, paddingBottom: 40 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -127,66 +313,52 @@ export default function AccountScreen() {
         }
       >
         {showLoading ? (
-          <View style={styles.loadingContainer}>
+          <LoadingWrap>
             <ActivityIndicator size="small" color={colors.textSecondary} />
-          </View>
+          </LoadingWrap>
         ) : error && !customer && accounts.length === 0 ? (
-          <View style={styles.centered}>
-            <Text style={[styles.errorText, { color: colors.error }]}>
-              {t("account.unableToLoad")}
-            </Text>
-            <TouchableOpacity onPress={onRefresh} style={[styles.retryButton, { backgroundColor: colors.primary }]}>
-              <Text style={styles.retryButtonText}>{t("common.retry")}</Text>
-            </TouchableOpacity>
-          </View>
+          <CenteredWrap>
+            <ErrorText>{t("account.unableToLoad")}</ErrorText>
+            <RetryButton onPress={refresh}>
+              <RetryButtonText>{t("common.retry")}</RetryButtonText>
+            </RetryButton>
+          </CenteredWrap>
         ) : (
           <>
             {customer && (
-              <View style={styles.section}>
-                <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                  <View style={styles.userHeader}>
-                    <View style={[styles.avatar, { backgroundColor: colors.surface }]}>
-                      <MaterialIcons
-                        name="person"
-                        size={24}
-                        color={colors.text}
-                      />
-                    </View>
-                    <View style={styles.userInfo}>
-                      <Text style={[styles.userName, { color: colors.text }]}>{customer.name}</Text>
-                      {customer.email && (
-                        <Text style={[styles.userEmail, { color: colors.textSecondary }]}>{customer.email}</Text>
-                      )}
-                    </View>
-                  </View>
+              <Section>
+                <CardBordered style={{ overflow: "hidden" }}>
+                  <UserHeader>
+                    <Avatar>
+                      <MaterialIcons name="person" size={24} color={colors.text} />
+                    </Avatar>
+                    <UserInfo>
+                      <UserName>{customer.name}</UserName>
+                      {customer.email && <UserEmail>{customer.email}</UserEmail>}
+                    </UserInfo>
+                  </UserHeader>
                   {customer.kyc_status && (
-                    <View style={[styles.userDetailRow, { borderTopColor: colors.border }]}>
-                      <Text style={[styles.userDetailLabel, { color: colors.textSecondary }]}>{t("account.kycStatus")}</Text>
-                      <Text style={[styles.userDetailValue, { color: colors.text }]}>
-                        {customer.kyc_status}
-                      </Text>
-                    </View>
+                    <UserDetailRow>
+                      <UserDetailLabel>{t("account.kycStatus")}</UserDetailLabel>
+                      <UserDetailValue>{customer.kyc_status}</UserDetailValue>
+                    </UserDetailRow>
                   )}
                   {customer.ai_identity_score != null && (
-                    <View style={[styles.userDetailRow, { borderTopColor: colors.border }]}>
-                      <Text style={[styles.userDetailLabel, { color: colors.textSecondary }]}>{t("account.aiIdentityScore")}</Text>
-                      <Text style={[styles.userDetailValue, { color: colors.text }]}>
-                        {(customer.ai_identity_score * 100).toFixed(0)}%
-                      </Text>
-                    </View>
+                    <UserDetailRow>
+                      <UserDetailLabel>{t("account.aiIdentityScore")}</UserDetailLabel>
+                      <UserDetailValue>{(customer.ai_identity_score * 100).toFixed(0)}%</UserDetailValue>
+                    </UserDetailRow>
                   )}
-                </View>
-              </View>
+                </CardBordered>
+              </Section>
             )}
 
             {accounts.length > 0 && (
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("account.accounts")}</Text>
-                  <Text style={[styles.totalBalance, { color: colors.text }]}>
-                    {formatBalance(totalBalance)}
-                  </Text>
-                </View>
+              <Section>
+                <SectionHeader>
+                  <SectionTitle>{t("account.accounts")}</SectionTitle>
+                  <TotalBalance>{formatBalance(totalBalance)}</TotalBalance>
+                </SectionHeader>
                 {accountTypeOrder.map((type) => {
                   const typeAccounts = groupedAccounts[type] || [];
                   if (typeAccounts.length === 0) return null;
@@ -210,10 +382,8 @@ export default function AccountScreen() {
                   };
 
                   return (
-                    <View key={type} style={styles.categorySection}>
-                      <Text style={[styles.categoryTitle, { color: colors.textSecondary }]}>
-                        {getAccountTypeLabel(type, t)}
-                      </Text>
+                    <CategorySection key={type}>
+                      <CategoryTitle>{getAccountTypeLabel(type, t)}</CategoryTitle>
                       {typeAccounts.map((account, accountIndex) => {
                         const accountIdToUse = getAccountUuid(account, accountIndex);
                         return (
@@ -224,136 +394,92 @@ export default function AccountScreen() {
                           />
                         );
                       })}
-                      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                        {typeAccounts.map((account, accountIndex) => {
-                          const accountIdToUse = getAccountUuid(account, accountIndex);
-                          return (
-                            <View key={account.id}>
-                              <TouchableOpacity
-                                style={styles.accountRow}
-                                activeOpacity={0.7}
-                              >
-                                <View style={styles.accountLeft}>
-                                  <View style={[styles.accountIcon, { backgroundColor: colors.surface }]}>
+                      <CardBordered style={{ overflow: "hidden" }}>
+                        {typeAccounts.map((account, accountIndex) => (
+                            <AccountItemWrap key={account.id}>
+                              <AccountRow activeOpacity={0.7}>
+                                <AccountLeft>
+                                  <AccountIcon>
                                     <MaterialIcons
                                       name="account-balance-wallet"
                                       size={20}
                                       color={colors.text}
                                     />
-                                  </View>
-                                  <View style={styles.accountInfo}>
-                                    <Text style={[styles.accountName, { color: colors.text }]}>
-                                      {account.name}
-                                    </Text>
-                                    <Text style={[styles.accountType, { color: colors.textSecondary }]}>
-                                      {getAccountTypeLabel(account.type, t)}
-                                    </Text>
-                                  </View>
-                                </View>
-                                <View style={styles.accountRight}>
-                                  <Text style={[styles.accountBalance, { color: colors.text }]}>
-                                    {formatBalance(account.balance)}
-                                  </Text>
+                                  </AccountIcon>
+                                  <AccountInfo>
+                                    <AccountName>{account.name}</AccountName>
+                                    <AccountType>{getAccountTypeLabel(account.type, t)}</AccountType>
+                                  </AccountInfo>
+                                </AccountLeft>
+                                <AccountRight>
+                                  <AccountBalance>{formatBalance(account.balance)}</AccountBalance>
                                   {account.todayChange !== 0 && (
-                                    <Text
-                                      style={[
-                                        styles.accountChange,
-                                        {
-                                          color:
-                                            account.todayChange > 0
-                                              ? colors.success
-                                              : colors.error,
-                                        },
-                                      ]}
-                                    >
+                                    <AccountChange positive={account.todayChange > 0}>
                                       {account.todayChange > 0 ? "+" : ""}
                                       {formatBalance(account.todayChange)}
-                                    </Text>
+                                    </AccountChange>
                                   )}
-                                </View>
-                              </TouchableOpacity>
-                              {accountIndex < typeAccounts.length - 1 && (
-                                <View style={[styles.separator, { backgroundColor: colors.border }]} />
-                              )}
-                            </View>
-                          );
-                        })}
-                      </View>
-                    </View>
+                                </AccountRight>
+                              </AccountRow>
+                              {accountIndex < typeAccounts.length - 1 && <Separator indent={60} />}
+                            </AccountItemWrap>
+                          ))}
+                      </CardBordered>
+                    </CategorySection>
                   );
                 })}
-              </View>
+              </Section>
             )}
 
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>{t("account.actions")}</Text>
-              </View>
-              <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <TouchableOpacity
-                  style={styles.actionRow}
-                  onPress={() => setRegisterVisible(true)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.settingsLeft}>
+            <Section>
+              <SectionHeader>
+                <SectionTitle>{t("account.actions")}</SectionTitle>
+              </SectionHeader>
+              <CardBordered style={{ overflow: "hidden" }}>
+                <ActionRow onPress={() => setRegisterVisible(true)} activeOpacity={0.7}>
+                  <ActionLeft>
                     <MaterialIcons name="person-add" size={20} color={colors.text} />
-                    <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.register")}</Text>
-                  </View>
+                    <ActionText>{t("account.register")}</ActionText>
+                  </ActionLeft>
                   <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
-                </TouchableOpacity>
-                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 52 }]} />
-                <TouchableOpacity
-                  style={styles.actionRow}
-                  onPress={() => setPaymentVisible(true)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.settingsLeft}>
+                </ActionRow>
+                <Separator indent={52} />
+                <ActionRow onPress={() => setPaymentVisible(true)} activeOpacity={0.7}>
+                  <ActionLeft>
                     <MaterialIcons name="payment" size={20} color={colors.text} />
-                    <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.newPayment")}</Text>
-                  </View>
+                    <ActionText>{t("account.newPayment")}</ActionText>
+                  </ActionLeft>
                   <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
-                </TouchableOpacity>
-                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 52 }]} />
-                <TouchableOpacity
-                  style={styles.actionRow}
-                  onPress={() => setTradeVisible(true)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.settingsLeft}>
+                </ActionRow>
+                <Separator indent={52} />
+                <ActionRow onPress={() => setTradeVisible(true)} activeOpacity={0.7}>
+                  <ActionLeft>
                     <MaterialIcons name="trending-up" size={20} color={colors.text} />
-                    <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.newTrade")}</Text>
-                  </View>
+                    <ActionText>{t("account.newTrade")}</ActionText>
+                  </ActionLeft>
                   <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
-                </TouchableOpacity>
-                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 52 }]} />
-                <TouchableOpacity
-                  style={styles.actionRow}
-                  onPress={() => setBlockchainTransferVisible(true)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.settingsLeft}>
+                </ActionRow>
+                <Separator indent={52} />
+                <ActionRow onPress={() => setBlockchainTransferVisible(true)} activeOpacity={0.7}>
+                  <ActionLeft>
                     <MaterialIcons name="swap-horiz" size={20} color={colors.text} />
-                    <Text style={[styles.settingsText, { color: colors.text }]}>{t("blockchain.transfer")}</Text>
-                  </View>
+                    <ActionText>{t("blockchain.transfer")}</ActionText>
+                  </ActionLeft>
                   <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
-                </TouchableOpacity>
-                <View style={[styles.separator, { backgroundColor: colors.border, marginLeft: 52 }]} />
-                <TouchableOpacity
-                  style={styles.actionRow}
-                  onPress={() => setSettingsVisible(true)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.settingsLeft}>
+                </ActionRow>
+                <Separator indent={52} />
+                <ActionRow onPress={() => setSettingsVisible(true)} activeOpacity={0.7}>
+                  <ActionLeft>
                     <MaterialIcons name="settings" size={20} color={colors.text} />
-                    <Text style={[styles.settingsText, { color: colors.text }]}>{t("account.settings")}</Text>
-                  </View>
+                    <ActionText>{t("account.settings")}</ActionText>
+                  </ActionLeft>
                   <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
-                </TouchableOpacity>
-              </View>
-            </View>
+                </ActionRow>
+              </CardBordered>
+            </Section>
           </>
         )}
-      </ScrollView>
+      </StyledScrollView>
 
       <SettingsDrawer
         visible={settingsVisible}
@@ -362,7 +488,7 @@ export default function AccountScreen() {
       <RegisterCustomerDrawer
         visible={registerVisible}
         onClose={() => setRegisterVisible(false)}
-        onSuccess={(c) => setCustomer(c)}
+        onSuccess={refresh}
       />
       <NewPaymentDrawer
         visible={paymentVisible}
@@ -378,207 +504,6 @@ export default function AccountScreen() {
         accounts={accounts}
         accountResources={accountResources}
       />
-    </SafeAreaView>
+    </StyledSafeArea>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  scroll: {
-    flex: 1,
-  },
-  content: {
-    paddingTop: 12,
-    paddingBottom: 40,
-  },
-  section: {
-    marginBottom: 28,
-    paddingHorizontal: 16,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-    paddingHorizontal: 4,
-  },
-  categorySection: {
-    marginBottom: 24,
-  },
-  categoryTitle: {
-    fontSize: 13,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 8,
-    paddingHorizontal: 4,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    letterSpacing: -0.4,
-  },
-  totalBalance: {
-    fontSize: 20,
-    fontWeight: "600",
-    letterSpacing: -0.4,
-  },
-  card: {
-    borderRadius: 12,
-    overflow: "hidden",
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  userHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-  },
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  userInfo: {
-    flex: 1,
-  },
-  userName: {
-    fontSize: 19,
-    fontWeight: "600",
-    marginBottom: 3,
-    letterSpacing: -0.4,
-  },
-  userEmail: {
-    fontSize: 14,
-    letterSpacing: -0.2,
-  },
-  userDetailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    paddingTop: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  userDetailLabel: {
-    fontSize: 14,
-    letterSpacing: -0.2,
-  },
-  userDetailValue: {
-    fontSize: 14,
-    fontWeight: "500",
-    letterSpacing: -0.2,
-  },
-  accountRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 14,
-    minHeight: 60,
-  },
-  accountLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    marginRight: 12,
-  },
-  accountIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  accountInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-  accountName: {
-    fontSize: 16,
-    fontWeight: "500",
-    marginBottom: 3,
-    letterSpacing: -0.3,
-  },
-  accountType: {
-    fontSize: 13,
-    letterSpacing: -0.2,
-  },
-  accountRight: {
-    alignItems: "flex-end",
-  },
-  accountBalance: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 3,
-    letterSpacing: -0.3,
-  },
-  accountChange: {
-    fontSize: 13,
-    fontWeight: "500",
-    letterSpacing: -0.2,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    marginLeft: 60,
-  },
-  actionRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 14,
-    minHeight: 52,
-  },
-  settingsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 14,
-    minHeight: 52,
-  },
-  settingsLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  settingsText: {
-    fontSize: 16,
-    fontWeight: "400",
-    letterSpacing: -0.3,
-  },
-  loadingContainer: {
-    flex: 1,
-    minHeight: 400,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 60,
-  },
-  centered: {
-    flex: 1,
-    minHeight: 300,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 40,
-  },
-  errorText: {
-    textAlign: "center",
-    fontSize: 15,
-    marginBottom: 16,
-    paddingHorizontal: 32,
-  },
-  retryButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 10,
-  },
-  retryButtonText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-});

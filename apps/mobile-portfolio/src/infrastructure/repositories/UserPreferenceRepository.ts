@@ -8,6 +8,15 @@ export class UserPreferenceRepository implements IUserPreferenceRepository {
     return list.find((p) => p.customer_id === customerId) ?? null;
   }
 
+  async create(data: UserPreferenceCreate): Promise<UserPreference | null> {
+    return httpClient.post<UserPreference>("user-preferences", {
+      customer_id: data.customer_id,
+      theme: data.theme ?? null,
+      language: data.language ?? null,
+      notifications_enabled: data.notifications_enabled ?? true,
+    });
+  }
+
   async update(
     customerId: string,
     data: Partial<UserPreferenceCreate>

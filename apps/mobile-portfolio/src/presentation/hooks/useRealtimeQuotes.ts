@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  createQuoteSocket,
-  type QuoteConnectionStatus,
-  type QuoteSnapshot,
-} from "../../infrastructure/api/quoteSocket";
+import type { QuoteConnectionStatus, QuoteSnapshot } from "../../domain/entities/quotes";
+import { container } from "../../application";
 
 export interface UseRealtimeQuotesResult {
   quotes: QuoteSnapshot;
@@ -23,6 +20,7 @@ export function useRealtimeQuotes(symbols: string[]): UseRealtimeQuotesResult {
       ),
     [symbols]
   );
+  const service = useMemo(() => container.getQuoteStreamService(), []);
 
   useEffect(() => {
     if (cleanedSymbols.length === 0) {
@@ -30,13 +28,13 @@ export function useRealtimeQuotes(symbols: string[]): UseRealtimeQuotesResult {
       setStatus("idle");
       return;
     }
-    const handle = createQuoteSocket({
+    const handle = service.subscribe({
       symbols: cleanedSymbols,
       onSnapshot: (next) => setQuotes(next),
       onStatusChange: (next) => setStatus(next),
     });
     return () => handle.close();
-  }, [cleanedSymbols.join(",")]);
+  }, [cleanedSymbols.join(","), service]);
 
   return { quotes, status };
 }

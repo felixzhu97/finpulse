@@ -1,5 +1,4 @@
 import type {
-  Account,
   AssetAllocationItem,
   Portfolio,
   PortfolioHistoryPoint,
@@ -27,16 +26,12 @@ export class GetPortfolioUseCase {
     };
   }
 
-  async getAccounts(): Promise<Account[]> {
-    return this.portfolioRepository.getAccounts();
-  }
-
-  async getAccountById(id: string): Promise<Account | undefined> {
-    return this.portfolioRepository.getAccountById(id);
-  }
-
-  async refresh(): Promise<void> {
+  async refresh(): Promise<{
+    portfolio: Portfolio | null;
+    allocation: AssetAllocationItem[];
+    history: PortfolioHistoryPoint[];
+  }> {
     this.portfolioRepository.invalidateCache();
-    await this.execute();
+    return this.execute();
   }
 }

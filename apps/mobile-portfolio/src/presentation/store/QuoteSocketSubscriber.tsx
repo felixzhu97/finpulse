@@ -1,13 +1,15 @@
-import { createQuoteSocket } from "@/src/infrastructure/api/quoteSocket";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import type { QuoteStreamHandle } from "../../domain/services/IQuoteStreamService";
 import { useAppDispatch, useAppSelector } from "./useAppStore";
 import { setSnapshot, setStatus } from "./quotesSlice";
 import { selectSubscribedSymbols } from "./quotesSelectors";
+import { container } from "../../application";
 
 export function QuoteSocketSubscriber() {
   const dispatch = useAppDispatch();
   const subscribedSymbols = useAppSelector(selectSubscribedSymbols);
-  const handleRef = useRef<ReturnType<typeof createQuoteSocket> | null>(null);
+  const handleRef = useRef<QuoteStreamHandle | null>(null);
+  const service = useMemo(() => container.getQuoteStreamService(), []);
 
   useEffect(() => {
     return () => {
@@ -34,7 +36,7 @@ export function QuoteSocketSubscriber() {
       return;
     }
 
-    const handle = createQuoteSocket({
+    const handle = service.subscribe({
       symbols: subscribedSymbols,
       onSnapshot: (quotes) => dispatch(setSnapshot(quotes)),
       onStatusChange: (status) => dispatch(setStatus(status)),
@@ -45,7 +47,7 @@ export function QuoteSocketSubscriber() {
       handle.close();
       handleRef.current = null;
     };
-  }, [subscribedSymbols.join(","), dispatch]);
+  }, [subscribedSymbols.join(","), dispatch, service]);
 
   return null;
 }

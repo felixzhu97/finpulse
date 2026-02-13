@@ -17,11 +17,8 @@ from src.core.application.use_cases.blockchain_service import (
     BlockchainApplicationService,
     InsufficientBalanceError,
 )
-from src.infrastructure.cache import (
-    BLOCKCHAIN_KEY_PREFIX,
-    DEFAULT_TTL,
-    RedisCache,
-)
+from src.api.config import BLOCKCHAIN_KEY_PREFIX, CACHE_TTL_SECONDS
+from src.infrastructure.cache import RedisCache
 
 
 def _block_to_response(block) -> BlockResponse:
@@ -103,7 +100,7 @@ def register(router: APIRouter) -> None:
             await cache.set(
                 cache_key,
                 [_block_to_cache(r) for r in response],
-                ttl_seconds=DEFAULT_TTL,
+                ttl_seconds=CACHE_TTL_SECONDS,
             )
         return response
 
@@ -135,7 +132,7 @@ def register(router: APIRouter) -> None:
             await cache.set(
                 cache_key,
                 response.model_dump(mode="json"),
-                ttl_seconds=DEFAULT_TTL,
+                ttl_seconds=CACHE_TTL_SECONDS,
             )
         return response
 
@@ -193,7 +190,7 @@ def register(router: APIRouter) -> None:
             await cache.set(
                 cache_key,
                 _tx_to_cache(response),
-                ttl_seconds=DEFAULT_TTL,
+                ttl_seconds=CACHE_TTL_SECONDS,
             )
         return response
 
@@ -221,6 +218,6 @@ def register(router: APIRouter) -> None:
             await cache.set(
                 cache_key,
                 response.model_dump(mode="json"),
-                ttl_seconds=DEFAULT_TTL,
+                ttl_seconds=CACHE_TTL_SECONDS,
             )
         return response

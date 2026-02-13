@@ -14,7 +14,7 @@ System_Boundary(finpulse, "FinPulse") {
     }
     
     Boundary(backend_boundary, "后端服务") {
-        Container(portfolio_api, "投资组合分析 API", "FastAPI", "REST、WebSocket；AI/ML（payments、trades、customers、risk-metrics）；区块链；投资组合、市场数据；批量 VaR、ClickHouse 分析（portfolio-risk、delta-info）、MLflow forecast/model")
+        Container(portfolio_api, "投资组合分析 API", "FastAPI", "Clean Architecture：composition.py、container、crud_helpers。REST、WebSocket；AI/ML；区块链；投资组合、市场数据；批量 VaR、ClickHouse、MLflow")
     }
     
     Boundary(data_boundary, "数据存储") {

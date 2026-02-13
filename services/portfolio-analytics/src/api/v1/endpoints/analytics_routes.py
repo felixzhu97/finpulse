@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from src.api.v1.endpoints.crud_helpers import register_crud
 from src.api.v1.schemas import (
     RiskMetricsCreate,
     RiskMetricsResponse,
@@ -22,6 +23,14 @@ from src.api.dependencies import (
 )
 from src.core.application.use_cases.analytics_service import AnalyticsApplicationService
 from src.core.domain.entities.analytics import RiskMetrics, Valuation
+
+
+def _values_to_returns(values: list[float]) -> list[float]:
+    return [
+        (values[i] - values[i - 1]) / values[i - 1]
+        for i in range(1, len(values))
+        if values[i - 1] and values[i - 1] != 0
+    ]
 
 
 def _risk_metrics_to_response(e: RiskMetrics) -> RiskMetricsResponse:
@@ -52,93 +61,19 @@ def _valuation_to_response(e: Valuation) -> ValuationResponse:
     )
 
 
+def _as_of(b):
+    return b.as_of_date or date.today()
+
+
 def register(router: APIRouter) -> None:
-    @router.get("/risk-metrics", response_model=list[RiskMetricsResponse])
-    async def list_risk_metrics(
-        limit: int = 100,
-        offset: int = 0,
-        repo: Annotated[object, Depends(get_risk_metrics_repo)] = None,
-    ):
-        return [_risk_metrics_to_response(e) for e in await repo.list(limit=limit, offset=offset)]
-
-    @router.get("/risk-metrics/{metric_id}", response_model=RiskMetricsResponse)
-    async def get_risk_metrics(
-        metric_id: UUID,
-        repo: Annotated[object, Depends(get_risk_metrics_repo)] = None,
-    ):
-        entity = await repo.get_by_id(metric_id)
-        if not entity:
-            raise HTTPException(status_code=404, detail="Risk metrics not found")
-        return _risk_metrics_to_response(entity)
-
-    @router.post("/risk-metrics", response_model=RiskMetricsResponse, status_code=201)
-    async def create_risk_metrics(
-        body: RiskMetricsCreate,
-        repo: Annotated[object, Depends(get_risk_metrics_repo)] = None,
-    ):
-        entity = RiskMetrics(
-            metric_id=uuid4(),
-            portfolio_id=body.portfolio_id,
-            as_of_date=body.as_of_date or date.today(),
-            risk_level=body.risk_level,
-            volatility=body.volatility,
-            sharpe_ratio=body.sharpe_ratio,
-            var=body.var,
-            beta=body.beta,
-        )
-        created = await repo.add(entity)
-        return _risk_metrics_to_response(created)
-
-    @router.post("/risk-metrics/batch", response_model=list[RiskMetricsResponse], status_code=201)
-    async def create_risk_metrics_batch(
-        body: list[RiskMetricsCreate],
-        repo: Annotated[object, Depends(get_risk_metrics_repo)] = None,
-    ):
-        entities = [
-            RiskMetrics(
-                metric_id=uuid4(),
-                portfolio_id=item.portfolio_id,
-                as_of_date=item.as_of_date or date.today(),
-                risk_level=item.risk_level,
-                volatility=item.volatility,
-                sharpe_ratio=item.sharpe_ratio,
-                var=item.var,
-                beta=item.beta,
-            )
-            for item in body
-        ]
-        created = await repo.add_many(entities)
-        return [_risk_metrics_to_response(e) for e in created]
-
-    @router.put("/risk-metrics/{metric_id}", response_model=RiskMetricsResponse)
-    async def update_risk_metrics(
-        metric_id: UUID,
-        body: RiskMetricsCreate,
-        repo: Annotated[object, Depends(get_risk_metrics_repo)] = None,
-    ):
-        entity = RiskMetrics(
-            metric_id=metric_id,
-            portfolio_id=body.portfolio_id,
-            as_of_date=body.as_of_date or date.today(),
-            risk_level=body.risk_level,
-            volatility=body.volatility,
-            sharpe_ratio=body.sharpe_ratio,
-            var=body.var,
-            beta=body.beta,
-        )
-        updated = await repo.save(entity)
-        if not updated:
-            raise HTTPException(status_code=404, detail="Risk metrics not found")
-        return _risk_metrics_to_response(updated)
-
-    @router.delete("/risk-metrics/{metric_id}", status_code=204)
-    async def delete_risk_metrics(
-        metric_id: UUID,
-        repo: Annotated[object, Depends(get_risk_metrics_repo)] = None,
-    ):
-        ok = await repo.remove(metric_id)
-        if not ok:
-            raise HTTPException(status_code=404, detail="Risk metrics not found")
+    register_crud(
+        router, "risk-metrics", "metric_id",
+        RiskMetricsCreate, RiskMetricsResponse, get_risk_metrics_repo,
+        _risk_metrics_to_response,
+        lambda b: RiskMetrics(metric_id=uuid4(), portfolio_id=b.portfolio_id, as_of_date=_as_of(b), risk_level=b.risk_level, volatility=b.volatility, sharpe_ratio=b.sharpe_ratio, var=b.var, beta=b.beta),
+        lambda pk, b, _: RiskMetrics(metric_id=pk, portfolio_id=b.portfolio_id, as_of_date=_as_of(b), risk_level=b.risk_level, volatility=b.volatility, sharpe_ratio=b.sharpe_ratio, var=b.var, beta=b.beta),
+        "Risk metrics not found",
+    )
 
     @router.post("/risk-metrics/compute")
     async def compute_var(
@@ -155,11 +90,7 @@ def register(router: APIRouter) -> None:
         if len(points) < 2:
             raise HTTPException(status_code=400, detail="Insufficient portfolio history for VaR computation")
         values = [float(p.value) for p in points]
-        returns = []
-        for i in range(1, len(values)):
-            if values[i - 1] and values[i - 1] != 0:
-                r = (values[i] - values[i - 1]) / values[i - 1]
-                returns.append(r)
+        returns = _values_to_returns(values)
         if not returns:
             raise HTTPException(status_code=400, detail="Could not compute returns from history")
         result = analytics.compute_var(
@@ -184,11 +115,7 @@ def register(router: APIRouter) -> None:
             if len(points) < 2:
                 continue
             values = [float(p.value) for p in points]
-            returns = []
-            for i in range(1, len(values)):
-                if values[i - 1] and values[i - 1] != 0:
-                    r = (values[i] - values[i - 1]) / values[i - 1]
-                    returns.append(r)
+            returns = _values_to_returns(values)
             if returns:
                 entries.append((str(portfolio_id), returns))
         if not entries:
@@ -265,95 +192,11 @@ def register(router: APIRouter) -> None:
         except Exception as e:
             raise HTTPException(status_code=503, detail=str(e)) from e
 
-    @router.get("/valuations", response_model=list[ValuationResponse])
-    async def list_valuations(
-        limit: int = 100,
-        offset: int = 0,
-        repo: Annotated[object, Depends(get_valuation_repo)] = None,
-    ):
-        return [_valuation_to_response(e) for e in await repo.list(limit=limit, offset=offset)]
-
-    @router.get("/valuations/{valuation_id}", response_model=ValuationResponse)
-    async def get_valuation(
-        valuation_id: UUID,
-        repo: Annotated[object, Depends(get_valuation_repo)] = None,
-    ):
-        entity = await repo.get_by_id(valuation_id)
-        if not entity:
-            raise HTTPException(status_code=404, detail="Valuation not found")
-        return _valuation_to_response(entity)
-
-    @router.post("/valuations", response_model=ValuationResponse, status_code=201)
-    async def create_valuation(
-        body: ValuationCreate,
-        repo: Annotated[object, Depends(get_valuation_repo)] = None,
-    ):
-        entity = Valuation(
-            valuation_id=uuid4(),
-            instrument_id=body.instrument_id,
-            as_of_date=body.as_of_date or date.today(),
-            method=body.method,
-            ev=body.ev,
-            equity_value=body.equity_value,
-            target_price=body.target_price,
-            multiples=body.multiples,
-            discount_rate=body.discount_rate,
-            growth_rate=body.growth_rate,
-        )
-        created = await repo.add(entity)
-        return _valuation_to_response(created)
-
-    @router.post("/valuations/batch", response_model=list[ValuationResponse], status_code=201)
-    async def create_valuations_batch(
-        body: list[ValuationCreate],
-        repo: Annotated[object, Depends(get_valuation_repo)] = None,
-    ):
-        entities = [
-            Valuation(
-                valuation_id=uuid4(),
-                instrument_id=item.instrument_id,
-                as_of_date=item.as_of_date or date.today(),
-                method=item.method,
-                ev=item.ev,
-                equity_value=item.equity_value,
-                target_price=item.target_price,
-                multiples=item.multiples,
-                discount_rate=item.discount_rate,
-                growth_rate=item.growth_rate,
-            )
-            for item in body
-        ]
-        created = await repo.add_many(entities)
-        return [_valuation_to_response(e) for e in created]
-
-    @router.put("/valuations/{valuation_id}", response_model=ValuationResponse)
-    async def update_valuation(
-        valuation_id: UUID,
-        body: ValuationCreate,
-        repo: Annotated[object, Depends(get_valuation_repo)] = None,
-    ):
-        entity = Valuation(
-            valuation_id=valuation_id,
-            instrument_id=body.instrument_id,
-            as_of_date=body.as_of_date or date.today(),
-            method=body.method,
-            ev=body.ev,
-            equity_value=body.equity_value,
-            target_price=body.target_price,
-            multiples=body.multiples,
-            discount_rate=body.discount_rate,
-            growth_rate=body.growth_rate,
-        )
-        updated = await repo.save(entity)
-        if not updated:
-            raise HTTPException(status_code=404, detail="Valuation not found")
-        return _valuation_to_response(updated)
-
-    @router.delete("/valuations/{valuation_id}", status_code=204)
-    async def delete_valuation(
-        valuation_id: UUID,
-        repo: Annotated[object, Depends(get_valuation_repo)] = None,
-    ):
-        ok = await repo.remove(valuation_id)
-        if not ok:
-            raise HTTPException(status_code=404, detail="Valuation not found")
+    register_crud(
+        router, "valuations", "valuation_id",
+        ValuationCreate, ValuationResponse, get_valuation_repo,
+        _valuation_to_response,
+        lambda b: Valuation(valuation_id=uuid4(), instrument_id=b.instrument_id, as_of_date=_as_of(b), method=b.method, ev=b.ev, equity_value=b.equity_value, target_price=b.target_price, multiples=b.multiples, discount_rate=b.discount_rate, growth_rate=b.growth_rate),
+        lambda pk, b, _: Valuation(valuation_id=pk, instrument_id=b.instrument_id, as_of_date=_as_of(b), method=b.method, ev=b.ev, equity_value=b.equity_value, target_price=b.target_price, multiples=b.multiples, discount_rate=b.discount_rate, growth_rate=b.growth_rate),
+        "Valuation not found",
+    )

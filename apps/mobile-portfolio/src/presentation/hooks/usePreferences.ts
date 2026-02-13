@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store";
 import {
@@ -9,8 +9,9 @@ import {
   type ThemePreference,
 } from "../store/preferencesSlice";
 import { useUserPreferences } from "./useUserPreferences";
-import { container } from "../../application/services/DependencyContainer";
+import { container } from "../../application";
 import { i18n } from "../i18n";
+import type { UpdatePreferenceInput } from "../../application/usecases/UserPreferenceUseCase";
 
 export function usePreferences() {
   const dispatch = useDispatch();
@@ -21,6 +22,8 @@ export function usePreferences() {
     loading: apiLoading,
     refresh: refreshApi,
   } = useUserPreferences();
+
+  const useCase = useMemo(() => container.getUserPreferenceUseCase(), []);
 
   useEffect(() => {
     if (apiPreference) {
@@ -36,88 +39,48 @@ export function usePreferences() {
     }
   }, [apiPreference, dispatch]);
 
-  const userPreferenceRepository = container.getUserPreferenceRepository();
+  const updatePreference = useCallback(
+    async (partial: UpdatePreferenceInput): Promise<boolean> => {
+      if (!customerId) return false;
+      const themeVal = preferences.theme === "auto" ? null : preferences.theme;
+      const data: UpdatePreferenceInput = {
+        theme: partial.theme ?? themeVal,
+        language: partial.language ?? preferences.language,
+        notificationsEnabled: partial.notificationsEnabled ?? preferences.notificationsEnabled,
+      };
+      try {
+        const updated = await useCase.update(customerId, data);
+        if (updated) {
+          await refreshApi();
+          return true;
+        }
+        return false;
+      } catch {
+        return false;
+      }
+    },
+    [customerId, preferences, refreshApi, useCase]
+  );
 
   const updateTheme = useCallback(
-    async (theme: ThemePreference) => {
-      if (!customerId) {
-        console.warn("Cannot update theme: customerId is null");
-        return false;
-      }
-      dispatch(setTheme(theme));
-      const themeValue = theme === "auto" ? null : theme;
-      try {
-        const updated = await userPreferenceRepository.update(customerId, {
-          theme: themeValue,
-          language: preferences.language,
-          notifications_enabled: preferences.notificationsEnabled,
-        });
-        if (updated) {
-          await refreshApi();
-          return true;
-        }
-        return false;
-      } catch (error) {
-        console.error("Error updating theme:", error);
-        return false;
-      }
-    },
-    [customerId, preferences.language, preferences.notificationsEnabled, dispatch, refreshApi, userPreferenceRepository]
+    (theme: ThemePreference) =>
+      updatePreference({ theme: theme === "auto" ? null : theme }),
+    [updatePreference]
   );
-
   const updateLanguage = useCallback(
     async (language: string | null) => {
-      if (!customerId) {
-        console.warn("Cannot update language: customerId is null");
-        return false;
-      }
       dispatch(setLanguage(language));
-      if (language) {
-        i18n.changeLanguage(language);
-      }
-      try {
-        const updated = await userPreferenceRepository.update(customerId, {
-          theme: preferences.theme === "auto" ? null : preferences.theme,
-          language,
-          notifications_enabled: preferences.notificationsEnabled,
-        });
-        if (updated) {
-          await refreshApi();
-          return true;
-        }
-        return false;
-      } catch (error) {
-        console.error("Error updating language:", error);
-        return false;
-      }
+      if (language) i18n.changeLanguage(language);
+      return updatePreference({ language });
     },
-    [customerId, preferences.theme, preferences.notificationsEnabled, dispatch, refreshApi, userPreferenceRepository]
+    [dispatch, updatePreference]
   );
-
   const updateNotifications = useCallback(
     async (enabled: boolean) => {
-      if (!customerId) {
-        console.warn("Cannot update notifications: customerId is null");
-        return false;
-      }
       dispatch(setNotificationsEnabled(enabled));
-      try {
-        const updated = await userPreferenceRepository.update(customerId, {
-          theme: preferences.theme === "auto" ? null : preferences.theme,
-          language: preferences.language,
-          notifications_enabled: enabled,
-        });
-        if (updated) {
-          await refreshApi();
-          return true;
-        }
-        return false;
-      } catch (error) {
-        console.error("Error updating notifications:", error);
-        return false;
-      }
+      return updatePreference({ notificationsEnabled: enabled });
     },
-    [customerId, preferences.theme, preferences.language, dispatch, refreshApi, userPreferenceRepository]
+    [dispatch, updatePreference]
   );
 
   return {

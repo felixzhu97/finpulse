@@ -11,12 +11,8 @@ import { useEffect, useMemo } from "react";
 import "react-native-reanimated";
 import { Provider, useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  useColorScheme,
-  View,
-} from "react-native";
+import { ActivityIndicator, useColorScheme } from "react-native";
+import styled from "styled-components/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubscriber";
 import { store, type RootState } from "@/src/presentation/store";
@@ -26,6 +22,13 @@ import { StyledThemeProvider } from "@/src/presentation/theme/StyledThemeProvide
 import "@/src/presentation/i18n/config";
 import { i18n } from "@/src/presentation/i18n";
 import "react-native-get-random-values";
+
+const LoadingRoot = styled.View<{ bg: string }>`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${(p) => p.bg};
+`;
 
 SplashScreen.preventAutoHideAsync();
 
@@ -70,9 +73,9 @@ function AppContent() {
 
   if (loading) {
     return (
-      <View style={[styles.loadingScreen, { backgroundColor: colors.background }]}>
+      <LoadingRoot bg={colors.background}>
         <ActivityIndicator size="large" color={colors.textSecondary} />
-      </View>
+      </LoadingRoot>
     );
   }
 
@@ -81,10 +84,10 @@ function AppContent() {
       <StyledThemeProvider>
         <StatusBar style={statusBarStyle} translucent />
         <GestureHandlerRootView
-          style={[styles.root, { backgroundColor: theme.colors.background }]}
+          style={{ flex: 1, backgroundColor: theme.colors.background }}
         >
           <SafeAreaView
-            style={[styles.root, { backgroundColor: theme.colors.background }]}
+            style={{ flex: 1, backgroundColor: theme.colors.background }}
           >
             <QuoteSocketSubscriber />
             <Stack initialRouteName="(tabs)">
@@ -119,14 +122,3 @@ export default function RootLayout() {
     </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  loadingScreen: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

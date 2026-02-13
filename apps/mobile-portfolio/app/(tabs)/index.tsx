@@ -1,21 +1,36 @@
-import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { useTheme as useNavTheme } from "@react-navigation/native";
+import { useState } from "react";
+import { ActivityIndicator, RefreshControl } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { NativeLineChart } from "@/src/presentation/components/native";
 import { PortfolioSummary } from "@/src/presentation/components/portfolio/PortfolioSummary";
 import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
 import { AssetAllocationChart } from "@/src/presentation/components/portfolio/AssetAllocationChart";
 import { NetWorthLineChart } from "@/src/presentation/components/portfolio/NetWorthLineChart";
-import { usePortfolio } from "@/src/presentation/hooks/usePortfolio";
+import { usePortfolio, useRefreshControl } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
+import {
+  ScreenRoot,
+  ContentPadding,
+  CenteredContainer,
+  ErrorText,
+  RetryText,
+  SectionTitle,
+  BlockWithGap,
+  ChartCard,
+  ChartCardTitle,
+} from "@/src/presentation/theme/primitives";
+import styled from "styled-components/native";
+
+const StyledScrollView = styled(ScrollView)`
+  flex: 1;
+  background-color: ${(p) => p.theme.colors.background};
+`;
+
+const NativeChartWrapper = styled.View`
+  height: 200px;
+  margin-bottom: 12px;
+`;
 
 export default function DashboardScreen() {
   const { isDark, colors } = useTheme();
@@ -25,18 +40,11 @@ export default function DashboardScreen() {
     allocation,
     history,
     loading,
-    error,
     refresh,
   } = usePortfolio();
   const chartTheme = isDark ? "dark" : "light";
   const [chartScrollLock, setChartScrollLock] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await refresh();
-    setRefreshing(false);
-  }, [refresh]);
+  const { refreshing, onRefresh } = useRefreshControl(refresh);
 
   const base = Date.now() - 5 * 24 * 60 * 60 * 1000;
   const fallbackTimestamps = [
@@ -57,39 +65,36 @@ export default function DashboardScreen() {
 
   if (!portfolio) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.background }]}>
-        {loading ? (
-          <ActivityIndicator size="small" color={colors.textSecondary} />
-        ) : (
-          <>
-            <Text style={[styles.errorText, { color: colors.textSecondary }]}>
-              {t("dashboard.unableToLoad")}
-            </Text>
-            <Text style={[styles.retryText, { color: colors.primary }]} onPress={refresh}>
-              {t("dashboard.tapToRetry")}
-            </Text>
-          </>
-        )}
-      </View>
+      <ScreenRoot>
+        <CenteredContainer>
+          {loading ? (
+            <ActivityIndicator size="small" color={colors.textSecondary} />
+          ) : (
+            <>
+              <ErrorText>{t("dashboard.unableToLoad")}</ErrorText>
+              <RetryText onPress={refresh}>{t("dashboard.tapToRetry")}</RetryText>
+            </>
+          )}
+        </CenteredContainer>
+      </ScreenRoot>
     );
   }
 
   return (
-    <ScrollView
-      style={[styles.screen, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.content}
+    <StyledScrollView
+      contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
       scrollEnabled={!chartScrollLock}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.primary}
-          />
-        }
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.primary}
+        />
+      }
     >
       <PortfolioSummary portfolio={portfolio} />
-      <View style={styles.block}>
-        <Text style={[styles.subsectionTitle, { color: colors.text }]}>{t("dashboard.netWorthTrend")}</Text>
+      <BlockWithGap>
+        <SectionTitle>{t("dashboard.netWorthTrend")}</SectionTitle>
         <NetWorthLineChart points={history} />
         <MetricCard
           label={t("dashboard.accounts")}
@@ -102,67 +107,20 @@ export default function DashboardScreen() {
             value: item.value,
           }))}
         />
-        <View style={[styles.chartCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.chartCardTitle, { color: colors.text }]}>{t("dashboard.netWorthNativeChart")}</Text>
-          <NativeLineChart
-            data={lineData}
-            theme={chartTheme}
-            timestamps={lineTimestamps}
-            style={styles.nativeChart}
-            onInteractionStart={() => setChartScrollLock(true)}
-            onInteractionEnd={() => setChartScrollLock(false)}
-          />
-        </View>
-      </View>
-    </ScrollView>
+        <ChartCard>
+          <ChartCardTitle>{t("dashboard.netWorthNativeChart")}</ChartCardTitle>
+          <NativeChartWrapper>
+            <NativeLineChart
+              data={lineData}
+              theme={chartTheme}
+              timestamps={lineTimestamps}
+              style={{ flex: 1 }}
+              onInteractionStart={() => setChartScrollLock(true)}
+              onInteractionEnd={() => setChartScrollLock(false)}
+            />
+          </NativeChartWrapper>
+        </ChartCard>
+      </BlockWithGap>
+    </StyledScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  screen: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  block: {
-    marginTop: 0,
-    gap: 12,
-  },
-  subsectionTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  errorText: {
-    textAlign: "center",
-    fontSize: 15,
-    marginBottom: 8,
-  },
-  retryText: {
-    marginTop: 12,
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  chartCard: {
-    borderRadius: 12,
-    padding: 12,
-    marginTop: 12,
-    overflow: "hidden",
-  },
-  chartCardTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  nativeChart: {
-    height: 200,
-    marginBottom: 12,
-  },
-});

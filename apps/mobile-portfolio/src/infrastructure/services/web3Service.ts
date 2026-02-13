@@ -1,9 +1,9 @@
 import { ethers } from "ethers";
-import type { WalletInfo, Web3Config } from "../domain/entities/blockchain";
+import type { WalletInfo, Web3Config } from "../../domain/entities/blockchain";
 
 class Web3Service {
   private provider: ethers.JsonRpcProvider | null = null;
-  private signer: ethers.Wallet | null = null;
+  private signer: ethers.Signer | null = null;
   private walletInfo: WalletInfo | null = null;
   private config: Web3Config | null = null;
 
@@ -24,7 +24,7 @@ class Web3Service {
     }
 
     const address = await this.signer.getAddress();
-    const balance = await this.provider.getBalance(address);
+    const balance = await this.provider!.getBalance(address);
     const network = await this.provider.getNetwork();
 
     this.walletInfo = {

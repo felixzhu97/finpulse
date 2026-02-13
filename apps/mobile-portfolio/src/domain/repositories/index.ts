@@ -1,3 +1,4 @@
+export * from "./IAccountRepository";
 export * from "./IPortfolioRepository";
 export * from "./IQuoteRepository";
 export * from "./ICustomerRepository";

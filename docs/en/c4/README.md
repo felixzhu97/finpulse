@@ -52,7 +52,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-mobile-portfolio-components.puml`
 
-**Description**: Mobile Portfolio app (Expo + React Native): thin client with AppContent (preferences loading spinner), tabs/screens; **styled-components** for theme-aware UI (StyledThemeProvider injects theme from useTheme; primitives: Card, LabelText, ValueText, HelperText, withTheme; useTheme in useTheme.ts to avoid require cycle); types (Portfolio, QuoteSnapshot); api layer (portfolioApi, getQuotes, createQuoteSocket); hooks (usePortfolio, useRealtimeQuotes, usePerSymbolHistory, usePreferences with component-level loading); Account screen uses useFocusEffect for load on tab focus; native charts and portfolio/account components; backend: GET /api/v1/portfolio, GET /api/v1/quotes, WS /ws/quotes. Native code follows OOP principles with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes. Charts render full-width with no left padding.
+**Description**: Mobile Portfolio app (Expo + React Native): thin client with AppContent (preferences loading spinner), tabs/screens; **Redux Toolkit** (quotes, preferences, portfolio slices); **styled-components** for theme-aware UI (StyledThemeProvider injects theme from useTheme; primitives: ScreenRoot, ListRow, CardBordered, LabelText, ValueText, withTheme); types (Portfolio, QuoteSnapshot); api layer (portfolioApi, getQuotes, createQuoteSocket); hooks (usePortfolio, useRealtimeQuotes, useSymbolDisplayData, usePreferences with component-level loading); Account screen uses useFocusEffect for load on tab focus; native charts and portfolio/account components; backend: GET /api/v1/portfolio, GET /api/v1/quotes, WS /ws/quotes. Native code follows OOP principles with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes. Charts render full-width with no left padding.
 
 ### Mobile Demo Components
 
@@ -89,7 +89,7 @@ After setup, diagrams render without network access.
 
 ## Recent Updates
 
-- **Styled Components (Mobile)**: Theme-aware UI with styled-components/native; StyledThemeProvider (injects theme from useTheme), theme primitives (Card, LabelText, ValueText, HelperText, withTheme), useTheme in useTheme.ts to avoid require cycle; MetricCard and RegisterCustomerDrawer use styled components.
+- **Redux + styled-components (Mobile)**: Portfolio state migrated to Redux (portfolio slice); all main screens (Dashboard, Account, Watchlist, Insights) and list components use styled-components primitives (ScreenRoot, ListRow, CardBordered, SafeAreaScreen, etc.) for theme-aware UI.
 - **OOP Architecture**: Native chart code refactored with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
 - **Code Simplification**: Removed unused code, simplified logic, improved maintainability through inheritance and abstraction
 - **Chart Layout**: Charts now render full-width with no left padding, extending to the far left edge

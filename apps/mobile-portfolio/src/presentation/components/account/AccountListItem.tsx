@@ -1,9 +1,18 @@
-import { StyleSheet, Text, View } from "react-native";
 import type { Account } from "@/src/domain/entities/portfolio";
-import { formatBalance, formatSigned } from "@/src/infrastructure/utils";
-import { getStockChangeInfo } from "@/src/infrastructure/utils/stockUtils";
+import { formatBalance, formatSigned, getStockChangeInfo } from "@/src/presentation/utils";
 import { Sparkline } from "../ui/Sparkline";
-import { useTheme } from "@/src/presentation/theme";
+import {
+  ListRow,
+  ListRowLeft,
+  ListRowRight,
+  ListRowSparkline,
+  RowTitle,
+  RowSubtitle,
+  RowValue,
+  RowChangeContainer,
+  RowChange,
+  RowChangePercent,
+} from "@/src/presentation/theme/primitives";
 
 interface AccountListItemProps {
   account: Account;
@@ -28,92 +37,33 @@ function getAccountTypeLabel(type: Account["type"]) {
 }
 
 export function AccountListItem({ account, historyValues }: AccountListItemProps) {
-  const { colors } = useTheme();
   const { isUp, trend, changeColor, changePercent } = getStockChangeInfo(
     account.todayChange,
     account.balance
   );
 
   return (
-    <View style={[styles.row, { borderBottomColor: colors.border }]}>
-      <View style={styles.left}>
-        <Text style={[styles.code, { color: colors.text }]} numberOfLines={1}>
-          {account.name}
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={1}>
+    <ListRow>
+      <ListRowLeft>
+        <RowTitle numberOfLines={1}>{account.name}</RowTitle>
+        <RowSubtitle numberOfLines={1}>
           {getAccountTypeLabel(account.type)}
-        </Text>
-      </View>
-      <View style={styles.sparkline}>
+        </RowSubtitle>
+      </ListRowLeft>
+      <ListRowSparkline>
         <Sparkline data={historyValues} trend={trend} width={80} height={36} />
-      </View>
-      <View style={styles.right}>
-        <Text style={[styles.price, { color: colors.text }]}>{formatBalance(account.balance)}</Text>
-        <View style={styles.changeContainer}>
-          <Text style={[styles.change, { color: changeColor }]}>
+      </ListRowSparkline>
+      <ListRowRight>
+        <RowValue>{formatBalance(account.balance)}</RowValue>
+        <RowChangeContainer>
+          <RowChange color={changeColor}>
             {formatSigned(account.todayChange, 0)}
-          </Text>
-          <Text style={[styles.changePercent, { color: changeColor }]}>
+          </RowChange>
+          <RowChangePercent color={changeColor}>
             {isUp ? "+" : ""}{changePercent}%
-          </Text>
-        </View>
-      </View>
-    </View>
+          </RowChangePercent>
+        </RowChangeContainer>
+      </ListRowRight>
+    </ListRow>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    minHeight: 64,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  left: {
-    flex: 1,
-    minWidth: 0,
-    paddingRight: 12,
-  },
-  code: {
-    fontSize: 20,
-    fontWeight: "600",
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    fontSize: 13,
-    marginTop: 3,
-    letterSpacing: -0.1,
-  },
-  sparkline: {
-    width: 80,
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 8,
-  },
-  right: {
-    alignItems: "flex-end",
-    minWidth: 90,
-  },
-  price: {
-    fontSize: 18,
-    fontWeight: "600",
-    letterSpacing: -0.3,
-  },
-  changeContainer: {
-    alignItems: "flex-end",
-    marginTop: 4,
-  },
-  change: {
-    fontSize: 15,
-    fontWeight: "500",
-    letterSpacing: -0.2,
-  },
-  changePercent: {
-    fontSize: 13,
-    fontWeight: "400",
-    marginTop: 1,
-    letterSpacing: -0.1,
-  },
-});

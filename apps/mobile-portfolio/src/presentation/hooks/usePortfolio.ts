@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import type {
   AssetAllocationItem,
   Portfolio,
   PortfolioHistoryPoint,
 } from "../../domain/entities/portfolio";
-import { container } from "../../application/services/DependencyContainer";
+import { container } from "../../application";
+import { useAsyncLoad } from "./useAsyncLoad";
 
 export interface UsePortfolioResult {
   portfolio: Portfolio | null;
@@ -16,45 +17,23 @@ export interface UsePortfolioResult {
 }
 
 export function usePortfolio(): UsePortfolioResult {
-  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
-  const [allocation, setAllocation] = useState<AssetAllocationItem[]>([]);
-  const [history, setHistory] = useState<PortfolioHistoryPoint[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const fetcher = useCallback(() => container.getPortfolioUseCase().execute(), []);
+  const refreshFetcher = useCallback(() => container.getPortfolioUseCase().refresh(), []);
+  const { data, loading, error, refresh } = useAsyncLoad(fetcher, null, {
+    refreshFetcher,
+  });
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const useCase = container.getPortfolioUseCase();
-      const result = await useCase.execute();
-      setPortfolio(result.portfolio);
-      setAllocation(result.allocation);
-      setHistory(result.history);
-      if (result.portfolio === null) setError(true);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  const refresh = useCallback(async () => {
-    const useCase = container.getPortfolioUseCase();
-    await useCase.refresh();
-    await load();
-  }, [load]);
+  const portfolio = data?.portfolio ?? null;
+  const allocation = data?.allocation ?? [];
+  const history = data?.history ?? [];
+  const hasError = error || (data != null && portfolio === null);
 
   return {
     portfolio,
     allocation,
     history,
     loading,
-    error,
+    error: hasError,
     refresh,
   };
 }

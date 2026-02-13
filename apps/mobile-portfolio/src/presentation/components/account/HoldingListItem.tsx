@@ -1,6 +1,14 @@
-import { StyleSheet, Text, View } from "react-native";
 import type { Holding } from "@/src/domain/entities/portfolio";
-import { formatCurrency, formatSigned, formatSignedPercent } from "@/src/infrastructure/utils";
+import { formatCurrency, formatSigned, formatSignedPercent } from "@/src/presentation/utils";
+import {
+  HoldingRow,
+  HoldingRowLeft,
+  HoldingRowRight,
+  HoldingName,
+  HoldingMeta,
+  HoldingValue,
+  HoldingChange,
+} from "@/src/presentation/theme/primitives";
 
 interface HoldingListItemProps {
   holding: Holding;
@@ -24,70 +32,24 @@ export function HoldingListItem({
   const isPositive = profit >= 0;
 
   return (
-    <View style={styles.row}>
-      <View style={styles.left}>
-        <Text numberOfLines={1} style={styles.name}>
-          {holding.name}
-        </Text>
-        <Text numberOfLines={1} style={styles.meta}>
+    <HoldingRow>
+      <HoldingRowLeft>
+        <HoldingName numberOfLines={1}>{holding.name}</HoldingName>
+        <HoldingMeta numberOfLines={1}>
           {holding.symbol} · {holding.quantity} shares
-        </Text>
-        <Text numberOfLines={1} style={styles.meta}>
+        </HoldingMeta>
+        <HoldingMeta numberOfLines={1}>
           Price {formatCurrency(price, "USD")}
-        </Text>
-      </View>
-      <View style={styles.right}>
-        <Text numberOfLines={1} style={styles.value}>
+        </HoldingMeta>
+      </HoldingRowLeft>
+      <HoldingRowRight>
+        <HoldingValue numberOfLines={1}>
           {formatCurrency(marketValue, "USD")}
-        </Text>
-        <Text
-          numberOfLines={1}
-          style={[styles.change, { color: isPositive ? "#16a34a" : "#b91c1c" }]}
-        >
+        </HoldingValue>
+        <HoldingChange positive={isPositive} numberOfLines={1}>
           {formatSigned(profit, 0)} · {formatSignedPercent(profitRate)}
-        </Text>
-      </View>
-    </View>
+        </HoldingChange>
+      </HoldingRowRight>
+    </HoldingRow>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(15, 23, 42, 0.06)",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 12,
-    minHeight: 56,
-  },
-  left: {
-    flex: 1,
-    minWidth: 0,
-  },
-  name: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#111827",
-  },
-  meta: {
-    marginTop: 2,
-    fontSize: 12,
-    color: "#6b7280",
-  },
-  right: {
-    alignItems: "flex-end",
-    flexShrink: 0,
-  },
-  value: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#111827",
-  },
-  change: {
-    marginTop: 2,
-    fontSize: 12,
-  },
-});
-

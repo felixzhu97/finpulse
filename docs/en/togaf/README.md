@@ -94,7 +94,7 @@ Technology Architecture
 
 ## Recent Updates
 
-- **Styled Components (Mobile Portfolio)**: Theme-aware UI with styled-components/native; StyledThemeProvider injects theme from useTheme (useTheme.ts to avoid require cycle); primitives (Card, LabelText, ValueText, HelperText, withTheme); MetricCard and RegisterCustomerDrawer use styled components.
+- **Redux + styled-components (Mobile Portfolio)**: Portfolio state in Redux (portfolio slice); main screens and list components use styled-components primitives (ScreenRoot, ListRow, CardBordered, SafeAreaScreen, etc.) for theme-aware UI.
+- **Clean Architecture (Mobile Portfolio)**: Presentation → Application → Domain; Infrastructure only in DependencyContainer. Shared hooks: **useAsyncLoad**, **runWithLoading**, **useRefreshControl**, **useAccountData**.
 - **OOP Architecture**: Native chart code refactored with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
-- **Code Simplification**: Removed unused code, simplified logic, improved maintainability through inheritance and abstraction
-- **Chart Layout**: Full-width rendering with optimized layout calculations
+- **Code Simplification**: Removed unused code (usePerSymbolHistory, duplicate PeriodDataProcessor), simplified logic, improved maintainability through inheritance and abstraction

@@ -8,7 +8,7 @@ Portfolio management mobile app for viewing investment accounts, performance cha
 |----------|--------------|
 | Framework | Expo 54, React 19, React Native 0.81 |
 | Routing | expo-router 6 (file-based) |
-| State | Redux Toolkit (quotes, preferences), custom store (portfolio UI) |
+| State | Redux Toolkit (quotes, preferences, portfolio) |
 | Charts | react-native-wagmi-charts, react-native-chart-kit, react-native-svg |
 | Native Charts | iOS Metal (Swift), Android (Kotlin) |
 | Navigation | React Navigation (bottom-tabs) |
@@ -24,7 +24,7 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 | Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native line chart |
 | Watchlist | `/(tabs)/watchlists` | Stock list (portfolio holdings) with real-time prices, sparklines, account rows; search (bottom sheet, closes on drawer/sort/tab), sort menu; pull-to-refresh; stock detail drawer (draggable, share) |
 | Insights | `/(tabs)/insights` | Risk metrics from API (volatility, Sharpe ratio, VaR, beta) via `GET /api/v1/risk-metrics`; computed VaR via `POST /api/v1/risk-metrics/compute` (useComputedVar hook) |
-| Account | `/(tabs)/account` | Profile (customer from `/api/v1/customers`), account list (from `/api/v1/portfolio`), Actions (Register Customer, New Payment, New Trade, Settings), drawers: RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, SettingsDrawer (theme, language, notifications via `/api/v1/user-preferences`). Uses **useFocusEffect** to load data when tab gains focus. |
+| Account | `/(tabs)/account` | Profile, account list, Actions (Register Customer, New Payment, New Trade, Settings), drawers. **useAccountData** loads customer, accounts, accountResources on tab focus via useFocusEffect; **useRefreshControl** for pull-to-refresh. |
 
 ## Project Structure (Clean Architecture)
 
@@ -37,19 +37,20 @@ The app follows **Clean Architecture** principles with clear separation of conce
   - `repositories/`: Abstract repository interfaces (`IPortfolioRepository`, `IQuoteRepository`, `ICustomerRepository`, `IUserPreferenceRepository`, `IWatchlistRepository`, `IInstrumentRepository`, `IRiskMetricsRepository`, `IPaymentRepository`, `ITradeRepository`, `IOrderRepository`, `IBlockchainRepository`)
 
 - **Application Layer** (`src/application/`): Use cases and application services
-  - `usecases/`: Business use cases (`GetPortfolioUseCase`, `GetCustomerUseCase`, `GetQuotesUseCase`)
+  - `usecases/`: Business use cases (`GetPortfolioUseCase`, `GetQuotesUseCase`, `PaymentUseCase`, `TradeUseCase`, etc.)
   - `services/`: Dependency injection container (`DependencyContainer`) that provides repository instances and use cases
 
 - **Infrastructure Layer** (`src/infrastructure/`): External concerns and implementations
   - `api/`: HTTP client, WebSocket client, API configuration (`httpClient.ts`, `quoteSocket.ts`, `config.ts`, `accountsApi.ts`)
   - `repositories/`: Concrete repository implementations that implement domain interfaces (`PortfolioRepository`, `QuoteRepository`, `CustomerRepository`, etc.)
-  - `services/`: External service integrations (`web3Service.ts`)
-  - `utils/`: Utility functions (`formatters.ts`, `stockUtils.ts`, `PeriodDataProcessor.ts`)
+  - `services/`: External service integrations (`QuoteStreamService`, `web3Service`)
+  - `utils/`: Utility exports (`index.ts`)
 
 - **Presentation Layer** (`src/presentation/`): UI components, hooks, and state management
   - `components/`: React Native components organized by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
-  - `hooks/`: React hooks for UI logic (`usePortfolio`, `useSymbolDisplayData`, `useRealtimeQuotes`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useDraggableDrawer`, etc.)
-  - `store/`: Redux state management (quotes slice, preferences slice, selectors, `QuoteSocketSubscriber`, custom portfolio store)
+  - `hooks/`: React hooks for UI logic (`usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `useRealtimeQuotes`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useRefreshControl`, `useDraggableDrawer`, etc.); shared utilities (`useAsyncLoad`, `runWithLoading`)
+  - `utils/`: Presentation utilities (`format.ts`, `stockDisplay.ts`, `PeriodDataProcessor.ts`)
+  - `store/`: Redux state management (quotes slice, preferences slice, portfolio slice, selectors, `QuoteSocketSubscriber`)
   - `theme/`: Theme system (`colors.ts`, `useTheme.ts` hook, `StyledThemeProvider`, `primitives.ts` styled components, `themeTypes.ts` AppTheme)
   - `i18n/`: Internationalization (`config.ts`, translation resources, `useTranslation` hook)
 
@@ -136,7 +137,7 @@ The app connects only to the backend; there is no in-app mock data.
 1. From repo root: `pnpm run start:backend` (Docker + TimescaleDB + Redis + Kafka + API + seed + mock quote producer).
 2. Or separately: `pnpm run start:kafka` for Kafka and mock quotes only.
 3. Override the base URL with `EXPO_PUBLIC_PORTFOLIO_API_URL` in `.env` if needed (e.g. `http://192.168.x.x:8800` when using a simulator or device).
-4. Pull-to-refresh on the dashboard calls `usePortfolio().refresh()` and refetches from the backend.
+4. Pull-to-refresh uses **useRefreshControl(refresh)** across Dashboard, Watchlist, Account, and Insights screens.
 
 ### Real-time quotes and sparklines
 
@@ -151,7 +152,7 @@ The Watchlist screen uses a single Redux-backed flow:
 The app supports light and dark themes with automatic system theme detection and **styled-components** for theme-aware UI:
 
 - **Theme System**: `src/presentation/theme/colors.ts` defines light/dark color schemes. `useTheme.ts` provides the `useTheme()` hook (no circular dependency with `StyledThemeProvider`). `theme/index.ts` re-exports theme APIs; `themeTypes.ts` defines `AppTheme` and augments styled-components `DefaultTheme`.
-- **Styled Components**: Root layout wraps the app with `StyledThemeProvider`, which reads `useTheme()` and injects `{ colors }` into styled-components. Primitives (`primitives.ts`) include `Card`, `LabelText`, `ValueText`, `HelperText` and `withTheme()` for type-safe theme access. Components such as `MetricCard` and `RegisterCustomerDrawer` use these styled components for consistent, theme-driven styling.
+- **Styled Components**: Root layout wraps the app with `StyledThemeProvider`, which reads `useTheme()` and injects `{ colors }` into styled-components. Primitives (`primitives.ts`) include layout primitives (`ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, etc.), text primitives (`LabelText`, `ValueText`, `RowTitle`, etc.), and `withTheme()` for type-safe theme access. Main screens (Dashboard, Account, Watchlist, Insights) and list components use these styled components for consistent, theme-driven styling.
 - **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Initial loading is component-level: `AppContent` shows a spinner until `usePreferences().loading` is false. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
 - **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.
 

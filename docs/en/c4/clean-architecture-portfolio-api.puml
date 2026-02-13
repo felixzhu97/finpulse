@@ -1,0 +1,55 @@
+@startuml clean-architecture-portfolio-api-en
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontSize 11
+
+title Portfolio Analytics API - Clean Architecture Layers
+
+rectangle "**API**\n(src/api/)" as API #E3F2FD {
+  rectangle "main.py\n(entry, router mount)" as MAIN
+  rectangle "composition.py\n(composition root)\nlifespan: engine, redis,\nquote_repo, Kafka" as LIFESPAN
+  rectangle "config.py\n(API constants:\ncache prefixes, TTL)" as CFG
+  rectangle "dependencies.py\n(dependency injection)\n_repo_from_session, container" as DI
+  rectangle "crud_helpers.py\n(register_crud)" as CRUD
+  rectangle "v1/endpoints\nv1/schemas\nv1/mappers" as WEB
+}
+
+rectangle "**Infrastructure**\n(src/infrastructure/)" as INFRA #E8F5E9 {
+  rectangle "database/\ncache/ (Redis)\nconfig/ (container.py)\nanalytics/ (ClickHouse)\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
+}
+
+rectangle "**Application**\n(src/core/application/)" as APP #FFF3E0 {
+  rectangle "use_cases/\n(portfolio, analytics, blockchain,\nQuoteHistoryService, etc.)" as UC
+  rectangle "ports/\n(IRealtimeQuoteRepository,\nrepository and service interfaces)" as PORTS
+}
+
+rectangle "**Domain**\n(src/core/domain/)" as DOMAIN #FCE4EC {
+  rectangle "entities/\nvalue_objects/\nevents/\nexceptions/\nservices/" as DOMAIN_IMPL
+}
+
+API -[#2196F3]-> INFRA : runtime wiring
+INFRA -[#4CAF50]-> APP : implements ports
+APP -[#FF9800]-> DOMAIN : depends on
+
+note right of DOMAIN
+  No outer dependencies
+end note
+
+note right of DI
+  Builds services via container.
+  get_realtime_quote_repo
+  accepts Request | WebSocket.
+end note
+
+note right of CRUD
+  register_crud: standard CRUD
+  list, get, create, batch, update, delete
+end note
+
+note bottom of LIFESPAN
+  composition.py creates engine,
+  session_factory, Redis, Kafka
+  (same event loop for async DB)
+end note
+
+@enduml

@@ -3,11 +3,12 @@ from typing import Annotated, Dict, List
 from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect
 
 from src.api.v1.mappers.portfolio_assembler import assemble_portfolio
+from src.api.config import CACHE_TTL_SECONDS, PORTFOLIO_AGGREGATE_KEY_PREFIX
 from src.api.dependencies import get_cache, get_market_data_service, get_portfolio_service, get_quote_history_service
 from src.core.application.use_cases.market_data_service import MarketDataService
 from src.core.application.use_cases.portfolio_service import PortfolioApplicationService
 from src.core.application.use_cases.quote_history_service import QuoteHistoryService
-from src.infrastructure.cache import PORTFOLIO_AGGREGATE_KEY_PREFIX, DEFAULT_TTL, RedisCache
+from src.infrastructure.cache import RedisCache
 
 router = APIRouter()
 
@@ -52,7 +53,7 @@ def register(r: APIRouter) -> None:
             await cache.set(
                 cache_key,
                 response.model_dump(mode="json"),
-                ttl_seconds=DEFAULT_TTL,
+                ttl_seconds=CACHE_TTL_SECONDS,
             )
         return response
 

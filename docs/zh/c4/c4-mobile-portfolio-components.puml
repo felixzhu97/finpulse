@@ -10,7 +10,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
     Component(overview_screen, "仪表板屏幕", "React Native", "组合摘要、原生图表、净资产、资产配置")
     Component(watchlist_screen, "自选屏幕", "React Native", "股票列表（组合）、底部搜索、排序、详情抽屉")
     Component(analytics_screen, "洞察屏幕", "React Native", "风险指标（波动率、夏普比率、VaR、Beta）、根据组合历史计算的 VaR")
-    Component(account_screen, "账户屏幕", "React Native", "个人资料、账户列表、操作（注册客户、新建支付、新建交易、设置）；useFocusEffect 在标签聚焦时加载数据")
+    Component(account_screen, "账户屏幕", "React Native", "个人资料、账户列表、操作；useAccountData 在标签聚焦时加载")
 
     ' Presentation Layer
     Boundary(presentation_layer, "展示层") {
@@ -27,8 +27,10 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(glass_search_bar, "底部搜索栏", "React Native", "GlassView，点击搜索图标打开")
         Component(glass_view, "GlassView", "React Native", "expo-blur，Liquid Glass")
         
-        Component(use_portfolio_hook, "usePortfolio", "Hook", "组合数据获取")
+        Component(use_portfolio_hook, "usePortfolio", "Hook", "组合数据 via useAsyncLoad")
+        Component(use_account_data_hook, "useAccountData", "Hook", "客户、账户、账户资源，聚焦时加载")
         Component(use_symbol_display_hook, "useSymbolDisplayData", "Hook", "Redux 管理的报价和历史")
+        Component(use_refresh_control_hook, "useRefreshControl", "Hook", "下拉刷新模式")
         Component(use_draggable_drawer_hook, "useDraggableDrawer", "Hook", "滑动/拖拽动画")
         Component(use_preferences_hook, "usePreferences", "Hook", "Redux 管理的用户偏好")
         Component(use_theme_hook, "useTheme", "Hook", "当前主题颜色")
@@ -38,13 +40,14 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes、history、subscribedSymbols")
         Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme、language、notifications")
         Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "WebSocket 订阅者")
-        Component(portfolio_store, "组合 Store", "自定义", "当前选中账户 id")
+        Component(redux_portfolio, "Redux portfolio slice", "Redux Toolkit", "selectedAccountId")
         
         Component(theme_system, "主题系统", "TypeScript", "浅色/深色配色；useTheme (useTheme.ts)")
         Component(styled_theme_provider, "StyledThemeProvider", "styled-components/native", "从 useTheme 注入 theme (colors) 到 styled-components")
-        Component(theme_primitives, "主题基元", "styled-components/native", "Card、LabelText、ValueText、HelperText、withTheme")
+        Component(theme_primitives, "主题基元", "styled-components/native", "ScreenRoot、ListRow、CardBordered、LabelText、ValueText、withTheme")
         Component(i18n_config, "i18n 配置", "TypeScript", "i18next 设置、翻译资源")
         Component(use_translation, "useTranslation", "Hook", "翻译 Hook")
+        Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "presentation/utils 周期过滤")
     }
 
     ' Application Layer
@@ -77,7 +80,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(accounts_api, "accountsApi", "TypeScript", "账户 API 客户端")
         
         Component(web3_service, "web3Service", "TypeScript", "Web3 集成")
-        Component(utils, "工具函数", "TypeScript", "formatters、stockUtils、PeriodDataProcessor")
+        Component(utils, "工具函数", "TypeScript", "infrastructure utils")
     }
 
     ' Native Components
@@ -86,7 +89,6 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(base_chart_view, "BaseChartView", "原生基类", "抽象 UIView，包含 Metal")
         Component(base_chart_renderer, "BaseChartRenderer", "原生基类", "抽象 Metal 渲染器")
         Component(native_line_chart, "NativeLineChart", "原生视图", "Metal / OpenGL ES 图表")
-        Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "周期数据过滤")
     }
 }
 
@@ -96,8 +98,9 @@ Container_Ext(portfolio_api, "投资组合分析 API", "REST / WebSocket", "组�
 Rel(use_portfolio_hook, dependency_container, "获取用例", "")
 Rel(use_symbol_display_hook, dependency_container, "获取仓库", "")
 Rel(use_preferences_hook, dependency_container, "获取仓库", "")
-Rel(use_risk_metrics_hook, dependency_container, "获取仓库", "")
-Rel(use_computed_var_hook, dependency_container, "获取仓库", "")
+Rel(use_risk_metrics_hook, dependency_container, "获取用例", "")
+Rel(use_computed_var_hook, dependency_container, "获取用例", "")
+Rel(use_account_data_hook, dependency_container, "获取用例", "")
 
 ' Application to Domain
 Rel(dependency_container, get_portfolio_usecase, "提供", "")
@@ -138,12 +141,15 @@ Rel(tabs_router, analytics_screen, "路由到", "")
 Rel(tabs_router, account_screen, "路由到", "")
 
 Rel(overview_screen, use_portfolio_hook, "使用", "")
+Rel(overview_screen, use_refresh_control_hook, "使用", "")
 Rel(overview_screen, portfolio_summary, "使用", "")
 Rel(overview_screen, asset_allocation_chart, "使用", "")
 Rel(overview_screen, net_worth_chart, "使用", "")
 Rel(overview_screen, native_line_chart, "使用", "")
 
+Rel(watchlist_screen, use_portfolio_hook, "使用", "")
 Rel(watchlist_screen, use_symbol_display_hook, "使用", "")
+Rel(watchlist_screen, use_refresh_control_hook, "使用", "")
 Rel(watchlist_screen, stock_list_item, "使用", "")
 Rel(watchlist_screen, account_list_item, "使用", "")
 Rel(watchlist_screen, stock_detail_drawer, "使用", "")
@@ -151,9 +157,12 @@ Rel(watchlist_screen, sort_menu, "使用", "")
 Rel(watchlist_screen, glass_search_bar, "使用", "")
 
 Rel(analytics_screen, use_risk_metrics_hook, "使用", "")
+Rel(analytics_screen, use_refresh_control_hook, "使用", "")
 Rel(analytics_screen, use_computed_var_hook, "使用", "")
 Rel(analytics_screen, metric_card, "使用", "")
 
+Rel(account_screen, use_account_data_hook, "使用", "")
+Rel(account_screen, use_refresh_control_hook, "使用", "")
 Rel(account_screen, account_drawers, "使用", "")
 Rel(account_screen, use_preferences_hook, "使用", "")
 

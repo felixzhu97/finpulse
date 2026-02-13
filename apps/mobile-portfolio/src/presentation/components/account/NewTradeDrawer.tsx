@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -50,16 +50,16 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
   const { slideAnim, dragOffset, panHandlers, backdropOpacity, closeWithAnimation } =
     useDraggableDrawer({ visible, drawerHeight: DRAWER_HEIGHT, onClose });
 
+  const tradeUseCase = useMemo(() => container.getTradeUseCase(), []);
+
   useEffect(() => {
     if (visible) {
-      const accountsApi = container.getAccountsApi();
-      const instrumentRepository = container.getInstrumentRepository();
-      Promise.all([accountsApi.list(20, 0), instrumentRepository.list(50, 0)]).then(([accs, insts]) => {
-        setAccounts(accs);
+      tradeUseCase.getFormData().then(({ accounts: accs, instruments: insts }) => {
+        setAccounts(accs.map((a) => ({ account_id: a.account_id, account_type: a.account_type, currency: a.currency })));
         setInstruments(insts);
       });
     }
-  }, [visible]);
+  }, [visible, tradeUseCase]);
 
   const handleClose = () => {
     setStep("order");
@@ -79,10 +79,9 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
     setSubmitting(true);
     setError(null);
     try {
-      const orderRepository = container.getOrderRepository();
-      const order = await orderRepository.create({
-        account_id: accountId,
-        instrument_id: instrumentId,
+      const order = await tradeUseCase.createOrder({
+        accountId,
+        instrumentId,
         side,
         quantity: qty,
       });
@@ -108,9 +107,8 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
     setSubmitting(true);
     setError(null);
     try {
-      const tradeRepository = container.getTradeRepository();
-      const trade = await tradeRepository.create({
-        order_id: oid,
+      const trade = await tradeUseCase.executeTrade({
+        orderId: oid,
         quantity: qty,
         price: prc,
       });

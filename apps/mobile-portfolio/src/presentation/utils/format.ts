@@ -22,12 +22,8 @@ export function formatPercent(value: number, decimals = 2): string {
 export function formatSignedPercent(value: number, decimals = 2): string {
   const percent = value * 100;
   const formatted = percent.toFixed(decimals);
-  if (percent > 0) {
-    return `+${formatted}%`;
-  }
-  if (percent < 0) {
-    return `${formatted}%`;
-  }
+  if (percent > 0) return `+${formatted}%`;
+  if (percent < 0) return `${formatted}%`;
   return "0.00%";
 }
 
@@ -42,9 +38,4 @@ export function formatBalance(value: number): string {
     maximumFractionDigits: 0,
     minimumFractionDigits: 0,
   });
-}
-
-export function calculateChangePercent(change: number, base: number): string {
-  if (base === 0) return "0.00";
-  return formatPercent((change / base) * 100);
 }

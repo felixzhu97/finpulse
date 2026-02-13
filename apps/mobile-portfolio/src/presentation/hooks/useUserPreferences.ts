@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { UserPreference } from "../../domain/entities/userPreference";
-import { container } from "../../application/services/DependencyContainer";
+import { container } from "../../application";
 
 export interface UseUserPreferencesResult {
   preference: UserPreference | null;
@@ -21,11 +21,9 @@ export function useUserPreferences(): UseUserPreferencesResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const customerRepository = container.getCustomerRepository();
-  const userPreferenceRepository = container.getUserPreferenceRepository();
-
   const minLoadingMs = 400;
   const maxLoadingMs = 10000;
+  const useCase = useMemo(() => container.getUserPreferenceUseCase(), []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -39,39 +37,18 @@ export function useUserPreferences(): UseUserPreferencesResult {
       setTimeout(() => setLoading(false), remaining);
     };
     try {
-      const customer = await customerRepository.getFirst();
-      if (!customer) {
-        setCustomerId(null);
-        setPreference(null);
-        scheduleDone();
-        return;
-      }
-      setCustomerId(customer.customer_id);
-      const pref = await userPreferenceRepository.getByCustomerId(customer.customer_id);
-      setPreference(pref ?? null);
-      if (!pref && customer) {
-        const { httpClient } = await import("../../infrastructure/api/httpClient");
-        const created = await httpClient.post<UserPreference>("user-preferences", {
-          customer_id: customer.customer_id,
-          theme: null,
-          language: null,
-          notifications_enabled: true,
-        });
-        setPreference(created ?? null);
-      }
+      const { preference: pref, customerId: cid } = await useCase.get();
+      setCustomerId(cid);
+      setPreference(pref);
     } catch {
       setError(true);
     } finally {
       scheduleDone();
     }
-  }, [customerRepository, userPreferenceRepository]);
+  }, [useCase]);
 
   useEffect(() => {
     load();
-  }, [load]);
-
-  const refresh = useCallback(async () => {
-    await load();
   }, [load]);
 
   const updatePreference = useCallback(
@@ -81,10 +58,10 @@ export function useUserPreferences(): UseUserPreferencesResult {
       notificationsEnabled: boolean
     ): Promise<boolean> => {
       if (!customerId) return false;
-      const updated = await userPreferenceRepository.update(customerId, {
+      const updated = await useCase.update(customerId, {
         theme,
         language,
-        notifications_enabled: notificationsEnabled,
+        notificationsEnabled,
       });
       if (updated) {
         setPreference(updated);
@@ -92,7 +69,7 @@ export function useUserPreferences(): UseUserPreferencesResult {
       }
       return false;
     },
-    [customerId, userPreferenceRepository]
+    [customerId, useCase]
   );
 
   return {
@@ -100,7 +77,7 @@ export function useUserPreferences(): UseUserPreferencesResult {
     customerId,
     loading,
     error,
-    refresh,
+    refresh: load,
     updatePreference,
   };
 }

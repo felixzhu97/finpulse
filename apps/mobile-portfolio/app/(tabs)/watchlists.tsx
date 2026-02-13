@@ -7,10 +7,7 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
-  StyleSheet,
-  Text,
   TextInput,
-  View,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,10 +22,68 @@ import { SortMenu, type SortOption } from "@/src/presentation/components/ui/Sort
 import { useSymbolDisplayData } from "@/src/presentation/hooks/useSymbolDisplayData";
 import type { Account, Holding } from "@/src/domain/entities/portfolio";
 import { container } from "@/src/application";
+import { usePortfolio, useRefreshControl } from "@/src/presentation/hooks";
 import { useAppDispatch } from "@/src/presentation/store/useAppStore";
 import { setHistory, setSnapshot } from "@/src/presentation/store/quotesSlice";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
+import {
+  SafeAreaScreen,
+  ScreenHeader,
+  HeaderTitleBlock,
+  ScreenTitle,
+  ScreenDate,
+  HeaderActions,
+  IconButton,
+  ListContainer,
+  CenteredContainer,
+  RetryButton,
+  RetryButtonText,
+  EmptyContainer,
+  EmptyText,
+  EmptySubtext,
+  LoadingWrap,
+} from "@/src/presentation/theme/primitives";
+import styled from "styled-components/native";
+
+const SearchBarContainer = styled(Animated.View)`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-horizontal: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+`;
+
+const SearchBarRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+`;
+
+const SearchBarWrapper = styled.View`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 14px;
+  padding-horizontal: 12px;
+  padding-vertical: 10px;
+  overflow: hidden;
+`;
+
+const SearchCloseBtn = styled.Pressable`
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  overflow: hidden;
+`;
+
+const ClearBtn = styled.Pressable`
+  padding: 4px;
+  margin-left: 8px;
+`;
 
 type ListRow =
   | { type: "stock"; holding: Holding; price: number; change: number }
@@ -67,12 +122,11 @@ function buildListRows(
 
 export default function WatchlistsScreen() {
   const dispatch = useAppDispatch();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const { t, i18n } = useTranslation();
-  const [baseAccounts, setBaseAccounts] = useState<Account[]>([]);
-  const [historyValues, setHistoryValues] = useState<number[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const { portfolio, history, loading, refresh } = usePortfolio();
+  const baseAccounts = portfolio?.accounts ?? [];
+  const historyValues = history.map((h) => h.value);
   const [detailItem, setDetailItem] = useState<StockDetailItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("name");
@@ -164,47 +218,34 @@ export default function WatchlistsScreen() {
     return [...sortedStocks, ...accountRows];
   }, [baseRows, searchQuery, sortBy]);
 
-  const load = useCallback(async () => {
-    const portfolioRepository = container.getPortfolioRepository();
-    const portfolio = await portfolioRepository.getPortfolio();
-    setBaseAccounts(portfolio?.accounts ?? []);
-    setHistoryValues(portfolio?.history.map((h) => h.value) ?? []);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
+  const quotesUseCase = useMemo(() => container.getQuotesUseCase(), []);
   const fetchQuotesAndHistory = useCallback(async () => {
     if (symbols.length === 0) return;
-    const quoteRepository = container.getQuoteRepository();
     const [historyData, snapshot] = await Promise.all([
-      Promise.all(symbols.map(s => quoteRepository.getQuotesHistory(s, 5))).then(results => {
-        const history: Record<string, number[]> = {};
-        symbols.forEach((s, i) => {
-          history[s.toUpperCase()] = results[i];
-        });
-        return history;
-      }),
-      quoteRepository.getQuotes(symbols),
+      Promise.all(symbols.map((s) => quotesUseCase.getHistory(s, 5))).then(
+        (results) => {
+          const history: Record<string, number[]> = {};
+          symbols.forEach((s, i) => {
+            history[s.toUpperCase()] = results[i];
+          });
+          return history;
+        }
+      ),
+      quotesUseCase.execute(symbols),
     ]).catch(() => [{}, {}] as const);
     dispatch(setHistory(historyData ?? {}));
     dispatch(setSnapshot(snapshot ?? {}));
-  }, [symbols.join(","), dispatch]);
+  }, [symbols.join(","), dispatch, quotesUseCase]);
 
   useEffect(() => {
     fetchQuotesAndHistory();
   }, [fetchQuotesAndHistory]);
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    const portfolioRepository = container.getPortfolioRepository();
-    portfolioRepository.invalidateCache();
-    await load();
+  const handleRefresh = useCallback(async () => {
+    await refresh();
     await fetchQuotesAndHistory();
-    setRefreshing(false);
-  }, [load, fetchQuotesAndHistory]);
+  }, [refresh, fetchQuotesAndHistory]);
+  const { refreshing, onRefresh } = useRefreshControl(handleRefresh);
 
   const closeSearchBar = useCallback(() => {
     if (!showSearchBar) return;
@@ -255,54 +296,57 @@ export default function WatchlistsScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
-        <StatusBar style={colors.isDark ? "light" : "dark"} />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color={colors.textSecondary} />
-        </View>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        <SafeAreaScreen>
+          <StatusBar style={isDark ? "light" : "dark"} />
+          <LoadingWrap>
+            <ActivityIndicator size="small" color={colors.textSecondary} />
+          </LoadingWrap>
+        </SafeAreaScreen>
       </SafeAreaView>
     );
   }
 
   if (baseAccounts.length === 0) {
     return (
-      <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
-        <StatusBar style={colors.isDark ? "light" : "dark"} />
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>{t("watchlist.stocks")}</Text>
-        </View>
-        <View style={styles.centered}>
-          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-            {t("watchlist.startBackendFirst")}
-          </Text>
-          <Pressable style={[styles.retryBtn, { backgroundColor: colors.primary }]} onPress={onRefresh}>
-            <Text style={styles.retryText}>{t("common.retry")}</Text>
-          </Pressable>
-        </View>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        <SafeAreaScreen>
+          <StatusBar style={isDark ? "light" : "dark"} />
+          <ScreenHeader>
+            <ScreenTitle>{t("watchlist.stocks")}</ScreenTitle>
+          </ScreenHeader>
+          <CenteredContainer>
+            <EmptyText>{t("watchlist.startBackendFirst")}</EmptyText>
+            <RetryButton onPress={onRefresh}>
+              <RetryButtonText>{t("common.retry")}</RetryButtonText>
+            </RetryButton>
+          </CenteredContainer>
+        </SafeAreaScreen>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]} edges={["top"]}>
-      <StatusBar style={colors.isDark ? "light" : "dark"} />
-      <View style={styles.header}>
-        <View>
-          <Text style={[styles.title, { color: colors.text }]}>{t("watchlist.stocks")}</Text>
-          <Text style={[styles.date, { color: colors.textSecondary }]}>{formatHeaderDate(i18n.language === "zh" ? "zh-CN" : "en-US")}</Text>
-        </View>
-        <View style={styles.headerActions}>
-          <SortMenu
-            currentSort={sortBy}
-            onSelect={setSortBy}
-            onOpen={closeSearchBar}
-          />
-          <Pressable style={styles.iconButton} onPress={handleSearchPress}>
-            <MaterialIcons name="search" size={24} color={colors.text} />
-          </Pressable>
-        </View>
-      </View>
-      <View style={styles.listContainer}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <SafeAreaScreen>
+        <StatusBar style={isDark ? "light" : "dark"} />
+        <ScreenHeader>
+          <HeaderTitleBlock>
+            <ScreenTitle>{t("watchlist.stocks")}</ScreenTitle>
+            <ScreenDate>{formatHeaderDate(i18n.language === "zh" ? "zh-CN" : "en-US")}</ScreenDate>
+          </HeaderTitleBlock>
+          <HeaderActions>
+            <SortMenu
+              currentSort={sortBy}
+              onSelect={setSortBy}
+              onOpen={closeSearchBar}
+            />
+            <IconButton onPress={handleSearchPress}>
+              <MaterialIcons name="search" size={24} color={colors.text} />
+            </IconButton>
+          </HeaderActions>
+        </ScreenHeader>
+        <ListContainer>
         <FlatList
           data={filteredAndSortedRows}
           keyExtractor={(item) =>
@@ -342,45 +386,35 @@ export default function WatchlistsScreen() {
           }
           ListEmptyComponent={
             searchQuery.trim() ? (
-              <View style={styles.emptyContainer}>
-                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t("watchlist.noStocksFound")}</Text>
-                <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
-                  {t("watchlist.tryDifferentSearch")}
-                </Text>
-              </View>
+              <EmptyContainer>
+                <EmptyText>{t("watchlist.noStocksFound")}</EmptyText>
+                <EmptySubtext>{t("watchlist.tryDifferentSearch")}</EmptySubtext>
+              </EmptyContainer>
             ) : null
           }
         />
-      </View>
-      <Animated.View
-        style={[
-          styles.searchBarContainer,
-          {
-            opacity: searchBarAnim,
-            transform: [
-              {
-                translateY: searchBarAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [100, 0],
-                }),
-              },
-            ],
-          },
-        ]}
+        </ListContainer>
+      <SearchBarContainer
+        style={{
+          opacity: searchBarAnim,
+          transform: [
+            {
+              translateY: searchBarAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [100, 0],
+              }),
+            },
+          ],
+        }}
         pointerEvents={showSearchBar ? "auto" : "none"}
       >
-        <GlassView intensity={70} tint="dark" style={styles.searchBarGlass}>
-          <View style={styles.searchBarRow}>
-            <GlassView intensity={50} tint="dark" style={styles.searchBarWrapper}>
-              <MaterialIcons
-                name="search"
-                size={20}
-                color={colors.textSecondary}
-                style={styles.searchIcon}
-              />
+        <GlassView intensity={70} tint="dark" style={{ borderRadius: 20, overflow: "hidden", borderWidth: 1, borderColor: "rgba(255,255,255,0.12)" }}>
+          <SearchBarRow>
+            <GlassView intensity={50} tint="dark" style={{ flex: 1, flexDirection: "row", alignItems: "center", borderRadius: 14, paddingHorizontal: 12, paddingVertical: 10, overflow: "hidden" }}>
+              <MaterialIcons name="search" size={20} color={colors.textSecondary} style={{ marginRight: 8 }} />
               <TextInput
                 ref={searchInputRef}
-                style={[styles.searchInput, { color: colors.text }]}
+                style={{ flex: 1, fontSize: 17, padding: 0, color: colors.text }}
                 placeholder={t("watchlist.searchStocks")}
                 placeholderTextColor={colors.textTertiary}
                 value={searchQuery}
@@ -390,27 +424,19 @@ export default function WatchlistsScreen() {
                 returnKeyType="search"
               />
               {searchQuery.length > 0 && (
-                <Pressable
-                  onPress={() => setSearchQuery("")}
-                  hitSlop={8}
-                  style={styles.clearBtn}
-                >
+                <ClearBtn onPress={() => setSearchQuery("")} hitSlop={8}>
                   <MaterialIcons name="close" size={18} color={colors.textSecondary} />
-                </Pressable>
+                </ClearBtn>
               )}
             </GlassView>
-            <Pressable
-              onPress={handleSearchPress}
-              hitSlop={8}
-              style={styles.searchCloseBtn}
-            >
-              <GlassView intensity={60} tint="dark" style={styles.searchCloseGlass}>
+            <SearchCloseBtn onPress={handleSearchPress} hitSlop={8}>
+              <GlassView intensity={60} tint="dark" style={{ flex: 1, width: "100%", height: "100%", borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
                 <MaterialIcons name="close" size={24} color={colors.text} />
               </GlassView>
-            </Pressable>
-          </View>
+            </SearchCloseBtn>
+          </SearchBarRow>
         </GlassView>
-      </Animated.View>
+      </SearchBarContainer>
       <StockDetailDrawer
         visible={detailItem !== null}
         item={detailItem}
@@ -421,134 +447,7 @@ export default function WatchlistsScreen() {
             : null
         }
       />
+      </SafeAreaScreen>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 12,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    letterSpacing: -0.5,
-  },
-  date: {
-    fontSize: 13,
-    marginTop: 4,
-    fontWeight: "400",
-  },
-  headerActions: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "transparent",
-  },
-  listContainer: {
-    flex: 1,
-  },
-  retryBtn: {
-    marginTop: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 10,
-  },
-  retryText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  emptyContainer: {
-    padding: 40,
-    alignItems: "center",
-  },
-  emptyText: {
-    fontSize: 17,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  emptySubtext: {
-    fontSize: 15,
-  },
-  searchBarContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 8,
-  },
-  searchBarGlass: {
-    borderRadius: 20,
-    overflow: "hidden",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(255,255,255,0.12)",
-  },
-  searchBarRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    padding: 6,
-  },
-  searchBarWrapper: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 14,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    overflow: "hidden",
-  },
-  searchCloseBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  searchCloseGlass: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 17,
-    padding: 0,
-  },
-  clearBtn: {
-    padding: 4,
-    marginLeft: 8,
-  },
-});

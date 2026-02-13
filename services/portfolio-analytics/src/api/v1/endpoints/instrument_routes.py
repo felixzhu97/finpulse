@@ -1,8 +1,8 @@
-from typing import Annotated
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
 
+from src.api.v1.endpoints.crud_helpers import register_crud
 from src.api.v1.schemas import (
     BondCreate,
     BondResponse,
@@ -15,7 +15,7 @@ from src.api.dependencies import get_bond_repo, get_instrument_repo, get_option_
 from src.core.domain.entities.instrument import Bond, Instrument, Option
 
 
-def _instrument_to_response(e: Instrument) -> InstrumentResponse:
+def _instrument_response(e: Instrument) -> InstrumentResponse:
     return InstrumentResponse(
         instrument_id=e.instrument_id,
         symbol=e.symbol,
@@ -26,7 +26,7 @@ def _instrument_to_response(e: Instrument) -> InstrumentResponse:
     )
 
 
-def _bond_to_response(e: Bond) -> BondResponse:
+def _bond_response(e: Bond) -> BondResponse:
     return BondResponse(
         bond_id=e.bond_id,
         instrument_id=e.instrument_id,
@@ -40,7 +40,7 @@ def _bond_to_response(e: Bond) -> BondResponse:
     )
 
 
-def _option_to_response(e: Option) -> OptionResponse:
+def _option_response(e: Option) -> OptionResponse:
     return OptionResponse(
         option_id=e.option_id,
         instrument_id=e.instrument_id,
@@ -61,274 +61,27 @@ def _option_to_response(e: Option) -> OptionResponse:
 
 
 def register(router: APIRouter) -> None:
-    @router.get("/instruments", response_model=list[InstrumentResponse])
-    async def list_instruments(
-        limit: int = 100,
-        offset: int = 0,
-        repo: Annotated[object, Depends(get_instrument_repo)] = None,
-    ):
-        return [_instrument_to_response(e) for e in await repo.list(limit=limit, offset=offset)]
-
-    @router.get("/instruments/{instrument_id}", response_model=InstrumentResponse)
-    async def get_instrument(
-        instrument_id: UUID,
-        repo: Annotated[object, Depends(get_instrument_repo)] = None,
-    ):
-        entity = await repo.get_by_id(instrument_id)
-        if not entity:
-            raise HTTPException(status_code=404, detail="Instrument not found")
-        return _instrument_to_response(entity)
-
-    @router.post("/instruments", response_model=InstrumentResponse, status_code=201)
-    async def create_instrument(
-        body: InstrumentCreate,
-        repo: Annotated[object, Depends(get_instrument_repo)] = None,
-    ):
-        entity = Instrument(
-            instrument_id=uuid4(),
-            symbol=body.symbol,
-            name=body.name,
-            asset_class=body.asset_class,
-            currency=body.currency,
-            exchange=body.exchange,
-        )
-        created = await repo.add(entity)
-        return _instrument_to_response(created)
-
-    @router.post("/instruments/batch", response_model=list[InstrumentResponse], status_code=201)
-    async def create_instruments_batch(
-        body: list[InstrumentCreate],
-        repo: Annotated[object, Depends(get_instrument_repo)] = None,
-    ):
-        entities = [
-            Instrument(instrument_id=uuid4(), symbol=item.symbol, name=item.name, asset_class=item.asset_class, currency=item.currency, exchange=item.exchange)
-            for item in body
-        ]
-        created = await repo.add_many(entities)
-        return [_instrument_to_response(e) for e in created]
-
-    @router.put("/instruments/{instrument_id}", response_model=InstrumentResponse)
-    async def update_instrument(
-        instrument_id: UUID,
-        body: InstrumentCreate,
-        repo: Annotated[object, Depends(get_instrument_repo)] = None,
-    ):
-        entity = Instrument(
-            instrument_id=instrument_id,
-            symbol=body.symbol,
-            name=body.name,
-            asset_class=body.asset_class,
-            currency=body.currency,
-            exchange=body.exchange,
-        )
-        updated = await repo.save(entity)
-        if not updated:
-            raise HTTPException(status_code=404, detail="Instrument not found")
-        return _instrument_to_response(updated)
-
-    @router.delete("/instruments/{instrument_id}", status_code=204)
-    async def delete_instrument(
-        instrument_id: UUID,
-        repo: Annotated[object, Depends(get_instrument_repo)] = None,
-    ):
-        ok = await repo.remove(instrument_id)
-        if not ok:
-            raise HTTPException(status_code=404, detail="Instrument not found")
-
-    @router.get("/bonds", response_model=list[BondResponse])
-    async def list_bonds(
-        limit: int = 100,
-        offset: int = 0,
-        repo: Annotated[object, Depends(get_bond_repo)] = None,
-    ):
-        return [_bond_to_response(e) for e in await repo.list(limit=limit, offset=offset)]
-
-    @router.get("/bonds/{bond_id}", response_model=BondResponse)
-    async def get_bond(
-        bond_id: UUID,
-        repo: Annotated[object, Depends(get_bond_repo)] = None,
-    ):
-        entity = await repo.get_by_id(bond_id)
-        if not entity:
-            raise HTTPException(status_code=404, detail="Bond not found")
-        return _bond_to_response(entity)
-
-    @router.post("/bonds", response_model=BondResponse, status_code=201)
-    async def create_bond(
-        body: BondCreate,
-        repo: Annotated[object, Depends(get_bond_repo)] = None,
-    ):
-        entity = Bond(
-            bond_id=uuid4(),
-            instrument_id=body.instrument_id,
-            face_value=body.face_value,
-            coupon_rate=body.coupon_rate,
-            ytm=body.ytm,
-            duration=body.duration,
-            convexity=body.convexity,
-            maturity_years=body.maturity_years,
-            frequency=body.frequency,
-        )
-        created = await repo.add(entity)
-        return _bond_to_response(created)
-
-    @router.post("/bonds/batch", response_model=list[BondResponse], status_code=201)
-    async def create_bonds_batch(
-        body: list[BondCreate],
-        repo: Annotated[object, Depends(get_bond_repo)] = None,
-    ):
-        entities = [
-            Bond(
-                bond_id=uuid4(),
-                instrument_id=item.instrument_id,
-                face_value=item.face_value,
-                coupon_rate=item.coupon_rate,
-                ytm=item.ytm,
-                duration=item.duration,
-                convexity=item.convexity,
-                maturity_years=item.maturity_years,
-                frequency=item.frequency,
-            )
-            for item in body
-        ]
-        created = await repo.add_many(entities)
-        return [_bond_to_response(e) for e in created]
-
-    @router.put("/bonds/{bond_id}", response_model=BondResponse)
-    async def update_bond(
-        bond_id: UUID,
-        body: BondCreate,
-        repo: Annotated[object, Depends(get_bond_repo)] = None,
-    ):
-        entity = Bond(
-            bond_id=bond_id,
-            instrument_id=body.instrument_id,
-            face_value=body.face_value,
-            coupon_rate=body.coupon_rate,
-            ytm=body.ytm,
-            duration=body.duration,
-            convexity=body.convexity,
-            maturity_years=body.maturity_years,
-            frequency=body.frequency,
-        )
-        updated = await repo.save(entity)
-        if not updated:
-            raise HTTPException(status_code=404, detail="Bond not found")
-        return _bond_to_response(updated)
-
-    @router.delete("/bonds/{bond_id}", status_code=204)
-    async def delete_bond(
-        bond_id: UUID,
-        repo: Annotated[object, Depends(get_bond_repo)] = None,
-    ):
-        ok = await repo.remove(bond_id)
-        if not ok:
-            raise HTTPException(status_code=404, detail="Bond not found")
-
-    @router.get("/options", response_model=list[OptionResponse])
-    async def list_options(
-        limit: int = 100,
-        offset: int = 0,
-        repo: Annotated[object, Depends(get_option_repo)] = None,
-    ):
-        return [_option_to_response(e) for e in await repo.list(limit=limit, offset=offset)]
-
-    @router.get("/options/{option_id}", response_model=OptionResponse)
-    async def get_option(
-        option_id: UUID,
-        repo: Annotated[object, Depends(get_option_repo)] = None,
-    ):
-        entity = await repo.get_by_id(option_id)
-        if not entity:
-            raise HTTPException(status_code=404, detail="Option not found")
-        return _option_to_response(entity)
-
-    @router.post("/options", response_model=OptionResponse, status_code=201)
-    async def create_option(
-        body: OptionCreate,
-        repo: Annotated[object, Depends(get_option_repo)] = None,
-    ):
-        entity = Option(
-            option_id=uuid4(),
-            instrument_id=body.instrument_id,
-            underlying_instrument_id=body.underlying_instrument_id,
-            strike=body.strike,
-            expiry=body.expiry,
-            option_type=body.option_type,
-            risk_free_rate=body.risk_free_rate,
-            volatility=body.volatility,
-            bs_price=body.bs_price,
-            delta=body.delta,
-            gamma=body.gamma,
-            theta=body.theta,
-            vega=body.vega,
-            rho=body.rho,
-            implied_volatility=body.implied_volatility,
-        )
-        created = await repo.add(entity)
-        return _option_to_response(created)
-
-    @router.post("/options/batch", response_model=list[OptionResponse], status_code=201)
-    async def create_options_batch(
-        body: list[OptionCreate],
-        repo: Annotated[object, Depends(get_option_repo)] = None,
-    ):
-        entities = [
-            Option(
-                option_id=uuid4(),
-                instrument_id=item.instrument_id,
-                underlying_instrument_id=item.underlying_instrument_id,
-                strike=item.strike,
-                expiry=item.expiry,
-                option_type=item.option_type,
-                risk_free_rate=item.risk_free_rate,
-                volatility=item.volatility,
-                bs_price=item.bs_price,
-                delta=item.delta,
-                gamma=item.gamma,
-                theta=item.theta,
-                vega=item.vega,
-                rho=item.rho,
-                implied_volatility=item.implied_volatility,
-            )
-            for item in body
-        ]
-        created = await repo.add_many(entities)
-        return [_option_to_response(e) for e in created]
-
-    @router.put("/options/{option_id}", response_model=OptionResponse)
-    async def update_option(
-        option_id: UUID,
-        body: OptionCreate,
-        repo: Annotated[object, Depends(get_option_repo)] = None,
-    ):
-        entity = Option(
-            option_id=option_id,
-            instrument_id=body.instrument_id,
-            underlying_instrument_id=body.underlying_instrument_id,
-            strike=body.strike,
-            expiry=body.expiry,
-            option_type=body.option_type,
-            risk_free_rate=body.risk_free_rate,
-            volatility=body.volatility,
-            bs_price=body.bs_price,
-            delta=body.delta,
-            gamma=body.gamma,
-            theta=body.theta,
-            vega=body.vega,
-            rho=body.rho,
-            implied_volatility=body.implied_volatility,
-        )
-        updated = await repo.save(entity)
-        if not updated:
-            raise HTTPException(status_code=404, detail="Option not found")
-        return _option_to_response(updated)
-
-    @router.delete("/options/{option_id}", status_code=204)
-    async def delete_option(
-        option_id: UUID,
-        repo: Annotated[object, Depends(get_option_repo)] = None,
-    ):
-        ok = await repo.remove(option_id)
-        if not ok:
-            raise HTTPException(status_code=404, detail="Option not found")
+    register_crud(
+        router, "instruments", "instrument_id",
+        InstrumentCreate, InstrumentResponse, get_instrument_repo,
+        _instrument_response,
+        lambda b: Instrument(instrument_id=uuid4(), symbol=b.symbol, name=b.name, asset_class=b.asset_class, currency=b.currency, exchange=b.exchange),
+        lambda pk, b, _: Instrument(instrument_id=pk, symbol=b.symbol, name=b.name, asset_class=b.asset_class, currency=b.currency, exchange=b.exchange),
+        "Instrument not found",
+    )
+    register_crud(
+        router, "bonds", "bond_id",
+        BondCreate, BondResponse, get_bond_repo,
+        _bond_response,
+        lambda b: Bond(bond_id=uuid4(), instrument_id=b.instrument_id, face_value=b.face_value, coupon_rate=b.coupon_rate, ytm=b.ytm, duration=b.duration, convexity=b.convexity, maturity_years=b.maturity_years, frequency=b.frequency),
+        lambda pk, b, _: Bond(bond_id=pk, instrument_id=b.instrument_id, face_value=b.face_value, coupon_rate=b.coupon_rate, ytm=b.ytm, duration=b.duration, convexity=b.convexity, maturity_years=b.maturity_years, frequency=b.frequency),
+        "Bond not found",
+    )
+    register_crud(
+        router, "options", "option_id",
+        OptionCreate, OptionResponse, get_option_repo,
+        _option_response,
+        lambda b: Option(option_id=uuid4(), instrument_id=b.instrument_id, underlying_instrument_id=b.underlying_instrument_id, strike=b.strike, expiry=b.expiry, option_type=b.option_type, risk_free_rate=b.risk_free_rate, volatility=b.volatility, bs_price=b.bs_price, delta=b.delta, gamma=b.gamma, theta=b.theta, vega=b.vega, rho=b.rho, implied_volatility=b.implied_volatility),
+        lambda pk, b, _: Option(option_id=pk, instrument_id=b.instrument_id, underlying_instrument_id=b.underlying_instrument_id, strike=b.strike, expiry=b.expiry, option_type=b.option_type, risk_free_rate=b.risk_free_rate, volatility=b.volatility, bs_price=b.bs_price, delta=b.delta, gamma=b.gamma, theta=b.theta, vega=b.vega, rho=b.rho, implied_volatility=b.implied_volatility),
+        "Option not found",
+    )

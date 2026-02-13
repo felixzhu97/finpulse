@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -183,6 +183,7 @@ export function RegisterCustomerDrawer({ visible, onClose, onSuccess }: Register
 
   const { slideAnim, dragOffset, panHandlers, backdropOpacity, closeWithAnimation } =
     useDraggableDrawer({ visible, drawerHeight: DRAWER_HEIGHT, onClose });
+  const useCase = useMemo(() => container.getRegisterCustomerUseCase(), []);
 
   const handleClose = () => {
     setName("");
@@ -198,8 +199,7 @@ export function RegisterCustomerDrawer({ visible, onClose, onSuccess }: Register
     setSubmitting(true);
     setError(null);
     try {
-      const customerRepository = container.getCustomerRepository();
-      const created = await customerRepository.create({
+      const created = await useCase.execute({
         name: trimmed,
         email: email.trim() || undefined,
       });

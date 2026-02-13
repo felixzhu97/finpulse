@@ -1,0 +1,3 @@
+PORTFOLIO_AGGREGATE_KEY_PREFIX = "portfolio:aggregate:"
+BLOCKCHAIN_KEY_PREFIX = "blockchain:"
+CACHE_TTL_SECONDS = 300

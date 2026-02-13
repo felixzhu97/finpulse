@@ -79,7 +79,7 @@ plantuml -tsvg *.puml
 
 ## 最近更新
 
-- **Styled Components（移动端投资组合）**：主题 UI 使用 styled-components/native；StyledThemeProvider 从 useTheme（useTheme.ts，避免 require 循环）注入 theme；基元（Card、LabelText、ValueText、HelperText、withTheme）；MetricCard、RegisterCustomerDrawer 等使用 styled 组件。
+- **Redux + styled-components（移动端投资组合）**：Portfolio 状态迁至 Redux（portfolio slice）；主屏与列表组件统一使用 styled-components 基元（ScreenRoot、ListRow、CardBordered、SafeAreaScreen 等）实现主题 UI。
+- **整洁架构（移动端投资组合）**：Presentation → Application → Domain；Infrastructure 仅由 DependencyContainer 注入。共享 hooks：**useAsyncLoad**、**runWithLoading**、**useRefreshControl**、**useAccountData**。
 - **OOP 架构**：原生图表代码重构，使用抽象基类（`BaseChartViewManager`、`BaseChartView`、`BaseChartRenderer`）和辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartDataCalculator）。共享工具：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes。
-- **代码简化**：通过继承和抽象移除未使用代码，简化逻辑，提升可维护性
-- **图表布局**：全宽渲染，优化布局计算
+- **代码简化**：移除未使用代码（usePerSymbolHistory、重复 PeriodDataProcessor），简化逻辑，提升可维护性

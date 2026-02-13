@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -45,16 +45,17 @@ export function NewPaymentDrawer({ visible, onClose, onSuccess }: NewPaymentDraw
   const { slideAnim, dragOffset, panHandlers, backdropOpacity, closeWithAnimation } =
     useDraggableDrawer({ visible, drawerHeight: DRAWER_HEIGHT, onClose });
 
+  const paymentUseCase = useMemo(() => container.getPaymentUseCase(), []);
+
   useEffect(() => {
     if (visible) {
       setLoadingAccounts(true);
-      const accountsApi = container.getAccountsApi();
-      accountsApi
-        .list(20, 0)
+      paymentUseCase
+        .getFormData()
         .then(setAccounts)
         .finally(() => setLoadingAccounts(false));
     }
-  }, [visible]);
+  }, [visible, paymentUseCase]);
 
   const handleClose = () => {
     setAccountId("");
@@ -71,9 +72,8 @@ export function NewPaymentDrawer({ visible, onClose, onSuccess }: NewPaymentDraw
     setSubmitting(true);
     setError(null);
     try {
-      const paymentRepository = container.getPaymentRepository();
-      const created = await paymentRepository.create({
-        account_id: accountId,
+      const created = await paymentUseCase.create({
+        accountId,
         amount: parsedAmount,
         currency: "USD",
         counterparty: counterparty.trim() || undefined,

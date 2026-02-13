@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { web3Service } from "../../infrastructure/services/web3Service";
+import { container } from "../../application";
 import type { WalletInfo, Web3Config } from "../../domain/entities/blockchain";
+import { runWithLoading } from "./runWithLoading";
 
 const DEFAULT_CONFIG: Web3Config = {
   rpcUrl: "https://eth.llamarpc.com",
@@ -14,61 +15,53 @@ export function useWeb3(config?: Web3Config) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const service = container.getWeb3Service();
     const web3Config = config ?? DEFAULT_CONFIG;
-    if (!web3Service.isInitialized()) {
-      web3Service.initialize(web3Config);
+    if (!service.isInitialized()) {
+      service.initialize(web3Config);
     }
-    setWalletInfo(web3Service.getWalletInfo());
+    setWalletInfo(service.getWalletInfo());
   }, [config]);
 
-  const connect = useCallback(
-    async (privateKey?: string) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const info = await web3Service.connectWallet(privateKey);
-        setWalletInfo(info);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to connect wallet";
-        setError(message);
-      } finally {
-        setLoading(false);
-      }
-    },
+  const run = useCallback(
+    <T>(fn: () => Promise<T>, fallback: T, msg: string) =>
+      runWithLoading(setLoading, setError, fn, fallback, msg),
     []
   );
 
+  const connect = useCallback(
+    async (privateKey?: string) => {
+      const info = await run(
+        () => container.getWeb3Service().connectWallet(privateKey),
+        null,
+        "Failed to connect wallet"
+      );
+      if (info) setWalletInfo(info);
+    },
+    [run]
+  );
+
   const disconnect = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      await web3Service.disconnect();
-      setWalletInfo(null);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to disconnect wallet";
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    const ok = await run(
+      async () => {
+        await container.getWeb3Service().disconnect();
+        return true;
+      },
+      false,
+      "Failed to disconnect wallet"
+    );
+    if (ok) setWalletInfo(null);
+  }, [run]);
 
   const refreshBalance = useCallback(async () => {
     if (!walletInfo?.address) return;
-
-    setLoading(true);
-    setError(null);
-    try {
-      const balance = await web3Service.getBalance(walletInfo.address);
-      setWalletInfo((prev) =>
-        prev ? { ...prev, balance } : null
-      );
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to refresh balance";
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, [walletInfo?.address]);
+    const balance = await run(
+      () => container.getWeb3Service().getBalance(walletInfo.address),
+      null,
+      "Failed to refresh balance"
+    );
+    if (balance != null) setWalletInfo((prev) => (prev ? { ...prev, balance } : null));
+  }, [run, walletInfo?.address]);
 
   return {
     walletInfo,
@@ -77,6 +70,6 @@ export function useWeb3(config?: Web3Config) {
     connect,
     disconnect,
     refreshBalance,
-    isConnected: web3Service.isConnected(),
+    isConnected: container.getWeb3Service().isConnected(),
   };
 }

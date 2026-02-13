@@ -1,3 +1,4 @@
+export * from "./AccountRepository";
 export * from "./PortfolioRepository";
 export * from "./QuoteRepository";
 export * from "./CustomerRepository";

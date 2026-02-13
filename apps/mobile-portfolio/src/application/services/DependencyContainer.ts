@@ -1,6 +1,14 @@
+import type { IQuoteStreamService } from "../../domain/services/IQuoteStreamService";
 import { GetPortfolioUseCase } from "../usecases/GetPortfolioUseCase";
-import { GetCustomerUseCase } from "../usecases/GetCustomerUseCase";
 import { GetQuotesUseCase } from "../usecases/GetQuotesUseCase";
+import { RiskMetricsUseCase } from "../usecases/RiskMetricsUseCase";
+import { TradeUseCase } from "../usecases/TradeUseCase";
+import { WatchlistUseCase } from "../usecases/WatchlistUseCase";
+import { UserPreferenceUseCase } from "../usecases/UserPreferenceUseCase";
+import { GetAccountDataUseCase } from "../usecases/GetAccountDataUseCase";
+import { RegisterCustomerUseCase } from "../usecases/RegisterCustomerUseCase";
+import { PaymentUseCase } from "../usecases/PaymentUseCase";
+import { BlockchainUseCase } from "../usecases/BlockchainUseCase";
 import { PortfolioRepository } from "../../infrastructure/repositories/PortfolioRepository";
 import { QuoteRepository } from "../../infrastructure/repositories/QuoteRepository";
 import { CustomerRepository } from "../../infrastructure/repositories/CustomerRepository";
@@ -12,6 +20,9 @@ import { PaymentRepository } from "../../infrastructure/repositories/PaymentRepo
 import { TradeRepository } from "../../infrastructure/repositories/TradeRepository";
 import { OrderRepository } from "../../infrastructure/repositories/OrderRepository";
 import { BlockchainRepository } from "../../infrastructure/repositories/BlockchainRepository";
+import { AccountRepository } from "../../infrastructure/repositories/AccountRepository";
+import { QuoteStreamService } from "../../infrastructure/services/QuoteStreamService";
+import { web3Service } from "../../infrastructure/services/web3Service";
 
 class DependencyContainer {
   private portfolioRepository = new PortfolioRepository();
@@ -25,66 +36,74 @@ class DependencyContainer {
   private tradeRepository = new TradeRepository();
   private orderRepository = new OrderRepository();
   private blockchainRepository = new BlockchainRepository();
+  private accountRepository = new AccountRepository();
+  private quoteStreamService = new QuoteStreamService();
 
   getPortfolioUseCase(): GetPortfolioUseCase {
     return new GetPortfolioUseCase(this.portfolioRepository);
-  }
-
-  getCustomerUseCase(): GetCustomerUseCase {
-    return new GetCustomerUseCase(this.customerRepository);
   }
 
   getQuotesUseCase(): GetQuotesUseCase {
     return new GetQuotesUseCase(this.quoteRepository);
   }
 
-  getQuoteRepository(): QuoteRepository {
-    return this.quoteRepository;
+  getRiskMetricsUseCase(): RiskMetricsUseCase {
+    return new RiskMetricsUseCase(
+      this.portfolioRepository,
+      this.riskMetricsRepository
+    );
   }
 
-  getPortfolioRepository(): PortfolioRepository {
-    return this.portfolioRepository;
+  getWatchlistUseCase(): WatchlistUseCase {
+    return new WatchlistUseCase(
+      this.customerRepository,
+      this.watchlistRepository,
+      this.instrumentRepository
+    );
   }
 
-  getCustomerRepository(): CustomerRepository {
-    return this.customerRepository;
+  getUserPreferenceUseCase(): UserPreferenceUseCase {
+    return new UserPreferenceUseCase(
+      this.customerRepository,
+      this.userPreferenceRepository
+    );
   }
 
-  getUserPreferenceRepository(): UserPreferenceRepository {
-    return this.userPreferenceRepository;
+  getAccountDataUseCase(): GetAccountDataUseCase {
+    return new GetAccountDataUseCase(
+      this.customerRepository,
+      this.portfolioRepository,
+      this.accountRepository
+    );
   }
 
-  getWatchlistRepository(): WatchlistRepository {
-    return this.watchlistRepository;
+  getRegisterCustomerUseCase(): RegisterCustomerUseCase {
+    return new RegisterCustomerUseCase(this.customerRepository);
   }
 
-  getInstrumentRepository(): InstrumentRepository {
-    return this.instrumentRepository;
+  getPaymentUseCase(): PaymentUseCase {
+    return new PaymentUseCase(this.accountRepository, this.paymentRepository);
   }
 
-  getRiskMetricsRepository(): RiskMetricsRepository {
-    return this.riskMetricsRepository;
+  getTradeUseCase(): TradeUseCase {
+    return new TradeUseCase(
+      this.accountRepository,
+      this.instrumentRepository,
+      this.orderRepository,
+      this.tradeRepository
+    );
   }
 
-  getPaymentRepository(): PaymentRepository {
-    return this.paymentRepository;
+  getBlockchainUseCase(): BlockchainUseCase {
+    return new BlockchainUseCase(this.blockchainRepository);
   }
 
-  getTradeRepository(): TradeRepository {
-    return this.tradeRepository;
+  getQuoteStreamService(): IQuoteStreamService {
+    return this.quoteStreamService;
   }
 
-  getOrderRepository(): OrderRepository {
-    return this.orderRepository;
-  }
-
-  getBlockchainRepository(): BlockchainRepository {
-    return this.blockchainRepository;
-  }
-
-  getAccountsApi() {
-    const { accountsApi } = require("../../infrastructure/api/accountsApi");
-    return accountsApi;
+  getWeb3Service() {
+    return web3Service;
   }
 }
 

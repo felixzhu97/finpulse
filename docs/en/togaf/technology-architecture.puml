@@ -145,12 +145,13 @@ package "Portfolio Analytics Backend" <<Infra>> {
     }
     note right of FastAPI
         services/portfolio-analytics
+        Clean Architecture: composition.py, container, crud_helpers, api/config
         GET/POST /api/v1/portfolio, seed
         GET /api/v1/quotes, WebSocket /ws/quotes
         AI in: payments (fraud), trades (surveillance),
         customers (identity), risk-metrics (VaR)
         MinIO, ClickHouse, Airflow, MLflow, Faust (batch/stream)
-        DDD, python-dotenv (.env), port 8800
+        python-dotenv (.env), port 8800
     end note
     note right of TimescaleDB: Portfolio metadata (JSONB)\nportfolio_history hypertable\nhost port 5433
     note right of Redis: Server-side cache\n(history, portfolio aggregate, blockchain reads)\nport 6379, TTL 300s

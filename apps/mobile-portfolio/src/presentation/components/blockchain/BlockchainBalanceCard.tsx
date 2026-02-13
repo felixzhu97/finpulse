@@ -1,11 +1,59 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import { ActivityIndicator } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useBlockchain } from "@/src/presentation/hooks/useBlockchain";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
-import { formatBalance } from "@/src/infrastructure/utils";
+import { formatBalance } from "@/src/presentation/utils";
 import type { BlockchainBalance } from "@/src/domain/entities/blockchain";
+import {
+  CardBordered,
+  RowTitle,
+  RowSubtitle,
+} from "@/src/presentation/theme/primitives";
+import styled from "styled-components/native";
+
+const Header = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 16px;
+`;
+
+const IconContainer = styled.View`
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  background-color: ${(p) => p.theme.colors.surface};
+`;
+
+const HeaderText = styled.View`
+  flex: 1;
+`;
+
+const BalanceContainer = styled.View`
+  padding-top: 4px;
+`;
+
+const BalanceText = styled.Text`
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  color: ${(p) => p.theme.colors.text};
+`;
+
+const NoBalanceText = styled.Text<{ error?: boolean }>`
+  font-size: 15px;
+  letter-spacing: -0.2px;
+  color: ${(p) => (p.error ? p.theme.colors.error : p.theme.colors.textSecondary)};
+`;
+
+const LoadingContainer = styled.View`
+  padding-vertical: 20px;
+  align-items: center;
+`;
 
 interface BlockchainBalanceCardProps {
   accountId: string;
@@ -35,92 +83,35 @@ export function BlockchainBalanceCard({
   };
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <View style={styles.header}>
-        <View style={[styles.iconContainer, { backgroundColor: colors.surface }]}>
+    <CardBordered style={{ marginBottom: 12 }}>
+      <Header>
+        <IconContainer>
           <MaterialIcons name="account-balance-wallet" size={20} color={colors.text} />
-        </View>
-        <View style={styles.headerText}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            {t("blockchain.blockchainBalance")}
-          </Text>
-          <Text style={[styles.currency, { color: colors.textSecondary }]}>{currency}</Text>
-        </View>
-      </View>
+        </IconContainer>
+        <HeaderText>
+          <RowTitle>{t("blockchain.blockchainBalance")}</RowTitle>
+          <RowSubtitle>{currency}</RowSubtitle>
+        </HeaderText>
+      </Header>
       {loading ? (
-        <View style={styles.loadingContainer}>
+        <LoadingContainer>
           <ActivityIndicator size="small" color={colors.textSecondary} />
-        </View>
+        </LoadingContainer>
       ) : error ? (
-        <View style={styles.balanceContainer}>
-          <Text style={[styles.noBalance, { color: colors.error }]}>
+        <BalanceContainer>
+          <NoBalanceText error>
             {t("blockchain.error")}: {error}
-          </Text>
-        </View>
+          </NoBalanceText>
+        </BalanceContainer>
       ) : balance ? (
-        <View style={styles.balanceContainer}>
-          <Text style={[styles.balance, { color: colors.text }]}>
-            {formatBalance(balance.balance)}
-          </Text>
-        </View>
+        <BalanceContainer>
+          <BalanceText>{formatBalance(balance.balance)}</BalanceText>
+        </BalanceContainer>
       ) : (
-        <View style={styles.balanceContainer}>
-          <Text style={[styles.noBalance, { color: colors.textSecondary }]}>
-            {t("blockchain.noBalance")}
-          </Text>
-        </View>
+        <BalanceContainer>
+          <NoBalanceText>{t("blockchain.noBalance")}</NoBalanceText>
+        </BalanceContainer>
       )}
-    </View>
+    </CardBordered>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: StyleSheet.hairlineWidth,
-    marginBottom: 12,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  headerText: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 15,
-    fontWeight: "600",
-    marginBottom: 2,
-    letterSpacing: -0.2,
-  },
-  currency: {
-    fontSize: 13,
-    letterSpacing: -0.1,
-  },
-  balanceContainer: {
-    paddingTop: 4,
-  },
-  balance: {
-    fontSize: 32,
-    fontWeight: "700",
-    letterSpacing: -0.8,
-  },
-  noBalance: {
-    fontSize: 15,
-    letterSpacing: -0.2,
-  },
-  loadingContainer: {
-    paddingVertical: 20,
-    alignItems: "center",
-  },
-});

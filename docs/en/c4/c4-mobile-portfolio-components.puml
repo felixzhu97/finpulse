@@ -10,7 +10,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(overview_screen, "Dashboard Screen", "React Native", "Portfolio summary, native charts, net worth, allocation")
     Component(watchlist_screen, "Watchlist Screen", "React Native", "Stocks list (portfolio), search (bottom), sort, detail drawer")
     Component(analytics_screen, "Insights Screen", "React Native", "Risk metrics (volatility, Sharpe, VaR, beta), computed VaR from portfolio history")
-    Component(account_screen, "Account Screen", "React Native", "Profile, account list, Actions (Register, New Payment, New Trade, Settings); useFocusEffect loads data on tab focus")
+    Component(account_screen, "Account Screen", "React Native", "Profile, account list, Actions; useAccountData loads on tab focus via useFocusEffect")
 
     ' Presentation Layer
     Boundary(presentation_layer, "Presentation Layer") {
@@ -27,8 +27,10 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(glass_search_bar, "Bottom search bar", "React Native", "GlassView, opens on search icon")
         Component(glass_view, "GlassView", "React Native", "expo-blur, Liquid Glass")
         
-        Component(use_portfolio_hook, "usePortfolio", "Hook", "Portfolio data fetching")
+        Component(use_portfolio_hook, "usePortfolio", "Hook", "Portfolio data via useAsyncLoad")
+        Component(use_account_data_hook, "useAccountData", "Hook", "Customer, accounts, accountResources on focus")
         Component(use_symbol_display_hook, "useSymbolDisplayData", "Hook", "Redux-backed quotes + history")
+        Component(use_refresh_control_hook, "useRefreshControl", "Hook", "Pull-to-refresh pattern")
         Component(use_draggable_drawer_hook, "useDraggableDrawer", "Hook", "Slide/drag animation")
         Component(use_preferences_hook, "usePreferences", "Hook", "Redux-backed user preferences")
         Component(use_theme_hook, "useTheme", "Hook", "Current theme colors")
@@ -38,13 +40,14 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes, history, subscribedSymbols")
         Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme, language, notifications")
         Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "WebSocket subscriber")
-        Component(portfolio_store, "Portfolio Store", "Custom", "Selected account id")
+        Component(redux_portfolio, "Redux portfolio slice", "Redux Toolkit", "selectedAccountId")
         
         Component(theme_system, "Theme System", "TypeScript", "Light/dark colors; useTheme (useTheme.ts)")
         Component(styled_theme_provider, "StyledThemeProvider", "styled-components/native", "Injects theme (colors) from useTheme into styled-components")
-        Component(theme_primitives, "Theme Primitives", "styled-components/native", "Card, LabelText, ValueText, HelperText, withTheme")
+        Component(theme_primitives, "Theme Primitives", "styled-components/native", "ScreenRoot, ListRow, CardBordered, LabelText, ValueText, withTheme")
         Component(i18n_config, "i18n Config", "TypeScript", "i18next setup, translations")
         Component(use_translation, "useTranslation", "Hook", "Translation hook")
+        Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "presentation/utils: period filtering")
     }
 
     ' Application Layer
@@ -77,7 +80,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(accounts_api, "accountsApi", "TypeScript", "Accounts API client")
         
         Component(web3_service, "web3Service", "TypeScript", "Web3 integration")
-        Component(utils, "Utils", "TypeScript", "formatters, stockUtils, PeriodDataProcessor")
+        Component(utils, "Utils", "TypeScript", "infrastructure utils")
     }
 
     ' Native Components
@@ -86,7 +89,6 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(base_chart_view, "BaseChartView", "Native Base Class", "Abstract UIView with Metal")
         Component(base_chart_renderer, "BaseChartRenderer", "Native Base Class", "Abstract Metal renderer")
         Component(native_line_chart, "NativeLineChart", "Native View", "Metal / OpenGL ES chart")
-        Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "Period data filtering")
     }
 }
 
@@ -96,8 +98,9 @@ Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Por
 Rel(use_portfolio_hook, dependency_container, "Gets use case", "")
 Rel(use_symbol_display_hook, dependency_container, "Gets repository", "")
 Rel(use_preferences_hook, dependency_container, "Gets repository", "")
-Rel(use_risk_metrics_hook, dependency_container, "Gets repository", "")
-Rel(use_computed_var_hook, dependency_container, "Gets repository", "")
+Rel(use_risk_metrics_hook, dependency_container, "Gets use case", "")
+Rel(use_computed_var_hook, dependency_container, "Gets use case", "")
+Rel(use_account_data_hook, dependency_container, "Gets use case", "")
 
 ' Application to Domain
 Rel(dependency_container, get_portfolio_usecase, "Provides", "")
@@ -138,12 +141,15 @@ Rel(tabs_router, analytics_screen, "Routes to", "")
 Rel(tabs_router, account_screen, "Routes to", "")
 
 Rel(overview_screen, use_portfolio_hook, "Uses", "")
+Rel(overview_screen, use_refresh_control_hook, "Uses", "")
 Rel(overview_screen, portfolio_summary, "Uses", "")
 Rel(overview_screen, asset_allocation_chart, "Uses", "")
 Rel(overview_screen, net_worth_chart, "Uses", "")
 Rel(overview_screen, native_line_chart, "Uses", "")
 
+Rel(watchlist_screen, use_portfolio_hook, "Uses", "")
 Rel(watchlist_screen, use_symbol_display_hook, "Uses", "")
+Rel(watchlist_screen, use_refresh_control_hook, "Uses", "")
 Rel(watchlist_screen, stock_list_item, "Uses", "")
 Rel(watchlist_screen, account_list_item, "Uses", "")
 Rel(watchlist_screen, stock_detail_drawer, "Uses", "")
@@ -151,9 +157,12 @@ Rel(watchlist_screen, sort_menu, "Uses", "")
 Rel(watchlist_screen, glass_search_bar, "Uses", "")
 
 Rel(analytics_screen, use_risk_metrics_hook, "Uses", "")
+Rel(analytics_screen, use_refresh_control_hook, "Uses", "")
 Rel(analytics_screen, use_computed_var_hook, "Uses", "")
 Rel(analytics_screen, metric_card, "Uses", "")
 
+Rel(account_screen, use_account_data_hook, "Uses", "")
+Rel(account_screen, use_refresh_control_hook, "Uses", "")
 Rel(account_screen, account_drawers, "Uses", "")
 Rel(account_screen, use_preferences_hook, "Uses", "")
 

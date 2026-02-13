@@ -19,11 +19,5 @@ export function getStockChangeInfo(change: number, basePrice: number): StockChan
   const changeColor = isUp ? COLOR_UP : isDown ? COLOR_DOWN : COLOR_FLAT;
   const changePercent = basePrice > 0 ? ((change / basePrice) * 100).toFixed(2) : "0.00";
 
-  return {
-    isUp,
-    isDown,
-    trend,
-    changeColor,
-    changePercent,
-  };
+  return { isUp, isDown, trend, changeColor, changePercent };
 }

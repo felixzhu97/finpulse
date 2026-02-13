@@ -1,20 +1,19 @@
-import { useEffect, useState } from "react";
-import { portfolioStore } from "./PortfolioStore";
+import { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedAccountId } from "./portfolioSlice";
+import type { RootState } from "./index";
 
 export function usePortfolioStore() {
-  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(
-    portfolioStore.getSelectedAccountId()
+  const selectedAccountId = useSelector(
+    (state: RootState) => state.portfolio.selectedAccountId
   );
-
-  useEffect(() => {
-    const unsubscribe = portfolioStore.subscribe(setSelectedAccountId);
-    return unsubscribe;
-  }, []);
+  const dispatch = useDispatch();
 
   return {
     selectedAccountId,
-    setSelectedAccountId: (id: string | null) => {
-      portfolioStore.setSelectedAccountId(id);
-    },
+    setSelectedAccountId: useCallback(
+      (id: string | null) => dispatch(setSelectedAccountId(id)),
+      [dispatch]
+    ),
   };
 }

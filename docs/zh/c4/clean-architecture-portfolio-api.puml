@@ -6,13 +6,16 @@ skinparam defaultFontSize 11
 title 投资组合分析 API - 整洁架构分层
 
 rectangle "**API**\n(src/api/)" as API #E3F2FD {
-  rectangle "main.py\n(lifespan: engine,\nsession_factory, redis)" as LIFESPAN
-  rectangle "dependencies.py\n(组合根)\nget_session 来自 app.state" as DI
+  rectangle "main.py\n(入口、路由挂载)" as MAIN
+  rectangle "composition.py\n(组合根)\nlifespan: engine, redis,\nquote_repo, Kafka" as LIFESPAN
+  rectangle "config.py\n(API 常量:\n缓存前缀、TTL)" as CFG
+  rectangle "dependencies.py\n(依赖注入)\n_repo_from_session, container" as DI
+  rectangle "crud_helpers.py\n(register_crud)" as CRUD
   rectangle "v1/endpoints\nv1/schemas\nv1/mappers" as WEB
 }
 
 rectangle "**基础设施**\n(src/infrastructure/)" as INFRA #E8F5E9 {
-  rectangle "database/\n(RealtimeQuoteRepository：\nORM、批量操作)\ncache/ (Redis)\nconfig/\nanalytics/ (ClickHouse)\nobject_storage/ (S3/MinIO)\nstream/ (Faust)\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
+  rectangle "database/\ncache/ (Redis)\nconfig/ (container.py)\nanalytics/ (ClickHouse)\nexternal_services/\nmessage_brokers/" as INFRA_IMPL
 }
 
 rectangle "**应用层**\n(src/core/application/)" as APP #FFF3E0 {
@@ -33,15 +36,19 @@ note right of DOMAIN
 end note
 
 note right of DI
-  唯一引用 infrastructure 的位置。
+  通过 container 构建服务。
   get_realtime_quote_repo
-  接受 Request | WebSocket，
-  以支持 WebSocket 路由。
+  接受 Request | WebSocket。
+end note
+
+note right of CRUD
+  register_crud 统一标准 CRUD：
+  list, get, create, batch, update, delete
 end note
 
 note bottom of LIFESPAN
-  engine 与 session_factory
-  在 lifespan 中创建
+  composition.py 创建 engine、
+  session_factory、Redis、Kafka
   (与异步 DB 同一事件循环)
 end note
 
