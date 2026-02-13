@@ -1,8 +1,8 @@
-import type { Instrument } from "@/src/lib/types/instrument";
-import type { Watchlist, WatchlistItem } from "@/src/lib/types/watchlist";
-import type { ICustomerRepository } from "@/src/lib/types/ICustomerRepository";
-import type { IInstrumentRepository } from "@/src/lib/types/IInstrumentRepository";
-import type { IWatchlistRepository } from "@/src/lib/types/IWatchlistRepository";
+import type { Instrument } from "@/src/types/instrument";
+import type { Watchlist, WatchlistItem } from "@/src/types/watchlist";
+import type { ICustomerRepository } from "@/src/types/ICustomerRepository";
+import type { IInstrumentRepository } from "@/src/types/IInstrumentRepository";
+import type { IWatchlistRepository } from "@/src/types/IWatchlistRepository";
 
 export interface WatchlistWithItems {
   watchlist: Watchlist;

@@ -1,5 +1,5 @@
-import type { Order, OrderCreate } from "@/src/lib/types/order";
-import type { IOrderRepository } from "@/src/lib/types/IOrderRepository";
+import type { Order, OrderCreate } from "@/src/types/order";
+import type { IOrderRepository } from "@/src/types/IOrderRepository";
 import { httpClient } from "@/src/lib/network/httpClient";
 
 export class OrderRepository implements IOrderRepository {

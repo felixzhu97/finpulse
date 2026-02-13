@@ -2,7 +2,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { memo, useState } from "react";
 import { Modal, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "@/src/theme";
+import { useTheme } from "@/src/styles";
 import { useTranslation } from "@/src/lib/i18n";
 import styled from "styled-components/native";
 

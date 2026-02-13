@@ -8,7 +8,7 @@ import { MetricCard } from "@/src/components/ui/MetricCard";
 import { AssetAllocationChart } from "@/src/components/portfolio/AssetAllocationChart";
 import { NetWorthLineChart } from "@/src/components/portfolio/NetWorthLineChart";
 import { usePortfolio } from "@/src/hooks";
-import { useTheme } from "@/src/theme";
+import { useTheme } from "@/src/styles";
 import { getCurrencySymbol } from "@/src/lib/utils";
 import { useTranslation } from "@/src/lib/i18n";
 import {
@@ -25,7 +25,7 @@ import {
   HeaderTitleBlock,
   ScreenTitle,
   ScreenDate,
-} from "@/src/theme/primitives";
+} from "@/src/styles/primitives";
 import styled from "styled-components/native";
 
 const StyledScrollView = styled(ScrollView)`

@@ -1,4 +1,4 @@
-import type { QuoteConnectionStatus, QuoteSnapshot } from "@/src/lib/types/quotes";
+import type { QuoteConnectionStatus, QuoteSnapshot } from "@/src/types/quotes";
 
 export interface QuoteStreamHandle {
   updateSymbols(symbols: string[]): void;

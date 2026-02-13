@@ -3,7 +3,7 @@ import type {
   AssetAllocationItem,
   Portfolio,
   PortfolioHistoryPoint,
-} from "@/src/lib/types/portfolio";
+} from "@/src/types/portfolio";
 import { container } from "@/src/lib/services/DependencyContainer";
 import { useAsyncLoad } from "./useAsyncLoad";
 

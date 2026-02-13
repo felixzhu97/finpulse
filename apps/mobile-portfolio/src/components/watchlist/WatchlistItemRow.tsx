@@ -12,7 +12,7 @@ import {
   RowChangeContainer,
   RowChange,
   RowChangePercent,
-} from "@/src/theme/primitives";
+} from "@/src/styles/primitives";
 
 interface WatchlistItemRowProps {
   symbol: string;

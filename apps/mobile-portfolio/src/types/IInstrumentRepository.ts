@@ -1,4 +1,4 @@
-import type { Instrument } from "@/src/lib/types/instrument";
+import type { Instrument } from "@/src/types/instrument";
 
 export interface IInstrumentRepository {
   list(limit?: number, offset?: number): Promise<Instrument[]>;

@@ -44,7 +44,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "Subscribes to merged symbols")
         Component(redux_portfolio, "Redux portfolio slice", "Redux Toolkit", "selectedAccountId")
         
-        Component(theme_system, "Theme System", "TypeScript", "Light/dark colors; useTheme (useTheme.ts)")
+        Component(theme_system, "Theme System", "TypeScript", "Light/dark colors; styles/useTheme.ts")
         Component(styled_theme_provider, "StyledThemeProvider", "styled-components/native", "Injects theme (colors) from useTheme into styled-components")
         Component(theme_primitives, "Theme Primitives", "styled-components/native", "ScreenRoot, ListRow, CardBordered, LabelText, ValueText, withTheme")
         Component(i18n_config, "i18n Config", "TypeScript", "i18next setup, translations")

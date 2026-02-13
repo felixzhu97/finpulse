@@ -1,5 +1,5 @@
 import { memo } from "react";
-import type { Account } from "@/src/lib/types/portfolio";
+import type { Account } from "@/src/types/portfolio";
 import { formatBalance, formatSigned, getStockChangeInfo } from "@/src/lib/utils";
 import { Sparkline } from "../ui/Sparkline";
 import {
@@ -13,7 +13,7 @@ import {
   RowChangeContainer,
   RowChange,
   RowChangePercent,
-} from "@/src/theme/primitives";
+} from "@/src/styles/primitives";
 
 interface AccountListItemProps {
   account: Account;

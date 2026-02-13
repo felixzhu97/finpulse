@@ -1,4 +1,4 @@
-import type { UserPreference, UserPreferenceCreate } from "@/src/lib/types/userPreference";
+import type { UserPreference, UserPreferenceCreate } from "@/src/types/userPreference";
 
 export interface IUserPreferenceRepository {
   getByCustomerId(customerId: string): Promise<UserPreference | null>;

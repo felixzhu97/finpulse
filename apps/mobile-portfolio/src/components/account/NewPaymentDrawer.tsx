@@ -12,10 +12,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { container } from "@/src/lib/services/DependencyContainer";
-import type { AccountResource } from "@/src/lib/types/accountResource";
-import type { Payment } from "@/src/lib/types/payment";
+import type { AccountResource } from "@/src/types/accountResource";
+import type { Payment } from "@/src/types/payment";
 import { useDraggableDrawer } from "@/src/hooks/useDraggableDrawer";
-import { useTheme } from "@/src/theme";
+import { useTheme } from "@/src/styles";
 import {
   AbsoluteFill,
   DrawerModalRoot,
@@ -33,7 +33,7 @@ import {
   DrawerSubmitButton,
   DrawerSubmitButtonText,
   DrawerErrorText,
-} from "@/src/theme/primitives";
+} from "@/src/styles/primitives";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "@/src/lib/i18n";
 import styled from "styled-components/native";

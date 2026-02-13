@@ -2,8 +2,8 @@ import { memo, type ReactNode } from "react";
 import { Platform } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import styled from "styled-components/native";
-import { Card, LabelText, ValueText, HelperText } from "@/src/theme/primitives";
-import { useTheme } from "@/src/theme";
+import { Card, LabelText, ValueText, HelperText } from "@/src/styles/primitives";
+import { useTheme } from "@/src/styles";
 
 const cardShadow = Platform.select({
   ios: {

@@ -3,7 +3,7 @@ import type {
   WatchlistItem,
   WatchlistCreate,
   WatchlistItemCreate,
-} from "@/src/lib/types/watchlist";
+} from "@/src/types/watchlist";
 
 export interface IWatchlistRepository {
   listWatchlists(limit?: number, offset?: number): Promise<Watchlist[]>;

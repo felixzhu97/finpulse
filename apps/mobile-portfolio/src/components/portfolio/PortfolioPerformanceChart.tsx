@@ -1,4 +1,4 @@
-import type { PortfolioHistoryPoint } from "@/src/lib/types/portfolio";
+import type { PortfolioHistoryPoint } from "@/src/types/portfolio";
 import styled from "styled-components/native";
 
 interface PortfolioPerformanceChartProps {

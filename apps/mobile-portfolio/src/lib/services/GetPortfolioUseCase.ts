@@ -2,8 +2,8 @@ import type {
   AssetAllocationItem,
   Portfolio,
   PortfolioHistoryPoint,
-} from "@/src/lib/types/portfolio";
-import type { IPortfolioRepository } from "@/src/lib/types/IPortfolioRepository";
+} from "@/src/types/portfolio";
+import type { IPortfolioRepository } from "@/src/types/IPortfolioRepository";
 
 export class GetPortfolioUseCase {
   constructor(private portfolioRepository: IPortfolioRepository) {}

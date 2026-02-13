@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import type { RiskMetrics } from "@/src/lib/types/riskMetrics";
+import type { RiskMetrics } from "@/src/types/riskMetrics";
 import { container } from "@/src/lib/services/DependencyContainer";
 import { useAsyncLoad } from "./useAsyncLoad";
 

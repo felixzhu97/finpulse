@@ -1,9 +1,9 @@
 import { memo } from "react";
-import type { Portfolio } from "@/src/lib/types/portfolio";
+import type { Portfolio } from "@/src/types/portfolio";
 import { formatCurrency, formatSignedPercent } from "@/src/lib/utils";
 import { useTranslation } from "@/src/lib/i18n";
 import { MetricCard } from "../ui/MetricCard";
-import { BlockRow, BlockRowHalf, BlockHalf } from "@/src/theme/primitives";
+import { BlockRow, BlockRowHalf, BlockHalf } from "@/src/styles/primitives";
 
 interface PortfolioSummaryProps {
   portfolio: Portfolio;

@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import type { QuoteConnectionStatus } from "@/src/lib/types/quotes";
+import type { QuoteConnectionStatus } from "@/src/types/quotes";
 import { shallowEqual } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../store";
 import {

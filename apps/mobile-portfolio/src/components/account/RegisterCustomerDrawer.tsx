@@ -10,8 +10,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
 import { container } from "@/src/lib/services/DependencyContainer";
-import { useTheme, withTheme } from "@/src/theme";
-import type { Customer } from "@/src/lib/types/customer";
+import { useTheme, withTheme } from "@/src/styles";
+import type { Customer } from "@/src/types/customer";
 import { useDraggableDrawer } from "@/src/hooks/useDraggableDrawer";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "@/src/lib/i18n";

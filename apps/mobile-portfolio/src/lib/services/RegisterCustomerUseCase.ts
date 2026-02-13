@@ -1,5 +1,5 @@
-import type { Customer } from "@/src/lib/types/customer";
-import type { ICustomerRepository } from "@/src/lib/types/ICustomerRepository";
+import type { Customer } from "@/src/types/customer";
+import type { ICustomerRepository } from "@/src/types/ICustomerRepository";
 
 export interface RegisterCustomerInput {
   name: string;

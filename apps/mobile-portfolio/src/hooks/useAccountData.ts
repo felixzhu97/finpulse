@@ -1,8 +1,8 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-import type { Account } from "@/src/lib/types/portfolio";
-import type { AccountResource } from "@/src/lib/types/accountResource";
-import type { Customer } from "@/src/lib/types/customer";
+import type { Account } from "@/src/types/portfolio";
+import type { AccountResource } from "@/src/types/accountResource";
+import type { Customer } from "@/src/types/customer";
 import { container } from "@/src/lib/services/DependencyContainer";
 import { useAsyncLoad } from "./useAsyncLoad";
 

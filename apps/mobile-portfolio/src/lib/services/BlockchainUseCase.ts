@@ -4,8 +4,8 @@ import type {
   BlockchainBlockWithTransactions,
   BlockchainTransaction,
   TransferRequest,
-} from "@/src/lib/types/blockchain";
-import type { IBlockchainRepository } from "@/src/lib/types/IBlockchainRepository";
+} from "@/src/types/blockchain";
+import type { IBlockchainRepository } from "@/src/types/IBlockchainRepository";
 
 export class BlockchainUseCase {
   constructor(private blockchainRepository: IBlockchainRepository) {}

@@ -5,7 +5,7 @@ import type {
   BlockchainBlockWithTransactions,
   BlockchainTransaction,
   TransferRequest,
-} from "@/src/lib/types/blockchain";
+} from "@/src/types/blockchain";
 import { container } from "@/src/lib/services/DependencyContainer";
 
 export function useBlockchain() {

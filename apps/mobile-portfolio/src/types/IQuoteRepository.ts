@@ -1,4 +1,4 @@
-import type { QuoteData, QuoteSnapshot } from "@/src/lib/types/quotes";
+import type { QuoteData, QuoteSnapshot } from "@/src/types/quotes";
 
 export interface IQuoteRepository {
   getQuotes(symbols: string[]): Promise<Record<string, QuoteData>>;

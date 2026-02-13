@@ -1,4 +1,4 @@
-import type { Order, OrderCreate } from "@/src/lib/types/order";
+import type { Order, OrderCreate } from "@/src/types/order";
 
 export interface IOrderRepository {
   list(limit?: number, offset?: number): Promise<Order[]>;

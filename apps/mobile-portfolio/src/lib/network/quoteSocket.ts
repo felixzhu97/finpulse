@@ -1,4 +1,4 @@
-import type { QuoteConnectionStatus, QuoteSnapshot } from "@/src/lib/types/quotes";
+import type { QuoteConnectionStatus, QuoteSnapshot } from "@/src/types/quotes";
 import { getBaseUrl } from "./config";
 
 export type { QuoteConnectionStatus, QuoteSnapshot };

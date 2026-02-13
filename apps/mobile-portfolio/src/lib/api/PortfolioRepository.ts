@@ -4,8 +4,8 @@ import type {
   Portfolio,
   PortfolioHistoryPoint,
   RiskSummary,
-} from "@/src/lib/types/portfolio";
-import type { IPortfolioRepository } from "@/src/lib/types/IPortfolioRepository";
+} from "@/src/types/portfolio";
+import type { IPortfolioRepository } from "@/src/types/IPortfolioRepository";
 import { httpClient } from "@/src/lib/network/httpClient";
 
 export class PortfolioRepository implements IPortfolioRepository {

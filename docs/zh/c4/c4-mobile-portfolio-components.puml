@@ -44,7 +44,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "订阅合并符号")
         Component(redux_portfolio, "Redux portfolio slice", "Redux Toolkit", "selectedAccountId")
         
-        Component(theme_system, "主题系统", "TypeScript", "浅色/深色配色；useTheme (useTheme.ts)")
+        Component(theme_system, "主题系统", "TypeScript", "浅色/深色配色；styles/useTheme.ts")
         Component(styled_theme_provider, "StyledThemeProvider", "styled-components/native", "从 useTheme 注入 theme (colors) 到 styled-components")
         Component(theme_primitives, "主题基元", "styled-components/native", "ScreenRoot、ListRow、CardBordered、LabelText、ValueText、withTheme")
         Component(i18n_config, "i18n 配置", "TypeScript", "i18next 设置、翻译资源")

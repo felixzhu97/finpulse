@@ -1,5 +1,5 @@
-import type { WatchlistItem } from "@/src/lib/types/watchlist";
-import type { Instrument } from "@/src/lib/types/instrument";
+import type { WatchlistItem } from "@/src/types/watchlist";
+import type { Instrument } from "@/src/types/instrument";
 import type { StockDetailItem } from "./StockDetailDrawer";
 import { WatchlistItemRow } from "./WatchlistItemRow";
 import styled from "styled-components/native";
