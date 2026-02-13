@@ -1,6 +1,7 @@
 import { memo } from "react";
 import type { Portfolio } from "@/src/domain/entities/portfolio";
 import { formatCurrency, formatSignedPercent } from "@/src/presentation/utils";
+import { useTranslation } from "@/src/presentation/i18n";
 import { MetricCard } from "../ui/MetricCard";
 import { BlockRow, BlockRowHalf, BlockHalf } from "@/src/presentation/theme/primitives";
 
@@ -9,6 +10,7 @@ interface PortfolioSummaryProps {
 }
 
 export const PortfolioSummary = memo(function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
+  const { t } = useTranslation();
   const { summary } = portfolio;
   const currency = portfolio.baseCurrency;
 
@@ -17,17 +19,22 @@ export const PortfolioSummary = memo(function PortfolioSummary({ portfolio }: Po
   const weekChangeRate =
     summary.totalAssets === 0 ? 0 : summary.weekChange / summary.totalAssets;
 
+  const netWorthHelper = t("dashboard.netWorthHelper", {
+    assets: formatCurrency(summary.totalAssets, currency),
+    liabilities: formatCurrency(summary.totalLiabilities, currency),
+  });
+
   return (
     <BlockRow>
       <MetricCard
-        label="Net worth"
+        label={t("dashboard.netWorth")}
         value={formatCurrency(summary.netWorth, currency)}
-        helper={`Assets ${formatCurrency(summary.totalAssets, currency)} · Liabilities ${formatCurrency(summary.totalLiabilities, currency)}`}
+        helper={netWorthHelper}
       />
       <BlockRowHalf>
         <BlockHalf>
           <MetricCard
-            label="Today"
+            label={t("dashboard.today")}
             value={formatCurrency(summary.todayChange, currency)}
             helper={formatSignedPercent(dayChangeRate)}
             tone={summary.todayChange >= 0 ? "positive" : "negative"}
@@ -35,7 +42,7 @@ export const PortfolioSummary = memo(function PortfolioSummary({ portfolio }: Po
         </BlockHalf>
         <BlockHalf>
           <MetricCard
-            label="This week"
+            label={t("dashboard.thisWeek")}
             value={formatCurrency(summary.weekChange, currency)}
             helper={formatSignedPercent(weekChangeRate)}
             tone={summary.weekChange >= 0 ? "positive" : "negative"}

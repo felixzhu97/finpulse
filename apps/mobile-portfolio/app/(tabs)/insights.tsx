@@ -166,7 +166,18 @@ export default function InsightsScreen() {
           ) : null}
           <InsightsSection>
             <InsightsSectionHeader>{t("insights.riskOverview")}</InsightsSectionHeader>
-            <InsightsChartCard style={Platform.OS === "ios" ? { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8 } : { elevation: 2 }}>
+            <InsightsChartCard
+              style={
+                Platform.OS === "ios"
+                  ? {
+                      shadowColor: "#000",
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.1,
+                      shadowRadius: 8,
+                    }
+                  : { elevation: 2 }
+              }
+            >
             <BarChart
               data={{
                 labels: ["High risk", "Top 5"],
@@ -186,7 +197,9 @@ export default function InsightsScreen() {
               yAxisSuffix="%"
               chartConfig={{
                 backgroundGradientFrom: colors.card,
+                backgroundGradientFromOpacity: 0,
                 backgroundGradientTo: colors.card,
+                backgroundGradientToOpacity: 0,
                 color: (opacity = 1) => {
                   if (Platform.OS === "ios") {
                     return `rgba(0, 122, 255, ${opacity})`;
@@ -212,7 +225,7 @@ export default function InsightsScreen() {
               }}
               withInnerLines={false}
               showBarTops={false}
-              style={{ marginLeft: -8, marginRight: -8 }}
+              style={{ marginLeft: -8, marginRight: -8, backgroundColor: "transparent" }}
               verticalLabelRotation={0}
             />
             </InsightsChartCard>

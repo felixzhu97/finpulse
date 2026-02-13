@@ -15,6 +15,8 @@ import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
 import { CardBordered } from "@/src/presentation/theme/primitives";
 
+const ACCOUNT_CARD_PADDING = 20;
+
 const StyledSafeArea = styled(SafeAreaView)`
   flex: 1;
   background-color: ${(p) => p.theme.colors.background};
@@ -68,7 +70,7 @@ const CategoryTitle = styled.Text`
 const UserHeader = styled.View`
   flex-direction: row;
   align-items: center;
-  padding: 16px;
+  padding-bottom: 16px;
 `;
 
 const Avatar = styled.View`
@@ -77,25 +79,28 @@ const Avatar = styled.View`
   border-radius: 26px;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
+  margin-right: 14px;
   background-color: ${(p) => p.theme.colors.surface};
 `;
 
 const UserInfo = styled.View`
   flex: 1;
+  min-width: 0;
 `;
 
 const UserName = styled.Text`
   font-size: 19px;
   font-weight: 600;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
   letter-spacing: -0.4px;
   color: ${(p) => p.theme.colors.text};
 `;
 
 const UserEmail = styled.Text`
   font-size: 14px;
+  font-weight: 400;
   letter-spacing: -0.2px;
+  line-height: 20px;
   color: ${(p) => p.theme.colors.textSecondary};
 `;
 
@@ -103,15 +108,14 @@ const UserDetailRow = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding-horizontal: 16px;
-  padding-bottom: 14px;
-  padding-top: 12px;
+  padding-vertical: 16px;
   border-top-width: 1px;
   border-top-color: ${(p) => p.theme.colors.border};
 `;
 
 const UserDetailLabel = styled.Text`
   font-size: 14px;
+  font-weight: 400;
   letter-spacing: -0.2px;
   color: ${(p) => p.theme.colors.textSecondary};
 `;
@@ -120,14 +124,13 @@ const UserDetailValue = styled.Text`
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.2px;
-  color: ${(p) => p.theme.colors.text};
+  color: ${(p) => p.theme.colors.textSecondary};
 `;
 
 const AccountRow = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 14px;
   min-height: 60px;
 `;
 
@@ -196,7 +199,6 @@ const ActionRow = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 14px;
   min-height: 52px;
 `;
 
@@ -314,7 +316,7 @@ export default function AccountScreen() {
           <>
             {customer && (
               <Section>
-                <CardBordered style={{ overflow: "hidden" }}>
+                <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING }}>
                   <UserHeader>
                     <Avatar>
                       <MaterialIcons name="person" size={24} color={colors.text} />
@@ -381,7 +383,7 @@ export default function AccountScreen() {
                           />
                         );
                       })}
-                      <CardBordered style={{ overflow: "hidden" }}>
+                      <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING }}>
                         {typeAccounts.map((account, accountIndex) => (
                             <AccountItemWrap key={account.id}>
                               <AccountRow activeOpacity={0.7}>
@@ -422,7 +424,7 @@ export default function AccountScreen() {
               <SectionHeader>
                 <SectionTitle>{t("account.actions")}</SectionTitle>
               </SectionHeader>
-              <CardBordered style={{ overflow: "hidden" }}>
+              <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING }}>
                 <ActionRow onPress={() => setRegisterVisible(true)} activeOpacity={0.7}>
                   <ActionLeft>
                     <MaterialIcons name="person-add" size={20} color={colors.text} />

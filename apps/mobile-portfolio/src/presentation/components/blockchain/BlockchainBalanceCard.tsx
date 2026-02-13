@@ -83,7 +83,7 @@ export const BlockchainBalanceCard = memo(function BlockchainBalanceCard({
   };
 
   return (
-    <CardBordered style={{ marginBottom: 12 }}>
+    <CardBordered style={{ marginBottom: 12, padding: 20 }}>
       <Header>
         <IconContainer>
           <MaterialIcons name="account-balance-wallet" size={20} color={colors.text} />

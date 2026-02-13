@@ -26,10 +26,17 @@
     "account": "账户"
   },
   "dashboard": {
+    "title": "仪表盘",
+    "overview": "概览",
+    "netWorth": "净资产",
+    "netWorthHelper": "资产 {{assets}} · 负债 {{liabilities}}",
+    "today": "今日",
+    "thisWeek": "本周",
     "netWorthTrend": "净资产趋势",
+    "allocation": "资产配置",
     "accounts": "账户",
     "accountsHelper": "此投资组合中的账户总数",
-    "netWorthNativeChart": "净资产（原生图表）",
+    "netWorthNativeChart": "净资产",
     "unableToLoad": "无法加载投资组合。请启动后端并填充数据，然后重试。",
     "tapToRetry": "点击重试"
   },

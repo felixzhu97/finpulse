@@ -16,6 +16,7 @@ export type NativeLineChartProps = {
   theme?: "light" | "dark";
   trend?: "up" | "down" | "flat";
   baselineValue?: number;
+  currencySymbol?: string;
   onInteractionStart?: () => void;
   onInteractionEnd?: () => void;
 } & ViewProps;
@@ -38,12 +39,18 @@ function formatTimestamp(ts: number): string {
   return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
+function formatShortDate(ts: number): string {
+  return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
 function formatHour(ts: number): string {
   return new Date(ts).getHours().toString();
 }
 
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
 export function NativeLineChart(props: NativeLineChartProps) {
-  const { data = [], onPointSelect, timestamps, theme = "light", trend: trendProp, baselineValue, onInteractionStart, onInteractionEnd, style, ...rest } = props;
+  const { data = [], onPointSelect, timestamps, theme = "light", trend: trendProp, baselineValue, currencySymbol = "", onInteractionStart, onInteractionEnd, style, ...rest } = props;
   const isDark = theme === "dark";
   const crosshairColor = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)";
   const [layoutWidth, setLayoutWidth] = useState(0);
@@ -131,18 +138,24 @@ export function NativeLineChart(props: NativeLineChartProps) {
     });
   }, [data, chartDataHeight]);
 
+  const isDaySpan = useMemo(() => {
+    if (!timestamps || timestamps.length < 2) return false;
+    return (timestamps[timestamps.length - 1] - timestamps[0]) > ONE_DAY_MS;
+  }, [timestamps]);
+
   const xAxisLabels = useMemo(() => {
     if (!timestamps || timestamps.length === 0 || chartWidth === 0) return [];
     const labelCount = 5;
     const startTime = timestamps[0];
     const endTime = timestamps[timestamps.length - 1];
     const duration = endTime - startTime;
-    const labelWidth = 24;
-    
+    const labelWidth = 36;
+    const formatX = isDaySpan ? formatShortDate : formatHour;
+
     return Array.from({ length: labelCount }, (_, i) => {
       const t = i / (labelCount - 1);
       const timestamp = startTime + t * duration;
-      const hour = formatHour(timestamp);
+      const text = formatX(timestamp);
       let x: number;
       let textAlign: "left" | "center" | "right";
       if (i === 0) {
@@ -155,9 +168,9 @@ export function NativeLineChart(props: NativeLineChartProps) {
         x = t * chartWidth - labelWidth / 2;
         textAlign = "center";
       }
-      return { hour, x, textAlign, timestamp };
+      return { text, x, textAlign, timestamp };
     });
-  }, [timestamps, chartWidth]);
+  }, [timestamps, chartWidth, isDaySpan]);
 
   const labelColor = isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.7)";
 
@@ -188,7 +201,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
             left: chartWidth + 8,
           }}
         >
-          {formatValue(label.value)}
+          {currencySymbol}{formatValue(label.value)}
         </Text>
       ))}
       {xAxisLabels.map((label, i) => (
@@ -198,7 +211,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
             position: "absolute",
             fontSize: 12,
             fontWeight: "500",
-            width: 24,
+            width: 36,
             height: 16,
             pointerEvents: "none",
             color: labelColor,
@@ -207,7 +220,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
             textAlign: label.textAlign,
           }}
         >
-          {label.hour}
+          {label.text}
         </Text>
       ))}
       <View
@@ -241,7 +254,7 @@ export function NativeLineChart(props: NativeLineChartProps) {
                 left: Math.max(8, Math.min(chartWidth - 8, selected.x - 40)),
               }}
             >
-              <Text style={{ fontSize: 14, fontWeight: "600", color: "#fff" }}>{formatValue(selected.value)}</Text>
+              <Text style={{ fontSize: 14, fontWeight: "600", color: "#fff" }}>{currencySymbol}{formatValue(selected.value)}</Text>
               {selected.ts != null && (
                 <Text style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", marginTop: 2 }}>{formatTimestamp(selected.ts)}</Text>
               )}

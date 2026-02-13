@@ -26,10 +26,17 @@
     "account": "Account"
   },
   "dashboard": {
+    "title": "Dashboard",
+    "overview": "Overview",
+    "netWorth": "Net worth",
+    "netWorthHelper": "Assets {{assets}} · Liabilities {{liabilities}}",
+    "today": "Today",
+    "thisWeek": "This week",
     "netWorthTrend": "Net worth trend",
+    "allocation": "Allocation",
     "accounts": "Accounts",
     "accountsHelper": "Total accounts in this portfolio",
-    "netWorthNativeChart": "Net worth (native chart)",
+    "netWorthNativeChart": "Net worth",
     "unableToLoad": "Unable to load portfolio. Start the backend and seed data, then retry.",
     "tapToRetry": "Tap to retry"
   },

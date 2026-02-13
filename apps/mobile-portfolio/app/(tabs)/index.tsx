@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
-import { ActivityIndicator } from "react-native";
+import { useMemo, useState, useCallback } from "react";
+import { ActivityIndicator, RefreshControl } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import { NativeLineChart } from "@/src/presentation/components/native";
 import { PortfolioSummary } from "@/src/presentation/components/portfolio/PortfolioSummary";
@@ -8,10 +9,10 @@ import { AssetAllocationChart } from "@/src/presentation/components/portfolio/As
 import { NetWorthLineChart } from "@/src/presentation/components/portfolio/NetWorthLineChart";
 import { usePortfolio } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
+import { getCurrencySymbol } from "@/src/presentation/utils";
 import { useTranslation } from "@/src/presentation/i18n";
 import {
   ScreenRoot,
-  ContentPadding,
   CenteredContainer,
   ErrorText,
   RetryText,
@@ -19,6 +20,11 @@ import {
   BlockWithGap,
   ChartCard,
   ChartCardTitle,
+  SafeAreaScreen,
+  ScreenHeader,
+  HeaderTitleBlock,
+  ScreenTitle,
+  ScreenDate,
 } from "@/src/presentation/theme/primitives";
 import styled from "styled-components/native";
 
@@ -27,23 +33,43 @@ const StyledScrollView = styled(ScrollView)`
   background-color: ${(p) => p.theme.colors.background};
 `;
 
+const ContentWrap = styled.View`
+  padding-horizontal: 16px;
+  padding-bottom: 32px;
+`;
+
+const Section = styled.View`
+  margin-top: 24px;
+`;
+
+const SectionHeader = styled.View`
+  margin-bottom: 12px;
+`;
+
 const NativeChartWrapper = styled.View`
   height: 200px;
   margin-bottom: 12px;
 `;
 
+function formatScreenDate(date: Date): string {
+  return date.toLocaleDateString(undefined, {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
 export default function DashboardScreen() {
   const { isDark, colors } = useTheme();
   const { t } = useTranslation();
-  const {
-    portfolio,
-    allocation,
-    history,
-    loading,
-    refresh,
-  } = usePortfolio();
+  const { portfolio, allocation, history, loading, refresh } = usePortfolio();
   const chartTheme = isDark ? "dark" : "light";
   const [chartScrollLock, setChartScrollLock] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    refresh();
+  }, [refresh]);
 
   const fallbackTimestamps = useMemo(() => {
     const base = Date.now() - 5 * 24 * 60 * 60 * 1000;
@@ -76,39 +102,75 @@ export default function DashboardScreen() {
   }
 
   return (
-    <StyledScrollView
-      contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
-      scrollEnabled={!chartScrollLock}
-    >
-      <PortfolioSummary portfolio={portfolio} />
-      <BlockWithGap>
-        <SectionTitle>{t("dashboard.netWorthTrend")}</SectionTitle>
-        <NetWorthLineChart points={history} />
-        <MetricCard
-          label={t("dashboard.accounts")}
-          value={String(portfolio.accounts.length)}
-          helper={t("dashboard.accountsHelper")}
-        />
-        <AssetAllocationChart
-          items={allocation.map((item) => ({
-            label: item.type,
-            value: item.value,
-          }))}
-        />
-        <ChartCard>
-          <ChartCardTitle>{t("dashboard.netWorthNativeChart")}</ChartCardTitle>
-          <NativeChartWrapper>
-            <NativeLineChart
-              data={lineData}
-              theme={chartTheme}
-              timestamps={lineTimestamps}
-              style={{ flex: 1 }}
-              onInteractionStart={() => setChartScrollLock(true)}
-              onInteractionEnd={() => setChartScrollLock(false)}
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <SafeAreaScreen>
+      <ScreenHeader>
+        <HeaderTitleBlock>
+          <ScreenTitle>{t("dashboard.title")}</ScreenTitle>
+          <ScreenDate>{formatScreenDate(new Date())}</ScreenDate>
+        </HeaderTitleBlock>
+      </ScreenHeader>
+      <StyledScrollView
+        contentContainerStyle={{ paddingBottom: 32 }}
+        scrollEnabled={!chartScrollLock}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+          />
+        }
+      >
+        <ContentWrap>
+          <Section>
+            <SectionHeader>
+              <SectionTitle>{t("dashboard.overview")}</SectionTitle>
+            </SectionHeader>
+            <PortfolioSummary portfolio={portfolio} />
+          </Section>
+          <Section>
+            <SectionHeader>
+              <SectionTitle>{t("dashboard.netWorthTrend")}</SectionTitle>
+            </SectionHeader>
+            <BlockWithGap>
+              <NetWorthLineChart points={history} baseCurrency={portfolio.baseCurrency} />
+              <MetricCard
+                label={t("dashboard.accounts")}
+                value={String(portfolio.accounts.length)}
+                helper={t("dashboard.accountsHelper")}
+              />
+            </BlockWithGap>
+          </Section>
+          <Section>
+            <SectionHeader>
+              <SectionTitle>{t("dashboard.allocation")}</SectionTitle>
+            </SectionHeader>
+            <AssetAllocationChart
+              items={allocation.map((item) => ({
+                label: item.type,
+                value: item.value,
+              }))}
             />
-          </NativeChartWrapper>
-        </ChartCard>
-      </BlockWithGap>
-    </StyledScrollView>
+          </Section>
+          <Section>
+            <ChartCard>
+              <ChartCardTitle>{t("dashboard.netWorthNativeChart")}</ChartCardTitle>
+              <NativeChartWrapper>
+                <NativeLineChart
+                  data={lineData}
+                  theme={chartTheme}
+                  timestamps={lineTimestamps}
+                  currencySymbol={getCurrencySymbol(portfolio.baseCurrency)}
+                  style={{ flex: 1 }}
+                  onInteractionStart={() => setChartScrollLock(true)}
+                  onInteractionEnd={() => setChartScrollLock(false)}
+                />
+              </NativeChartWrapper>
+            </ChartCard>
+          </Section>
+        </ContentWrap>
+      </StyledScrollView>
+      </SafeAreaScreen>
+    </SafeAreaView>
   );
 }
