@@ -23,7 +23,7 @@ import { useSymbolDisplayData } from "@/src/presentation/hooks/useSymbolDisplayD
 import type { Account, Holding } from "@/src/domain/entities/portfolio";
 import { container } from "@/src/application";
 import { usePortfolio, useRefreshControl } from "@/src/presentation/hooks";
-import { useAppDispatch } from "@/src/presentation/store/useAppStore";
+import { useAppDispatch } from "@/src/presentation/store";
 import { setHistory, setSnapshot } from "@/src/presentation/store/quotesSlice";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
@@ -349,6 +349,8 @@ export default function WatchlistsScreen() {
         <ListContainer>
         <FlatList
           data={filteredAndSortedRows}
+          initialNumToRender={12}
+          maxToRenderPerBatch={10}
           keyExtractor={(item) =>
             item.type === "stock" ? item.holding.id : item.account.id
           }

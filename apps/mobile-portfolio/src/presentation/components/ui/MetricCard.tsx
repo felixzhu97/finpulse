@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import { Platform } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import styled from "styled-components/native";
@@ -42,7 +42,7 @@ interface MetricCardProps {
   onInfoPress?: () => void;
 }
 
-export function MetricCard({
+export const MetricCard = memo(function MetricCard({
   label,
   value,
   helper,
@@ -68,6 +68,6 @@ export function MetricCard({
       {helper ? <HelperText>{helper}</HelperText> : null}
     </Card>
   );
-}
+});
 
 const styles = { labelFlex: { flex: 1 as const } };

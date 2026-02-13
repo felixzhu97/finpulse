@@ -1,5 +1,5 @@
 import type { QuoteConnectionStatus, QuoteSnapshot } from "@/src/domain/entities/quotes";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 const MAX_HISTORY_POINTS = 45;
 
@@ -30,22 +30,22 @@ const quotesSlice = createSlice({
   name: "quotes",
   initialState,
   reducers: {
-    setSubscribedSymbols(state, action: { payload: string[] }) {
+    setSubscribedSymbols(state, action: PayloadAction<string[]>) {
       state.subscribedSymbols = Array.from(
         new Set(action.payload.map((s) => s.toUpperCase()))
       );
     },
-    setSnapshot(state, action: { payload: QuoteSnapshot }) {
+    setSnapshot(state, action: PayloadAction<QuoteSnapshot>) {
       for (const [sym, data] of Object.entries(action.payload)) {
         const key = sym.toUpperCase();
         state.quotes[key] = data;
         state.history[key] = appendHistory(state.history[key], data.price);
       }
     },
-    setStatus(state, action: { payload: QuoteConnectionStatus }) {
+    setStatus(state, action: PayloadAction<QuoteConnectionStatus>) {
       state.status = action.payload;
     },
-    setHistory(state, action: { payload: Record<string, number[]> }) {
+    setHistory(state, action: PayloadAction<Record<string, number[]>>) {
       for (const [sym, prices] of Object.entries(action.payload)) {
         const key = sym.toUpperCase();
         if (prices?.length) {
@@ -53,7 +53,7 @@ const quotesSlice = createSlice({
         }
       }
     },
-    setExtraSubscribedSymbols(state, action: { payload: string[] }) {
+    setExtraSubscribedSymbols(state, action: PayloadAction<string[]>) {
       state.extraSubscribedSymbols = action.payload.map((s) => s.toUpperCase()).filter(Boolean);
     },
   },

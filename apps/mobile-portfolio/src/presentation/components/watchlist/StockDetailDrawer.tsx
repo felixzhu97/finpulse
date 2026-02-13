@@ -16,7 +16,7 @@ import { formatPrice, formatSigned } from "@/src/presentation/utils";
 import { getStockChangeInfo, PeriodDataProcessor } from "@/src/presentation/utils";
 import { InteractiveStockChart } from "./InteractiveStockChart";
 import { useTheme } from "@/src/presentation/theme";
-import { useAppDispatch, useAppSelector } from "@/src/presentation/store/useAppStore";
+import { useAppDispatch, useAppSelector } from "@/src/presentation/store";
 import { selectQuotesForSymbols } from "@/src/presentation/store/quotesSelectors";
 import { setExtraSubscribedSymbols } from "@/src/presentation/store/quotesSlice";
 import {

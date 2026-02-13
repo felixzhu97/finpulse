@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ActivityIndicator, RefreshControl } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { NativeLineChart } from "@/src/presentation/components/native";
@@ -46,15 +46,11 @@ export default function DashboardScreen() {
   const [chartScrollLock, setChartScrollLock] = useState(false);
   const { refreshing, onRefresh } = useRefreshControl(refresh);
 
-  const base = Date.now() - 5 * 24 * 60 * 60 * 1000;
-  const fallbackTimestamps = [
-    base + 1 * 24 * 60 * 60 * 1000,
-    base + 2 * 24 * 60 * 60 * 1000,
-    base + 3 * 24 * 60 * 60 * 1000,
-    base + 4 * 24 * 60 * 60 * 1000,
-    base + 5 * 24 * 60 * 60 * 1000,
-  ];
-  const fallbackValues = [102.4, 101.8, 103.2, 104.6, 103.9];
+  const fallbackTimestamps = useMemo(() => {
+    const base = Date.now() - 5 * 24 * 60 * 60 * 1000;
+    return [base + 864e5, base + 2 * 864e5, base + 3 * 864e5, base + 4 * 864e5, base + 5 * 864e5];
+  }, []);
+  const fallbackValues = useMemo(() => [102.4, 101.8, 103.2, 104.6, 103.9], []);
 
   const lineData =
     history.length > 0 ? history.map((p) => p.value) : fallbackValues;

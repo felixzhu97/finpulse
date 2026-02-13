@@ -1,5 +1,5 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Modal, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/src/presentation/theme";
@@ -67,7 +67,7 @@ const OptionText = styled.Text`
   color: ${(p) => p.theme.colors.text};
 `;
 
-export function SortMenu({ currentSort, onSelect, onOpen }: SortMenuProps) {
+export const SortMenu = memo(function SortMenu({ currentSort, onSelect, onOpen }: SortMenuProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
@@ -123,4 +123,4 @@ export function SortMenu({ currentSort, onSelect, onOpen }: SortMenuProps) {
       </Modal>
     </>
   );
-}
+});

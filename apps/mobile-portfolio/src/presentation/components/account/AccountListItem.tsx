@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Account } from "@/src/domain/entities/portfolio";
 import { formatBalance, formatSigned, getStockChangeInfo } from "@/src/presentation/utils";
 import { Sparkline } from "../ui/Sparkline";
@@ -36,7 +37,7 @@ function getAccountTypeLabel(type: Account["type"]) {
   }
 }
 
-export function AccountListItem({ account, historyValues }: AccountListItemProps) {
+export const AccountListItem = memo(function AccountListItem({ account, historyValues }: AccountListItemProps) {
   const { isUp, trend, changeColor, changePercent } = getStockChangeInfo(
     account.todayChange,
     account.balance
@@ -66,4 +67,4 @@ export function AccountListItem({ account, historyValues }: AccountListItemProps
       </ListRowRight>
     </ListRow>
   );
-}
+});

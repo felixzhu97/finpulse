@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Portfolio } from "@/src/domain/entities/portfolio";
 import { formatCurrency, formatSignedPercent } from "@/src/presentation/utils";
 import { MetricCard } from "../ui/MetricCard";
@@ -7,7 +8,7 @@ interface PortfolioSummaryProps {
   portfolio: Portfolio;
 }
 
-export function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
+export const PortfolioSummary = memo(function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
   const { summary } = portfolio;
   const currency = portfolio.baseCurrency;
 
@@ -43,4 +44,4 @@ export function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
       </BlockRowHalf>
     </BlockRow>
   );
-}
+});

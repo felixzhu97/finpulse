@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useAppSelector } from "../store/useAppStore";
+import { useAppSelector } from "../store";
 import { useColorScheme as useSystemColorScheme } from "react-native";
 import { LightColors, DarkColors, type ColorScheme } from "./colors";
 

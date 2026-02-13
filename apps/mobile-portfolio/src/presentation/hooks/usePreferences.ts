@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { useAppDispatch, useAppSelector } from "../store/useAppStore";
+import { useAppDispatch, useAppSelector } from "../store";
 import {
   setPreferences,
   setTheme,

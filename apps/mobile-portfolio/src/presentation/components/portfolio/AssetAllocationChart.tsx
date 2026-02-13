@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Dimensions } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 import { useTheme } from "@/src/presentation/theme";
@@ -17,7 +18,7 @@ const Container = styled.View`
   background-color: ${(p) => p.theme.colors.card};
 `;
 
-export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
+export const AssetAllocationChart = memo(function AssetAllocationChart({ items }: AssetAllocationChartProps) {
   const { colors } = useTheme();
   const total = items.reduce((sum, item) => sum + item.value, 0);
 
@@ -53,4 +54,4 @@ export function AssetAllocationChart({ items }: AssetAllocationChartProps) {
       />
     </Container>
   );
-}
+});

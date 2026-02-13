@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useBlockchain } from "@/src/presentation/hooks/useBlockchain";
@@ -60,7 +60,7 @@ interface BlockchainBalanceCardProps {
   currency?: string;
 }
 
-export function BlockchainBalanceCard({
+export const BlockchainBalanceCard = memo(function BlockchainBalanceCard({
   accountId,
   currency = "SIM_COIN",
 }: BlockchainBalanceCardProps) {
@@ -114,4 +114,4 @@ export function BlockchainBalanceCard({
       )}
     </CardBordered>
   );
-}
+});

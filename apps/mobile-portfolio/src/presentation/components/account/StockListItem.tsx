@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Holding } from "@/src/domain/entities/portfolio";
 import { formatPrice, formatSigned, getStockChangeInfo } from "@/src/presentation/utils";
 import { Sparkline } from "../ui/Sparkline";
@@ -22,7 +23,7 @@ interface StockListItemProps {
   onPress?: () => void;
 }
 
-export function StockListItem({
+export const StockListItem = memo(function StockListItem({
   holding,
   price,
   change,
@@ -51,4 +52,4 @@ export function StockListItem({
       </ListRowRight>
     </ListRowPressable>
   );
-}
+});

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Holding } from "@/src/domain/entities/portfolio";
 import { formatCurrency, formatSigned, formatSignedPercent } from "@/src/presentation/utils";
 import {
@@ -18,7 +19,7 @@ interface HoldingListItemProps {
   displayProfitRate?: number;
 }
 
-export function HoldingListItem({
+export const HoldingListItem = memo(function HoldingListItem({
   holding,
   displayPrice,
   displayMarketValue,
@@ -52,4 +53,4 @@ export function HoldingListItem({
       </HoldingRowRight>
     </HoldingRow>
   );
-}
+});

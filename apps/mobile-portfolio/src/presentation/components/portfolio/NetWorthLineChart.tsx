@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import type { PortfolioHistoryPoint } from "@/src/domain/entities/portfolio";
@@ -19,7 +19,7 @@ const Container = styled.View`
   background-color: ${(p) => p.theme.colors.card};
 `;
 
-export function NetWorthLineChart({ points }: NetWorthLineChartProps) {
+export const NetWorthLineChart = memo(function NetWorthLineChart({ points }: NetWorthLineChartProps) {
   const { colors } = useTheme();
   const [width, setWidth] = useState(0);
 
@@ -57,4 +57,4 @@ export function NetWorthLineChart({ points }: NetWorthLineChartProps) {
       )}
     </Container>
   );
-}
+});

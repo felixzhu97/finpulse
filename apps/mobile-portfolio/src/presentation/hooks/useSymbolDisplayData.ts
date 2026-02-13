@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import type { QuoteConnectionStatus } from "../../domain/entities/quotes";
 import { shallowEqual } from "react-redux";
-import { useAppDispatch, useAppSelector } from "../store/useAppStore";
+import { useAppDispatch, useAppSelector } from "../store";
 import {
   selectQuotesForSymbols,
   selectHistoryForSymbols,

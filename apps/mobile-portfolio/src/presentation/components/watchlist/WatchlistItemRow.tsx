@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { formatPrice, formatSigned, getStockChangeInfo } from "@/src/presentation/utils";
 import { Sparkline } from "../ui/Sparkline";
 import {
@@ -22,7 +23,7 @@ interface WatchlistItemRowProps {
   onPress?: () => void;
 }
 
-export function WatchlistItemRow({
+export const WatchlistItemRow = memo(function WatchlistItemRow({
   symbol,
   name,
   price,
@@ -54,4 +55,4 @@ export function WatchlistItemRow({
       </ListRowRight>
     </ListRowPressable>
   );
-}
+});

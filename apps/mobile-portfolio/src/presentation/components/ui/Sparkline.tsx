@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { NativeSparkline } from "../native/NativeSparkline";
 
 interface SparklineProps {
@@ -7,6 +8,6 @@ interface SparklineProps {
   height?: number;
 }
 
-export function Sparkline({ trend = "flat", data, width = 60, height = 32 }: SparklineProps) {
+export const Sparkline = memo(function Sparkline({ trend = "flat", data, width = 60, height = 32 }: SparklineProps) {
   return <NativeSparkline trend={trend} data={data} style={{ width, height }} />;
-}
+});
