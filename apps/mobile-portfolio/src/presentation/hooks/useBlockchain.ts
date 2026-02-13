@@ -7,15 +7,24 @@ import type {
   TransferRequest,
 } from "../../domain/entities/blockchain";
 import { container } from "../../application";
-import { runWithLoading } from "./runWithLoading";
 
 export function useBlockchain() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const run = useCallback(
-    <T>(fn: () => Promise<T>, fallback: T, msg: string) =>
-      runWithLoading(setLoading, setError, fn, fallback, msg),
+    async <T>(fn: () => Promise<T>, fallback: T, msg: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        return await fn();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : msg);
+        return fallback;
+      } finally {
+        setLoading(false);
+      }
+    },
     []
   );
 

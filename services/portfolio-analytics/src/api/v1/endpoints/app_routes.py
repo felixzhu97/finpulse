@@ -3,6 +3,10 @@ from typing import Annotated, Dict, List
 from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect
 
 from src.api.v1.mappers.portfolio_assembler import assemble_portfolio
+from src.api.v1.schemas.portfolio_read_models import (
+  AssetAllocationItemView,
+  RiskSummaryView,
+)
 from src.api.config import CACHE_TTL_SECONDS, PORTFOLIO_AGGREGATE_KEY_PREFIX
 from src.api.dependencies import get_cache, get_market_data_service, get_portfolio_service, get_quote_history_service
 from src.core.application.use_cases.market_data_service import MarketDataService
@@ -56,6 +60,26 @@ def register(r: APIRouter) -> None:
                 ttl_seconds=CACHE_TTL_SECONDS,
             )
         return response
+
+    @r.get("/api/v1/portfolio/risk-summary", response_model=RiskSummaryView)
+    async def portfolio_risk_summary_get(
+        svc: Annotated[PortfolioApplicationService, Depends(get_portfolio_service)],
+    ):
+        summary = await svc.get_risk_summary()
+        return RiskSummaryView(
+          highRatio=summary.high_ratio,
+          topHoldingsConcentration=summary.top_holdings_concentration,
+        )
+
+    @r.get(
+        "/api/v1/portfolio/asset-allocation-by-account-type",
+        response_model=list[AssetAllocationItemView],
+    )
+    async def portfolio_asset_allocation_by_account_type_get(
+        svc: Annotated[PortfolioApplicationService, Depends(get_portfolio_service)],
+    ):
+        items = await svc.get_asset_allocation_by_account_type()
+        return [AssetAllocationItemView(type=item.type, value=item.value) for item in items]
 
     @r.get("/api/v1/quotes")
     def quotes_get(

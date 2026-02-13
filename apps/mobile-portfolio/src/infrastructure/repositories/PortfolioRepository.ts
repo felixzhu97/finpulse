@@ -7,6 +7,7 @@ import type {
 } from "../../domain/entities/portfolio";
 import type { IPortfolioRepository } from "../../domain/repositories/IPortfolioRepository";
 import { httpClient } from "../api/httpClient";
+import { portfolioApi } from "../api/portfolioApi";
 
 export class PortfolioRepository implements IPortfolioRepository {
   private cache: Portfolio | null = null;
@@ -50,17 +51,7 @@ export class PortfolioRepository implements IPortfolioRepository {
   }
 
   async getAssetAllocationByAccountType(): Promise<AssetAllocationItem[]> {
-    const portfolio = await this.getPortfolio();
-    if (!portfolio) return [];
-    const grouped = new Map<Account["type"], number>();
-    portfolio.accounts.forEach((account) => {
-      const current = grouped.get(account.type) ?? 0;
-      grouped.set(account.type, current + Math.max(account.balance, 0));
-    });
-    return Array.from(grouped.entries()).map(([type, value]) => ({
-      type,
-      value,
-    }));
+    return portfolioApi.getAssetAllocationByAccountType();
   }
 
   async getPortfolioHistory(): Promise<PortfolioHistoryPoint[]> {
@@ -69,34 +60,14 @@ export class PortfolioRepository implements IPortfolioRepository {
   }
 
   async getRiskSummary(): Promise<RiskSummary> {
-    const portfolio = await this.getPortfolio();
-    if (!portfolio) return { highRatio: 0, topHoldingsConcentration: 0 };
-    const allHoldings = portfolio.accounts.flatMap((account) => account.holdings);
-    const totalMarketValue = allHoldings.reduce(
-      (sum, holding) => sum + holding.marketValue,
-      0
-    );
-    const highRiskValue = allHoldings
-      .filter((holding) => holding.riskLevel === "high")
-      .reduce((sum, holding) => sum + holding.marketValue, 0);
-    const sortedBySize = [...allHoldings].sort(
-      (a, b) => b.marketValue - a.marketValue
-    );
-    const topFive = sortedBySize.slice(0, 5);
-    const topFiveValue = topFive.reduce(
-      (sum, holding) => sum + holding.marketValue,
-      0
-    );
-    if (!totalMarketValue) {
+    const summary = await portfolioApi.getRiskSummary();
+    if (!summary) {
       return { highRatio: 0, topHoldingsConcentration: 0 };
     }
-    return {
-      highRatio: highRiskValue / totalMarketValue,
-      topHoldingsConcentration: topFiveValue / totalMarketValue,
-    };
+    return summary;
   }
 
   private async fetchFromApi(): Promise<Portfolio | null> {
-    return httpClient.get<Portfolio>("/api/v1/portfolio");
+    return portfolioApi.getPortfolio();
   }
 }

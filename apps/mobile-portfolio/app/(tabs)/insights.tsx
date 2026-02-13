@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, Dimensions, Platform } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
 import { RiskMetricDetailDrawer } from "@/src/presentation/components/insights";
 import { useComputedVar } from "@/src/presentation/hooks/useComputedVar";
 import { useRiskMetrics } from "@/src/presentation/hooks/useRiskMetrics";
-import { container } from "@/src/application";
+import { useRiskSummary } from "@/src/presentation/hooks/useRiskSummary";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
 import {
@@ -30,39 +30,17 @@ export default function InsightsScreen() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const { metrics, loading, error, refresh } = useRiskMetrics();
-  const { computedVar, loading: varLoading, compute: computeVar } = useComputedVar();
-  const [highRatio, setHighRatio] = useState(0);
-  const [topConcentration, setTopConcentration] = useState(0);
-  const [localLoading, setLocalLoading] = useState(true);
+  const { summary, loading: summaryLoading, error: summaryError, refresh: refreshSummary } = useRiskSummary();
+  const { computedVar, loading: varLoading, error: varError, compute: computeVar } = useComputedVar();
   const [detailDrawerVisible, setDetailDrawerVisible] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState<{ key: string; value: number } | null>(null);
 
-  const riskUseCase = useMemo(() => container.getRiskMetricsUseCase(), []);
-
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      const [risk] = await Promise.all([
-        riskUseCase.getRiskSummary(),
-        computeVar(),
-      ]);
-      if (!active) return;
-      setHighRatio(risk.highRatio);
-      setTopConcentration(risk.topHoldingsConcentration);
-      setLocalLoading(false);
-    };
-    load();
-    return () => {
-      active = false;
-    };
-  }, [computeVar, riskUseCase]);
-
   const handleRefresh = useCallback(async () => {
-    await Promise.all([refresh(), computeVar()]);
-    const risk = await riskUseCase.getRiskSummary();
-    setHighRatio(risk.highRatio);
-    setTopConcentration(risk.topHoldingsConcentration);
-  }, [refresh, computeVar, riskUseCase]);
+    await Promise.all([refresh(), refreshSummary(), computeVar()]);
+  }, [refresh, refreshSummary, computeVar]);
+
+  const highRatio = summary?.highRatio ?? 0;
+  const topConcentration = summary?.topHoldingsConcentration ?? 0;
 
   const highRiskPercent = (highRatio * 100).toFixed(1);
   const concentrationPercent = (topConcentration * 100).toFixed(1);
@@ -80,7 +58,9 @@ export default function InsightsScreen() {
   const screenWidth = Dimensions.get("window").width;
   const chartWidth = screenWidth - 80;
 
-  if (error && !metrics && !localLoading) {
+  const hasError = (error || summaryError || varError) && !metrics && !summary && !computedVar;
+
+  if (hasError) {
     return (
       <InsightsCentered>
         <InsightsErrorText>{t("insights.unableToLoad")}</InsightsErrorText>
@@ -100,7 +80,7 @@ export default function InsightsScreen() {
     <InsightsScrollView
       contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
     >
-      {loading && !metrics && localLoading ? (
+      {(loading && !metrics) || (summaryLoading && !summary) || (varLoading && !computedVar) ? (
         <InsightsLoadingContainer>
           <ActivityIndicator size="small" color={colors.textSecondary} />
         </InsightsLoadingContainer>

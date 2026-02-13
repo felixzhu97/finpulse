@@ -35,6 +35,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(use_preferences_hook, "usePreferences", "Hook", "Redux 管理的用户偏好")
         Component(use_theme_hook, "useTheme", "Hook", "当前主题颜色")
         Component(use_risk_metrics_hook, "useRiskMetrics", "Hook", "风险指标 API")
+        Component(use_risk_summary_hook, "useRiskSummary", "Hook", "风险摘要（高风险持仓占比、前五大持仓集中度）")
         Component(use_computed_var_hook, "useComputedVar", "Hook", "VaR 计算")
         
         Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes、history、subscribedSymbols、extraSubscribedSymbols")
@@ -56,6 +57,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(get_portfolio_usecase, "GetPortfolioUseCase", "TypeScript", "组合用例")
         Component(get_customer_usecase, "GetCustomerUseCase", "TypeScript", "客户用例")
         Component(get_quotes_usecase, "GetQuotesUseCase", "TypeScript", "报价用例")
+        Component(risk_metrics_usecase, "RiskMetricsUseCase", "TypeScript", "风险指标、风险摘要、VaR 计算用例")
     }
 
     ' Domain Layer
@@ -73,11 +75,12 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes")
         Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL")
         
-        Component(portfolio_repo_impl, "PortfolioRepository", "TypeScript", "实现 IPortfolioRepository")
+        Component(portfolio_repo_impl, "PortfolioRepository", "TypeScript", "实现 IPortfolioRepository（薄客户端；将组合与风险逻辑委托给后端 API）")
         Component(quote_repo_impl, "QuoteRepository", "TypeScript", "实现 IQuoteRepository")
         Component(customer_repo_impl, "CustomerRepository", "TypeScript", "实现 ICustomerRepository")
         Component(other_repo_impls, "其他仓库", "TypeScript", "UserPreference、Watchlist 等")
         Component(accounts_api, "accountsApi", "TypeScript", "账户 API 客户端")
+        Component(portfolio_api_client, "PortfolioApi", "TypeScript", "组合 API 客户端（组合、风险摘要、资产配置）")
         
         Component(web3_service, "web3Service", "TypeScript", "Web3 集成")
         Component(utils, "工具函数", "TypeScript", "infrastructure utils")
@@ -99,6 +102,7 @@ Rel(use_portfolio_hook, dependency_container, "获取用例", "")
 Rel(use_symbol_display_hook, dependency_container, "获取仓库", "")
 Rel(use_preferences_hook, dependency_container, "获取仓库", "")
 Rel(use_risk_metrics_hook, dependency_container, "获取用例", "")
+Rel(use_risk_summary_hook, dependency_container, "获取用例", "")
 Rel(use_computed_var_hook, dependency_container, "获取用例", "")
 Rel(use_account_data_hook, dependency_container, "获取用例", "")
 
@@ -106,9 +110,11 @@ Rel(use_account_data_hook, dependency_container, "获取用例", "")
 Rel(dependency_container, get_portfolio_usecase, "提供", "")
 Rel(dependency_container, get_customer_usecase, "提供", "")
 Rel(dependency_container, get_quotes_usecase, "提供", "")
+Rel(dependency_container, risk_metrics_usecase, "提供", "")
 Rel(get_portfolio_usecase, portfolio_repo_interface, "使用", "")
 Rel(get_customer_usecase, customer_repo_interface, "使用", "")
 Rel(get_quotes_usecase, quote_repo_interface, "使用", "")
+Rel(risk_metrics_usecase, portfolio_repo_interface, "使用", "")
 
 ' Infrastructure implements Domain
 Rel(portfolio_repo_impl, portfolio_repo_interface, "实现", "")
@@ -128,6 +134,7 @@ Rel(quote_repo_impl, http_client, "使用", "")
 Rel(customer_repo_impl, http_client, "使用", "")
 Rel(http_client, api_config, "使用", "")
 Rel(http_client, portfolio_api, "HTTP", "")
+Rel(portfolio_api_client, portfolio_api, "HTTP", "/api/v1/portfolio, /api/v1/portfolio/risk-summary, /api/v1/portfolio/asset-allocation-by-account-type")
 Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
 Rel(accounts_api, http_client, "使用", "")
 Rel(accounts_api, portfolio_api, "HTTP", "")
@@ -157,6 +164,7 @@ Rel(watchlist_screen, sort_menu, "使用", "")
 Rel(watchlist_screen, glass_search_bar, "使用", "")
 
 Rel(analytics_screen, use_risk_metrics_hook, "使用", "")
+Rel(analytics_screen, use_risk_summary_hook, "使用", "")
 Rel(analytics_screen, use_refresh_control_hook, "使用", "")
 Rel(analytics_screen, use_computed_var_hook, "使用", "")
 Rel(analytics_screen, metric_card, "使用", "")

@@ -64,8 +64,7 @@ package "Presentation Layer" <<Presentation>> {
         component "Stocks screen" as StocksScreen {
             component "StockListItem" as StockListItem
             component "NativeSparkline" as NativeSparkline
-            component "useRealtimeQuotes" as UseRealtimeQuotes
-            component "usePerSymbolHistory" as UsePerSymbolHistory
+            component "useSymbolDisplayData" as UseSymbolDisplayData
         }
         component "NativeDemoCard (demo native card)" as NativeDemoCard {
             component "iOS RCTViewManager" as NativeDemoCardIOS
@@ -171,7 +170,7 @@ package "External Services" <<External>> {
     component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
         component "FastAPI app (Clean Architecture)" as FastAPIApp
         component "composition.py, container, crud_helpers, api/config" as FastAPIStructure
-        component "GET /api/v1/portfolio, POST /seed" as PortfolioGet
+        component "GET /api/v1/portfolio, POST /seed, GET /api/v1/portfolio/risk-summary, GET /api/v1/portfolio/asset-allocation-by-account-type" as PortfolioGet
         component "GET /api/v1/quotes, WebSocket /ws/quotes" as QuotesGet
         component "MarketDataService + KafkaMarketDataProvider" as MarketDataServiceComponent
         component "AI/ML (integrated)" as AIMLAPI {
@@ -236,8 +235,7 @@ MobileHooks --> DependencyContainer
 ExpoRN --> StocksScreen
 StocksScreen --> StockListItem
 StockListItem --> NativeSparkline
-StocksScreen --> UseRealtimeQuotes
-StocksScreen --> UsePerSymbolHistory
+StocksScreen --> UseSymbolDisplayData
 ExpoRN --> NativeDemoCard
 NativeDemoCard --> NativeDemoCardIOS
 NativeDemoCard --> NativeDemoCardAndroid

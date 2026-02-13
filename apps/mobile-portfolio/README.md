@@ -115,14 +115,16 @@ If you see **"Unable to locate a Java Runtime"**: set `JAVA_HOME` to a JDK 17+ (
 
 ## Backend
 
-The app connects only to the backend; there is no in-app mock data.
+The app is a thin client: all portfolio and risk business logic runs on the Portfolio Analytics API; the mobile app focuses on presentation, navigation, and light orchestration.
 
 | Endpoint | Usage |
 |----------|--------|
-| `GET /api/v1/portfolio` | Aggregated portfolio (Overview, Accounts, Analytics) |
+| `GET /api/v1/portfolio` | Aggregated portfolio (Overview, Accounts, Analytics) used by `PortfolioApi.getPortfolio()` |
+| `GET /api/v1/portfolio/risk-summary` | Portfolio risk summary (high risk ratio, top holdings concentration) used by `PortfolioApi.getRiskSummary()` and `useRiskSummary` |
+| `GET /api/v1/portfolio/asset-allocation-by-account-type` | Asset allocation grouped by account type used by `PortfolioApi.getAssetAllocationByAccountType()` and `GetPortfolioUseCase` |
 | `GET /api/v1/quotes?symbols=...` | One-off quote fetch via `getQuotes(symbols)` |
 | `WS /ws/quotes` | Real-time quotes via `createQuoteSocket` (Watchlist screen) |
-| `POST /api/v1/seed` | Seed portfolio via `portfolioApi.seedPortfolio(payload)` |
+| `POST /api/v1/seed` | Seed portfolio via `PortfolioRepository.seedPortfolio(payload)` |
 | `GET /api/v1/customers` | Customer info for Account Profile |
 | `POST /api/v1/customers` | Register customer (returns `ai_identity_score`) |
 | `GET /api/v1/accounts` | Account list for payment/trade flows |

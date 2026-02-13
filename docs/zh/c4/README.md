@@ -14,13 +14,12 @@
 4. **整洁架构（投资组合 API）** — `clean-architecture-portfolio-api.puml`
 5. **Web 应用组件** — `c4-web-app-components.puml`
 6. **移动端投资组合组件** — `c4-mobile-portfolio-components.puml`
-7. **移动端演示组件** — `c4-mobile-demo-components.puml`
 
 ### 移动端投资组合组件
 
 **文件**：`c4-mobile-portfolio-components.puml`
 
-**说明**：移动端投资组合应用（Expo + React Native）薄客户端：AppContent（偏好加载 spinner）、标签/屏幕；**Redux Toolkit**（quotes 含 subscribedSymbols + extraSubscribedSymbols、preferences、portfolio）；**styled-components** 主题 UI（基元 ScreenRoot、ListRow、CardBordered 等）；hooks（usePortfolio、useSymbolDisplayData、usePreferences）；QuoteSocketSubscriber 订阅合并符号；StockDetailDrawer 通过 setExtraSubscribedSymbols 添加符号；账户屏 useFocusEffect；原生图表；后端 GET /api/v1/portfolio、GET /api/v1/quotes、WS /ws/quotes。
+**说明**：移动端投资组合应用（Expo + React Native）薄客户端：AppContent（偏好加载 spinner）、标签/屏幕；**Redux Toolkit**（quotes 含 subscribedSymbols + extraSubscribedSymbols、preferences、portfolio）；**styled-components** 主题 UI（基元 ScreenRoot、ListRow、CardBordered 等）；hooks（usePortfolio、useSymbolDisplayData、usePreferences、useRiskMetrics、useRiskSummary、useComputedVar）；QuoteSocketSubscriber 订阅合并符号；StockDetailDrawer 通过 setExtraSubscribedSymbols 添加符号；账户屏 useFocusEffect；原生图表；后端 GET /api/v1/portfolio、GET /api/v1/portfolio/risk-summary、GET /api/v1/portfolio/asset-allocation-by-account-type、GET /api/v1/quotes、WS /ws/quotes。
 
 ### 投资组合分析 API 组件
 
@@ -38,7 +37,7 @@
 
 ```bash
 cd docs/zh/c4
-plantuml c4-system-context.puml c4-containers.puml c4-components.puml clean-architecture-portfolio-api.puml c4-web-app-components.puml c4-mobile-portfolio-components.puml c4-mobile-demo-components.puml
+plantuml c4-system-context.puml c4-containers.puml c4-components.puml clean-architecture-portfolio-api.puml c4-web-app-components.puml c4-mobile-portfolio-components.puml
 plantuml -tsvg *.puml
 ```
 

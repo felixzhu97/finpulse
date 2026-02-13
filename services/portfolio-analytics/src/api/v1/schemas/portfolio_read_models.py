@@ -47,3 +47,13 @@ class PortfolioView(BaseModel):
     accounts: List[AccountView]
     summary: PortfolioSummaryView
     history: List[HistoryPointView]
+
+
+class RiskSummaryView(BaseModel):
+    highRatio: float
+    topHoldingsConcentration: float
+
+
+class AssetAllocationItemView(BaseModel):
+    type: str
+    value: float

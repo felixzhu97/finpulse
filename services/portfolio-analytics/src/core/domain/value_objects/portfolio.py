@@ -14,3 +14,15 @@ class PortfolioSummary:
 class HistoryPoint:
   date: str
   value: float
+
+
+@dataclass(frozen=True)
+class RiskSummary:
+  high_ratio: float
+  top_holdings_concentration: float
+
+
+@dataclass(frozen=True)
+class AssetAllocationItem:
+  type: str
+  value: float

@@ -1,6 +1,8 @@
 class ApiPaths:
     PREFIX = "/api/v1"
     PORTFOLIO = f"{PREFIX}/portfolio"
+    PORTFOLIO_RISK_SUMMARY = f"{PREFIX}/portfolio/risk-summary"
+    PORTFOLIO_ASSET_ALLOCATION = f"{PREFIX}/portfolio/asset-allocation-by-account-type"
     SEED = f"{PREFIX}/seed"
     BLOCKCHAIN_BLOCKS = f"{PREFIX}/blockchain/blocks"
     BLOCKCHAIN_BLOCK = f"{PREFIX}/blockchain/blocks"

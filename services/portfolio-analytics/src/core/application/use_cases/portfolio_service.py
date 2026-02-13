@@ -1,12 +1,17 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional
 
 from src.core.application.ports.message_brokers.event_ports import IEventPublisherPort
 from src.core.application.ports.repositories.portfolio_repository import IPortfolioRepository
 from src.core.domain.entities.portfolio import Account, Holding, Portfolio
 from src.core.domain.events import PortfolioEvent
-from src.core.domain.value_objects.portfolio import HistoryPoint, PortfolioSummary
+from src.core.domain.value_objects.portfolio import (
+  AssetAllocationItem,
+  HistoryPoint,
+  PortfolioSummary,
+  RiskSummary,
+)
 
 
 def _demo_portfolio() -> Portfolio:
@@ -42,21 +47,35 @@ def _demo_portfolio() -> Portfolio:
 
 def _portfolio_from_raw(raw: dict) -> Optional[Portfolio]:
   try:
-    accounts = []
+    accounts: List[Account] = []
     for a in raw["accounts"]:
       holdings = [
         Holding(
-          h["id"], h["symbol"], h["name"],
-          float(h["quantity"]), float(h["price"]), float(h["costBasis"]),
-          float(h["marketValue"]), float(h["profit"]), float(h["profitRate"]),
-          h["assetClass"], h["riskLevel"],
+          h["id"],
+          h["symbol"],
+          h["name"],
+          float(h["quantity"]),
+          float(h["price"]),
+          float(h["costBasis"]),
+          float(h["marketValue"]),
+          float(h["profit"]),
+          float(h["profitRate"]),
+          h["assetClass"],
+          h["riskLevel"],
         )
         for h in a["holdings"]
       ]
-      accounts.append(Account(
-        a["id"], a["name"], a["type"], a["currency"],
-        float(a["balance"]), float(a["todayChange"]), holdings,
-      ))
+      accounts.append(
+        Account(
+          a["id"],
+          a["name"],
+          a["type"],
+          a["currency"],
+          float(a["balance"]),
+          float(a["todayChange"]),
+          holdings,
+        )
+      )
     summary = PortfolioSummary(
       float(raw["summary"]["totalAssets"]),
       float(raw["summary"]["totalLiabilities"]),
@@ -66,8 +85,12 @@ def _portfolio_from_raw(raw: dict) -> Optional[Portfolio]:
     )
     history = [HistoryPoint(h["date"], float(h["value"])) for h in raw["history"]]
     return Portfolio(
-      raw["id"], raw["ownerName"], raw["baseCurrency"],
-      accounts, summary, history,
+      raw["id"],
+      raw["ownerName"],
+      raw["baseCurrency"],
+      accounts,
+      summary,
+      history,
     )
   except (KeyError, TypeError):
     return None
@@ -81,6 +104,31 @@ class PortfolioApplicationService:
     async def get_portfolio(self, portfolio_id: str = "demo-portfolio") -> Portfolio:
         portfolio = await self._repo.get(portfolio_id)
         return portfolio if portfolio is not None else _demo_portfolio()
+
+    async def get_risk_summary(self, portfolio_id: str = "demo-portfolio") -> RiskSummary:
+        portfolio = await self.get_portfolio(portfolio_id)
+        holdings: List[Holding] = []
+        for account in portfolio.accounts:
+            holdings.extend(account.holdings)
+        total_market_value = sum(max(h.market_value, 0) for h in holdings)
+        if not total_market_value:
+            return RiskSummary(high_ratio=0.0, top_holdings_concentration=0.0)
+        high_risk_value = sum(max(h.market_value, 0) for h in holdings if h.risk_level == "high")
+        sorted_by_size = sorted(holdings, key=lambda h: h.market_value, reverse=True)
+        top_five = sorted_by_size[:5]
+        top_five_value = sum(max(h.market_value, 0) for h in top_five)
+        return RiskSummary(
+          high_ratio=high_risk_value / total_market_value,
+          top_holdings_concentration=top_five_value / total_market_value,
+        )
+
+    async def get_asset_allocation_by_account_type(self, portfolio_id: str = "demo-portfolio") -> List[AssetAllocationItem]:
+        portfolio = await self.get_portfolio(portfolio_id)
+        grouped: Dict[str, float] = {}
+        for account in portfolio.accounts:
+            current = grouped.get(account.type, 0.0)
+            grouped[account.type] = current + max(account.balance, 0.0)
+        return [AssetAllocationItem(type=key, value=value) for key, value in grouped.items()]
 
     async def seed_portfolio(self, payload: Any) -> bool:
         if not isinstance(payload, dict):

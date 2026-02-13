@@ -82,8 +82,7 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
         component "股票屏幕" as StocksScreen {
             component "StockListItem" as StockListItem
             component "NativeSparkline" as NativeSparkline
-            component "useRealtimeQuotes" as UseRealtimeQuotes
-            component "usePerSymbolHistory" as UsePerSymbolHistory
+            component "useSymbolDisplayData" as UseSymbolDisplayData
         }
         component "NativeDemoCard (demo native card)" as NativeDemoCard {
             component "iOS RCTViewManager" as NativeDemoCardIOS
@@ -292,7 +291,7 @@ package "外部服务层 (External Services)" <<External>> {
     component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
         component "FastAPI app (Clean Architecture)" as FastAPIApp
         component "composition.py、container、crud_helpers、api/config" as FastAPIStructure
-        component "GET /api/v1/portfolio, POST /seed" as PortfolioGet
+        component "GET /api/v1/portfolio, POST /seed, GET /api/v1/portfolio/risk-summary, GET /api/v1/portfolio/asset-allocation-by-account-type" as PortfolioGet
         component "AI/ML（融入业务）" as AIMLAPI {
             component "Payments → 欺诈检测" as AIML1
             component "Trades → 监控" as AIML2
@@ -371,8 +370,7 @@ MobileHooks --> DependencyContainer
 ExpoRN --> StocksScreen
 StocksScreen --> StockListItem
 StockListItem --> NativeSparkline
-StocksScreen --> UseRealtimeQuotes
-StocksScreen --> UsePerSymbolHistory
+StocksScreen --> UseSymbolDisplayData
 ExpoRN --> NativeDemoCard
 NativeDemoCard --> NativeDemoCardIOS
 NativeDemoCard --> NativeDemoCardAndroid

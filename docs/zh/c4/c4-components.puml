@@ -6,9 +6,9 @@ title 投资组合分析 API - 组件图
 
 Container_Boundary(portfolio_api, "投资组合分析 API") {
     Boundary(api_boundary, "API 层") {
-        Component(portfolio_router, "投资组合路由", "FastAPI", "REST: GET /portfolio, POST /seed")
+        Component(portfolio_router, "投资组合路由", "FastAPI", "REST: GET /api/v1/portfolio, POST /api/v1/seed")
         Component(resource_router, "资源路由", "FastAPI", "REST: /api/v1/* 通过 register_crud + 自定义；CRUD、batch；payments→欺诈、trades→监控、customers→身份、risk-metrics→VaR")
-        Component(quotes_router, "行情路由", "FastAPI", "REST: GET /quotes、GET /quotes/history、WebSocket /ws/quotes")
+        Component(quotes_router, "行情路由", "FastAPI", "REST: GET /api/v1/quotes、GET /api/v1/quotes/history、WebSocket /ws/quotes")
         Component(blockchain_router, "区块链路由", "FastAPI", "REST: /api/v1/blockchain - 转账、区块、余额")
     }
     

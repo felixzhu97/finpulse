@@ -10,7 +10,6 @@ System_Boundary(finpulse, "FinPulse") {
     Boundary(frontend_boundary, "前端应用") {
         Container(web_app, "Web 应用", "Angular 21", "金融分析控制台：投资组合、市场趋势、风险、交易")
         Container(mobile_portfolio, "移动端投资组合", "Expo + React Native", "投资组合应用：股票、实时行情、原生图表。整洁架构：展示层 → 应用层 → 领域层 ← 基础设施层")
-        Container(mobile_demo, "移动端演示", "React Native", "演示应用与原生图表展示")
     }
     
     Boundary(backend_boundary, "后端服务") {
@@ -36,7 +35,6 @@ Rel(investor, web_app, "使用", "HTTPS")
 Rel(investor, mobile_portfolio, "使用", "HTTPS / WebSocket")
 Rel(web_app, portfolio_api, "API 调用", "REST / WebSocket")
 Rel(mobile_portfolio, portfolio_api, "API 调用", "REST / WebSocket")
-Rel(mobile_demo, portfolio_api, "API 调用", "REST")
 Rel(portfolio_api, timescale, "读写", "SQL / asyncpg")
 Rel(portfolio_api, redis, "缓存", "Redis 协议")
 Rel(portfolio_api, kafka, "发布与消费", "Kafka")

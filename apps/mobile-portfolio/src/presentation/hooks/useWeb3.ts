@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { container } from "../../application";
 import type { WalletInfo, Web3Config } from "../../domain/entities/blockchain";
-import { runWithLoading } from "./runWithLoading";
 
 const DEFAULT_CONFIG: Web3Config = {
   rpcUrl: "https://eth.llamarpc.com",
@@ -24,8 +23,18 @@ export function useWeb3(config?: Web3Config) {
   }, [config]);
 
   const run = useCallback(
-    <T>(fn: () => Promise<T>, fallback: T, msg: string) =>
-      runWithLoading(setLoading, setError, fn, fallback, msg),
+    async <T>(fn: () => Promise<T>, fallback: T, msg: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        return await fn();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : msg);
+        return fallback;
+      } finally {
+        setLoading(false);
+      }
+    },
     []
   );
 

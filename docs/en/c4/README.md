@@ -14,7 +14,6 @@ This directory contains **English** C4 PlantUML diagrams.
 4. [Clean Architecture (Portfolio API)](#clean-architecture-portfolio-api) — `clean-architecture-portfolio-api.puml`
 5. [Web App Components](#web-app-components) — `c4-web-app-components.puml`
 6. [Mobile Portfolio Components](#mobile-portfolio-components) — `c4-mobile-portfolio-components.puml`
-7. [Mobile Demo Components](#mobile-demo-components) — `c4-mobile-demo-components.puml`
 
 ## Diagram Reference
 
@@ -28,7 +27,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-containers.puml`
 
-**Description**: Web App, Mobile Portfolio, Mobile Demo, Portfolio Analytics API, TimescaleDB, Redis, Kafka.
+**Description**: Web App, Mobile Portfolio, Portfolio Analytics API, TimescaleDB, Redis, Kafka.
 
 ### Portfolio Analytics API Components
 
@@ -52,19 +51,13 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-mobile-portfolio-components.puml`
 
-**Description**: Mobile Portfolio app (Expo + React Native): thin client with AppContent (preferences loading spinner), tabs/screens; **Redux Toolkit** (quotes with subscribedSymbols + extraSubscribedSymbols, preferences, portfolio); **styled-components** for theme-aware UI (primitives: ScreenRoot, ListRow, CardBordered, etc.); hooks (usePortfolio, useSymbolDisplayData, usePreferences); QuoteSocketSubscriber subscribes to merged symbols; StockDetailDrawer adds symbol via setExtraSubscribedSymbols; Account screen uses useFocusEffect; native charts; backend: GET /api/v1/portfolio, GET /api/v1/quotes, WS /ws/quotes.
-
-### Mobile Demo Components
-
-**File**: `c4-mobile-demo-components.puml`
-
-**Description**: Mobile Demo app (React Native): tabs, home/cart/categories/profile/product, ApiService, ProductService, stores, UI components.
+**Description**: Mobile Portfolio app (Expo + React Native): thin client with AppContent (preferences loading spinner), tabs/screens; **Redux Toolkit** (quotes with subscribedSymbols + extraSubscribedSymbols, preferences, portfolio); **styled-components** for theme-aware UI (primitives: ScreenRoot, ListRow, CardBordered, etc.); hooks (usePortfolio, useSymbolDisplayData, usePreferences, useRiskMetrics, useRiskSummary, useComputedVar); QuoteSocketSubscriber subscribes to merged symbols; StockDetailDrawer adds symbol via setExtraSubscribedSymbols; Account screen uses useFocusEffect; native charts; backend: GET /api/v1/portfolio, GET /api/v1/portfolio/risk-summary, GET /api/v1/portfolio/asset-allocation-by-account-type, GET /api/v1/quotes, WS /ws/quotes.
 
 ## How to View Diagrams
 
 ```bash
 cd docs/en/c4
-plantuml c4-system-context.puml c4-containers.puml c4-components.puml clean-architecture-portfolio-api.puml c4-web-app-components.puml c4-mobile-portfolio-components.puml c4-mobile-demo-components.puml
+plantuml c4-system-context.puml c4-containers.puml c4-components.puml clean-architecture-portfolio-api.puml c4-web-app-components.puml c4-mobile-portfolio-components.puml
 plantuml -tsvg *.puml
 ```
 
