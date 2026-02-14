@@ -97,7 +97,7 @@ function formatHeaderDate(locale: string = "en-US") {
 
 function buildListRows(
   baseAccounts: Account[],
-  quotes: Record<string, { price: number; change: number }>
+  quotes: Record<string, { price: number; change: number; volume?: number }>
 ): ListRow[] {
   const rows: ListRow[] = [];
   for (const account of baseAccounts) {
