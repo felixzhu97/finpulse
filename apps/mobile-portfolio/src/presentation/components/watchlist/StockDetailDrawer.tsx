@@ -34,6 +34,7 @@ export interface StockDetailItem {
   name: string | null;
   price: number;
   change: number;
+  volume?: number;
   historyValues?: number[];
 }
 
@@ -87,10 +88,10 @@ export function StockDetailDrawer({
     };
   }, [visible, drawerSymbols.join(","), dispatch]);
 
-  const fallbackQuote = item ? quotes[item.symbol.toUpperCase()] : undefined;
-  const price = displayData?.price ?? fallbackQuote?.price ?? item?.price ?? 0;
-  const change = displayData?.change ?? fallbackQuote?.change ?? item?.change ?? 0;
-  const realtimeVolume = fallbackQuote?.volume;
+  const quote = item ? quotes[item.symbol.toUpperCase()] : undefined;
+  const price = quote?.price ?? item?.price ?? 0;
+  const change = quote?.change ?? item?.change ?? 0;
+  const realtimeVolume = quote?.volume;
 
   const allChartValues = useMemo(() => {
     if (displayData?.history?.length) return displayData.history;

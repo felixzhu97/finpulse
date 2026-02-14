@@ -12,12 +12,13 @@ import { setSubscribedSymbols } from "../store/quotesSlice";
 export interface SymbolDisplayData {
   price: number;
   change: number;
+  volume?: number;
   history: number[];
 }
 
 export interface UseSymbolDisplayDataResult {
   bySymbol: Record<string, SymbolDisplayData>;
-  quoteMap: Record<string, { price: number; change: number }>;
+  quoteMap: Record<string, { price: number; change: number; volume?: number }>;
   historyBySymbol: Record<string, number[]>;
   status: QuoteConnectionStatus;
 }
@@ -44,7 +45,10 @@ export function useSymbolDisplayData(
   const quoteMap = useMemo(
     () =>
       Object.fromEntries(
-        Object.entries(quotes).map(([k, v]) => [k, { price: v.price, change: v.change }])
+        Object.entries(quotes).map(([k, v]) => [
+          k,
+          { price: v.price, change: v.change, volume: v.volume },
+        ])
       ),
     [quotes]
   );
@@ -67,6 +71,7 @@ export function useSymbolDisplayData(
       out[key] = {
         price,
         change: q?.change ?? 0,
+        volume: q?.volume,
         history: hist,
       };
     }
