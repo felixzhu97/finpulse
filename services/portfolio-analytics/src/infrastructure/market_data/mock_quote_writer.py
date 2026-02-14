@@ -4,31 +4,10 @@ from typing import Optional
 
 from src.infrastructure.database.repositories.realtime_quote_repository import RealtimeQuoteRepository
 from src.infrastructure.market_data.kafka_quote_producer import KafkaQuoteProducer
+from src.infrastructure.market_data.nasdaq_symbols import NASDAQ_200_SYMBOLS, initial_prices
 
-
-DEFAULT_SYMBOLS = [
-    "AAPL", "TSLA", "GOOG", "GOOGL", "META", "MSFT", "AMZN",
-    "BRK.B", "JPM", "SPY", "NVDA",
-    "9988.HK", "0700.HK", "3690.HK", "1810.HK",
-]
-
-DEFAULT_INITIAL_PRICES = {
-    "AAPL": 234.38,
-    "TSLA": 419.29,
-    "GOOG": 325.71,
-    "GOOGL": 175.40,
-    "META": 603.52,
-    "MSFT": 411.71,
-    "AMZN": 200.99,
-    "BRK.B": 415.00,
-    "JPM": 218.50,
-    "SPY": 585.00,
-    "NVDA": 875.28,
-    "9988.HK": 157.90,
-    "0700.HK": 560.00,
-    "3690.HK": 91.05,
-    "1810.HK": 35.20,
-}
+DEFAULT_SYMBOLS = NASDAQ_200_SYMBOLS
+DEFAULT_INITIAL_PRICES = initial_prices()
 
 
 class MockQuoteWriter:
