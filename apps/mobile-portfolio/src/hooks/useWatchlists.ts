@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
-import type { Instrument } from "@/src/types/instrument";
-import type { Watchlist } from "@/src/types/watchlist";
+import type { Instrument } from "@/src/lib/types/instrument";
+import type { Watchlist } from "@/src/lib/types/watchlist";
 import { container } from "@/src/lib/services/DependencyContainer";
 import type { WatchlistWithItems } from "../lib/services/WatchlistUseCase";
 import { useAsyncLoad } from "./useAsyncLoad";

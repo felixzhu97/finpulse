@@ -2,15 +2,15 @@ import { memo, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useBlockchain } from "@/src/hooks/useBlockchain";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/lib/i18n";
 import { formatBalance } from "@/src/lib/utils";
-import type { BlockchainBalance } from "@/src/types/blockchain";
+import type { BlockchainBalance } from "@/src/lib/types/blockchain";
 import {
   CardBordered,
   RowTitle,
   RowSubtitle,
-} from "@/src/styles/primitives";
+} from "@/src/theme/primitives";
 import styled from "styled-components/native";
 
 const Header = styled.View`

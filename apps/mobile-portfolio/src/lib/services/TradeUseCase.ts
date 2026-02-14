@@ -1,11 +1,11 @@
-import type { AccountResource } from "@/src/types/accountResource";
-import type { Instrument } from "@/src/types/instrument";
-import type { Order } from "@/src/types/order";
-import type { Trade } from "@/src/types/trade";
-import type { IAccountRepository } from "@/src/types/IAccountRepository";
-import type { IInstrumentRepository } from "@/src/types/IInstrumentRepository";
-import type { IOrderRepository } from "@/src/types/IOrderRepository";
-import type { ITradeRepository } from "@/src/types/ITradeRepository";
+import type { AccountResource } from "@/src/lib/types/accountResource";
+import type { Instrument } from "@/src/lib/types/instrument";
+import type { Order } from "@/src/lib/types/order";
+import type { Trade } from "@/src/lib/types/trade";
+import type { IAccountRepository } from "@/src/lib/types/IAccountRepository";
+import type { IInstrumentRepository } from "@/src/lib/types/IInstrumentRepository";
+import type { IOrderRepository } from "@/src/lib/types/IOrderRepository";
+import type { ITradeRepository } from "@/src/lib/types/ITradeRepository";
 
 export class TradeUseCase {
   constructor(

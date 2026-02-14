@@ -1,4 +1,4 @@
-import type { AccountResource } from "@/src/types/accountResource";
+import type { AccountResource } from "@/src/lib/types/accountResource";
 
 export interface IAccountRepository {
   list(limit?: number, offset?: number): Promise<AccountResource[]>;

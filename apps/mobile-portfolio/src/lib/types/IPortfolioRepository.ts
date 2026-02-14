@@ -4,7 +4,7 @@ import type {
   Portfolio,
   PortfolioHistoryPoint,
   RiskSummary,
-} from "@/src/types/portfolio";
+} from "@/src/lib/types/portfolio";
 
 export interface IPortfolioRepository {
   getPortfolio(): Promise<Portfolio | null>;

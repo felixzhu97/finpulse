@@ -11,11 +11,11 @@ import {
   View,
 } from "react-native";
 import { container } from "@/src/lib/services/DependencyContainer";
-import type { Instrument } from "@/src/types/instrument";
-import type { Order } from "@/src/types/order";
-import type { Trade } from "@/src/types/trade";
+import type { Instrument } from "@/src/lib/types/instrument";
+import type { Order } from "@/src/lib/types/order";
+import type { Trade } from "@/src/lib/types/trade";
 import { useDraggableDrawer } from "@/src/hooks/useDraggableDrawer";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import {
   AbsoluteFill,
   BlockRowHalf,
@@ -34,7 +34,7 @@ import {
   DrawerSubmitButton,
   DrawerSubmitButtonText,
   DrawerErrorText,
-} from "@/src/styles/primitives";
+} from "@/src/theme/primitives";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "@/src/lib/i18n";
 

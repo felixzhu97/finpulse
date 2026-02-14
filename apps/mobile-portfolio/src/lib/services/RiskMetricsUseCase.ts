@@ -1,7 +1,7 @@
-import type { RiskMetrics } from "@/src/types/riskMetrics";
-import type { VarComputeResult } from "@/src/types/varCompute";
-import type { IPortfolioRepository } from "@/src/types/IPortfolioRepository";
-import type { IRiskMetricsRepository } from "@/src/types/IRiskMetricsRepository";
+import type { RiskMetrics } from "@/src/lib/types/riskMetrics";
+import type { VarComputeResult } from "@/src/lib/types/varCompute";
+import type { IPortfolioRepository } from "@/src/lib/types/IPortfolioRepository";
+import type { IRiskMetricsRepository } from "@/src/lib/types/IRiskMetricsRepository";
 
 export class RiskMetricsUseCase {
   constructor(

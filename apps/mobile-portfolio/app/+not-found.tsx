@@ -1,5 +1,5 @@
 import { Text } from "react-native";
-import { CenteredContainer } from "@/src/styles/primitives";
+import { CenteredContainer } from "@/src/theme/primitives";
 
 export default function NotFoundScreen() {
   return (

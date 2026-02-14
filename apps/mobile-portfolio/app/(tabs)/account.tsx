@@ -3,7 +3,7 @@ import { ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import styled from "styled-components/native";
-import type { Account } from "@/src/types";
+import type { Account } from "@/src/lib/types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useAccountData } from "@/src/hooks";
 import { SettingsDrawer } from "@/src/components/account/SettingsDrawer";
@@ -12,9 +12,9 @@ import { NewPaymentDrawer } from "@/src/components/account/NewPaymentDrawer";
 import { NewTradeDrawer } from "@/src/components/account/NewTradeDrawer";
 import { BlockchainBalanceCard, BlockchainTransferDrawer } from "@/src/components/blockchain";
 import { formatBalance } from "@/src/lib/utils";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/lib/i18n";
-import { CardBordered } from "@/src/styles/primitives";
+import { CardBordered } from "@/src/theme/primitives";
 
 const ACCOUNT_CARD_PADDING = 20;
 

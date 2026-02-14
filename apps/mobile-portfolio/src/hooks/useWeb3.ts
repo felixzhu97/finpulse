@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { container } from "@/src/lib/services/DependencyContainer";
-import type { WalletInfo, Web3Config } from "@/src/types/blockchain";
+import type { WalletInfo, Web3Config } from "@/src/lib/types/blockchain";
 
 const DEFAULT_CONFIG: Web3Config = {
   rpcUrl: "https://eth.llamarpc.com",

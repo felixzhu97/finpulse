@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import type { RiskSummary } from "@/src/types/portfolio";
+import type { RiskSummary } from "@/src/lib/types/portfolio";
 import { container } from "@/src/lib/services/DependencyContainer";
 import { useAsyncLoad } from "./useAsyncLoad";
 

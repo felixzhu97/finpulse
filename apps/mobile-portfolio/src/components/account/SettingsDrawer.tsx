@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useDraggableDrawer } from "@/src/hooks/useDraggableDrawer";
 import { usePreferences } from "@/src/hooks/usePreferences";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import {
   AbsoluteFill,
   DrawerModalRoot,
@@ -23,7 +23,7 @@ import {
   DrawerHeader,
   DrawerHeaderTitle,
   DrawerCloseButton,
-} from "@/src/styles/primitives";
+} from "@/src/theme/primitives";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "@/src/lib/i18n";
 
@@ -51,9 +51,9 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
   const [saving, setSaving] = useState(false);
 
   const THEME_OPTIONS = [
-    { value: "dark" as const, label: t("styles.dark") },
-    { value: "light" as const, label: t("styles.light") },
-    { value: "auto" as const, label: t("styles.auto") },
+    { value: "dark" as const, label: t("theme.dark") },
+    { value: "light" as const, label: t("theme.light") },
+    { value: "auto" as const, label: t("theme.auto") },
   ];
 
   const LANGUAGE_OPTIONS = [
@@ -71,7 +71,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
       try {
         await updateTheme(themeValue);
       } catch (error) {
-        console.error("Failed to update styles:", error);
+        console.error("Failed to update theme:", error);
       } finally {
         setSaving(false);
       }
@@ -143,7 +143,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
             ) : (
               <View style={{ gap: 32 }}>
                 <View style={{ gap: 12 }}>
-                  <Text style={{ fontSize: 13, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.5, color: colors.textTertiary }}>{t("common.styles")}</Text>
+                  <Text style={{ fontSize: 13, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.5, color: colors.textTertiary }}>{t("common.theme")}</Text>
                   <View style={{ flexDirection: "row", gap: 8 }}>
                     {THEME_OPTIONS.map((option) => {
                       const isSelected = theme === option.value;

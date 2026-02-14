@@ -5,7 +5,7 @@ import type {
   BlockchainTransaction,
   TransferRequest,
   SeedBalanceRequest,
-} from "@/src/types/blockchain";
+} from "@/src/lib/types/blockchain";
 
 export interface IBlockchainRepository {
   getBlocks(limit?: number, offset?: number): Promise<BlockchainBlock[]>;

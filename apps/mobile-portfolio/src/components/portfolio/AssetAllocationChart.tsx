@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Dimensions } from "react-native";
 import { PieChart } from "react-native-chart-kit";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import styled from "styled-components/native";
 
 type AllocationItem = { label: string; value: number };

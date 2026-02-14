@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { UserPreference } from "@/src/types/userPreference";
+import type { UserPreference } from "@/src/lib/types/userPreference";
 import { container } from "@/src/lib/services/DependencyContainer";
 
 export interface UseUserPreferencesResult {

@@ -1,6 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useMemo, useState } from "react";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import {
   Animated,
   Dimensions,
@@ -12,7 +12,7 @@ import {
   View,
 } from "react-native";
 import { useDraggableDrawer } from "@/src/hooks/useDraggableDrawer";
-import type { Instrument } from "@/src/types/instrument";
+import type { Instrument } from "@/src/lib/types/instrument";
 import {
   AbsoluteFill,
   DrawerModalRoot,
@@ -21,7 +21,7 @@ import {
   DrawerSafe,
   DrawerDragArea,
   DrawerHandle,
-} from "@/src/styles/primitives";
+} from "@/src/theme/primitives";
 
 interface AddSymbolModalProps {
   visible: boolean;

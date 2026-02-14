@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import type { VarComputeResult } from "@/src/types/varCompute";
+import type { VarComputeResult } from "@/src/lib/types/varCompute";
 import { container } from "@/src/lib/services/DependencyContainer";
 
 export interface UseComputedVarResult {

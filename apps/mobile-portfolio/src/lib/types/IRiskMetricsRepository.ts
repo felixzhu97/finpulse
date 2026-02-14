@@ -1,5 +1,5 @@
-import type { RiskMetrics } from "@/src/types/riskMetrics";
-import type { VarComputeRequest, VarComputeResult } from "@/src/types/varCompute";
+import type { RiskMetrics } from "@/src/lib/types/riskMetrics";
+import type { VarComputeRequest, VarComputeResult } from "@/src/lib/types/varCompute";
 
 export interface IRiskMetricsRepository {
   list(limit?: number, offset?: number): Promise<RiskMetrics[]>;

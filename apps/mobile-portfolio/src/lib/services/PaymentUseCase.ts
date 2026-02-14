@@ -1,7 +1,7 @@
-import type { AccountResource } from "@/src/types/accountResource";
-import type { Payment } from "@/src/types/payment";
-import type { IAccountRepository } from "@/src/types/IAccountRepository";
-import type { IPaymentRepository } from "@/src/types/IPaymentRepository";
+import type { AccountResource } from "@/src/lib/types/accountResource";
+import type { Payment } from "@/src/lib/types/payment";
+import type { IAccountRepository } from "@/src/lib/types/IAccountRepository";
+import type { IPaymentRepository } from "@/src/lib/types/IPaymentRepository";
 
 export class PaymentUseCase {
   constructor(

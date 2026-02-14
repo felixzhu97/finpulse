@@ -1,4 +1,4 @@
-import type { QuoteConnectionStatus, QuoteSnapshot } from "@/src/types/quotes";
+import type { QuoteConnectionStatus, QuoteSnapshot } from "@/src/lib/types/quotes";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 const MAX_HISTORY_POINTS = 45;

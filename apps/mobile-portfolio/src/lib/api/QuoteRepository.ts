@@ -1,5 +1,5 @@
-import type { QuoteData } from "@/src/types/quotes";
-import type { IQuoteRepository } from "@/src/types/IQuoteRepository";
+import type { QuoteData } from "@/src/lib/types/quotes";
+import type { IQuoteRepository } from "@/src/lib/types/IQuoteRepository";
 import { httpClient } from "@/src/lib/network/httpClient";
 
 export class QuoteRepository implements IQuoteRepository {

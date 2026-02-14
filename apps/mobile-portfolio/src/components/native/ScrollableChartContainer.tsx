@@ -2,7 +2,7 @@ import { View, ScrollView, Text } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
 import type { ReactNode } from "react";
 import { ChartTooltipOverlay } from "./chartTooltip";
-import { AbsoluteFillView } from "@/src/styles/primitives";
+import { AbsoluteFillView } from "@/src/theme/primitives";
 import { X_AXIS_HEIGHT, X_LABEL_COUNT } from "./useScrollableChart";
 import type { ScrollableChartSelection } from "./useScrollableChart";
 

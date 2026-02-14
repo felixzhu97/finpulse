@@ -15,7 +15,7 @@ import type { SymbolDisplayData } from "@/src/hooks/useSymbolDisplayData";
 import { formatPrice, formatSigned } from "@/src/lib/utils";
 import { getStockChangeInfo, PeriodDataProcessor } from "@/src/lib/utils";
 import { InteractiveStockChart } from "./InteractiveStockChart";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import { useAppDispatch, useAppSelector } from "@/src/store";
 import { selectQuotesForSymbols } from "@/src/store/quotesSelectors";
 import { setExtraSubscribedSymbols } from "@/src/store/quotesSlice";
@@ -27,7 +27,7 @@ import {
   DrawerSafe,
   DrawerDragArea,
   DrawerHandle,
-} from "@/src/styles/primitives";
+} from "@/src/theme/primitives";
 
 export interface StockDetailItem {
   symbol: string;

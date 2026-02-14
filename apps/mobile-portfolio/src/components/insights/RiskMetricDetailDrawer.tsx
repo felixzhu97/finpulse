@@ -1,7 +1,7 @@
 import { Animated, Modal, ScrollView, Text } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useDraggableDrawer } from "@/src/hooks/useDraggableDrawer";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/lib/i18n";
 import {
   AbsoluteFill,
@@ -14,7 +14,7 @@ import {
   DrawerHeader,
   DrawerHeaderTitle,
   DrawerCloseButton,
-} from "@/src/styles/primitives";
+} from "@/src/theme/primitives";
 import styled from "styled-components/native";
 
 interface RiskMetricDetailDrawerProps {

@@ -1,6 +1,6 @@
-import type { UserPreference } from "@/src/types/userPreference";
-import type { ICustomerRepository } from "@/src/types/ICustomerRepository";
-import type { IUserPreferenceRepository } from "@/src/types/IUserPreferenceRepository";
+import type { UserPreference } from "@/src/lib/types/userPreference";
+import type { ICustomerRepository } from "@/src/lib/types/ICustomerRepository";
+import type { IUserPreferenceRepository } from "@/src/lib/types/IUserPreferenceRepository";
 
 export interface UpdatePreferenceInput {
   theme?: string | null;

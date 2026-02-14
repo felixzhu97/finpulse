@@ -1,4 +1,4 @@
-import type { Customer, CustomerCreate } from "@/src/types/customer";
+import type { Customer, CustomerCreate } from "@/src/lib/types/customer";
 
 export interface ICustomerRepository {
   getFirst(): Promise<Customer | null>;

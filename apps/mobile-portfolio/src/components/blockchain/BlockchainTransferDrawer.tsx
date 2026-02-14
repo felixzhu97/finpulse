@@ -26,12 +26,12 @@ import {
   DrawerInput,
   DrawerSubmitButton,
   DrawerSubmitButtonText,
-} from "@/src/styles/primitives";
+} from "@/src/theme/primitives";
 import { useBlockchain } from "@/src/hooks/useBlockchain";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/lib/i18n";
-import type { Account } from "@/src/types/portfolio";
-import type { AccountResource } from "@/src/types/accountResource";
+import type { Account } from "@/src/lib/types/portfolio";
+import type { AccountResource } from "@/src/lib/types/accountResource";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const DRAWER_HEIGHT = Math.min(SCREEN_HEIGHT * 0.75, 600);

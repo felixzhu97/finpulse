@@ -1,5 +1,5 @@
 import { memo } from "react";
-import type { Holding } from "@/src/types/portfolio";
+import type { Holding } from "@/src/lib/types/portfolio";
 import { formatPrice, formatSigned, getStockChangeInfo } from "@/src/lib/utils";
 import { Sparkline } from "../ui/Sparkline";
 import {
@@ -13,7 +13,7 @@ import {
   RowChangeContainer,
   RowChange,
   RowChangePercent,
-} from "@/src/styles/primitives";
+} from "@/src/theme/primitives";
 
 interface StockListItemProps {
   holding: Holding;

@@ -6,7 +6,7 @@ import { RiskMetricDetailDrawer } from "@/src/components/insights";
 import { useComputedVar } from "@/src/hooks/useComputedVar";
 import { useRiskMetrics } from "@/src/hooks/useRiskMetrics";
 import { useRiskSummary } from "@/src/hooks/useRiskSummary";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/lib/i18n";
 import {
   InsightsScrollView,
@@ -24,7 +24,7 @@ import {
   InsightsRetryText,
   InsightsCentered,
   InsightsLoadingContainer,
-} from "@/src/styles/primitives";
+} from "@/src/theme/primitives";
 
 export default function InsightsScreen() {
   const { colors } = useTheme();

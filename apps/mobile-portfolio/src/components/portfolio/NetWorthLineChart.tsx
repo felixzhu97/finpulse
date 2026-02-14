@@ -1,8 +1,8 @@
 import { memo, useMemo, useState } from "react";
 import { View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import type { PortfolioHistoryPoint } from "@/src/types/portfolio";
-import { useTheme } from "@/src/styles";
+import type { PortfolioHistoryPoint } from "@/src/lib/types/portfolio";
+import { useTheme } from "@/src/theme";
 import { formatCompactCurrency } from "@/src/lib/utils";
 import styled from "styled-components/native";
 

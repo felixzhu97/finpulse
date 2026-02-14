@@ -1,7 +1,7 @@
 import { ActivityIndicator, TouchableOpacity } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useWeb3 } from "@/src/hooks/useWeb3";
-import { useTheme } from "@/src/styles";
+import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/lib/i18n";
 import styled from "styled-components/native";
 

@@ -28,11 +28,11 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 
 ## Project Structure (Clean Architecture)
 
-The app follows **Clean Architecture** with a flat `src/` layout. Logical layers are preserved; code lives under `src/types/`, `src/lib/*`, `src/hooks/`, `src/components/`, `src/styles/`, `src/store/`.
+The app follows **Clean Architecture** with a flat `src/` layout. Logical layers (domain, application, infrastructure, presentation) are preserved; code lives under `src/lib/*`, `src/hooks`, `src/components`, `src/theme`, `src/store`.
 
 ### Architecture Layers
 
-- **Domain** (`src/types/`): Entities and repository interfaces
+- **Domain** (`src/lib/types/`): Entities and repository interfaces
   - Entity types: `portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`, `payment.ts`, `trade.ts`, `order.ts`, `blockchain.ts`, `accountResource.ts`, `varCompute.ts`
   - Repository interfaces: `IPortfolioRepository`, `IQuoteRepository`, `ICustomerRepository`, `IUserPreferenceRepository`, `IWatchlistRepository`, `IInstrumentRepository`, `IRiskMetricsRepository`, `IPaymentRepository`, `ITradeRepository`, `IOrderRepository`, `IBlockchainRepository`, `IAccountRepository`
 
@@ -46,11 +46,11 @@ The app follows **Clean Architecture** with a flat `src/` layout. Logical layers
   - `lib/api/`: Repository implementations (`PortfolioRepository`, `QuoteRepository`, `CustomerRepository`, etc.)
   - `lib/utils/`: `format.ts`, `stockDisplay.ts`, `PeriodDataProcessor.ts`
 
-- **Presentation**: UI, hooks, state, styles, i18n
+- **Presentation**: UI, hooks, state, theme, i18n
   - `src/components/`: Feature-based components (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
   - `src/hooks/`: `usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useDraggableDrawer`, `useAsyncLoad`, etc.
   - `src/store/`: Redux (quotes, preferences, portfolio slices, selectors, `QuoteSocketSubscriber`)
-  - `src/styles/`: `colors.ts`, `useTheme.ts`, `StyledThemeProvider`, `primitives.ts`, `themeTypes.ts`
+  - `src/theme/`: `colors.ts`, `useTheme.ts`, `StyledThemeProvider`, `primitives.ts`, `themeTypes.ts`
   - `src/lib/i18n/`: `config.ts`, locales (en, zh), `useTranslation`
 
 - `app/`: Expo Router file-based routes and screens
@@ -162,8 +162,8 @@ Single Redux-backed flow, one WebSocket:
 
 The app supports light and dark themes with automatic system theme detection and **styled-components** for theme-aware UI:
 
-- **Theme System**: `src/styles/colors.ts` defines light/dark schemes; `src/styles/useTheme.ts` provides `useTheme()`; `themeTypes.ts` defines `AppTheme` and augments styled-components `DefaultTheme`.
-- **Styled Components**: Root layout uses `StyledThemeProvider` (injects `colors` from `useTheme()`). Primitives in `src/styles/primitives.ts`: `ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, `LabelText`, `ValueText`, `RowTitle`, `withTheme()`. Screens and lists use these for theme-driven styling.
+- **Theme System**: `src/theme/colors.ts` defines light/dark schemes; `src/theme/useTheme.ts` provides `useTheme()`; `themeTypes.ts` defines `AppTheme` and augments styled-components `DefaultTheme`.
+- **Styled Components**: Root layout uses `StyledThemeProvider` (injects `colors` from `useTheme()`). Primitives in `src/theme/primitives.ts`: `ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, `LabelText`, `ValueText`, `RowTitle`, `withTheme()`. Screens and lists use these for theme-driven styling.
 - **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Initial loading is component-level: `AppContent` shows a spinner until `usePreferences().loading` is false. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
 - **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.
 

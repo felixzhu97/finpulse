@@ -1,4 +1,4 @@
-import type { Payment, PaymentCreate } from "@/src/types/payment";
+import type { Payment, PaymentCreate } from "@/src/lib/types/payment";
 
 export interface IPaymentRepository {
   list(limit?: number, offset?: number): Promise<Payment[]>;

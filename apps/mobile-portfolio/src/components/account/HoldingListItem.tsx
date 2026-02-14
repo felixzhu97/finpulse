@@ -1,5 +1,5 @@
 import { memo } from "react";
-import type { Holding } from "@/src/types/portfolio";
+import type { Holding } from "@/src/lib/types/portfolio";
 import { formatCurrency, formatSigned, formatSignedPercent } from "@/src/lib/utils";
 import {
   HoldingRow,
@@ -9,7 +9,7 @@ import {
   HoldingMeta,
   HoldingValue,
   HoldingChange,
-} from "@/src/styles/primitives";
+} from "@/src/theme/primitives";
 
 interface HoldingListItemProps {
   holding: Holding;

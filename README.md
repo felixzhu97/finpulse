@@ -114,7 +114,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 
 - **apps/web** - Angular-based financial analytics web console.
 - **apps/mobile** - React Native demo mobile app.
-- **apps/mobile-portfolio** - React Native (Expo) portfolio app; flat `src/` layout: `src/types/`, `src/lib/` (services, api, network, i18n, utils), `src/hooks/`, `src/components/`, `src/styles/`, `src/store/`. Stocks screen with real-time prices and sparklines (NativeSparkline, useSymbolDisplayData); native views NativeDemoCard and six charts (Metal/OpenGL ES); OOP base classes and ChartSupport helpers. Theme, tooltips, drag-to-scroll via `useScrollableChart`, `ScrollableChartContainer`.
+- **apps/mobile-portfolio** - React Native (Expo) portfolio app; flat `src/` layout: `src/lib/` (types, services, api, network, i18n, utils), `src/hooks/`, `src/components/`, `src/theme/`, `src/store/`. Stocks screen with real-time prices and sparklines (NativeSparkline, useSymbolDisplayData); native views NativeDemoCard and six charts (Metal/OpenGL ES); OOP base classes and ChartSupport helpers. Theme, tooltips, drag-to-scroll via `useScrollableChart`, `ScrollableChartContainer`.
 - **services/portfolio-analytics** - Python FastAPI backend (Clean Architecture: composition, container, crud_helpers); PostgreSQL; Kafka; REST resources + batch create; AI/ML (VaR, fraud, surveillance, sentiment, identity, forecast); config via `.env.example`; `pnpm run start:backend`; `pnpm run test:api`.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
@@ -337,7 +337,7 @@ fintech-project/
 Angular-based financial analytics web console. Uses `chart.js`/`ng2-charts` for performance charts and `chartjs-chart-financial` for candlestick stock charts. Depends on `@fintech/ui` and `@fintech/utils`.
 
 #### `apps/mobile-portfolio`
-Expo + React Native portfolio app. Structure: `src/types/`, `src/lib/` (services, api, network, i18n, utils), `src/hooks/`, `src/components/`, `src/styles/`, `src/store/`. Native views: NativeDemoCard, six charts (NativeLineChart, NativeCandleChart, etc.), NativeSparkline on Stocks; Metal (iOS) / OpenGL ES (Android); OOP base classes and ChartSupport helpers. Theme (light/dark), tooltips, drag-to-scroll; wrappers in `src/components/native/`.
+Expo + React Native portfolio app. Structure: `src/lib/` (types, services, api, network, i18n, utils), `src/hooks/`, `src/components/`, `src/theme/`, `src/store/`. Native views: NativeDemoCard, six charts (NativeLineChart, NativeCandleChart, etc.), NativeSparkline on Stocks; Metal (iOS) / OpenGL ES (Android); OOP base classes and ChartSupport helpers. Theme (light/dark), tooltips, drag-to-scroll; wrappers in `src/components/native/`.
 
 #### `packages/ui`
 Shared UI component library, a collection of components built on Radix UI and Tailwind CSS. Can be reused across multiple applications.

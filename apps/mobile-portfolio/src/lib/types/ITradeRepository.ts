@@ -1,4 +1,4 @@
-import type { Trade, TradeCreate } from "@/src/types/trade";
+import type { Trade, TradeCreate } from "@/src/lib/types/trade";
 
 export interface ITradeRepository {
   list(limit?: number, offset?: number): Promise<Trade[]>;
