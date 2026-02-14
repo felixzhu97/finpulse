@@ -49,7 +49,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(theme_primitives, "主题基元", "styled-components/native", "ScreenRoot、ListRow、CardBordered、LabelText、ValueText、withTheme")
         Component(i18n_config, "i18n 配置", "TypeScript", "i18next 设置、翻译资源")
         Component(use_translation, "useTranslation", "Hook", "翻译 Hook")
-        Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "lib/utils 周期过滤")
+        Component(period_data_processor, "PeriodDataProcessor", "TypeScript", "presentation/utils 周期过滤")
         Component(storybook_ui_root, "StorybookUIRoot", "Storybook React Native", "原生组件和 React Native 组件的设备端目录")
     }
 
@@ -83,7 +83,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(other_repo_impls, "其他仓库", "TypeScript", "UserPreference、Watchlist 等")
         
         Component(web3_service, "web3Service", "TypeScript", "Web3 集成")
-        Component(utils, "工具函数", "TypeScript", "lib/utils")
+        Component(utils, "工具函数", "TypeScript", "infrastructure utils")
     }
 
     ' Native Components

@@ -7,10 +7,8 @@
 
 | 子目录 | 说明 |
 |--------|------|
-| [c4/](c4/README.md) | C4 模型图（PlantUML） |
-| [togaf/](togaf/README.md) | TOGAF 架构图（业务、应用、数据、技术） |
-| [domain/](domain/README.md) | 金融系统领域图 |
-| [er-diagram/](er-diagram/README.md) | 实体关系图 |
+| [architecture/](architecture/README.md) | TOGAF 架构图与说明（业务、应用、数据、技术） |
+| [domain/](domain/README.md) | 金融系统领域图（综合架构、领域、流程） |
 | [TODO.md](TODO.md) | 项目 TODO 中文版 |
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/felixzhu97s-projects/fintech-project)
@@ -122,7 +120,7 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 
 - **apps/web** - 基于 Angular 的金融分析 Web 控制台。
 - **apps/mobile** - React Native 演示移动应用。
-- **apps/mobile-portfolio** - React Native（Expo）组合应用；扁平化 `src/`：`src/lib/`（types、services、api、network、i18n、utils）、`src/hooks/`、`src/components/`、`src/theme/`、`src/store/`。Stocks 屏实时报价与 sparkline；原生图表（Metal/OpenGL ES）；主题、提示、拖拽滚动。
+- **apps/mobile-portfolio** - React Native（Expo）组合概览与指标应用；**Stocks** 屏幕展示实时价格与每股票 sparkline（NativeSparkline、useSymbolDisplayData）；含原生视图 **NativeDemoCard** 及六类原生图表：**NativeLineChart**、**NativeCandleChart**、**NativeAmericanLineChart**、**NativeBaselineChart**、**NativeHistogramChart**、**NativeLineOnlyChart**（iOS Metal，Android OpenGL ES）。图表支持主题（亮/暗）、提示、X 轴标签与水平拖拽滚动，共享 `useScrollableChart`、`ScrollableChartContainer`。
 - **services/portfolio-analytics** - Python FastAPI 后端（Clean Architecture）；PostgreSQL；Kafka；AI/ML 融入 payments、trades、customers、risk-metrics；配置见 `.env.example`；`pnpm run start:backend`；API 测试 `pnpm run test:api`。
 - **packages/ui** - 共享 UI 组件库。
 - **packages/utils** - 共享工具函数库。

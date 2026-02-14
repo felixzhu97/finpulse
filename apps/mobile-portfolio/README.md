@@ -28,32 +28,33 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 
 ## Project Structure (Clean Architecture)
 
-The app follows **Clean Architecture** with a flat `src/` layout. Logical layers (domain, application, infrastructure, presentation) are preserved; code lives under `src/lib/*`, `src/hooks`, `src/components`, `src/theme`, `src/store`.
+The app follows **Clean Architecture** principles with clear separation of concerns across four layers:
 
 ### Architecture Layers
 
-- **Domain** (`src/lib/types/`): Entities and repository interfaces
-  - Entity types: `portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`, `payment.ts`, `trade.ts`, `order.ts`, `blockchain.ts`, `accountResource.ts`, `varCompute.ts`
-  - Repository interfaces: `IPortfolioRepository`, `IQuoteRepository`, `ICustomerRepository`, `IUserPreferenceRepository`, `IWatchlistRepository`, `IInstrumentRepository`, `IRiskMetricsRepository`, `IPaymentRepository`, `ITradeRepository`, `IOrderRepository`, `IBlockchainRepository`, `IAccountRepository`
+- **Domain Layer** (`src/domain/`): Core business entities and repository interfaces
+  - `entities/`: Domain models (`portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`, `payment.ts`, `trade.ts`, `order.ts`, `blockchain.ts`, `accountResource.ts`, `varCompute.ts`)
+  - `repositories/`: Abstract repository interfaces (`IPortfolioRepository`, `IQuoteRepository`, `ICustomerRepository`, `IUserPreferenceRepository`, `IWatchlistRepository`, `IInstrumentRepository`, `IRiskMetricsRepository`, `IPaymentRepository`, `ITradeRepository`, `IOrderRepository`, `IBlockchainRepository`)
 
-- **Application** (`src/lib/services/`): Use cases and DI
-  - Use cases: `GetPortfolioUseCase`, `GetQuotesUseCase`, `GetAccountDataUseCase`, `PaymentUseCase`, `TradeUseCase`, `WatchlistUseCase`, `UserPreferenceUseCase`, `RiskMetricsUseCase`, `BlockchainUseCase`, `RegisterCustomerUseCase`
-  - `DependencyContainer`: provides repository instances and use cases
-  - `QuoteStreamService`, `IQuoteStreamService`, `web3Service`
+- **Application Layer** (`src/application/`): Use cases and application services
+  - `usecases/`: Business use cases (`GetPortfolioUseCase`, `GetQuotesUseCase`, `PaymentUseCase`, `TradeUseCase`, etc.)
+  - `services/`: Dependency injection container (`DependencyContainer`) that provides repository instances and use cases
 
-- **Infrastructure** (`src/lib/api/`, `src/lib/network/`, `src/lib/utils/`): HTTP, WebSocket, and repository implementations
-  - `lib/network/`: `httpClient.ts`, `quoteSocket.ts`, `config.ts`
-  - `lib/api/`: Repository implementations (`PortfolioRepository`, `QuoteRepository`, `CustomerRepository`, etc.)
-  - `lib/utils/`: `format.ts`, `stockDisplay.ts`, `PeriodDataProcessor.ts`
+- **Infrastructure Layer** (`src/infrastructure/`): External concerns and implementations
+  - `api/`: HTTP client, WebSocket client, API configuration (`httpClient.ts`, `quoteSocket.ts`, `config.ts`)
+  - `repositories/`: Concrete repository implementations that implement domain interfaces (`PortfolioRepository`, `QuoteRepository`, `CustomerRepository`, etc.)
+  - `services/`: External service integrations (`QuoteStreamService`, `web3Service`)
+  - `utils/`: Utility exports (`index.ts`)
 
-- **Presentation**: UI, hooks, state, theme, i18n
-  - `src/components/`: Feature-based components (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
-  - `src/hooks/`: `usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useDraggableDrawer`, `useAsyncLoad`, etc.
-  - `src/store/`: Redux (quotes, preferences, portfolio slices, selectors, `QuoteSocketSubscriber`)
-  - `src/theme/`: `colors.ts`, `useTheme.ts`, `StyledThemeProvider`, `primitives.ts`, `themeTypes.ts`
-  - `src/lib/i18n/`: `config.ts`, locales (en, zh), `useTranslation`
+- **Presentation Layer** (`src/presentation/`): UI components, hooks, and state management
+  - `components/`: React Native components organized by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
+  - `hooks/`: React hooks for UI logic (`usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`,  `useDraggableDrawer`, etc.); shared utilities (`useAsyncLoad`, `runWithLoading`)
+  - `utils/`: Presentation utilities (`format.ts`, `stockDisplay.ts`, `PeriodDataProcessor.ts`)
+  - `store/`: Redux state management (quotes slice, preferences slice, portfolio slice, selectors, `QuoteSocketSubscriber`)
+  - `theme/`: Theme system (`colors.ts`, `useTheme.ts` hook, `StyledThemeProvider`, `primitives.ts` styled components, `themeTypes.ts` AppTheme)
+  - `i18n/`: Internationalization (`config.ts`, translation resources, `useTranslation` hook)
 
-- `app/`: Expo Router file-based routes and screens
+- `app/`: Expo Router file-based routing and screens
 
 ### Dependency Flow
 
@@ -67,7 +68,8 @@ Infrastructure ────┘
 - Application layer depends only on Domain layer
 - Infrastructure layer implements Domain interfaces and is used by Application layer
 - No circular dependencies; clear separation of concerns
-- **Native**: `ios/mobileportfolio/` (iOS OOP: BaseChartViewManager, BaseChartView, BaseChartRenderer; ChartSupport, ChartLayoutCalculator, ValueFormatter, AxisLabelManager). `android/.../view/` (Android: ChartGl, ChartCurve, ChartLayoutCalculator, ValueFormatter, AxisLabelManager, HistogramRenderer, sparkline, democard).
+- `ios/mobileportfolio/`: Native iOS code with OOP structure. Chart components inherit from base classes: `BaseChartViewManager` (abstract RCTViewManager), `BaseChartView` (abstract UIView with Metal setup), `BaseChartRenderer` (abstract Metal renderer). Chart components use helper classes: `ChartLayoutCalculator` (layout calculations), `ValueFormatter` (value formatting), `AxisLabelManager` (axis label management), `ChartDataCalculator` (data calculations). ChartSupport provides shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
+- `android/app/src/main/java/com/anonymous/mobileportfolio/view/`: Native Android code with OOP structure. Chart components use helper classes: `ChartLayoutCalculator`, `ValueFormatter`, `AxisLabelManager`, `HistogramRenderer`. Chart package (`view/chart/`) provides ChartGl, ChartCurve, and per-chart themes. Sparkline and democard packages provide specialized components.
 
 ### Diagrams
 
@@ -76,11 +78,11 @@ Infrastructure ────┘
 
 ## Storybook (native component catalog)
 
-This app uses **Storybook for React Native** to document native and React Native components (including Metal/Kotlin chart bridges in `src/components/native`).
+This app uses **Storybook for React Native** to document and exercise native and React Native components (especially the Metal/Kotlin chart bridges in `src/presentation/components/native`).
 
-- **Stories**: `src/components/**/*.stories.tsx` (e.g. `NativeLineChart`, `NativeCandleChart`, `NativeBaselineChart`, `NativeHistogramChart`, `NativeLineOnlyChart`, `NativeSparkline`, `NativeDemoCard`).
-- **Route**: `/storybook` in `app/storybook.tsx`, wrapping `StorybookUIRoot` with a back bar.
-- **Entry** (dev): Account tab → Actions → Storybook row when `__DEV__`.
+- **Stories**: Live under `src/presentation/components/**\/*.stories.tsx`, including the native chart components (`NativeLineChart`, `NativeCandleChart`, `NativeBaselineChart`, `NativeHistogramChart`, `NativeLineOnlyChart`, `NativeSparkline`, `NativeDemoCard`).
+- **Route**: `/storybook` implemented by `app/storybook.tsx`, which wraps `StorybookUIRoot` (from `.rnstorybook`) and adds a simple back bar.
+- **Entry point in UI** (dev only): On the **Account** tab, the **Actions** card shows a `Storybook` row when `__DEV__` is true; tapping it navigates to `/storybook`.
 
 Because the app relies on native chart views, Storybook must run inside the **dev build client**, not inside Expo Go.
 
@@ -162,8 +164,8 @@ Single Redux-backed flow, one WebSocket:
 
 The app supports light and dark themes with automatic system theme detection and **styled-components** for theme-aware UI:
 
-- **Theme System**: `src/theme/colors.ts` defines light/dark schemes; `src/theme/useTheme.ts` provides `useTheme()`; `themeTypes.ts` defines `AppTheme` and augments styled-components `DefaultTheme`.
-- **Styled Components**: Root layout uses `StyledThemeProvider` (injects `colors` from `useTheme()`). Primitives in `src/theme/primitives.ts`: `ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, `LabelText`, `ValueText`, `RowTitle`, `withTheme()`. Screens and lists use these for theme-driven styling.
+- **Theme System**: `src/presentation/theme/colors.ts` defines light/dark color schemes. `useTheme.ts` provides the `useTheme()` hook (no circular dependency with `StyledThemeProvider`). `theme/index.ts` re-exports theme APIs; `themeTypes.ts` defines `AppTheme` and augments styled-components `DefaultTheme`.
+- **Styled Components**: Root layout wraps the app with `StyledThemeProvider`, which reads `useTheme()` and injects `{ colors }` into styled-components. Primitives (`primitives.ts`) include layout primitives (`ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, etc.), text primitives (`LabelText`, `ValueText`, `RowTitle`, etc.), and `withTheme()` for type-safe theme access. Main screens (Dashboard, Account, Watchlist, Insights) and list components use these styled components for consistent, theme-driven styling.
 - **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Initial loading is component-level: `AppContent` shows a spinner until `usePreferences().loading` is false. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
 - **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.
 
@@ -171,7 +173,7 @@ The app supports light and dark themes with automatic system theme detection and
 
 The app supports multiple languages with dynamic language switching:
 
-- **i18n System**: `src/lib/i18n/config.ts` configures i18next; translations in `src/lib/i18n/locales/` (en, zh).
+- **i18n System**: `src/i18n/config.ts` configures i18next with React Native support. Translation resources are stored in `src/i18n/locales/` (currently English and Chinese).
 - **Language Management**: Language preference is stored in Redux (`preferencesSlice`) and synchronized with i18next. When users change language in Settings, all UI text updates immediately.
 - **Components**: All screens and components use `useTranslation()` hook from `react-i18next` to access translated strings. Translation keys are organized by feature (common, tabs, dashboard, watchlist, insights, account).
 - **Language Persistence**: User language preference is saved via `/api/v1/user-preferences` and restored on app launch. The app initializes with the saved language or defaults to English.

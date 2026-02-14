@@ -114,7 +114,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 
 - **apps/web** - Angular-based financial analytics web console.
 - **apps/mobile** - React Native demo mobile app.
-- **apps/mobile-portfolio** - React Native (Expo) portfolio app; flat `src/` layout: `src/lib/` (types, services, api, network, i18n, utils), `src/hooks/`, `src/components/`, `src/theme/`, `src/store/`. Stocks screen with real-time prices and sparklines (NativeSparkline, useSymbolDisplayData); native views NativeDemoCard and six charts (Metal/OpenGL ES); OOP base classes and ChartSupport helpers. Theme, tooltips, drag-to-scroll via `useScrollableChart`, `ScrollableChartContainer`.
+- **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; **Stocks** screen with real-time prices and per-stock sparklines (NativeSparkline, useSymbolDisplayData); native views **NativeDemoCard** and six native charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Native code follows OOP principles: iOS uses **ChartSupport** (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes) and OOP helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartRenderer, ChartDataCalculator, HistogramRenderer); Android uses **view/chart/** (ChartGl, ChartCurve, ChartLayoutCalculator, ValueFormatter, AxisLabelManager, HistogramRenderer, per-chart themes), **view/sparkline/** (SparklineTheme, SparklinePoints), **view/democard/**. Charts support theme (light/dark), tooltips, x-axis labels, full-width rendering, and horizontal drag-to-scroll via `useScrollableChart` and `ScrollableChartContainer`.
 - **services/portfolio-analytics** - Python FastAPI backend (Clean Architecture: composition, container, crud_helpers); PostgreSQL; Kafka; REST resources + batch create; AI/ML (VaR, fraud, surveillance, sentiment, identity, forecast); config via `.env.example`; `pnpm run start:backend`; `pnpm run test:api`.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
@@ -320,11 +320,10 @@ fintech-project/
 │   └── utils/                    # Utility function library (@fintech/utils)
 ├── docs/                         # Documentation (en/ and zh/)
 │   ├── en/                       # English docs
-│   │   ├── c4/                   # C4 model diagrams (PlantUML)
-│   │   ├── togaf/                # TOGAF architecture diagrams (PlantUML)
+│   │   ├── architecture/         # TOGAF architecture diagrams (PlantUML)
 │   │   ├── domain/               # Finance system domain views
 │   │   └── er-diagram/           # Entity-relationship diagram
-│   └── zh/                       # Chinese docs (c4、togaf、领域、ER 图)
+│   └── zh/                       # Chinese docs (架构、领域、ER 图)
 ├── package.json                  # Root package.json (workspaces configuration)
 ├── pnpm-workspace.yaml           # pnpm workspaces configuration
 ├── pnpm-lock.yaml                # Dependency lock file
@@ -337,7 +336,7 @@ fintech-project/
 Angular-based financial analytics web console. Uses `chart.js`/`ng2-charts` for performance charts and `chartjs-chart-financial` for candlestick stock charts. Depends on `@fintech/ui` and `@fintech/utils`.
 
 #### `apps/mobile-portfolio`
-Expo + React Native portfolio app. Structure: `src/lib/` (types, services, api, network, i18n, utils), `src/hooks/`, `src/components/`, `src/theme/`, `src/store/`. Native views: NativeDemoCard, six charts (NativeLineChart, NativeCandleChart, etc.), NativeSparkline on Stocks; Metal (iOS) / OpenGL ES (Android); OOP base classes and ChartSupport helpers. Theme (light/dark), tooltips, drag-to-scroll; wrappers in `src/components/native/`.
+Expo + React Native app for portfolio overview, net worth trend, asset allocation, and stock charts. Native views: **NativeDemoCard** and six charts—**NativeLineChart** (line+area, crosshair/tooltip), **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart**; **NativeSparkline** on Stocks screen. Charts use Metal (iOS) / OpenGL ES (Android), with OOP architecture: iOS **ChartSupport** (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartRenderer, ChartDataCalculator, HistogramRenderer); Android **view/chart/** (ChartGl, ChartCurve, ChartLayoutCalculator, ValueFormatter, AxisLabelManager, HistogramRenderer, themes), **view/sparkline/**, **view/democard/**. Support `theme` (light/dark), tooltips, x-axis labels, full-width rendering, drag-to-scroll; JS: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Wrappers in `src/components/native/`. Code follows clean code principles with simplified logic and removed unused code.
 
 #### `packages/ui`
 Shared UI component library, a collection of components built on Radix UI and Tailwind CSS. Can be reused across multiple applications.
