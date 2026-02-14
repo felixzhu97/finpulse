@@ -1,7 +1,7 @@
 import type { RiskMetrics } from "@/src/types/riskMetrics";
 import type { VarComputeRequest, VarComputeResult } from "@/src/types/varCompute";
 import type { IRiskMetricsRepository } from "@/src/types/IRiskMetricsRepository";
-import { httpClient } from "@/src/lib/api/client/httpClient";
+import { httpClient } from "@/src/lib/network/httpClient";
 
 export class RiskMetricsRepository implements IRiskMetricsRepository {
   async list(limit = 100, offset = 0): Promise<RiskMetrics[]> {

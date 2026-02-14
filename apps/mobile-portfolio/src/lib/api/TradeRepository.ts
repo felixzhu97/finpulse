@@ -1,6 +1,6 @@
 import type { Trade, TradeCreate } from "@/src/types/trade";
 import type { ITradeRepository } from "@/src/types/ITradeRepository";
-import { httpClient } from "@/src/lib/api/client/httpClient";
+import { httpClient } from "@/src/lib/network/httpClient";
 
 export class TradeRepository implements ITradeRepository {
   async list(limit = 100, offset = 0): Promise<Trade[]> {

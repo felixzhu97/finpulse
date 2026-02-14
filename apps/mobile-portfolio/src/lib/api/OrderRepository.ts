@@ -1,6 +1,6 @@
 import type { Order, OrderCreate } from "@/src/types/order";
 import type { IOrderRepository } from "@/src/types/IOrderRepository";
-import { httpClient } from "@/src/lib/api/client/httpClient";
+import { httpClient } from "@/src/lib/network/httpClient";
 
 export class OrderRepository implements IOrderRepository {
   async list(limit = 100, offset = 0): Promise<Order[]> {

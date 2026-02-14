@@ -71,16 +71,16 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(other_repo_interfaces, "其他仓库接口", "TypeScript", "UserPreference、Watchlist、Instrument 等")
     }
 
-    ' Infrastructure Layer (lib/api/client, lib/api/endpoints, lib/utils)
+    ' Infrastructure Layer
     Boundary(infrastructure_layer, "基础设施层") {
-        Component(http_client, "HttpClient", "TypeScript", "lib/api/client：HTTP 客户端")
-        Component(quote_socket, "createQuoteSocket", "TypeScript", "lib/api/client：WebSocket /ws/quotes")
-        Component(api_config, "API Config", "TypeScript", "lib/api/client：EXPO_PUBLIC_PORTFOLIO_API_URL")
+        Component(http_client, "HttpClient", "TypeScript", "HTTP 客户端包装器")
+        Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes")
+        Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL")
         
-        Component(portfolio_repo_impl, "PortfolioRepository", "TypeScript", "lib/api/endpoints：实现 IPortfolioRepository")
-        Component(quote_repo_impl, "QuoteRepository", "TypeScript", "lib/api/endpoints：IQuoteRepository")
-        Component(customer_repo_impl, "CustomerRepository", "TypeScript", "lib/api/endpoints：ICustomerRepository")
-        Component(other_repo_impls, "其他仓库", "TypeScript", "lib/api/endpoints：UserPreference、Watchlist 等")
+        Component(portfolio_repo_impl, "PortfolioRepository", "TypeScript", "实现 IPortfolioRepository（薄客户端；将组合与风险逻辑委托给后端 API）")
+        Component(quote_repo_impl, "QuoteRepository", "TypeScript", "实现 IQuoteRepository")
+        Component(customer_repo_impl, "CustomerRepository", "TypeScript", "实现 ICustomerRepository")
+        Component(other_repo_impls, "其他仓库", "TypeScript", "UserPreference、Watchlist 等")
         
         Component(web3_service, "web3Service", "TypeScript", "Web3 集成")
         Component(utils, "工具函数", "TypeScript", "lib/utils")

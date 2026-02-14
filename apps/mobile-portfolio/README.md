@@ -41,16 +41,16 @@ The app follows **Clean Architecture** with a flat `src/` layout. Logical layers
   - `DependencyContainer`: provides repository instances and use cases
   - `QuoteStreamService`, `IQuoteStreamService`, `web3Service`
 
-- **Infrastructure** (`src/lib/api/`, `src/lib/utils/`): HTTP, WebSocket, and repository implementations
-  - `lib/api/client/`: `httpClient.ts`, `quoteSocket.ts`, `config.ts`
-  - `lib/api/endpoints/`: Repository implementations (`PortfolioRepository`, `QuoteRepository`, `CustomerRepository`, etc.)
+- **Infrastructure** (`src/lib/api/`, `src/lib/network/`, `src/lib/utils/`): HTTP, WebSocket, and repository implementations
+  - `lib/network/`: `httpClient.ts`, `quoteSocket.ts`, `config.ts`
+  - `lib/api/`: Repository implementations (`PortfolioRepository`, `QuoteRepository`, `CustomerRepository`, etc.)
   - `lib/utils/`: `format.ts`, `stockDisplay.ts`, `PeriodDataProcessor.ts`
 
 - **Presentation**: UI, hooks, state, styles, i18n
   - `src/components/`: Feature-based components (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
   - `src/hooks/`: `usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useDraggableDrawer`, `useAsyncLoad`, etc.
   - `src/store/`: Redux (quotes, preferences, portfolio slices, selectors, `QuoteSocketSubscriber`)
-  - `src/styles/`: `colors.ts`, `useTheme.ts`, `themeTypes.ts`, `primitives.ts`, `StyledThemeProvider.tsx`
+  - `src/styles/`: `colors.ts`, `useTheme.ts`, `StyledThemeProvider`, `primitives.ts`, `themeTypes.ts`
   - `src/lib/i18n/`: `config.ts`, locales (en, zh), `useTranslation`
 
 - `app/`: Expo Router file-based routes and screens
@@ -162,8 +162,8 @@ Single Redux-backed flow, one WebSocket:
 
 The app supports light and dark themes with automatic system theme detection and **styled-components** for theme-aware UI:
 
-- **Theme System**: `src/styles/colors.ts` defines light/dark schemes; `src/styles/useTheme.ts` provides `useTheme()`; `src/styles/themeTypes.ts` defines `AppTheme` and augments styled-components `DefaultTheme`.
-- **Styled Components**: Root layout uses `StyledThemeProvider` from `src/styles/` (injects `colors` from `useTheme()`). Primitives in `src/styles/primitives.ts`: `ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, `LabelText`, `ValueText`, `RowTitle`, `withTheme()`. Screens and lists use these for theme-driven styling.
+- **Theme System**: `src/styles/colors.ts` defines light/dark schemes; `src/styles/useTheme.ts` provides `useTheme()`; `themeTypes.ts` defines `AppTheme` and augments styled-components `DefaultTheme`.
+- **Styled Components**: Root layout uses `StyledThemeProvider` (injects `colors` from `useTheme()`). Primitives in `src/styles/primitives.ts`: `ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, `LabelText`, `ValueText`, `RowTitle`, `withTheme()`. Screens and lists use these for theme-driven styling.
 - **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Initial loading is component-level: `AppContent` shows a spinner until `usePreferences().loading` is false. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
 - **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.
 

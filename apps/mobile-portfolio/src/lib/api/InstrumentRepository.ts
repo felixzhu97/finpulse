@@ -1,6 +1,6 @@
 import type { Instrument } from "@/src/types/instrument";
 import type { IInstrumentRepository } from "@/src/types/IInstrumentRepository";
-import { httpClient } from "@/src/lib/api/client/httpClient";
+import { httpClient } from "@/src/lib/network/httpClient";
 
 export class InstrumentRepository implements IInstrumentRepository {
   async list(limit = 500, offset = 0): Promise<Instrument[]> {
