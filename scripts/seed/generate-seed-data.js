@@ -5,6 +5,63 @@ const baseUrl =
 
 const api = (path) => `${baseUrl.replace(/\/$/, "")}${path}`;
 
+const NASDAQ_STOCKS_EXTRA = [
+  ["ABNB", "Airbnb, Inc."], ["ALGN", "Align Technology, Inc."], ["AMAT", "Applied Materials, Inc."], ["ANSS", "Ansys, Inc."], ["ARM", "Arm Holdings plc"],
+  ["BIIB", "Biogen Inc."], ["BKR", "Baker Hughes Company"], ["CCEP", "Coca-Cola Europacific Partners plc"], ["CHTR", "Charter Communications, Inc."], ["CRWD", "CrowdStrike Holdings, Inc."],
+  ["CTAS", "Cintas Corporation"], ["CTSH", "Cognizant Technology Solutions Corporation"], ["DDOG", "Datadog, Inc."], ["DXCM", "DexCom, Inc."], ["EA", "Electronic Arts Inc."],
+  ["EBAY", "eBay Inc."], ["ENPH", "Enphase Energy, Inc."], ["EXC", "Exelon Corporation"], ["FANG", "Diamondback Energy, Inc."], ["FAST", "Fastenal Company"],
+  ["FISV", "Fiserv, Inc."], ["FTNT", "Fortinet, Inc."], ["GEHC", "GE HealthCare Technologies Inc."], ["GFS", "GLOBALFOUNDRIES Inc."], ["HON", "Honeywell International Inc."],
+  ["IDXX", "IDEXX Laboratories, Inc."], ["ILMN", "Illumina, Inc."], ["KDP", "Keurig Dr Pepper Inc."], ["KHC", "The Kraft Heinz Company"], ["LULU", "Lululemon Athletica Inc."],
+  ["MCHP", "Microchip Technology Incorporated"], ["MDB", "MongoDB, Inc."], ["MELI", "MercadoLibre, Inc."], ["MNST", "Monster Beverage Corporation"], ["MRNA", "Moderna, Inc."],
+  ["NTES", "NetEase, Inc."], ["NXPI", "NXP Semiconductors N.V."], ["ODFL", "Old Dominion Freight Line, Inc."], ["ON", "ON Semiconductor Corporation"], ["PAYX", "Paychex, Inc."],
+  ["PCAR", "PACCAR Inc."], ["PDD", "PDD Holdings Inc."], ["PYPL", "PayPal Holdings, Inc."], ["QCOM", "Qualcomm Incorporated"], ["REGN", "Regeneron Pharmaceuticals, Inc."],
+  ["ROST", "Ross Stores, Inc."], ["SIRI", "Sirius XM Holdings Inc."], ["TEAM", "Atlassian Corporation"], ["TXN", "Texas Instruments Incorporated"], ["WBA", "Walgreens Boots Alliance, Inc."],
+  ["XEL", "Xcel Energy Inc."], ["ZS", "Zscaler, Inc."], ["AKAM", "Akamai Technologies, Inc."], ["ALNY", "Alnylam Pharmaceuticals, Inc."], ["BIDU", "Baidu, Inc."],
+  ["BMRN", "BioMarin Pharmaceutical Inc."], ["CDW", "CDW Corporation"], ["CHKP", "Check Point Software Technologies Ltd."], ["CMCSA", "Comcast Corporation"], ["CPRT", "Copart, Inc."],
+  ["CSGP", "CoStar Group, Inc."], ["DLTR", "Dollar Tree, Inc."], ["EXPE", "Expedia Group, Inc."], ["FLEX", "Flex Ltd."], ["HII", "Huntington Ingalls Industries, Inc."],
+  ["ICUI", "ICU Medical, Inc."], ["INCY", "Incyte Corporation"], ["INTU", "Intuit Inc."], ["JD", "JD.com, Inc."], ["MAR", "Marriott International, Inc."],
+  ["NTAP", "NetApp, Inc."], ["OKTA", "Okta, Inc."], ["QGEN", "Qiagen N.V."], ["SPLK", "Splunk Inc."], ["SWKS", "Skyworks Solutions, Inc."],
+  ["TCOM", "Trip.com Group Limited"], ["TRIP", "Tripadvisor, Inc."], ["TTWO", "Take-Two Interactive Software, Inc."], ["VRSK", "Verisk Analytics, Inc."], ["WDAY", "Workday Inc."],
+  ["WDC", "Western Digital Corporation"], ["ZBRA", "Zebra Technologies Corporation"], ["AEP", "American Electric Power Company, Inc."], ["AMED", "Amedisys, Inc."], ["APLS", "Apellis Pharmaceuticals, Inc."],
+  ["ARWR", "Arrowhead Pharmaceuticals, Inc."], ["AXON", "Axon Enterprise, Inc."], ["CARG", "CarGurus, Inc."], ["CGNX", "Cognex Corporation"], ["CRUS", "Cirrus Logic, Inc."],
+  ["DASH", "DoorDash, Inc."], ["DOCU", "DocuSign, Inc."], ["FOLD", "Amicus Therapeutics, Inc."], ["FROG", "JFrog Ltd."], ["GEN", "Gen Digital Inc."],
+  ["HZNP", "Horizon Therapeutics plc"], ["ICLR", "ICON plc"], ["IOVA", "Iovance Biotherapeutics, Inc."], ["IRDM", "Iridium Communications Inc."], ["JAZZ", "Jazz Pharmaceuticals plc"],
+  ["LCID", "Lucid Group, Inc."], ["LPLA", "LPL Financial Holdings Inc."], ["MASI", "Masimo Corporation"], ["MKTX", "MarketAxess Holdings Inc."], ["MODV", "Modivcare Inc."],
+  ["NBIX", "Neurocrine Biosciences, Inc."], ["NCNO", "nCino, Inc."], ["NUVL", "Nuvalent, Inc."], ["OPEN", "Opendoor Technologies Inc."], ["PODD", "Insulet Corporation"],
+  ["RARE", "Ultragenyx Pharmaceutical Inc."], ["RGNX", "Regenxbio Inc."], ["RIVN", "Rivian Automotive, Inc."], ["RUN", "Sunrun Inc."], ["SKY", "Skyline Champion Corporation"],
+  ["SMCI", "Super Micro Computer, Inc."], ["TNDM", "Tandem Diabetes Care, Inc."], ["TREE", "LendingTree, Inc."], ["TWST", "Twist Bioscience Corporation"], ["UAL", "United Airlines Holdings, Inc."],
+  ["VTRS", "Viatris Inc."], ["WIX", "Wix.com Ltd."], ["Z", "Zillow Group, Inc."], ["ZION", "Zions Bancorporation, N.A."], ["AFRM", "Affirm Holdings, Inc."],
+  ["AI", "C3.ai, Inc."], ["BROS", "Dutch Bros Inc."], ["CELH", "Celsius Holdings, Inc."], ["CFLT", "Confluent, Inc."], ["COIN", "Coinbase Global, Inc."],
+  ["DKNG", "DraftKings Inc."], ["DPZ", "Domino's Pizza, Inc."], ["FICO", "Fair Isaac Corporation"], ["FSLR", "First Solar, Inc."], ["GDDY", "GoDaddy Inc."],
+  ["GTLB", "GitLab Inc."], ["HUBS", "HubSpot, Inc."], ["IRTC", "iRhythm Technologies, Inc."], ["LI", "Li Auto Inc."], ["MSTR", "MicroStrategy Incorporated"],
+  ["NU", "Nu Holdings Ltd."], ["PATH", "UiPath Inc."], ["RBLX", "Roblox Corporation"], ["ROKU", "Roku, Inc."], ["SHOP", "Shopify Inc."],
+  ["SNOW", "Snowflake Inc."], ["SOFI", "SoFi Technologies, Inc."], ["TTD", "The Trade Desk, Inc."], ["UBER", "Uber Technologies, Inc."], ["VEEV", "Veeva Systems Inc."],
+  ["WBD", "Warner Bros. Discovery, Inc."], ["ZM", "Zoom Video Communications, Inc."], ["MU", "Micron Technology, Inc."], ["WMT", "Walmart Inc."], ["GOOG", "Alphabet Inc. Class C"],
+  ["META", "Meta Platforms, Inc."], ["TSLA", "Tesla, Inc."], ["ADSK", "Autodesk, Inc."], ["PLTR", "Palantir Technologies Inc."],
+  ["AAPL", "Apple Inc."], ["MSFT", "Microsoft Corporation"], ["GOOGL", "Alphabet Inc. Class A"], ["AMZN", "Amazon.com, Inc."], ["NVDA", "NVIDIA Corporation"],
+  ["NDAQ", "Nasdaq, Inc."], ["BKNG", "Booking Holdings Inc."], ["ADI", "Analog Devices, Inc."], ["MTCH", "Match Group, Inc."], ["LBTYK", "Liberty Global plc Class C"],
+  ["LILAK", "Liberty Latin America Ltd. Class C"], ["QRTEA", "Qurate Retail, Inc. Series A"], ["RDFN", "Redfin Corporation"], ["STX", "Seagate Technology Holdings plc"],
+  ["SYNA", "Synaptics Incorporated"], ["ZG", "Zillow Group, Inc. Class C"], ["YELP", "Yelp Inc."],
+];
+
+function buildNasdaqExtraInstruments() {
+  const seen = new Set();
+  return NASDAQ_STOCKS_EXTRA.map(([symbol, name]) => {
+    if (seen.has(symbol)) return null;
+    seen.add(symbol);
+    return { symbol, name, asset_class: "equity", currency: "USD", exchange: "NASDAQ" };
+  }).filter(Boolean);
+}
+
+function buildNasdaqExtraMarketData(close, i) {
+  const base = (close || 50) + (i % 300);
+  const open = base;
+  const high = base * 1.02;
+  const low = base * 0.98;
+  const change = (i % 5) * 0.1 - 0.2;
+  return { open, high, low, close: base * (1 + change / 100), volume: 1000000 * (1 + (i % 100)), change_pct: change };
+}
+
 const seedPortfolio = {
   id: "demo-portfolio",
   ownerName: "BlackRock Model Portfolio",
@@ -308,6 +365,31 @@ async function seedResources() {
     { symbol: "QQQ", name: "Invesco QQQ Trust", asset_class: "etf", currency: "USD", exchange: "NASDAQ" },
     { symbol: "US912828XG18", name: "United States 10-Year Treasury Note", asset_class: "bond", currency: "USD", exchange: "OTC" },
     { symbol: "AAPL250117C00230000", name: "AAPL Jan 2026 230 Call", asset_class: "option", currency: "USD", exchange: "CBOE" },
+    { symbol: "INTC", name: "Intel Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "AMD", name: "Advanced Micro Devices, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "ADBE", name: "Adobe Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "CRM", name: "Salesforce, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "NFLX", name: "Netflix, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "AVGO", name: "Broadcom Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "ORCL", name: "Oracle Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "CSCO", name: "Cisco Systems, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "PEP", name: "PepsiCo, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "COST", name: "Costco Wholesale Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "ISRG", name: "Intuitive Surgical, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "GILD", name: "Gilead Sciences, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "AMGN", name: "Amgen Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "SBUX", name: "Starbucks Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "TMUS", name: "T-Mobile US, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "VRTX", name: "Vertex Pharmaceuticals Incorporated", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "MDLZ", name: "Mondelez International, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "KLAC", name: "KLA Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "SNPS", name: "Synopsys, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "MRVL", name: "Marvell Technology, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "PANW", name: "Palo Alto Networks, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "CDNS", name: "Cadence Design Systems, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "ASML", name: "ASML Holding N.V.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    { symbol: "LRCX", name: "Lam Research Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+    ...buildNasdaqExtraInstruments().slice(0, 176),
   ]);
   const inst1 = instruments[0];
   const inst2 = instruments[1];
@@ -319,6 +401,7 @@ async function seedResources() {
   const inst8 = instruments[7];
   const inst9 = instruments[8];
   const instOption = instruments[9];
+  const instNasdaqStocks = instruments.slice(10);
 
   const portfolios = await postBatch("/api/v1/portfolios/batch", [
     { account_id: accountIds[0], name: "S&P 500 Growth", base_currency: "USD" },
@@ -435,6 +518,33 @@ async function seedResources() {
   await seedBlockchain(accountIds);
 
   const now = new Date().toISOString();
+  const nasdaqMarketData = [
+    { open: 22.4, high: 22.8, low: 22.2, close: 22.6, volume: 42000000, change_pct: 0.89 },
+    { open: 178.5, high: 181.0, low: 177.8, close: 180.2, volume: 52000000, change_pct: 1.52 },
+    { open: 548.0, high: 552.0, low: 546.0, close: 550.5, volume: 2100000, change_pct: 0.46 },
+    { open: 268.0, high: 271.5, low: 267.0, close: 270.2, volume: 6800000, change_pct: 0.82 },
+    { open: 685.0, high: 692.0, low: 682.0, close: 688.5, volume: 3200000, change_pct: 0.51 },
+    { open: 218.5, high: 222.0, low: 217.5, close: 220.8, volume: 2800000, change_pct: 1.05 },
+    { open: 138.0, high: 140.5, low: 137.2, close: 139.8, volume: 6200000, change_pct: 1.30 },
+    { open: 52.2, high: 52.8, low: 51.8, close: 52.5, volume: 18500000, change_pct: 0.57 },
+    { open: 218.0, high: 220.0, low: 217.0, close: 219.2, volume: 5200000, change_pct: 0.55 },
+    { open: 985.0, high: 992.0, low: 982.0, close: 988.5, volume: 1800000, change_pct: 0.36 },
+    { open: 428.0, high: 432.0, low: 426.0, close: 430.5, volume: 1200000, change_pct: 0.58 },
+    { open: 68.5, high: 69.2, low: 68.0, close: 68.9, volume: 5800000, change_pct: 0.29 },
+    { open: 312.0, high: 315.0, low: 310.5, close: 313.8, volume: 2500000, change_pct: 0.58 },
+    { open: 92.5, high: 93.5, low: 92.0, close: 93.2, volume: 6200000, change_pct: 0.76 },
+    { open: 178.0, high: 180.0, low: 177.0, close: 179.2, volume: 4200000, change_pct: 0.67 },
+    { open: 178.5, high: 180.0, low: 177.8, close: 179.5, volume: 3800000, change_pct: 0.56 },
+    { open: 472.0, high: 476.0, low: 470.0, close: 474.5, volume: 1500000, change_pct: 0.53 },
+    { open: 72.5, high: 73.2, low: 72.0, close: 72.8, volume: 5200000, change_pct: 0.41 },
+    { open: 852.0, high: 858.0, low: 848.0, close: 855.0, volume: 980000, change_pct: 0.35 },
+    { open: 62.5, high: 63.2, low: 62.0, close: 62.8, volume: 6800000, change_pct: 0.48 },
+    { open: 42.5, high: 43.0, low: 42.2, close: 42.8, volume: 8200000, change_pct: 0.71 },
+    { open: 398.0, high: 402.0, low: 396.0, close: 400.5, volume: 2100000, change_pct: 0.63 },
+    { open: 318.0, high: 321.0, low: 316.0, close: 319.5, volume: 1500000, change_pct: 0.47 },
+    { open: 1025.0, high: 1032.0, low: 1022.0, close: 1028.0, volume: 1200000, change_pct: 0.29 },
+    { open: 1125.0, high: 1132.0, low: 1122.0, close: 1128.0, volume: 980000, change_pct: 0.27 },
+  ];
   const marketDataItems = [
     { instrument_id: inst1.instrument_id, timestamp: now, open: 227.2, high: 229.5, low: 226.8, close: 228.5, volume: 52000000, change_pct: 0.57 },
     { instrument_id: inst2.instrument_id, timestamp: now, open: 416.5, high: 419.0, low: 415.2, close: 418.2, volume: 18500000, change_pct: 0.41 },
@@ -443,6 +553,10 @@ async function seedResources() {
     { instrument_id: inst6.instrument_id, timestamp: now, open: 197.0, high: 199.5, low: 196.2, close: 198.6, volume: 45000000, change_pct: 0.81 },
     { instrument_id: inst7.instrument_id, timestamp: now, open: 136.5, high: 139.2, low: 135.8, close: 138.5, volume: 38000000, change_pct: 1.47 },
     { instrument_id: inst8.instrument_id, timestamp: now, open: 518.0, high: 522.5, low: 517.0, close: 521.0, volume: 42000000, change_pct: 0.58 },
+    ...instNasdaqStocks.map((inst, i) => {
+      const data = i < nasdaqMarketData.length ? nasdaqMarketData[i] : buildNasdaqExtraMarketData(null, i - nasdaqMarketData.length);
+      return { instrument_id: inst.instrument_id, timestamp: now, ...data };
+    }),
   ];
   await postBatch("/api/v1/market-data/batch", marketDataItems);
 
@@ -485,7 +599,7 @@ async function seedResources() {
   await postBatch("/api/v1/valuations/batch", valuationItems);
 
   const riskMetricsCount = riskMetricsData.length;
-  console.log("[seed] Domain resources seeded via batch APIs: customers(3), user-preferences(3), accounts(5), instruments(10), portfolios(4), watchlists(3), watchlist-items(9), positions(10), bonds(2), options(1), orders(4), trades(4), cash-transactions(4), payments(4), settlements(4), blockchain(all accounts seeded with SIM_COIN balance + transfers), market-data(7), risk-metrics(" + riskMetricsCount + "), valuations(5).");
+  console.log("[seed] Domain resources seeded via batch APIs: customers(3), user-preferences(3), accounts(5), instruments(" + instruments.length + "), portfolios(4), watchlists(3), watchlist-items(9), positions(10), bonds(2), options(1), orders(4), trades(4), cash-transactions(4), payments(4), settlements(4), blockchain(all accounts seeded with SIM_COIN balance + transfers), market-data(" + marketDataItems.length + "), risk-metrics(" + riskMetricsCount + "), valuations(5).");
 }
 
 async function seedBlockchain(accountIds) {

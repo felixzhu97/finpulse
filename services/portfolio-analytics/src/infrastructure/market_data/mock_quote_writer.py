@@ -4,31 +4,10 @@ from typing import Optional
 
 from src.infrastructure.database.repositories.realtime_quote_repository import RealtimeQuoteRepository
 from src.infrastructure.market_data.kafka_quote_producer import KafkaQuoteProducer
+from src.infrastructure.market_data.nasdaq_symbols import NASDAQ_200_SYMBOLS, initial_prices
 
-
-DEFAULT_SYMBOLS = [
-    "AAPL", "TSLA", "GOOG", "GOOGL", "META", "MSFT", "AMZN",
-    "BRK.B", "JPM", "SPY", "NVDA",
-    "9988.HK", "0700.HK", "3690.HK", "1810.HK",
-]
-
-DEFAULT_INITIAL_PRICES = {
-    "AAPL": 234.38,
-    "TSLA": 419.29,
-    "GOOG": 325.71,
-    "GOOGL": 175.40,
-    "META": 603.52,
-    "MSFT": 411.71,
-    "AMZN": 200.99,
-    "BRK.B": 415.00,
-    "JPM": 218.50,
-    "SPY": 585.00,
-    "NVDA": 875.28,
-    "9988.HK": 157.90,
-    "0700.HK": 560.00,
-    "3690.HK": 91.05,
-    "1810.HK": 35.20,
-}
+DEFAULT_SYMBOLS = NASDAQ_200_SYMBOLS
+DEFAULT_INITIAL_PRICES = initial_prices()
 
 
 class MockQuoteWriter:
@@ -48,20 +27,22 @@ class MockQuoteWriter:
         self._stop = threading.Event()
 
     def _tick(self) -> None:
-        quotes: dict[str, tuple[float, float, float]] = {}
+        quotes: dict[str, tuple[float, float, float, float]] = {}
         for symbol in self._symbols:
             last = self._state.get(symbol, 100.0)
             delta = random.uniform(-0.5, 0.5)
             price = max(1.0, last + delta)
             change = price - last
             change_rate = change / last if last else 0.0
+            volume = random.randint(100000, 5000000)
             self._state[symbol] = price
-            quotes[symbol] = (round(price, 2), round(change, 2), round(change_rate, 4))
+            quotes[symbol] = (round(price, 2), round(change, 2), round(change_rate, 4), float(volume))
         if self._producer.is_available():
             self._producer.publish_quotes(quotes)
-        self._repo.upsert_quotes(quotes)
+        repo_quotes = {s: (p, c, cr) for s, (p, c, cr, _) in quotes.items()}
+        self._repo.upsert_quotes(repo_quotes)
         try:
-            self._repo.insert_ticks(quotes)
+            self._repo.insert_ticks(repo_quotes)
         except Exception:
             pass
 

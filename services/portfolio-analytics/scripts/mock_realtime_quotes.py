@@ -1,9 +1,13 @@
 import json
 import os
 import random
+import sys
 import time
 
 from confluent_kafka import Producer
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from src.infrastructure.market_data.nasdaq_symbols import NASDAQ_200_SYMBOLS, initial_prices
 
 
 def main() -> None:
@@ -12,24 +16,8 @@ def main() -> None:
   print(f"Using Kafka {bootstrap}, topic {topic}")
 
   producer = Producer({"bootstrap.servers": bootstrap})
-
-  symbols = [
-    "AAPL", "TSLA", "GOOG", "GOOGL", "META", "MSFT", "AMZN",
-    "BRK.B", "JPM", "SPY", "NVDA",
-  ]
-  state = {
-    "AAPL": 234.38,
-    "TSLA": 419.29,
-    "GOOG": 325.71,
-    "GOOGL": 175.40,
-    "META": 603.52,
-    "MSFT": 411.71,
-    "AMZN": 200.99,
-    "BRK.B": 415.00,
-    "JPM": 218.50,
-    "SPY": 585.00,
-    "NVDA": 875.28,
-  }
+  symbols = NASDAQ_200_SYMBOLS
+  state = dict(initial_prices())
 
   try:
     iteration = 0

@@ -8,7 +8,7 @@ interface WatchlistCardProps {
   title: string;
   items: WatchlistItem[];
   instruments: Instrument[];
-  quotes: Record<string, { price: number; change: number }>;
+  quotes: Record<string, { price: number; change: number; volume?: number }>;
   historyBySymbol?: Record<string, number[]>;
   onItemPress?: (item: StockDetailItem) => void;
 }
@@ -75,6 +75,7 @@ export function WatchlistCard({
             name,
             price,
             change,
+            volume: q?.volume,
             historyValues,
           };
           return (

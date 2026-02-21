@@ -1,6 +1,6 @@
 import json
 import time
-from typing import Dict, Optional, Tuple
+from typing import Dict, Tuple
 
 from src.infrastructure.config import KAFKA_BOOTSTRAP_SERVERS, KAFKA_QUOTES_ENRICHED_TOPIC
 
@@ -17,17 +17,18 @@ class KafkaQuoteProducer:
     def is_available(self) -> bool:
         return self._producer is not None
 
-    def publish_quotes(self, quotes: Dict[str, Tuple[float, float, float]]) -> bool:
+    def publish_quotes(self, quotes: Dict[str, Tuple[float, float, float, float]]) -> bool:
         if not self._producer or not quotes:
             return False
         try:
             ts = time.time()
-            for symbol, (price, change, change_rate) in quotes.items():
+            for symbol, (price, change, change_rate, volume) in quotes.items():
                 payload = {
                     "symbol": symbol,
                     "price": price,
                     "change": change,
                     "changeRate": change_rate,
+                    "volume": volume,
                     "ts": ts,
                 }
                 self._producer.produce(
