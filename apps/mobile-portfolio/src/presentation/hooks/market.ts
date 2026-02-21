@@ -39,7 +39,8 @@ export interface UseSymbolDisplayDataResult {
 
 export function useSymbolDisplayData(
   symbols: string[],
-  initialPrices: Record<string, number> = {}
+  initialPrices: Record<string, number> = {},
+  subscribeSymbols?: string[]
 ): UseSymbolDisplayDataResult {
   const dispatch = useAppDispatch();
   const quotes = useAppSelector(
@@ -51,10 +52,13 @@ export function useSymbolDisplayData(
     shallowEqual
   );
   const status = useAppSelector(selectStatus);
+  const toSubscribe = subscribeSymbols !== undefined && subscribeSymbols.length > 0
+    ? subscribeSymbols
+    : symbols;
 
   useEffect(() => {
-    dispatch(setSubscribedSymbols(symbols));
-  }, [symbols.join(","), dispatch]);
+    dispatch(setSubscribedSymbols(toSubscribe));
+  }, [toSubscribe.join(","), dispatch]);
 
   const quoteMap = useMemo(
     () =>
@@ -165,12 +169,12 @@ export function useQuotesForSymbols(symbols: string[]) {
 
   const refreshQuotes = useCallback(async () => {
     if (symbols.length === 0) return;
-    const [historyData, snapshot] = await Promise.all([
-      getQuotesHistoryBatch(symbols, 5),
-      getQuotes(symbols),
-    ]).catch(() => [{}, {}] as const);
-    dispatch(setHistory(historyData ?? {}));
-    dispatch(setSnapshot(snapshot ?? {}));
+    getQuotesHistoryBatch(symbols, 5)
+      .then((data) => dispatch(setHistory(data ?? {})))
+      .catch(() => dispatch(setHistory({})));
+    getQuotes(symbols)
+      .then((data) => dispatch(setSnapshot(data ?? {})))
+      .catch(() => dispatch(setSnapshot({})));
   }, [symbols.join(","), dispatch]);
 
   useEffect(() => {

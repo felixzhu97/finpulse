@@ -22,20 +22,21 @@ object LineChartThemes {
         val fillTop: FloatArray
         val fillBottom: FloatArray
         
+        val fillAlpha = if (dark) 0.15f else 0.55f
         when (trend) {
             "up" -> {
                 lineColor = floatArrayOf(255f/255f, 59f/255f, 48f/255f, 1f)
-                fillTop = floatArrayOf(255f/255f, 59f/255f, 48f/255f, 0.15f)
+                fillTop = floatArrayOf(255f/255f, 59f/255f, 48f/255f, fillAlpha)
                 fillBottom = floatArrayOf(255f/255f, 59f/255f, 48f/255f, 0f)
             }
             "down" -> {
                 lineColor = floatArrayOf(52f/255f, 199f/255f, 89f/255f, 1f)
-                fillTop = floatArrayOf(52f/255f, 199f/255f, 89f/255f, 0.15f)
+                fillTop = floatArrayOf(52f/255f, 199f/255f, 89f/255f, fillAlpha)
                 fillBottom = floatArrayOf(52f/255f, 199f/255f, 89f/255f, 0f)
             }
             else -> {
                 lineColor = floatArrayOf(142f/255f, 142f/255f, 147f/255f, 1f)
-                fillTop = floatArrayOf(142f/255f, 142f/255f, 147f/255f, 0.15f)
+                fillTop = floatArrayOf(142f/255f, 142f/255f, 147f/255f, fillAlpha)
                 fillBottom = floatArrayOf(142f/255f, 142f/255f, 147f/255f, 0f)
             }
         }

@@ -38,20 +38,17 @@ public class NativeSparklineView: UIView {
 
         let doubleData = (data as? [NSNumber])?.map { $0.doubleValue }
         let fallback = (trend as String?) ?? "flat"
-        let pts: [CGPoint]
-        if let dp = dataPoints {
-            pts = dp
-        } else {
-            pts = SparklinePoints.placeholderPoints(for: fallback)
+        guard let dp = dataPoints, dp.count >= 2 else {
+            drawBaseline(context: ctx, width: w, midY: midY, trend: "flat")
+            return
         }
-        guard pts.count >= 2 else { return }
 
         let resolvedTrend = SparklinePoints.resolvedTrend(data: doubleData, fallback: fallback)
         let lineColor = SparklineTheme.lineColor(for: resolvedTrend)
 
-        drawGradient(context: ctx, width: w, height: h, points: pts, lineColor: lineColor)
+        drawGradient(context: ctx, width: w, height: h, points: dp, lineColor: lineColor)
         drawBaseline(context: ctx, width: w, midY: midY, trend: resolvedTrend)
-        drawLine(context: ctx, width: w, height: h, points: pts, lineColor: lineColor)
+        drawLine(context: ctx, width: w, height: h, points: dp, lineColor: lineColor)
     }
 
     private func drawGradient(context: CGContext, width: CGFloat, height: CGFloat, points: [CGPoint], lineColor: UIColor) {

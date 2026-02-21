@@ -90,12 +90,27 @@ export default function WatchlistsScreen() {
   );
 
   const initialPrices = useMemo(() => ({}), []);
+  const [visibleSymbols, setVisibleSymbols] = useState<string[]>([]);
+
+  const subscribeSymbols = visibleSymbols.length > 0 ? visibleSymbols : symbols;
 
   const { quoteMap, historyBySymbol, bySymbol } = useSymbolDisplayData(
     symbols,
-    initialPrices
+    initialPrices,
+    subscribeSymbols
   );
   const { refreshQuotes } = useQuotesForSymbols(symbols);
+
+  const onViewableItemsChanged = useRef(
+    (info: { viewableItems: Array<{ item: WatchlistStockRow }> }) => {
+      const syms = uniq(map(info.viewableItems, (v) => v.item.symbol.toUpperCase()));
+      setVisibleSymbols(syms);
+    }
+  ).current;
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 50,
+    minimumViewTime: 100,
+  }).current;
 
   const baseRows = useMemo(
     (): WatchlistStockRow[] =>
@@ -213,6 +228,8 @@ export default function WatchlistsScreen() {
               data={filteredAndSortedRows}
               initialNumToRender={12}
               maxToRenderPerBatch={10}
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
               keyExtractor={(item) => item.instrument_id}
               renderItem={({ item }) => (
                 <WatchlistItemRow

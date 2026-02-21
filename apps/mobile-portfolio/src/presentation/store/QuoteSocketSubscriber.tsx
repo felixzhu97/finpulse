@@ -5,9 +5,15 @@ import { setSnapshot, setStatus } from "./quotesSlice";
 import { selectMergedSubscribedSymbols } from "./quotesSelectors";
 import { quoteStreamService } from "../../infrastructure/services";
 
+function selectHistoryLoaded(s: { quotes: { historyLoaded: boolean } }) {
+  return s.quotes.historyLoaded;
+}
+
 export function QuoteSocketSubscriber() {
   const dispatch = useAppDispatch();
-  const subscribedSymbols = useAppSelector(selectMergedSubscribedSymbols);
+  const mergedSymbols = useAppSelector(selectMergedSubscribedSymbols);
+  const historyLoaded = useAppSelector(selectHistoryLoaded);
+  const subscribedSymbols = historyLoaded ? mergedSymbols : [];
   const handleRef = useRef<QuoteStreamHandle | null>(null);
   const service = quoteStreamService;
 
