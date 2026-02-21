@@ -9,7 +9,7 @@ import { AssetAllocationChart } from "@/src/presentation/components/portfolio/As
 import { NetWorthLineChart } from "@/src/presentation/components/portfolio/NetWorthLineChart";
 import { usePortfolio } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
-import { getCurrencySymbol } from "@/src/presentation/utils";
+import { formatScreenDateLong, getCurrencySymbol } from "@/src/presentation/utils";
 import { useTranslation } from "@/src/presentation/i18n";
 import {
   ScreenRoot,
@@ -50,15 +50,6 @@ const NativeChartWrapper = styled.View`
   height: 200px;
   margin-bottom: 12px;
 `;
-
-function formatScreenDate(date: Date): string {
-  return date.toLocaleDateString(undefined, {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
 
 export default function DashboardScreen() {
   const { isDark, colors } = useTheme();
@@ -107,7 +98,7 @@ export default function DashboardScreen() {
       <ScreenHeader>
         <HeaderTitleBlock>
           <ScreenTitle>{t("dashboard.title")}</ScreenTitle>
-          <ScreenDate>{formatScreenDate(new Date())}</ScreenDate>
+          <ScreenDate>{formatScreenDateLong(new Date())}</ScreenDate>
         </HeaderTitleBlock>
       </ScreenHeader>
       <StyledScrollView

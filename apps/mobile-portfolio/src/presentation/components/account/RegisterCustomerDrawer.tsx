@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -9,10 +9,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
-import { container } from "@/src/application";
+import { registerCustomer } from "@/src/infrastructure/api";
 import { useTheme, withTheme } from "@/src/presentation/theme";
 import type { Customer } from "@/src/domain/entities/customer";
-import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
+import { useDraggableDrawer } from "@/src/presentation/hooks";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "@/src/presentation/i18n";
 
@@ -183,7 +183,6 @@ export function RegisterCustomerDrawer({ visible, onClose, onSuccess }: Register
 
   const { slideAnim, dragOffset, panHandlers, backdropOpacity, closeWithAnimation } =
     useDraggableDrawer({ visible, drawerHeight: DRAWER_HEIGHT, onClose });
-  const useCase = useMemo(() => container.getRegisterCustomerUseCase(), []);
 
   const handleClose = () => {
     setName("");
@@ -199,7 +198,7 @@ export function RegisterCustomerDrawer({ visible, onClose, onSuccess }: Register
     setSubmitting(true);
     setError(null);
     try {
-      const created = await useCase.execute({
+      const created = await registerCustomer({
         name: trimmed,
         email: email.trim() || undefined,
       });

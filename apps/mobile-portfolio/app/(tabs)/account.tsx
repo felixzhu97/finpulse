@@ -14,7 +14,14 @@ import { BlockchainBalanceCard, BlockchainTransferDrawer } from "@/src/presentat
 import { formatBalance } from "@/src/presentation/utils";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
-import { CardBordered } from "@/src/presentation/theme/primitives";
+import {
+  CardBordered,
+  CenteredContainer,
+  LoadingWrap,
+  RetryButton,
+  RetryButtonText,
+  SectionTitle,
+} from "@/src/presentation/theme/primitives";
 
 const ACCOUNT_CARD_PADDING = 20;
 
@@ -38,13 +45,6 @@ const SectionHeader = styled.View`
   align-items: center;
   margin-bottom: 10px;
   padding-horizontal: 4px;
-`;
-
-const SectionTitle = styled.Text`
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.4px;
-  color: ${(p) => p.theme.colors.text};
 `;
 
 const TotalBalance = styled.Text`
@@ -216,41 +216,12 @@ const ActionText = styled.Text`
   color: ${(p) => p.theme.colors.text};
 `;
 
-const LoadingWrap = styled.View`
-  flex: 1;
-  min-height: 400px;
-  align-items: center;
-  justify-content: center;
-  padding-vertical: 60px;
-`;
-
-const CenteredWrap = styled.View`
-  flex: 1;
-  min-height: 300px;
-  align-items: center;
-  justify-content: center;
-  padding-vertical: 40px;
-`;
-
-const ErrorText = styled.Text`
+const AccountErrorText = styled.Text`
   text-align: center;
   font-size: 15px;
   margin-bottom: 16px;
   padding-horizontal: 32px;
   color: ${(p) => p.theme.colors.error};
-`;
-
-const RetryButton = styled(TouchableOpacity)`
-  padding-horizontal: 24px;
-  padding-vertical: 12px;
-  border-radius: 10px;
-  background-color: ${(p) => p.theme.colors.primary};
-`;
-
-const RetryButtonText = styled.Text`
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
 `;
 
 const AccountItemWrap = styled.View``;
@@ -308,12 +279,12 @@ export default function AccountScreen() {
             <ActivityIndicator size="small" color={colors.textSecondary} />
           </LoadingWrap>
         ) : error && !customer && accounts.length === 0 ? (
-          <CenteredWrap>
-            <ErrorText>{t("account.unableToLoad")}</ErrorText>
+          <CenteredContainer>
+            <AccountErrorText>{t("account.unableToLoad")}</AccountErrorText>
             <RetryButton onPress={refresh}>
               <RetryButtonText>{t("common.retry")}</RetryButtonText>
             </RetryButton>
-          </CenteredWrap>
+          </CenteredContainer>
         ) : (
           <>
             {customer && (

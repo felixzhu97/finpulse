@@ -12,7 +12,7 @@ import {
   Modal,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
+import { useDraggableDrawer } from "@/src/presentation/hooks";
 import {
   AbsoluteFill,
   DrawerModalRoot,
@@ -27,7 +27,7 @@ import {
   DrawerSubmitButton,
   DrawerSubmitButtonText,
 } from "@/src/presentation/theme/primitives";
-import { useBlockchain } from "@/src/presentation/hooks/useBlockchain";
+import { useBlockchain } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
 import type { Account } from "@/src/domain/entities/portfolio";

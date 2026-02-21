@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 import { AbsoluteFillView } from "@/src/presentation/theme/primitives";
+import { formatChartTooltipDate } from "@/src/presentation/utils";
 
 export function formatChartValue(value: number): string {
   if (value >= 1e9) return (value / 1e9).toFixed(2) + "B";
@@ -9,8 +10,7 @@ export function formatChartValue(value: number): string {
 }
 
 export function formatChartTimestamp(ts: number): string {
-  const d = new Date(ts);
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  return formatChartTooltipDate(new Date(ts));
 }
 
 const tooltipValueStyle = { fontSize: 14, fontWeight: "600" as const, color: "#fff" };

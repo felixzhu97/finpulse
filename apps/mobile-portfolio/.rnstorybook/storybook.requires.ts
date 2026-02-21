@@ -26,13 +26,20 @@ declare global {
   var STORYBOOK_WEBSOCKET: { host: string; port: number } | undefined;
 }
 
+type StorybookGlobal = typeof globalThis & {
+  view?: View;
+  STORIES?: typeof normalizedStories;
+  STORYBOOK_WEBSOCKET?: { host: string; port: number };
+};
+
+const g = globalThis as StorybookGlobal;
 
 const annotations = [
   require('./preview'),
   require("@storybook/react-native/preview")
 ];
 
-globalThis.STORIES = normalizedStories;
+g.STORIES = normalizedStories;
 
 
 // @ts-ignore
@@ -40,14 +47,14 @@ module?.hot?.accept?.();
 
 
 
-if (!globalThis.view) {
-  globalThis.view = start({
+if (!g.view) {
+  g.view = start({
     annotations,
     storyEntries: normalizedStories,
 
   });
 } else {
-  updateView(globalThis.view, annotations, normalizedStories);
+  updateView(g.view, annotations, normalizedStories);
 }
 
-export const view: View = globalThis.view;
+export const view: View = g.view;

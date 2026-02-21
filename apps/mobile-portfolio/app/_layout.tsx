@@ -16,7 +16,7 @@ import styled from "styled-components/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubscriber";
 import { store } from "@/src/presentation/store";
-import { usePreferences } from "@/src/presentation/hooks/usePreferences";
+import { usePreferences } from "@/src/presentation/hooks";
 import { DarkColors, LightColors } from "@/src/presentation/theme/colors";
 import { StyledThemeProvider } from "@/src/presentation/theme/StyledThemeProvider";
 import "@/src/presentation/i18n/config";

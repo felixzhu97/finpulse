@@ -8,32 +8,24 @@ import orderBy from "lodash/orderBy";
 import trim from "lodash/trim";
 import uniq from "lodash/uniq";
 import uniqBy from "lodash/uniqBy";
-import zipObject from "lodash/zipObject";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import {
-  ActivityIndicator,
-  Animated,
-  FlatList,
-  TextInput,
-} from "react-native";
+import { ActivityIndicator, FlatList } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   StockDetailDrawer,
   type StockDetailItem,
+  WatchlistSearchBar,
+  type WatchlistSearchBarRef,
 } from "@/src/presentation/components/watchlist";
 import { WatchlistItemRow } from "@/src/presentation/components/watchlist/WatchlistItemRow";
-import { GlassView } from "@/src/presentation/components/ui/GlassView";
 import { SortMenu, type SortOption } from "@/src/presentation/components/ui/SortMenu";
-import { useSymbolDisplayData } from "@/src/presentation/hooks/useSymbolDisplayData";
+import { useSymbolDisplayData, useWatchlists, useQuotesForSymbols } from "@/src/presentation/hooks";
 import type { Instrument } from "@/src/domain/entities/instrument";
-import { container } from "@/src/application";
-import { useWatchlists } from "@/src/presentation/hooks";
-import { useAppDispatch } from "@/src/presentation/store";
-import { setHistory, setSnapshot } from "@/src/presentation/store/quotesSlice";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
+import { formatScreenDate } from "@/src/presentation/utils";
 import {
   SafeAreaScreen,
   ScreenHeader,
@@ -51,36 +43,6 @@ import {
   EmptySubtext,
   LoadingWrap,
 } from "@/src/presentation/theme/primitives";
-import styled from "styled-components/native";
-
-const SearchBarContainer = styled(Animated.View)`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding-horizontal: 16px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-`;
-
-const SearchBarRow = styled.View`
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  padding: 6px;
-`;
-
-const SearchCloseBtn = styled.Pressable`
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  overflow: hidden;
-`;
-
-const ClearBtn = styled.Pressable`
-  padding: 4px;
-  margin-left: 8px;
-`;
 
 interface WatchlistStockRow {
   instrument_id: string;
@@ -101,15 +63,7 @@ function buildStocksFromInstruments(instruments: Instrument[]): { instrument_id:
   );
 }
 
-function formatHeaderDate(locale: string = "en-US") {
-  return new Date().toLocaleDateString(locale, {
-    month: "long",
-    day: "numeric",
-  });
-}
-
 export default function WatchlistsScreen() {
-  const dispatch = useAppDispatch();
   const { colors, isDark } = useTheme();
   const { t, i18n } = useTranslation();
   const { instruments, loading, refresh } = useWatchlists();
@@ -117,8 +71,7 @@ export default function WatchlistsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("name");
   const [showSearchBar, setShowSearchBar] = useState(false);
-  const searchInputRef = useRef<TextInput>(null);
-  const searchBarAnim = useRef(new Animated.Value(0)).current;
+  const searchBarRef = useRef<WatchlistSearchBarRef>(null);
 
   const watchlistStocks = useMemo(
     () => buildStocksFromInstruments(instruments),
@@ -142,6 +95,7 @@ export default function WatchlistsScreen() {
     symbols,
     initialPrices
   );
+  const { refreshQuotes } = useQuotesForSymbols(symbols);
 
   const baseRows = useMemo(
     (): WatchlistStockRow[] =>
@@ -174,54 +128,25 @@ export default function WatchlistsScreen() {
     ])(baseRows);
   }, [baseRows, searchQuery, sortBy]);
 
-  const quotesUseCase = useMemo(() => container.getQuotesUseCase(), []);
-  const fetchQuotesAndHistory = useCallback(async () => {
-    if (symbols.length === 0) return;
-    const keys = map(symbols, (s) => s.toUpperCase());
-    const [historyResults, snapshot] = await Promise.all([
-      Promise.all(map(symbols, (s) => quotesUseCase.getHistory(s, 5))),
-      quotesUseCase.execute(symbols),
-    ]).catch(() => [[], {}] as const);
-    const historyData = historyResults.length > 0 ? zipObject(keys, historyResults) : {};
-    dispatch(setHistory(historyData));
-    dispatch(setSnapshot(snapshot ?? {}));
-  }, [symbols.join(","), dispatch, quotesUseCase]);
-
-  useEffect(() => {
-    fetchQuotesAndHistory();
-  }, [fetchQuotesAndHistory]);
-
   const handleRefresh = useCallback(async () => {
     await refresh();
-    await fetchQuotesAndHistory();
-  }, [refresh, fetchQuotesAndHistory]);
+    await refreshQuotes();
+  }, [refresh, refreshQuotes]);
 
   const closeSearchBar = useCallback(() => {
     if (!showSearchBar) return;
-    searchInputRef.current?.blur();
+    searchBarRef.current?.blur();
     setShowSearchBar(false);
-    Animated.spring(searchBarAnim, {
-      toValue: 0,
-      useNativeDriver: true,
-    }).start(() => {
-      setSearchQuery("");
-    });
-  }, [showSearchBar, searchBarAnim]);
+    setSearchQuery("");
+  }, [showSearchBar]);
 
   const handleSearchPress = useCallback(() => {
-    const nextShow = !showSearchBar;
-    setShowSearchBar(nextShow);
-    Animated.spring(searchBarAnim, {
-      toValue: nextShow ? 1 : 0,
-      useNativeDriver: true,
-    }).start(() => {
-      if (nextShow) {
-        setTimeout(() => searchInputRef.current?.focus(), 100);
-      } else {
-        setSearchQuery("");
-      }
-    });
-  }, [showSearchBar, searchBarAnim]);
+    if (showSearchBar) {
+      closeSearchBar();
+    } else {
+      setShowSearchBar(true);
+    }
+  }, [showSearchBar, closeSearchBar]);
 
   useEffect(() => {
     if (detailItem !== null && showSearchBar) {
@@ -231,16 +156,15 @@ export default function WatchlistsScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      void fetchQuotesAndHistory();
+      void refreshQuotes();
       return () => {
         if (showSearchBar) {
-          searchInputRef.current?.blur();
+          searchBarRef.current?.blur();
           setShowSearchBar(false);
-          searchBarAnim.setValue(0);
           setSearchQuery("");
         }
       };
-    }, [fetchQuotesAndHistory, showSearchBar, searchBarAnim])
+    }, [refreshQuotes, showSearchBar])
   );
 
   if (loading) {
@@ -263,7 +187,7 @@ export default function WatchlistsScreen() {
         <ScreenHeader>
           <HeaderTitleBlock>
             <ScreenTitle>{t("watchlist.stocks")}</ScreenTitle>
-            <ScreenDate>{formatHeaderDate(i18n.language === "zh" ? "zh-CN" : "en-US")}</ScreenDate>
+            <ScreenDate>{formatScreenDate(new Date(), i18n.language === "zh" ? "zh-CN" : "en-US")}</ScreenDate>
           </HeaderTitleBlock>
           <HeaderActions>
             <SortMenu
@@ -319,49 +243,14 @@ export default function WatchlistsScreen() {
             />
           )}
         </ListContainer>
-        <SearchBarContainer
-          style={{
-            opacity: searchBarAnim,
-            transform: [
-              {
-                translateY: searchBarAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [100, 0],
-                }),
-              },
-            ],
-          }}
-          pointerEvents={showSearchBar ? "auto" : "none"}
-        >
-          <GlassView intensity={70} tint="dark" style={{ borderRadius: 20, overflow: "hidden", borderWidth: 1, borderColor: "rgba(255,255,255,0.12)" }}>
-            <SearchBarRow>
-              <GlassView intensity={50} tint="dark" style={{ flex: 1, flexDirection: "row", alignItems: "center", borderRadius: 14, paddingHorizontal: 12, paddingVertical: 10, overflow: "hidden" }}>
-                <MaterialIcons name="search" size={20} color={colors.textSecondary} style={{ marginRight: 8 }} />
-                <TextInput
-                  ref={searchInputRef}
-                  style={{ flex: 1, fontSize: 17, padding: 0, color: colors.text }}
-                  placeholder={t("watchlist.searchStocks")}
-                  placeholderTextColor={colors.textTertiary}
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  returnKeyType="search"
-                />
-                {searchQuery.length > 0 && (
-                  <ClearBtn onPress={() => setSearchQuery("")} hitSlop={8}>
-                    <MaterialIcons name="close" size={18} color={colors.textSecondary} />
-                  </ClearBtn>
-                )}
-              </GlassView>
-              <SearchCloseBtn onPress={handleSearchPress} hitSlop={8}>
-                <GlassView intensity={60} tint="dark" style={{ flex: 1, width: "100%", height: "100%", borderRadius: 20, alignItems: "center", justifyContent: "center" }}>
-                  <MaterialIcons name="close" size={24} color={colors.text} />
-                </GlassView>
-              </SearchCloseBtn>
-            </SearchBarRow>
-          </GlassView>
-        </SearchBarContainer>
+        <WatchlistSearchBar
+          ref={searchBarRef}
+          visible={showSearchBar}
+          searchQuery={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={closeSearchBar}
+          placeholder={t("watchlist.searchStocks")}
+        />
         <StockDetailDrawer
           visible={detailItem !== null}
           item={detailItem}

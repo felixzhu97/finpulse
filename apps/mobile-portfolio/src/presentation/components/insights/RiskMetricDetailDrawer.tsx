@@ -1,6 +1,6 @@
 import { Animated, Modal, ScrollView, Text } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
+import { useDraggableDrawer } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
 import {

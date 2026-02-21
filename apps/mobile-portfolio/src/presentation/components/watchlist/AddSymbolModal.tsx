@@ -11,7 +11,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
+import { useDraggableDrawer } from "@/src/presentation/hooks";
 import type { Instrument } from "@/src/domain/entities/instrument";
 import {
   AbsoluteFill,

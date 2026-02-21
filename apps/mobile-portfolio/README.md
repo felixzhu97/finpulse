@@ -32,42 +32,36 @@ The app follows **Clean Architecture** principles with clear separation of conce
 
 ### Architecture Layers
 
-- **Domain Layer** (`src/domain/`): Core business entities and repository interfaces
+- **Domain Layer** (`src/domain/`): Data shapes only
   - `entities/`: Domain models (`portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`, `payment.ts`, `trade.ts`, `order.ts`, `blockchain.ts`, `accountResource.ts`, `varCompute.ts`)
-  - `repositories/`: Abstract repository interfaces (`IPortfolioRepository`, `IQuoteRepository`, `ICustomerRepository`, `IUserPreferenceRepository`, `IWatchlistRepository`, `IInstrumentRepository`, `IRiskMetricsRepository`, `IPaymentRepository`, `ITradeRepository`, `IOrderRepository`, `IBlockchainRepository`)
+  - `dto.ts`: Shared DTOs (`WatchlistWithItems`, `UpdatePreferenceInput`, `AccountDataResult`, `RegisterCustomerInput`)
 
-- **Application Layer** (`src/application/`): Use cases and application services
-  - `usecases/`: Business use cases (`GetPortfolioUseCase`, `GetQuotesUseCase`, `PaymentUseCase`, `TradeUseCase`, etc.)
-  - `services/`: Dependency injection container (`DependencyContainer`) that provides repository instances and use cases
-
-- **Infrastructure Layer** (`src/infrastructure/`): External concerns and implementations
-  - `api/`: HTTP client, WebSocket client, API configuration (`httpClient.ts`, `quoteSocket.ts`, `config.ts`)
-  - `repositories/`: Concrete repository implementations that implement domain interfaces (`PortfolioRepository`, `QuoteRepository`, `CustomerRepository`, etc.)
-  - `services/`: External service integrations (`QuoteStreamService`, `web3Service`)
-  - `utils/`: Utility exports (`index.ts`)
+- **Infrastructure Layer** (`src/infrastructure/`): API and external integrations
+  - `api/`: REST API by domain (`portfolio`, `market`, `account`, `risk`, `blockchain`); functions such as `getPortfolioData`, `getQuotes`, `getWatchlists`, `getAccountData`, `getRiskMetrics`, `getBlockchainBalance`, etc.; all use `httpClient`
+  - `network/`: HTTP client, WebSocket factory, config (`httpClient.ts`, `quoteSocket.ts`, `config.ts`)
+  - `services/`: Quote stream and Web3 (`quoteStreamTypes.ts`, `QuoteStreamService`, `quoteStreamService`, `web3Service`)
 
 - **Presentation Layer** (`src/presentation/`): UI components, hooks, and state management
-  - `components/`: React Native components organized by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
-  - `hooks/`: React hooks for UI logic (`usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`,  `useDraggableDrawer`, etc.); shared utilities (`useAsyncLoad`, `runWithLoading`)
+  - `components/`: React Native components by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
+  - `hooks/`: React hooks by domain (`portfolio`, `market`, `account`, `risk`, `blockchain`, `common`); call `infrastructure/api` and `infrastructure/services` (`usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useDraggableDrawer`, etc.); shared utilities (`useAsyncLoad`, `runWithLoading`)
   - `utils/`: Presentation utilities (`format.ts`, `stockDisplay.ts`, `PeriodDataProcessor.ts`)
-  - `store/`: Redux state management (quotes slice, preferences slice, portfolio slice, selectors, `QuoteSocketSubscriber`)
-  - `theme/`: Theme system (`colors.ts`, `useTheme.ts` hook, `StyledThemeProvider`, `primitives.ts` styled components, `themeTypes.ts` AppTheme)
-  - `i18n/`: Internationalization (`config.ts`, translation resources, `useTranslation` hook)
+  - `store/`: Redux (quotes slice, preferences slice, portfolio slice, selectors, `QuoteSocketSubscriber` using `quoteStreamService`)
+  - `theme/`: Theme system (`colors.ts`, `useTheme.ts`, `StyledThemeProvider`, `primitives.ts`, `themeTypes.ts`)
+  - `i18n/`: Internationalization (`config.ts`, locales, `useTranslation`)
 
 - `app/`: Expo Router file-based routing and screens
 
 ### Dependency Flow
 
 ```
-Presentation → Application → Domain
-     ↓              ↑
-Infrastructure ────┘
+Presentation (hooks, screens) → Infrastructure (api, services)
+         ↓                              ↓
+      Domain (entities, dto)      network (httpClient, quoteSocket)
 ```
 
-- Presentation layer depends on Application and Domain layers
-- Application layer depends only on Domain layer
-- Infrastructure layer implements Domain interfaces and is used by Application layer
-- No circular dependencies; clear separation of concerns
+- Presentation depends on Domain (types) and Infrastructure (api + services)
+- Infrastructure API uses `httpClient`; services use `quoteSocket` or Web3
+- No application layer or container; hooks import from `infrastructure/api` and `infrastructure/services` directly
 - `ios/mobileportfolio/`: Native iOS code with OOP structure. Chart components inherit from base classes: `BaseChartViewManager` (abstract RCTViewManager), `BaseChartView` (abstract UIView with Metal setup), `BaseChartRenderer` (abstract Metal renderer). Chart components use helper classes: `ChartLayoutCalculator` (layout calculations), `ValueFormatter` (value formatting), `AxisLabelManager` (axis label management), `ChartDataCalculator` (data calculations). ChartSupport provides shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
 - `android/app/src/main/java/com/anonymous/mobileportfolio/view/`: Native Android code with OOP structure. Chart components use helper classes: `ChartLayoutCalculator`, `ValueFormatter`, `AxisLabelManager`, `HistogramRenderer`. Chart package (`view/chart/`) provides ChartGl, ChartCurve, and per-chart themes. Sparkline and democard packages provide specialized components.
 
@@ -130,12 +124,12 @@ The app is a thin client: all portfolio and risk business logic runs on the Port
 
 | Endpoint | Usage |
 |----------|--------|
-| `GET /api/v1/portfolio` | Aggregated portfolio (Overview, Accounts, Analytics) used by `PortfolioRepository.getPortfolio()` |
-| `GET /api/v1/portfolio/risk-summary` | Portfolio risk summary (high risk ratio, top holdings concentration) used by `PortfolioRepository.getRiskSummary()` and `useRiskSummary` |
-| `GET /api/v1/portfolio/asset-allocation-by-account-type` | Asset allocation grouped by account type used by `PortfolioRepository.getAssetAllocationByAccountType()` and `GetPortfolioUseCase` |
+| `GET /api/v1/portfolio` | Aggregated portfolio (Overview, Accounts, Analytics) via `getPortfolioData()` in api |
+| `GET /api/v1/portfolio/risk-summary` | Portfolio risk summary (high risk ratio, top holdings concentration) via `getRiskSummary()` and `useRiskSummary` |
+| `GET /api/v1/portfolio/asset-allocation-by-account-type` | Asset allocation grouped by account type via `getPortfolioData()` |
 | `GET /api/v1/quotes?symbols=...` | One-off quote fetch via `getQuotes(symbols)` |
-| `WS /ws/quotes` | Real-time quotes via `createQuoteSocket` (Watchlist screen) |
-| `POST /api/v1/seed` | Seed portfolio via `PortfolioRepository.seedPortfolio(payload)` |
+| `WS /ws/quotes` | Real-time quotes via `createQuoteSocket` and `quoteStreamService` (Watchlist screen) |
+| `POST /api/v1/seed` | Seed portfolio via `seedPortfolio(payload)` in api |
 | `GET /api/v1/customers` | Customer info for Account Profile |
 | `POST /api/v1/customers` | Register customer (returns `ai_identity_score`) |
 | `GET /api/v1/accounts` | Account list for payment/trade flows |

@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 import { useCallback, useMemo, useState } from "react";
 import type { ViewProps } from "react-native";
 import { Platform, requireNativeComponent, Text, View, PanResponder } from "react-native";
+import { formatChartLabel, formatChartTooltipDate } from "@/src/presentation/utils";
 
 export type PointSelectPayload = {
   index: number;
@@ -36,11 +37,11 @@ function formatValue(value: number): string {
 }
 
 function formatTimestamp(ts: number): string {
-  return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  return formatChartTooltipDate(new Date(ts));
 }
 
 function formatShortDate(ts: number): string {
-  return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return formatChartLabel(new Date(ts));
 }
 
 function formatHour(ts: number): string {

@@ -3,9 +3,7 @@ import { ActivityIndicator, Dimensions, Platform } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
 import { RiskMetricDetailDrawer } from "@/src/presentation/components/insights";
-import { useComputedVar } from "@/src/presentation/hooks/useComputedVar";
-import { useRiskMetrics } from "@/src/presentation/hooks/useRiskMetrics";
-import { useRiskSummary } from "@/src/presentation/hooks/useRiskSummary";
+import { useComputedVar, useRiskMetrics, useRiskSummary } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
 import {
