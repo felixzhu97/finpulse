@@ -11,6 +11,13 @@ export const store = configureStore({
     portfolio: portfolioReducer,
     web3: web3Reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        warnAfter: 128,
+        ignoredPaths: ["quotes.quotes", "quotes.history"],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

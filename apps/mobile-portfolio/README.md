@@ -8,14 +8,14 @@ Portfolio management mobile app for viewing investment accounts, performance cha
 |----------|--------------|
 | Framework | Expo 55 (preview), React 19.2, React Native 0.83 |
 | Routing | expo-router 55 (file-based) |
-| State | Redux Toolkit (quotes, preferences, portfolio, web3) |
+| State | Redux Toolkit (quotes with historyLoaded, preferences, portfolio, web3); serializableCheck.ignoredPaths for quotes/history |
 | Charts | react-native-wagmi-charts, react-native-chart-kit, react-native-svg |
 | Native Charts | iOS Metal (Swift), Android (Kotlin) |
 | Navigation | React Navigation (bottom-tabs) |
 | UI | styled-components (theme-aware), expo-blur (Liquid Glass), useDraggableDrawer (bottom sheets) |
 | Internationalization | i18next, react-i18next (English, Chinese) |
 
-Native chart components: line, candlestick (K-line), American OHLC, baseline, histogram, line-only, with horizontal scroll and tooltips. Native code follows OOP principles with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes for layout calculation, value formatting, axis label management, and rendering logic.
+Native chart components: line (gradient fill in light and dark theme), candlestick (K-line), American OHLC, baseline, histogram, line-only, with horizontal scroll and tooltips. **NativeSparkline** shows only baseline when history data length &lt; 2. Native code follows OOP principles with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes for layout calculation, value formatting, axis label management, and rendering logic.
 
 ## Main Screens
 
@@ -162,13 +162,13 @@ The app is a thin client: all portfolio and risk business logic runs on the Port
 
 ### Real-time quotes and sparklines
 
-Single Redux-backed flow, one WebSocket:
+Single Redux-backed flow, one WebSocket; **history before real-time**:
 
-- **QuoteSocketSubscriber** reads merged symbols (`subscribedSymbols` + `extraSubscribedSymbols`) from the store, subscribes to `/ws/quotes`, dispatches `setSnapshot` / `setStatus`.
-- **useQuotesForSymbols(symbols)** (used by watchlist) fetches **batch** history via `getQuotesHistoryBatch(symbols, 5)` and snapshot via `getQuotes(symbols)` in one refresh; dispatches `setHistory` and `setSnapshot`.
-- **useSymbolDisplayData(symbols)** sets `subscribedSymbols` and reads `bySymbol`, `quoteMap`, `historyBySymbol` (memoized selectors).
-- **StockDetailDrawer** dispatches `setExtraSubscribedSymbols([symbol])` when open, reads quotes from Redux.
-- **StockListItem** shows sparkline (history from `useSymbolDisplayData`), current price, and daily change. Tapping a row opens **StockDetailDrawer** with live price and chart. **SortMenu** (name, price, change, change %) and a **bottom search bar** (opened by header search icon, **GlassView**; closes when opening detail drawer, sort menu, or switching tab) are on the Watchlist screen. Tab bar uses **expo-blur** (Liquid Glass) background.
+- **useQuotesForSymbols(symbols)** fetches history via `getQuotesHistoryBatch(symbols, 5)` and snapshot via `getQuotes(symbols)`; each response dispatches **as soon as it arrives** (`setHistory` / `setSnapshot`), so history can appear before snapshot.
+- **QuoteSocketSubscriber** subscribes to `/ws/quotes` **only after** `historyLoaded` is true (set by first `setHistory`). It reads merged symbols (`subscribedSymbols` + `extraSubscribedSymbols`), connects, then **1s refresh**; dispatches `setSnapshot` / `setStatus`.
+- **useSymbolDisplayData(symbols, initialPrices, subscribeSymbols)** sets `subscribedSymbols` to `subscribeSymbols` when provided (else `symbols`). Watchlist passes **visible-only** symbols (from `onViewableItemsChanged`) so only viewport + detail symbol are subscribed.
+- **StockDetailDrawer** dispatches `setExtraSubscribedSymbols([symbol])` when open; detail price updates in real time.
+- **WatchlistRow** (memo) wraps **WatchlistItemRow** with stable `onPress` for VirtualizedList performance. **NativeSparkline** shows only baseline when data length &lt; 2 (no fake trend). **SortMenu** and **bottom search bar** (GlassView) on Watchlist; tab bar uses **expo-blur** (Liquid Glass).
 
 ## Theming
 

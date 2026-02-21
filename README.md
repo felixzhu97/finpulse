@@ -209,8 +209,9 @@ The platform supports real-time market data for the mobile portfolio app using t
     - `GET /api/v1/quotes?symbols=AAPL,MSFT`
     - WebSocket `/ws/quotes` (`{"type":"subscribe","symbols":["AAPL","MSFT"]}` → `{"type":"snapshot","quotes":{...}}`).
 - **Mobile integration**
-  - On entering the watchlist page, the app fetches quotes from the DB via REST and pushes them to the store.
-  - A shared `quoteSocket` client opens a WebSocket connection to `/ws/quotes` for live updates in the watchlist screen.
+  - Watchlist loads **history first** via REST (`getQuotesHistoryBatch` and `getQuotes`); each response dispatches to Redux as soon as it arrives. **WebSocket** subscribes only after `historyLoaded` is set, so real-time updates start after history is rendered.
+  - Subscription is **visible-only**: only symbols in the current viewport (and the open stock-detail symbol) are sent to `/ws/quotes`. Refresh interval 1s. Redux: `quotes`, `history`, `historyLoaded`, `subscribedSymbols`, `extraSubscribedSymbols`; store uses `serializableCheck.ignoredPaths` for large quote/history state.
+  - List rows use a memoized **WatchlistRow** and stable callbacks to keep VirtualizedList updates fast.
 
 Quick local setup:
 
@@ -311,7 +312,7 @@ fintech-project/
 │   └── mobile-portfolio/         # React Native portfolio overview mobile app
 ├── scripts/
 │   ├── backend/start-backend.sh # One-click: Docker (Postgres + Kafka) + API + seed
-│   ├── seed/generate-seed-data.js   # Seed via batch APIs (run by start:backend or after API is up)
+│   ├── seed/generate-seed-data.js   # Seed via batch APIs; dedupeInstrumentsBySymbol for unique symbols (run by start:backend or after API is up)
 │   └── db/                        # Schema and seed SQL for fintech ER database
 ├── services/
 │   └── portfolio-analytics/    # FastAPI, PostgreSQL, Kafka (DDD)
@@ -336,7 +337,7 @@ fintech-project/
 Angular-based financial analytics web console. Uses `chart.js`/`ng2-charts` for performance charts and `chartjs-chart-financial` for candlestick stock charts. Depends on `@fintech/ui` and `@fintech/utils`.
 
 #### `apps/mobile-portfolio`
-Expo + React Native app for portfolio overview, net worth trend, asset allocation, and stock charts. **Layering**: domain (entities, dto), infrastructure (api + network + services + config/web3Config), presentation (hooks, Redux: quotes, preferences, portfolio, **web3**). **Account** tab: Quick trade (NewTradeDrawer with prefill), Send ETH (EthTransferDrawer, real chain via Sepolia by default), Connect/Disconnect wallet (WalletConnectButton, Redux web3 slice, web3Service). Watchlist history: **getQuotesHistoryBatch** for batch quote history. Native views: **NativeDemoCard** and six charts (NativeLineChart, NativeCandleChart, etc.); **NativeSparkline** on Stocks screen. Charts use Metal (iOS) / OpenGL ES (Android); JS: `useScrollableChart`, `ScrollableChartContainer`. Wrappers in `src/components/native/`.
+Expo + React Native app for portfolio overview, net worth trend, asset allocation, and stock charts. **Layering**: domain (entities, dto), infrastructure (api + network + services + config/web3Config), presentation (hooks, Redux: quotes with **historyLoaded**, preferences, portfolio, **web3**). **Account** tab: Quick trade, Send ETH (Sepolia default), Connect/Disconnect wallet (WalletConnectButton, Redux web3, web3Service). **Watchlist**: history fetched first (getQuotesHistoryBatch + getQuotes, dispatch on each response); WebSocket starts after history loaded; **visible-only** subscription + 1s refresh; **WatchlistRow** (memo) for list performance; **NativeSparkline** shows baseline only when no data. Native charts (Metal/OpenGL ES): NativeLineChart (gradient in light theme), NativeCandleChart, etc.; **NativeSparkline**; JS: `useScrollableChart`, `ScrollableChartContainer`. Redux middleware: `serializableCheck.ignoredPaths` for quotes/history. Seed script: **dedupeInstrumentsBySymbol** so instruments have unique symbols.
 
 #### `packages/ui`
 Shared UI component library, a collection of components built on Radix UI and Tailwind CSS. Can be reused across multiple applications.

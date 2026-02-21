@@ -8,7 +8,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(app_content, "AppContent", "React Native", "Root layout: uses usePreferences().loading, shows spinner until preferences fetched, then renders tabs")
     Component(tabs_router, "Tabs Router", "Expo Router", "Dashboard, Watchlist, Insights, Account, Storybook (dev)")
     Component(overview_screen, "Dashboard Screen", "React Native", "Portfolio summary, native charts, net worth, allocation")
-    Component(watchlist_screen, "Watchlist Screen", "React Native", "Stocks list (portfolio), search (bottom), sort, detail drawer")
+    Component(watchlist_screen, "Watchlist Screen", "React Native", "Stocks list, visible-only subscribeSymbols, WatchlistRow (memo), search, sort, detail drawer")
     Component(analytics_screen, "Insights Screen", "React Native", "Risk metrics (volatility, Sharpe, VaR, beta), computed VaR from portfolio history")
     Component(account_screen, "Account Screen", "React Native", "Profile, account list, Wallet (Connect/Disconnect), Actions: Quick trade, Send ETH, Register, Payment, Trade, Settings; useAccountData on tab focus")
     Component(storybook_screen, "Storybook Screen", "React Native", "Dev-only /storybook route; wraps StorybookUIRoot with back bar")
@@ -32,7 +32,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
 
         Component(use_portfolio_hook, "usePortfolio", "Hook", "Portfolio data via useAsyncLoad")
         Component(use_account_data_hook, "useAccountData", "Hook", "Customer, accounts, accountResources on focus")
-        Component(use_symbol_display_hook, "useSymbolDisplayData", "Hook", "Redux-backed quotes + history")
+        Component(use_symbol_display_hook, "useSymbolDisplayData", "Hook", "Redux quotes + history; subscribeSymbols (visible or all)")
         Component(use_refresh_control_hook, "useRefreshControl", "Hook", "Pull-to-refresh pattern")
         Component(use_draggable_drawer_hook, "useDraggableDrawer", "Hook", "Slide/drag animation")
         Component(use_preferences_hook, "usePreferences", "Hook", "Redux-backed user preferences")
@@ -42,10 +42,10 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(use_computed_var_hook, "useComputedVar", "Hook", "VaR computation")
         Component(use_web3_hook, "useWeb3", "Hook", "Wallet state from Redux web3 slice, connect, disconnect, refreshBalance")
 
-        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes, history, subscribedSymbols, extraSubscribedSymbols")
+        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes, history, historyLoaded, subscribedSymbols, extraSubscribedSymbols")
         Component(redux_web3, "Redux web3 slice", "Redux Toolkit", "walletInfo, loading, error; connectWallet, disconnectWallet, refreshWalletBalance")
         Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme, language, notifications")
-        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "Subscribes to merged symbols")
+        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "Subscribes after historyLoaded; merged symbols (visible + extra); 1s refresh")
         Component(redux_portfolio, "Redux portfolio slice", "Redux Toolkit", "selectedAccountId")
 
         Component(theme_system, "Theme System", "TypeScript", "Light/dark colors; useTheme (useTheme.ts)")

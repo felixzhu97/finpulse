@@ -8,7 +8,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
     Component(app_content, "AppContent", "React Native", "根布局：使用 usePreferences().loading，偏好加载完成前显示 spinner，随后渲染标签")
     Component(tabs_router, "标签路由", "Expo Router", "仪表板、自选、洞察、账户、Storybook（开发）")
     Component(overview_screen, "仪表板屏幕", "React Native", "组合摘要、原生图表、净资产、资产配置")
-    Component(watchlist_screen, "自选屏幕", "React Native", "股票列表（组合）、底部搜索、排序、详情抽屉")
+    Component(watchlist_screen, "自选屏幕", "React Native", "股票列表、仅可见 subscribeSymbols、WatchlistRow（memo）、搜索、排序、详情抽屉")
     Component(analytics_screen, "洞察屏幕", "React Native", "风险指标（波动率、夏普比率、VaR、Beta）、根据组合历史计算的 VaR")
     Component(account_screen, "账户屏幕", "React Native", "个人资料、账户列表、钱包（连接/断开）；操作：快捷交易、发送 ETH、注册、支付、交易、设置；useAccountData 在标签聚焦时加载")
     Component(storybook_screen, "Storybook 屏幕", "React Native", "仅开发环境的 /storybook 路由；包裹 StorybookUIRoot 并提供返回栏")
@@ -32,7 +32,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         
         Component(use_portfolio_hook, "usePortfolio", "Hook", "组合数据 via useAsyncLoad")
         Component(use_account_data_hook, "useAccountData", "Hook", "客户、账户、账户资源，聚焦时加载")
-        Component(use_symbol_display_hook, "useSymbolDisplayData", "Hook", "Redux 管理的报价和历史")
+        Component(use_symbol_display_hook, "useSymbolDisplayData", "Hook", "Redux 报价与历史；subscribeSymbols（可见或全部）")
         Component(use_refresh_control_hook, "useRefreshControl", "Hook", "下拉刷新模式")
         Component(use_draggable_drawer_hook, "useDraggableDrawer", "Hook", "滑动/拖拽动画")
         Component(use_preferences_hook, "usePreferences", "Hook", "Redux 管理的用户偏好")
@@ -42,10 +42,10 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(use_computed_var_hook, "useComputedVar", "Hook", "VaR 计算")
         Component(use_web3_hook, "useWeb3", "Hook", "Redux web3 钱包状态，connect、disconnect、refreshBalance")
         
-        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes、history、subscribedSymbols、extraSubscribedSymbols")
+        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes、history、historyLoaded、subscribedSymbols、extraSubscribedSymbols")
         Component(redux_web3, "Redux web3 slice", "Redux Toolkit", "walletInfo、loading、error；connectWallet、disconnectWallet、refreshWalletBalance")
         Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme、language、notifications")
-        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "订阅合并符号")
+        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "historyLoaded 后订阅；合并符号（可见+详情）；1s 刷新")
         Component(redux_portfolio, "Redux portfolio slice", "Redux Toolkit", "selectedAccountId")
         
         Component(theme_system, "主题系统", "TypeScript", "浅色/深色配色；useTheme (useTheme.ts)")
