@@ -25,15 +25,31 @@ export async function getQuotesHistory(
 ): Promise<number[]> {
   const cleaned = symbol.trim().toUpperCase();
   if (!cleaned) return [];
+  const data = await getQuotesHistoryBatch([cleaned], days);
+  return data[cleaned] ?? [];
+}
+
+export async function getQuotesHistoryBatch(
+  symbols: string[],
+  days = 30
+): Promise<Record<string, number[]>> {
+  const cleaned = symbols
+    .map((s) => s.trim().toUpperCase())
+    .filter((s) => s.length > 0);
+  if (cleaned.length === 0) return {};
   const minutes = Math.min(60, days * 24 * 60);
   const params = new URLSearchParams({
-    symbols: cleaned,
+    symbols: cleaned.join(","),
     minutes: String(minutes),
   }).toString();
   const result = await httpClient.get<Record<string, number[]>>(
     `/api/v1/quotes/history?${params}`
   );
-  return result?.[cleaned] ?? [];
+  const out: Record<string, number[]> = {};
+  for (const sym of cleaned) {
+    out[sym] = result?.[sym] ?? [];
+  }
+  return out;
 }
 
 export async function getWatchlists(): Promise<{

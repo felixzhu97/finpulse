@@ -119,6 +119,7 @@
     "tradeFailed": "Trade failed",
     "tradeSuccess": "Trade executed",
     "newTrade": "New Trade",
+    "quickTrade": "Quick trade",
     "register": "Register",
     "registerFailed": "Registration failed",
     "registerSuccess": "Profile created",
@@ -135,7 +136,10 @@
     }
   },
   "blockchain": {
+    "wallet": "Wallet",
     "connectWallet": "Connect Wallet",
+    "connected": "Connected",
+    "connectFailed": "Could not connect. Check network and try again.",
     "disconnect": "Disconnect",
     "blockchainBalance": "Blockchain Balance",
     "noBalance": "No balance",
@@ -151,6 +155,19 @@
     "error": "Error",
     "success": "Success",
     "fillAllFields": "Please fill all fields",
-    "invalidAmount": "Invalid amount"
+    "invalidAmount": "Invalid amount",
+    "sendEth": "Send ETH",
+    "toAddress": "To address",
+    "amountEth": "Amount (ETH)",
+    "walletRequired": "Connect your wallet first to send ETH.",
+    "confirmSendTitle": "Confirm send",
+    "network": "Network",
+    "ethBalance": "ETH balance",
+    "invalidAddress": "Invalid address",
+    "insufficientBalance": "Insufficient balance",
+    "sendEthSuccess": "Transaction submitted.",
+    "sendEthFailed": "Send failed",
+    "testnetFaucetHint": "Testnet: get test ETH from a Sepolia faucet.",
+    "testnetNotice": "Using testnet and test ETH."
   }
 }

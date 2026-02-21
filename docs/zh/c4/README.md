@@ -19,7 +19,7 @@
 
 **文件**：`c4-mobile-portfolio-components.puml`
 
-**说明**：移动端投资组合应用（Expo + React Native）**展示层**（hooks 按领域：portfolio、market、account、risk、blockchain、common；屏幕、Redux、主题、i18n）直接调用**基础设施**——**API 模块**（按领域：portfolio、market、account、risk、blockchain；getPortfolioData、getQuotes、getWatchlists、getAccountData、getRiskMetrics、getBlockchainBalance 等）与 **quoteStreamService**（WebSocket subscribe）；无应用层与容器。**领域层**仅含实体与 DTO。**基础设施**另有 HttpClient、createQuoteSocket、web3Service。Redux Toolkit（quotes 含 subscribedSymbols + extraSubscribedSymbols、preferences、portfolio）；styled-components（ScreenRoot、ListRow、CardBordered 等）；QuoteSocketSubscriber 使用 quoteStreamService；后端 GET /api/v1/portfolio、GET /api/v1/quotes、WS /ws/quotes 等。
+**说明**：移动端投资组合应用（Expo + React Native）**展示层**（hooks：portfolio、market、account、risk、blockchain、common；屏幕、Redux、主题、i18n）直接调用**基础设施**——**API 模块**（getPortfolioData、getQuotes、**getQuotesHistoryBatch**、getWatchlists、getAccountData、getRiskMetrics 等）与 **quoteStreamService**（WebSocket）。**账户**标签：WalletConnectButton、EthTransferDrawer（发送 ETH，真实链；默认 Sepolia）；**useWeb3** 与 **Redux web3 slice**（connectWallet、disconnectWallet、refreshWalletBalance）；web3Service + web3Config。**领域层**仅含实体与 DTO。**基础设施**：HttpClient、createQuoteSocket、web3Service、config/web3Config。Redux：quotes（subscribedSymbols、extraSubscribedSymbols、history）、preferences、portfolio、**web3**。行情历史：通过 getQuotesHistoryBatch 单次批量请求。后端：GET /api/v1/portfolio、GET /api/v1/quotes、GET /api/v1/quotes/history?symbols=...&minutes=...、WS /ws/quotes。
 
 ### 投资组合分析 API 组件
 

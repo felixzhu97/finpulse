@@ -1,5 +1,3 @@
-import map from "lodash/map";
-import zipObject from "lodash/zipObject";
 import { useCallback, useEffect, useMemo } from "react";
 import type { Instrument } from "../../domain/entities/instrument";
 import type { Watchlist } from "../../domain/entities/watchlist";
@@ -10,7 +8,7 @@ import {
   removeWatchlistItem as apiRemoveWatchlistItem,
   createWatchlist as apiCreateWatchlist,
   getQuotes,
-  getQuotesHistory,
+  getQuotesHistoryBatch,
 } from "../../infrastructure/api";
 import { useAsyncLoad } from "./common";
 import type { QuoteConnectionStatus } from "../../domain/entities/quotes";
@@ -167,13 +165,11 @@ export function useQuotesForSymbols(symbols: string[]) {
 
   const refreshQuotes = useCallback(async () => {
     if (symbols.length === 0) return;
-    const keys = map(symbols, (s) => s.toUpperCase());
-    const [historyResults, snapshot] = await Promise.all([
-      Promise.all(map(symbols, (s) => getQuotesHistory(s, 5))),
+    const [historyData, snapshot] = await Promise.all([
+      getQuotesHistoryBatch(symbols, 5),
       getQuotes(symbols),
-    ]).catch(() => [[], {}] as const);
-    const historyData = historyResults.length > 0 ? zipObject(keys, historyResults) : {};
-    dispatch(setHistory(historyData));
+    ]).catch(() => [{}, {}] as const);
+    dispatch(setHistory(historyData ?? {}));
     dispatch(setSnapshot(snapshot ?? {}));
   }, [symbols.join(","), dispatch]);
 

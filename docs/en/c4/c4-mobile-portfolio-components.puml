@@ -10,7 +10,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
     Component(overview_screen, "Dashboard Screen", "React Native", "Portfolio summary, native charts, net worth, allocation")
     Component(watchlist_screen, "Watchlist Screen", "React Native", "Stocks list (portfolio), search (bottom), sort, detail drawer")
     Component(analytics_screen, "Insights Screen", "React Native", "Risk metrics (volatility, Sharpe, VaR, beta), computed VaR from portfolio history")
-    Component(account_screen, "Account Screen", "React Native", "Profile, account list, Actions; useAccountData loads on tab focus via useFocusEffect")
+    Component(account_screen, "Account Screen", "React Native", "Profile, account list, Wallet (Connect/Disconnect), Actions: Quick trade, Send ETH, Register, Payment, Trade, Settings; useAccountData on tab focus")
     Component(storybook_screen, "Storybook Screen", "React Native", "Dev-only /storybook route; wraps StorybookUIRoot with back bar")
 
     ' Presentation Layer
@@ -23,11 +23,13 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(metric_card, "MetricCard", "React Native", "Label, value, helper")
         Component(native_sparkline, "NativeSparkline", "Native View", "Per-stock sparkline")
         Component(stock_detail_drawer, "StockDetailDrawer", "React Native", "Draggable drawer, setExtraSubscribedSymbols, Redux quotes, share")
-        Component(account_drawers, "Account Drawers", "React Native", "RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, SettingsDrawer")
+        Component(account_drawers, "Account Drawers", "React Native", "RegisterCustomerDrawer, NewPaymentDrawer, NewTradeDrawer, EthTransferDrawer, SettingsDrawer")
+        Component(wallet_connect_btn, "WalletConnectButton", "React Native", "Connect/Disconnect wallet, Redux web3")
+        Component(eth_transfer_drawer, "EthTransferDrawer", "React Native", "Send ETH, real chain (Sepolia default)")
         Component(sort_menu, "SortMenu", "React Native", "Sort by name, price, change, change %")
         Component(glass_search_bar, "Bottom search bar", "React Native", "GlassView, opens on search icon")
         Component(glass_view, "GlassView", "React Native", "expo-blur, Liquid Glass")
-        
+
         Component(use_portfolio_hook, "usePortfolio", "Hook", "Portfolio data via useAsyncLoad")
         Component(use_account_data_hook, "useAccountData", "Hook", "Customer, accounts, accountResources on focus")
         Component(use_symbol_display_hook, "useSymbolDisplayData", "Hook", "Redux-backed quotes + history")
@@ -38,12 +40,14 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(use_risk_metrics_hook, "useRiskMetrics", "Hook", "Risk metrics API")
         Component(use_risk_summary_hook, "useRiskSummary", "Hook", "Risk summary (high-risk ratio, top holdings concentration)")
         Component(use_computed_var_hook, "useComputedVar", "Hook", "VaR computation")
-        
+        Component(use_web3_hook, "useWeb3", "Hook", "Wallet state from Redux web3 slice, connect, disconnect, refreshBalance")
+
         Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes, history, subscribedSymbols, extraSubscribedSymbols")
+        Component(redux_web3, "Redux web3 slice", "Redux Toolkit", "walletInfo, loading, error; connectWallet, disconnectWallet, refreshWalletBalance")
         Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme, language, notifications")
         Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "Subscribes to merged symbols")
         Component(redux_portfolio, "Redux portfolio slice", "Redux Toolkit", "selectedAccountId")
-        
+
         Component(theme_system, "Theme System", "TypeScript", "Light/dark colors; useTheme (useTheme.ts)")
         Component(styled_theme_provider, "StyledThemeProvider", "styled-components/native", "Injects theme (colors) from useTheme into styled-components")
         Component(theme_primitives, "Theme Primitives", "styled-components/native", "ScreenRoot, ListRow, CardBordered, LabelText, ValueText, withTheme")
@@ -61,7 +65,7 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
 
     ' Infrastructure Layer
     Boundary(infrastructure_layer, "Infrastructure Layer") {
-        Component(api_module, "API Module", "TypeScript", "By domain: portfolio, market, account, risk, blockchain. getPortfolioData, getQuotes, getWatchlists, getAccountData, getRiskMetrics, getBlockchainBalance, etc.")
+        Component(api_module, "API Module", "TypeScript", "By domain: portfolio, market, account, risk. getPortfolioData, getQuotes, getQuotesHistoryBatch, getWatchlists, getAccountData, getRiskMetrics, etc.")
         Component(http_client, "HttpClient", "TypeScript", "HTTP client wrapper")
         Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes")
         Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL")
@@ -83,7 +87,7 @@ Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Por
 ' Presentation to Infrastructure (API and services)
 Rel(use_portfolio_hook, api_module, "Calls getPortfolioData", "")
 Rel(use_account_data_hook, api_module, "Calls getAccountData", "")
-Rel(use_symbol_display_hook, api_module, "Calls getQuotes, getQuotesHistory", "")
+Rel(use_symbol_display_hook, api_module, "Calls getQuotes, getQuotesHistoryBatch", "")
 Rel(use_preferences_hook, api_module, "Calls getUserPreference, updateUserPreference", "")
 Rel(use_risk_metrics_hook, api_module, "Calls getRiskMetrics", "")
 Rel(use_risk_summary_hook, api_module, "Calls getRiskSummary", "")
@@ -137,6 +141,12 @@ Rel(account_screen, use_refresh_control_hook, "Uses", "")
 Rel(account_screen, account_drawers, "Uses", "")
 Rel(account_screen, use_preferences_hook, "Uses", "")
 Rel(account_screen, storybook_screen, "Navigates to (dev Storybook entry)", "")
+Rel(account_screen, wallet_connect_btn, "Uses", "")
+Rel(account_screen, eth_transfer_drawer, "Uses (Send ETH)", "")
+Rel(wallet_connect_btn, use_web3_hook, "Uses", "")
+Rel(eth_transfer_drawer, use_web3_hook, "Uses", "")
+Rel(use_web3_hook, redux_web3, "Dispatches, selects", "")
+Rel(use_web3_hook, web3_service, "Calls connectWallet, disconnect, getBalance", "")
 
 ' Redux and State
 Rel(use_symbol_display_hook, redux_quotes, "Dispatches, selects", "")

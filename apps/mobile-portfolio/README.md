@@ -6,9 +6,9 @@ Portfolio management mobile app for viewing investment accounts, performance cha
 
 | Category | Technologies |
 |----------|--------------|
-| Framework | Expo 54, React 19, React Native 0.81 |
-| Routing | expo-router 6 (file-based) |
-| State | Redux Toolkit (quotes, preferences, portfolio) |
+| Framework | Expo 55 (preview), React 19.2, React Native 0.83 |
+| Routing | expo-router 55 (file-based) |
+| State | Redux Toolkit (quotes, preferences, portfolio, web3) |
 | Charts | react-native-wagmi-charts, react-native-chart-kit, react-native-svg |
 | Native Charts | iOS Metal (Swift), Android (Kotlin) |
 | Navigation | React Navigation (bottom-tabs) |
@@ -24,7 +24,7 @@ Native chart components: line, candlestick (K-line), American OHLC, baseline, hi
 | Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native line chart |
 | Watchlist | `/(tabs)/watchlists` | Stock list (portfolio holdings) with real-time prices, sparklines, account rows; search (bottom sheet, closes on drawer/sort/tab), sort menu; pull-to-refresh; stock detail drawer (draggable, share) |
 | Insights | `/(tabs)/insights` | Risk metrics from API (volatility, Sharpe ratio, VaR, beta) via `GET /api/v1/risk-metrics`; computed VaR via `POST /api/v1/risk-metrics/compute` (useComputedVar hook) |
-| Account | `/(tabs)/account` | Profile, account list, Actions (Register Customer, New Payment, New Trade, Settings), drawers. **useAccountData** loads customer, accounts, accountResources on tab focus via useFocusEffect. In development, Actions include a **Storybook** entry that navigates to `/storybook`. |
+| Account | `/(tabs)/account` | Profile, account list, **Wallet** (Connect/Disconnect via WalletConnectButton; Redux web3). Actions: Register Customer, New Payment, New Trade, **Quick trade**, **Send ETH** (EthTransferDrawer, real Ethereum; default Sepolia testnet), Settings. **useAccountData** loads on tab focus; in dev, Actions include **Storybook**. |
 
 ## Project Structure (Clean Architecture)
 
@@ -37,15 +37,16 @@ The app follows **Clean Architecture** principles with clear separation of conce
   - `dto.ts`: Shared DTOs (`WatchlistWithItems`, `UpdatePreferenceInput`, `AccountDataResult`, `RegisterCustomerInput`)
 
 - **Infrastructure Layer** (`src/infrastructure/`): API and external integrations
-  - `api/`: REST API by domain (`portfolio`, `market`, `account`, `risk`, `blockchain`); functions such as `getPortfolioData`, `getQuotes`, `getWatchlists`, `getAccountData`, `getRiskMetrics`, `getBlockchainBalance`, etc.; all use `httpClient`
+  - `api/`: REST API by domain (`portfolio`, `market`, `account`, `risk`); `getPortfolioData`, `getQuotes`, `getQuotesHistoryBatch`, `getWatchlists`, `getAccountData`, `getRiskMetrics`, etc.; all use `httpClient`
   - `network/`: HTTP client, WebSocket factory, config (`httpClient.ts`, `quoteSocket.ts`, `config.ts`)
+  - `config/`: Web3 config (`web3Config.ts`: `getWeb3Config`, `SEPOLIA_CHAIN_ID`; env: `EXPO_PUBLIC_ETH_RPC_URL`, `EXPO_PUBLIC_ETH_CHAIN_ID`, `EXPO_PUBLIC_ETH_CHAIN_NAME`)
   - `services/`: Quote stream and Web3 (`quoteStreamTypes.ts`, `QuoteStreamService`, `quoteStreamService`, `web3Service`)
 
 - **Presentation Layer** (`src/presentation/`): UI components, hooks, and state management
   - `components/`: React Native components by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
-  - `hooks/`: React hooks by domain (`portfolio`, `market`, `account`, `risk`, `blockchain`, `common`); call `infrastructure/api` and `infrastructure/services` (`usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useDraggableDrawer`, etc.); shared utilities (`useAsyncLoad`, `runWithLoading`)
+  - `hooks/`: React hooks by domain (`portfolio`, `market`, `account`, `risk`, `blockchain`, `common`); call `infrastructure/api` and `infrastructure/services` (`usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `useWeb3`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useDraggableDrawer`, etc.); shared utilities (`useAsyncLoad`, `runWithLoading`)
   - `utils/`: Presentation utilities (`format.ts`, `stockDisplay.ts`, `PeriodDataProcessor.ts`)
-  - `store/`: Redux (quotes slice, preferences slice, portfolio slice, selectors, `QuoteSocketSubscriber` using `quoteStreamService`)
+  - `store/`: Redux (quotes slice, preferences slice, portfolio slice, **web3 slice** (connectWallet, disconnectWallet, refreshWalletBalance), selectors, `QuoteSocketSubscriber` using `quoteStreamService`)
   - `theme/`: Theme system (`colors.ts`, `useTheme.ts`, `StyledThemeProvider`, `primitives.ts`, `themeTypes.ts`)
   - `i18n/`: Internationalization (`config.ts`, locales, `useTranslation`)
 
@@ -118,6 +119,19 @@ If you see **"No Android connected device found, and no emulators could be start
 
 If you see **"Unable to locate a Java Runtime"**: set `JAVA_HOME` to a JDK 17+ (e.g. Homebrew: `export JAVA_HOME="/opt/homebrew/opt/openjdk@17"`).
 
+### iOS: pod install / SDWebImage clone timeout
+
+If `pod install` fails with **"RPC failed; curl 56 Recv failure: Operation timed out"** when cloning SDWebImage (or other git-based pods):
+
+1. Increase Git HTTP buffer and retry from the app directory:
+   ```bash
+   git config --global http.postBuffer 524288000
+   cd ios && pod install
+   ```
+   Or run: `pnpm run pod-install` (from `apps/mobile-portfolio`).
+
+2. If it still times out, try a different network, disable VPN, or retry later; the clone is from GitHub and can be sensitive to latency.
+
 ## Backend
 
 The app is a thin client: all portfolio and risk business logic runs on the Portfolio Analytics API; the mobile app focuses on presentation, navigation, and light orchestration.
@@ -128,6 +142,7 @@ The app is a thin client: all portfolio and risk business logic runs on the Port
 | `GET /api/v1/portfolio/risk-summary` | Portfolio risk summary (high risk ratio, top holdings concentration) via `getRiskSummary()` and `useRiskSummary` |
 | `GET /api/v1/portfolio/asset-allocation-by-account-type` | Asset allocation grouped by account type via `getPortfolioData()` |
 | `GET /api/v1/quotes?symbols=...` | One-off quote fetch via `getQuotes(symbols)` |
+| `GET /api/v1/quotes/history?symbols=...&minutes=...` | Batch quote history via `getQuotesHistoryBatch(symbols, days)` (single request for all symbols) |
 | `WS /ws/quotes` | Real-time quotes via `createQuoteSocket` and `quoteStreamService` (Watchlist screen) |
 | `POST /api/v1/seed` | Seed portfolio via `seedPortfolio(payload)` in api |
 | `GET /api/v1/customers` | Customer info for Account Profile |
@@ -150,6 +165,7 @@ The app is a thin client: all portfolio and risk business logic runs on the Port
 Single Redux-backed flow, one WebSocket:
 
 - **QuoteSocketSubscriber** reads merged symbols (`subscribedSymbols` + `extraSubscribedSymbols`) from the store, subscribes to `/ws/quotes`, dispatches `setSnapshot` / `setStatus`.
+- **useQuotesForSymbols(symbols)** (used by watchlist) fetches **batch** history via `getQuotesHistoryBatch(symbols, 5)` and snapshot via `getQuotes(symbols)` in one refresh; dispatches `setHistory` and `setSnapshot`.
 - **useSymbolDisplayData(symbols)** sets `subscribedSymbols` and reads `bySymbol`, `quoteMap`, `historyBySymbol` (memoized selectors).
 - **StockDetailDrawer** dispatches `setExtraSubscribedSymbols([symbol])` when open, reads quotes from Redux.
 - **StockListItem** shows sparkline (history from `useSymbolDisplayData`), current price, and daily change. Tapping a row opens **StockDetailDrawer** with live price and chart. **SortMenu** (name, price, change, change %) and a **bottom search bar** (opened by header search icon, **GlassView**; closes when opening detail drawer, sort menu, or switching tab) are on the Watchlist screen. Tab bar uses **expo-blur** (Liquid Glass) background.
