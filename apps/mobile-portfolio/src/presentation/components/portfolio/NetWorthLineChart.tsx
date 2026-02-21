@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import type { PortfolioHistoryPoint } from "@/src/domain/entities/portfolio";
 import { useTheme } from "@/src/presentation/theme";
-import { formatCompactCurrency } from "@/src/presentation/utils";
+import { formatChartLabel, formatCompactCurrency } from "@/src/presentation/utils";
 import styled from "styled-components/native";
 
 const X_LABEL_COUNT = 5;
@@ -43,8 +43,7 @@ export const NetWorthLineChart = memo(function NetWorthLineChart({
     const indices = new Set(pickLabelIndices(points.length));
     const labels = points.map((p, i) => {
       if (!indices.has(i)) return "";
-      const d = new Date(p.date);
-      return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+      return formatChartLabel(new Date(p.date));
     });
     return { data, labels };
   }, [points]);

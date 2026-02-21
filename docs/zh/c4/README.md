@@ -19,7 +19,7 @@
 
 **文件**：`c4-mobile-portfolio-components.puml`
 
-**说明**：移动端投资组合应用（Expo + React Native）薄客户端：AppContent（偏好加载 spinner）、标签/屏幕；**Redux Toolkit**（quotes 含 subscribedSymbols + extraSubscribedSymbols、preferences、portfolio）；**styled-components** 主题 UI（基元 ScreenRoot、ListRow、CardBordered 等）；hooks（usePortfolio、useSymbolDisplayData、usePreferences、useRiskMetrics、useRiskSummary、useComputedVar）；QuoteSocketSubscriber 订阅合并符号；StockDetailDrawer 通过 setExtraSubscribedSymbols 添加符号；账户屏 useFocusEffect；原生图表；后端 GET /api/v1/portfolio、GET /api/v1/portfolio/risk-summary、GET /api/v1/portfolio/asset-allocation-by-account-type、GET /api/v1/quotes、WS /ws/quotes。
+**说明**：移动端投资组合应用（Expo + React Native）**展示层**（hooks 按领域：portfolio、market、account、risk、blockchain、common；屏幕、Redux、主题、i18n）直接调用**基础设施**——**API 模块**（按领域：portfolio、market、account、risk、blockchain；getPortfolioData、getQuotes、getWatchlists、getAccountData、getRiskMetrics、getBlockchainBalance 等）与 **quoteStreamService**（WebSocket subscribe）；无应用层与容器。**领域层**仅含实体与 DTO。**基础设施**另有 HttpClient、createQuoteSocket、web3Service。Redux Toolkit（quotes 含 subscribedSymbols + extraSubscribedSymbols、preferences、portfolio）；styled-components（ScreenRoot、ListRow、CardBordered 等）；QuoteSocketSubscriber 使用 quoteStreamService；后端 GET /api/v1/portfolio、GET /api/v1/quotes、WS /ws/quotes 等。
 
 ### 投资组合分析 API 组件
 

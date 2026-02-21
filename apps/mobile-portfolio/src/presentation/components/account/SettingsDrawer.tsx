@@ -9,8 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
-import { usePreferences } from "@/src/presentation/hooks/usePreferences";
+import { useDraggableDrawer, usePreferences } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import {
   AbsoluteFill,

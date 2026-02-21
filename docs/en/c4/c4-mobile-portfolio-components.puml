@@ -53,37 +53,20 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
         Component(storybook_ui_root, "StorybookUIRoot", "Storybook React Native", "On-device catalog of native and RN components")
     }
 
-    ' Application Layer
-    Boundary(application_layer, "Application Layer") {
-        Component(dependency_container, "DependencyContainer", "TypeScript", "Dependency injection container")
-        Component(get_portfolio_usecase, "GetPortfolioUseCase", "TypeScript", "Portfolio use case")
-        Component(get_customer_usecase, "GetCustomerUseCase", "TypeScript", "Customer use case")
-        Component(get_quotes_usecase, "GetQuotesUseCase", "TypeScript", "Quotes use case")
-        Component(risk_metrics_usecase, "RiskMetricsUseCase", "TypeScript", "Risk metrics, risk summary, VaR computation")
-    }
-
     ' Domain Layer
     Boundary(domain_layer, "Domain Layer") {
         Component(domain_entities, "Domain Entities", "TypeScript", "Portfolio, Quote, Customer, etc.")
-        Component(portfolio_repo_interface, "IPortfolioRepository", "TypeScript", "Portfolio repository interface")
-        Component(quote_repo_interface, "IQuoteRepository", "TypeScript", "Quote repository interface")
-        Component(customer_repo_interface, "ICustomerRepository", "TypeScript", "Customer repository interface")
-        Component(other_repo_interfaces, "Other Repository Interfaces", "TypeScript", "UserPreference, Watchlist, Instrument, etc.")
+        Component(domain_dto, "Domain DTOs", "TypeScript", "WatchlistWithItems, UpdatePreferenceInput, AccountDataResult, RegisterCustomerInput")
     }
 
     ' Infrastructure Layer
     Boundary(infrastructure_layer, "Infrastructure Layer") {
+        Component(api_module, "API Module", "TypeScript", "By domain: portfolio, market, account, risk, blockchain. getPortfolioData, getQuotes, getWatchlists, getAccountData, getRiskMetrics, getBlockchainBalance, etc.")
         Component(http_client, "HttpClient", "TypeScript", "HTTP client wrapper")
         Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes")
         Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL")
-        
-        Component(portfolio_repo_impl, "PortfolioRepository", "TypeScript", "Implements IPortfolioRepository (thin client; delegates portfolio and risk logic to API)")
-        Component(quote_repo_impl, "QuoteRepository", "TypeScript", "Implements IQuoteRepository")
-        Component(customer_repo_impl, "CustomerRepository", "TypeScript", "Implements ICustomerRepository")
-        Component(other_repo_impls, "Other Repositories", "TypeScript", "UserPreference, Watchlist, etc.")
-        
+        Component(quote_stream_service, "quoteStreamService", "TypeScript", "QuoteStreamService: subscribe(symbols), uses quoteStreamTypes")
         Component(web3_service, "web3Service", "TypeScript", "Web3 integration")
-        Component(utils, "Utils", "TypeScript", "infrastructure utils")
     }
 
     ' Native Components
@@ -97,44 +80,26 @@ Container_Boundary(mobile_portfolio, "Mobile Portfolio (Expo + React Native)") {
 
 Container_Ext(portfolio_api, "Portfolio Analytics API", "REST / WebSocket", "Portfolio, /ws/quotes, customers, accounts, payments, orders, trades, risk-metrics")
 
-' Presentation to Application
-Rel(use_portfolio_hook, dependency_container, "Gets use case", "")
-Rel(use_symbol_display_hook, dependency_container, "Gets repository", "")
-Rel(use_preferences_hook, dependency_container, "Gets repository", "")
-Rel(use_risk_metrics_hook, dependency_container, "Gets use case", "")
-Rel(use_risk_summary_hook, dependency_container, "Gets use case", "")
-Rel(use_computed_var_hook, dependency_container, "Gets use case", "")
-Rel(use_account_data_hook, dependency_container, "Gets use case", "")
+' Presentation to Infrastructure (API and services)
+Rel(use_portfolio_hook, api_module, "Calls getPortfolioData", "")
+Rel(use_account_data_hook, api_module, "Calls getAccountData", "")
+Rel(use_symbol_display_hook, api_module, "Calls getQuotes, getQuotesHistory", "")
+Rel(use_preferences_hook, api_module, "Calls getUserPreference, updateUserPreference", "")
+Rel(use_risk_metrics_hook, api_module, "Calls getRiskMetrics", "")
+Rel(use_risk_summary_hook, api_module, "Calls getRiskSummary", "")
+Rel(use_computed_var_hook, api_module, "Calls computeVar", "")
+Rel(account_drawers, api_module, "Calls registerCustomer, createPayment, getTradeFormData, createOrder, executeTrade", "")
 
-' Application to Domain
-Rel(dependency_container, get_portfolio_usecase, "Provides", "")
-Rel(dependency_container, get_customer_usecase, "Provides", "")
-Rel(dependency_container, get_quotes_usecase, "Provides", "")
-Rel(dependency_container, risk_metrics_usecase, "Provides", "")
-Rel(get_portfolio_usecase, portfolio_repo_interface, "Uses", "")
-Rel(get_customer_usecase, customer_repo_interface, "Uses", "")
-Rel(get_quotes_usecase, quote_repo_interface, "Uses", "")
-Rel(risk_metrics_usecase, portfolio_repo_interface, "Uses", "")
+Rel(quote_subscriber, quote_stream_service, "Uses subscribe()", "")
+Rel(quote_stream_service, quote_socket, "Uses createQuoteSocket", "")
+Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
 
-' Infrastructure implements Domain
-Rel(portfolio_repo_impl, portfolio_repo_interface, "Implements", "")
-Rel(quote_repo_impl, quote_repo_interface, "Implements", "")
-Rel(customer_repo_impl, customer_repo_interface, "Implements", "")
-Rel(other_repo_impls, other_repo_interfaces, "Implements", "")
-
-' Application uses Infrastructure
-Rel(dependency_container, portfolio_repo_impl, "Provides", "")
-Rel(dependency_container, quote_repo_impl, "Provides", "")
-Rel(dependency_container, customer_repo_impl, "Provides", "")
-Rel(dependency_container, other_repo_impls, "Provides", "")
-
-' Infrastructure to External API
-Rel(portfolio_repo_impl, http_client, "Uses", "")
-Rel(quote_repo_impl, http_client, "Uses", "")
-Rel(customer_repo_impl, http_client, "Uses", "")
+' API module to HTTP and Domain
+Rel(api_module, http_client, "Uses", "")
+Rel(api_module, domain_entities, "Uses types", "")
+Rel(api_module, domain_dto, "Uses types", "")
 Rel(http_client, api_config, "Uses", "")
 Rel(http_client, portfolio_api, "HTTP", "")
-Rel(quote_socket, portfolio_api, "WebSocket", "/ws/quotes")
 
 ' Presentation UI
 Rel(app_content, use_preferences_hook, "Uses", "")
@@ -205,10 +170,6 @@ Rel(base_chart_view_manager, base_chart_view, "Creates", "")
 Rel(stock_detail_drawer, period_data_processor, "Uses", "")
 Rel(storybook_screen, storybook_ui_root, "Renders", "")
 
-' Domain entities
-Rel(portfolio_repo_interface, domain_entities, "Returns", "")
-Rel(quote_repo_interface, domain_entities, "Returns", "")
-Rel(customer_repo_interface, domain_entities, "Returns", "")
 
 LAYOUT_TOP_DOWN()
 

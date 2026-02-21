@@ -59,3 +59,34 @@ export function formatBalance(value: number): string {
     minimumFractionDigits: 0,
   });
 }
+
+export function formatScreenDate(date: Date, locale?: string): string {
+  return date.toLocaleDateString(locale ?? undefined, {
+    month: "long",
+    day: "numeric",
+  });
+}
+
+export function formatScreenDateLong(date: Date, locale?: string): string {
+  return date.toLocaleDateString(locale ?? undefined, {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+export function formatChartLabel(date: Date, locale?: string): string {
+  return date.toLocaleDateString(locale ?? undefined, {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+export function formatChartTooltipDate(date: Date, locale?: string): string {
+  return date.toLocaleDateString(locale ?? undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}

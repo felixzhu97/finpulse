@@ -51,7 +51,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-mobile-portfolio-components.puml`
 
-**Description**: Mobile Portfolio app (Expo + React Native): thin client with AppContent (preferences loading spinner), tabs/screens; **Redux Toolkit** (quotes with subscribedSymbols + extraSubscribedSymbols, preferences, portfolio); **styled-components** for theme-aware UI (primitives: ScreenRoot, ListRow, CardBordered, etc.); hooks (usePortfolio, useSymbolDisplayData, usePreferences, useRiskMetrics, useRiskSummary, useComputedVar); QuoteSocketSubscriber subscribes to merged symbols; StockDetailDrawer adds symbol via setExtraSubscribedSymbols; Account screen uses useFocusEffect; native charts; backend: GET /api/v1/portfolio, GET /api/v1/portfolio/risk-summary, GET /api/v1/portfolio/asset-allocation-by-account-type, GET /api/v1/quotes, WS /ws/quotes.
+**Description**: Mobile Portfolio app (Expo + React Native): **Presentation** (hooks by domain: portfolio, market, account, risk, blockchain, common; screens, Redux, theme, i18n) calls **Infrastructure** directly—**API module** (by domain: portfolio, market, account, risk, blockchain; getPortfolioData, getQuotes, getWatchlists, getAccountData, getRiskMetrics, getBlockchainBalance, etc.) and **quoteStreamService** (WebSocket subscribe); no application layer or container. **Domain** is entities + DTOs only. **Infrastructure** also has HttpClient, createQuoteSocket, web3Service. Redux Toolkit (quotes with subscribedSymbols + extraSubscribedSymbols, preferences, portfolio); styled-components (ScreenRoot, ListRow, CardBordered, etc.); QuoteSocketSubscriber uses quoteStreamService; backend: GET /api/v1/portfolio, GET /api/v1/quotes, WS /ws/quotes, etc.
 
 ## How to View Diagrams
 

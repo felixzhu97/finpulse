@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -10,11 +10,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { container } from "@/src/application";
+import {
+  getTradeFormData,
+  createOrder,
+  executeTrade,
+} from "@/src/infrastructure/api";
 import type { Instrument } from "@/src/domain/entities/instrument";
 import type { Order } from "@/src/domain/entities/order";
 import type { Trade } from "@/src/domain/entities/trade";
-import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
+import { useDraggableDrawer } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import {
   AbsoluteFill,
@@ -66,16 +70,14 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
   const { slideAnim, dragOffset, panHandlers, backdropOpacity, closeWithAnimation } =
     useDraggableDrawer({ visible, drawerHeight: DRAWER_HEIGHT, onClose });
 
-  const tradeUseCase = useMemo(() => container.getTradeUseCase(), []);
-
   useEffect(() => {
     if (visible) {
-      tradeUseCase.getFormData().then(({ accounts: accs, instruments: insts }) => {
+      getTradeFormData().then(({ accounts: accs, instruments: insts }) => {
         setAccounts(accs.map((a) => ({ account_id: a.account_id, account_type: a.account_type, currency: a.currency })));
         setInstruments(insts);
       });
     }
-  }, [visible, tradeUseCase]);
+  }, [visible]);
 
   const handleClose = () => {
     setStep("order");
@@ -95,7 +97,7 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
     setSubmitting(true);
     setError(null);
     try {
-      const order = await tradeUseCase.createOrder({
+      const order = await createOrder({
         accountId,
         instrumentId,
         side,
@@ -123,7 +125,7 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
     setSubmitting(true);
     setError(null);
     try {
-      const trade = await tradeUseCase.executeTrade({
+      const trade = await executeTrade({
         orderId: oid,
         quantity: qty,
         price: prc,

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -11,10 +11,10 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { container } from "@/src/application";
+import { getPaymentFormData, createPayment } from "@/src/infrastructure/api";
 import type { AccountResource } from "@/src/domain/entities/accountResource";
 import type { Payment } from "@/src/domain/entities/payment";
-import { useDraggableDrawer } from "@/src/presentation/hooks/useDraggableDrawer";
+import { useDraggableDrawer } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import {
   AbsoluteFill,
@@ -62,17 +62,14 @@ export function NewPaymentDrawer({ visible, onClose, onSuccess }: NewPaymentDraw
   const { slideAnim, dragOffset, panHandlers, backdropOpacity, closeWithAnimation } =
     useDraggableDrawer({ visible, drawerHeight: DRAWER_HEIGHT, onClose });
 
-  const paymentUseCase = useMemo(() => container.getPaymentUseCase(), []);
-
   useEffect(() => {
     if (visible) {
       setLoadingAccounts(true);
-      paymentUseCase
-        .getFormData()
+      getPaymentFormData()
         .then(setAccounts)
         .finally(() => setLoadingAccounts(false));
     }
-  }, [visible, paymentUseCase]);
+  }, [visible]);
 
   const handleClose = () => {
     setAccountId("");
@@ -89,7 +86,7 @@ export function NewPaymentDrawer({ visible, onClose, onSuccess }: NewPaymentDraw
     setSubmitting(true);
     setError(null);
     try {
-      const created = await paymentUseCase.create({
+      const created = await createPayment({
         accountId,
         amount: parsedAmount,
         currency: "USD",

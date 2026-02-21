@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import { ScrollView, PanResponder } from "react-native";
+import { formatChartLabel } from "@/src/presentation/utils";
 
 const MIN_BAR_WIDTH = 52;
 const X_LABEL_COUNT = 5;
@@ -123,10 +124,7 @@ export function useScrollableChart({
   const formatXLabel = useCallback(
     (idx: number) => {
       if (timestamps != null && timestamps[idx] != null) {
-        return new Date(timestamps[idx]).toLocaleDateString(undefined, {
-          month: "numeric",
-          day: "numeric",
-        });
+        return formatChartLabel(new Date(timestamps[idx]));
       }
       return String(idx + 1);
     },

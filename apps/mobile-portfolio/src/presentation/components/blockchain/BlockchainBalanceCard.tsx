@@ -1,7 +1,7 @@
 import { memo, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useBlockchain } from "@/src/presentation/hooks/useBlockchain";
+import { useBlockchain } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
 import { formatBalance } from "@/src/presentation/utils";
