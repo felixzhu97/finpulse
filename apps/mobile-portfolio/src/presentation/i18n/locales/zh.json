@@ -46,6 +46,7 @@
     "noStocksFound": "未找到股票",
     "tryDifferentSearch": "尝试其他搜索词",
     "startBackendFirst": "请先启动后端并填充数据。",
+    "emptyWatchlist": "自选股为空。",
     "sortBy": "排序方式",
     "sortOptions": {
       "name": "名称",

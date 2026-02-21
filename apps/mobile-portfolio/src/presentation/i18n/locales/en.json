@@ -46,6 +46,7 @@
     "noStocksFound": "No stocks found",
     "tryDifferentSearch": "Try a different search term",
     "startBackendFirst": "Start backend and seed data first.",
+    "emptyWatchlist": "No symbols in your watchlist.",
     "sortBy": "Sort by",
     "sortOptions": {
       "name": "Name",
