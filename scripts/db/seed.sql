@@ -205,8 +205,6 @@ INSERT INTO instrument (instrument_id, symbol, name, asset_class, currency, exch
   ('d0000001-0000-4000-8000-0000000000b9', 'TSLA', 'Tesla, Inc.', 'equity', 'USD', 'NASDAQ'),
   ('d0000001-0000-4000-8000-0000000000ba', 'ADSK', 'Autodesk, Inc.', 'equity', 'USD', 'NASDAQ'),
   ('d0000001-0000-4000-8000-0000000000bb', 'PLTR', 'Palantir Technologies Inc.', 'equity', 'USD', 'NASDAQ'),
-  ('d0000001-0000-4000-8000-0000000000bc', 'AAPL', 'Apple Inc.', 'equity', 'USD', 'NASDAQ'),
-  ('d0000001-0000-4000-8000-0000000000bd', 'MSFT', 'Microsoft Corporation', 'equity', 'USD', 'NASDAQ'),
   ('d0000001-0000-4000-8000-0000000000be', 'GOOGL', 'Alphabet Inc. Class A', 'equity', 'USD', 'NASDAQ'),
   ('d0000001-0000-4000-8000-0000000000bf', 'AMZN', 'Amazon.com, Inc.', 'equity', 'USD', 'NASDAQ'),
   ('d0000001-0000-4000-8000-0000000000c0', 'NVDA', 'NVIDIA Corporation', 'equity', 'USD', 'NASDAQ'),

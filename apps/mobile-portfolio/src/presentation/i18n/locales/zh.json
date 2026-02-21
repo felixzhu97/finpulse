@@ -119,6 +119,7 @@
     "tradeFailed": "交易失败",
     "tradeSuccess": "交易已执行",
     "newTrade": "新建交易",
+    "quickTrade": "快捷交易",
     "register": "注册",
     "registerFailed": "注册失败",
     "registerSuccess": "资料已创建",
@@ -135,7 +136,10 @@
     }
   },
   "blockchain": {
+    "wallet": "钱包",
     "connectWallet": "连接钱包",
+    "connected": "已连接",
+    "connectFailed": "连接失败，请检查网络后重试。",
     "disconnect": "断开连接",
     "blockchainBalance": "区块链余额",
     "noBalance": "暂无余额",
@@ -151,6 +155,19 @@
     "error": "错误",
     "success": "成功",
     "fillAllFields": "请填写所有字段",
-    "invalidAmount": "无效的金额"
+    "invalidAmount": "无效的金额",
+    "sendEth": "发送 ETH",
+    "toAddress": "收款地址",
+    "amountEth": "数量 (ETH)",
+    "walletRequired": "请先连接钱包以发送 ETH。",
+    "confirmSendTitle": "确认发送",
+    "network": "网络",
+    "ethBalance": "ETH 余额",
+    "invalidAddress": "无效地址",
+    "insufficientBalance": "余额不足",
+    "sendEthSuccess": "交易已提交。",
+    "sendEthFailed": "发送失败",
+    "testnetFaucetHint": "测试网：可从 Sepolia 水龙头领取测试 ETH。",
+    "testnetNotice": "当前使用测试网与测试 ETH。"
   }
 }

@@ -60,8 +60,11 @@ class NativeSparklineView @JvmOverloads constructor(
         val h = height.toFloat()
         if (w <= 0 || h <= 0) return
 
-        val pts = dataPoints ?: SparklinePoints.generatePlaceholder(trend)
-        if (pts.size < 2) return
+        val pts = dataPoints
+        if (pts == null || pts.size < 2) {
+            drawBaseline(canvas, w, h, "flat")
+            return
+        }
 
         val resolvedTrend = SparklinePoints.resolveTrend(dataValues, trend)
         val lineColor = SparklineTheme.lineColorForTrend(resolvedTrend)

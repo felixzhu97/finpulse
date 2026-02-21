@@ -1,5 +1,3 @@
-import map from "lodash/map";
-import zipObject from "lodash/zipObject";
 import { useCallback, useEffect, useMemo } from "react";
 import type { Instrument } from "../../domain/entities/instrument";
 import type { Watchlist } from "../../domain/entities/watchlist";
@@ -10,7 +8,7 @@ import {
   removeWatchlistItem as apiRemoveWatchlistItem,
   createWatchlist as apiCreateWatchlist,
   getQuotes,
-  getQuotesHistory,
+  getQuotesHistoryBatch,
 } from "../../infrastructure/api";
 import { useAsyncLoad } from "./common";
 import type { QuoteConnectionStatus } from "../../domain/entities/quotes";
@@ -41,7 +39,8 @@ export interface UseSymbolDisplayDataResult {
 
 export function useSymbolDisplayData(
   symbols: string[],
-  initialPrices: Record<string, number> = {}
+  initialPrices: Record<string, number> = {},
+  subscribeSymbols?: string[]
 ): UseSymbolDisplayDataResult {
   const dispatch = useAppDispatch();
   const quotes = useAppSelector(
@@ -53,10 +52,13 @@ export function useSymbolDisplayData(
     shallowEqual
   );
   const status = useAppSelector(selectStatus);
+  const toSubscribe = subscribeSymbols !== undefined && subscribeSymbols.length > 0
+    ? subscribeSymbols
+    : symbols;
 
   useEffect(() => {
-    dispatch(setSubscribedSymbols(symbols));
-  }, [symbols.join(","), dispatch]);
+    dispatch(setSubscribedSymbols(toSubscribe));
+  }, [toSubscribe.join(","), dispatch]);
 
   const quoteMap = useMemo(
     () =>
@@ -167,14 +169,12 @@ export function useQuotesForSymbols(symbols: string[]) {
 
   const refreshQuotes = useCallback(async () => {
     if (symbols.length === 0) return;
-    const keys = map(symbols, (s) => s.toUpperCase());
-    const [historyResults, snapshot] = await Promise.all([
-      Promise.all(map(symbols, (s) => getQuotesHistory(s, 5))),
-      getQuotes(symbols),
-    ]).catch(() => [[], {}] as const);
-    const historyData = historyResults.length > 0 ? zipObject(keys, historyResults) : {};
-    dispatch(setHistory(historyData));
-    dispatch(setSnapshot(snapshot ?? {}));
+    getQuotesHistoryBatch(symbols, 5)
+      .then((data) => dispatch(setHistory(data ?? {})))
+      .catch(() => dispatch(setHistory({})));
+    getQuotes(symbols)
+      .then((data) => dispatch(setSnapshot(data ?? {})))
+      .catch(() => dispatch(setSnapshot({})));
   }, [symbols.join(","), dispatch]);
 
   useEffect(() => {

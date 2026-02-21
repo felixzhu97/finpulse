@@ -78,7 +78,7 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 ### Backend Services
 
-- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. Clean Architecture: `composition.py` (lifespan), `container` (service factories), `crud_helpers` (generic CRUD), `api/config` (cache constants); SQLAlchemy 2.0 + asyncpg; Alembic migrations; config via `.env`. REST resources under `/api/v1/*` with **batch create** (`POST .../batch`) for seeding. **Blockchain simulation**: `/api/v1/blockchain/*` (transfers, blocks, balances).
+- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. Clean Architecture: `composition.py` (lifespan), `container` (service factories), `crud_helpers` (generic CRUD), `api/config` (cache constants); SQLAlchemy 2.0 + asyncpg; Alembic migrations; config via `.env`. REST resources under `/api/v1/*` with **batch create** (`POST .../batch`) for seeding.
 - **TimescaleDB (PostgreSQL)** - Portfolio metadata and time-series history (hypertable); Docker, host port 5433
 - **Redis** - Cache for portfolio history (Docker, port 6379)
 - **Apache Kafka** - Event messaging for portfolio events and real-time market data (Docker, port 9092)
@@ -114,7 +114,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 
 - **apps/web** - Angular-based financial analytics web console.
 - **apps/mobile** - React Native demo mobile app.
-- **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; **Stocks** screen with real-time prices and per-stock sparklines (NativeSparkline, useSymbolDisplayData); native views **NativeDemoCard** and six native charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Native code follows OOP principles: iOS uses **ChartSupport** (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes) and OOP helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartRenderer, ChartDataCalculator, HistogramRenderer); Android uses **view/chart/** (ChartGl, ChartCurve, ChartLayoutCalculator, ValueFormatter, AxisLabelManager, HistogramRenderer, per-chart themes), **view/sparkline/** (SparklineTheme, SparklinePoints), **view/democard/**. Charts support theme (light/dark), tooltips, x-axis labels, full-width rendering, and horizontal drag-to-scroll via `useScrollableChart` and `ScrollableChartContainer`.
+- **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; **Stocks** screen with real-time prices and per-stock sparklines (NativeSparkline, useSymbolDisplayData); **Account** tab with Quick trade, Send ETH (real Ethereum via Sepolia testnet by default), Connect/Disconnect wallet (Redux web3 slice, web3Service). Quote history uses **batch API** (`getQuotesHistoryBatch`) for fewer requests. Native views **NativeDemoCard** and six native charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Native code follows OOP principles: iOS uses **ChartSupport** (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes) and OOP helper classes; Android uses **view/chart/**, **view/sparkline/**, **view/democard/**. Charts support theme (light/dark), tooltips, x-axis labels, full-width rendering, and horizontal drag-to-scroll via `useScrollableChart` and `ScrollableChartContainer`.
 - **services/portfolio-analytics** - Python FastAPI backend (Clean Architecture: composition, container, crud_helpers); PostgreSQL; Kafka; REST resources + batch create; AI/ML (VaR, fraud, surveillance, sentiment, identity, forecast); config via `.env.example`; `pnpm run start:backend`; `pnpm run test:api`.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
@@ -209,8 +209,9 @@ The platform supports real-time market data for the mobile portfolio app using t
     - `GET /api/v1/quotes?symbols=AAPL,MSFT`
     - WebSocket `/ws/quotes` (`{"type":"subscribe","symbols":["AAPL","MSFT"]}` → `{"type":"snapshot","quotes":{...}}`).
 - **Mobile integration**
-  - On entering the watchlist page, the app fetches quotes from the DB via REST and pushes them to the store.
-  - A shared `quoteSocket` client opens a WebSocket connection to `/ws/quotes` for live updates in the watchlist screen.
+  - Watchlist loads **history first** via REST (`getQuotesHistoryBatch` and `getQuotes`); each response dispatches to Redux as soon as it arrives. **WebSocket** subscribes only after `historyLoaded` is set, so real-time updates start after history is rendered.
+  - Subscription is **visible-only**: only symbols in the current viewport (and the open stock-detail symbol) are sent to `/ws/quotes`. Refresh interval 1s. Redux: `quotes`, `history`, `historyLoaded`, `subscribedSymbols`, `extraSubscribedSymbols`; store uses `serializableCheck.ignoredPaths` for large quote/history state.
+  - List rows use a memoized **WatchlistRow** and stable callbacks to keep VirtualizedList updates fast.
 
 Quick local setup:
 
@@ -311,7 +312,7 @@ fintech-project/
 │   └── mobile-portfolio/         # React Native portfolio overview mobile app
 ├── scripts/
 │   ├── backend/start-backend.sh # One-click: Docker (Postgres + Kafka) + API + seed
-│   ├── seed/generate-seed-data.js   # Seed via batch APIs (run by start:backend or after API is up)
+│   ├── seed/generate-seed-data.js   # Seed via batch APIs; dedupeInstrumentsBySymbol for unique symbols (run by start:backend or after API is up)
 │   └── db/                        # Schema and seed SQL for fintech ER database
 ├── services/
 │   └── portfolio-analytics/    # FastAPI, PostgreSQL, Kafka (DDD)
@@ -336,7 +337,7 @@ fintech-project/
 Angular-based financial analytics web console. Uses `chart.js`/`ng2-charts` for performance charts and `chartjs-chart-financial` for candlestick stock charts. Depends on `@fintech/ui` and `@fintech/utils`.
 
 #### `apps/mobile-portfolio`
-Expo + React Native app for portfolio overview, net worth trend, asset allocation, and stock charts. **Layering**: domain (entities, dto), infrastructure (api module + network + services), presentation (hooks call api and quoteStreamService directly; no application layer or container). Native views: **NativeDemoCard** and six charts—**NativeLineChart** (line+area, crosshair/tooltip), **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart**; **NativeSparkline** on Stocks screen. Charts use Metal (iOS) / OpenGL ES (Android), with OOP architecture: iOS **ChartSupport** (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartRenderer, ChartDataCalculator, HistogramRenderer); Android **view/chart/** (ChartGl, ChartCurve, ChartLayoutCalculator, ValueFormatter, AxisLabelManager, HistogramRenderer, themes), **view/sparkline/**, **view/democard/**. Support `theme` (light/dark), tooltips, x-axis labels, full-width rendering, drag-to-scroll; JS: `useScrollableChart`, `ScrollableChartContainer`, `chartTooltip`. Wrappers in `src/components/native/`.
+Expo + React Native app for portfolio overview, net worth trend, asset allocation, and stock charts. **Layering**: domain (entities, dto), infrastructure (api + network + services + config/web3Config), presentation (hooks, Redux: quotes with **historyLoaded**, preferences, portfolio, **web3**). **Account** tab: Quick trade, Send ETH (Sepolia default), Connect/Disconnect wallet (WalletConnectButton, Redux web3, web3Service). **Watchlist**: history fetched first (getQuotesHistoryBatch + getQuotes, dispatch on each response); WebSocket starts after history loaded; **visible-only** subscription + 1s refresh; **WatchlistRow** (memo) for list performance; **NativeSparkline** shows baseline only when no data. Native charts (Metal/OpenGL ES): NativeLineChart (gradient in light theme), NativeCandleChart, etc.; **NativeSparkline**; JS: `useScrollableChart`, `ScrollableChartContainer`. Redux middleware: `serializableCheck.ignoredPaths` for quotes/history. Seed script: **dedupeInstrumentsBySymbol** so instruments have unique symbols.
 
 #### `packages/ui`
 Shared UI component library, a collection of components built on Radix UI and Tailwind CSS. Can be reused across multiple applications.

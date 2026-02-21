@@ -49,9 +49,10 @@ interface NewTradeDrawerProps {
   visible: boolean;
   onClose: () => void;
   onSuccess?: (trade: Trade) => void;
+  prefillDefaults?: boolean;
 }
 
-export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerProps) {
+export function NewTradeDrawer({ visible, onClose, onSuccess, prefillDefaults }: NewTradeDrawerProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const [step, setStep] = useState<"order" | "trade">("order");
@@ -73,11 +74,16 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
   useEffect(() => {
     if (visible) {
       getTradeFormData().then(({ accounts: accs, instruments: insts }) => {
-        setAccounts(accs.map((a) => ({ account_id: a.account_id, account_type: a.account_type, currency: a.currency })));
+        const accList = accs.map((a) => ({ account_id: a.account_id, account_type: a.account_type, currency: a.currency }));
+        setAccounts(accList);
         setInstruments(insts);
+        if (prefillDefaults && accList.length > 0 && insts.length > 0) {
+          setAccountId(accList[0].account_id);
+          setInstrumentId(insts[0].instrument_id);
+        }
       });
     }
-  }, [visible]);
+  }, [visible, prefillDefaults]);
 
   const handleClose = () => {
     setStep("order");
@@ -93,9 +99,10 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
 
   const handleCreateOrder = async () => {
     const qty = parseFloat(quantity);
-    if (!accountId || !instrumentId || isNaN(qty) || qty <= 0) return;
-    setSubmitting(true);
+    if (!accountId || !instrumentId || !quantity.trim()) return;
+    if (isNaN(qty) || qty <= 0 || !Number.isFinite(qty) || qty > 1e12) return;
     setError(null);
+    setSubmitting(true);
     try {
       const order = await createOrder({
         accountId,
@@ -121,7 +128,10 @@ export function NewTradeDrawer({ visible, onClose, onSuccess }: NewTradeDrawerPr
     const qty = parseFloat(quantity);
     const prc = parseFloat(price);
     const oid = createdOrder?.order_id;
-    if (!oid || isNaN(qty) || qty <= 0 || isNaN(prc) || prc <= 0) return;
+    if (!oid || !price.trim()) return;
+    if (isNaN(qty) || qty <= 0 || !Number.isFinite(qty) || qty > 1e12) return;
+    if (isNaN(prc) || prc <= 0 || !Number.isFinite(prc) || prc > 1e12) return;
+    setError(null);
     setSubmitting(true);
     setError(null);
     try {

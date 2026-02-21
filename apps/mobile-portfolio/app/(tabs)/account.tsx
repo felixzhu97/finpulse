@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import styled from "styled-components/native";
@@ -10,7 +10,8 @@ import { SettingsDrawer } from "@/src/presentation/components/account/SettingsDr
 import { RegisterCustomerDrawer } from "@/src/presentation/components/account/RegisterCustomerDrawer";
 import { NewPaymentDrawer } from "@/src/presentation/components/account/NewPaymentDrawer";
 import { NewTradeDrawer } from "@/src/presentation/components/account/NewTradeDrawer";
-import { BlockchainBalanceCard, BlockchainTransferDrawer } from "@/src/presentation/components/blockchain";
+import { WalletConnectButton, EthTransferDrawer } from "@/src/presentation/components/blockchain";
+import { useWeb3, SEPOLIA_CHAIN_ID } from "@/src/presentation/hooks";
 import { formatBalance } from "@/src/presentation/utils";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
@@ -252,7 +253,9 @@ export default function AccountScreen() {
   const [registerVisible, setRegisterVisible] = useState(false);
   const [paymentVisible, setPaymentVisible] = useState(false);
   const [tradeVisible, setTradeVisible] = useState(false);
-  const [blockchainTransferVisible, setBlockchainTransferVisible] = useState(false);
+  const [tradePrefillDefaults, setTradePrefillDefaults] = useState(false);
+  const [ethTransferVisible, setEthTransferVisible] = useState(false);
+  const { walletInfo } = useWeb3();
 
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 
@@ -325,37 +328,9 @@ export default function AccountScreen() {
                   const typeAccounts = groupedAccounts[type] || [];
                   if (typeAccounts.length === 0) return null;
 
-                  const getAccountUuid = (account: Account, index: number): string => {
-                    const accountTypeMap: Record<string, string[]> = {
-                      brokerage: ["brokerage"],
-                      saving: ["saving", "cash"],
-                      checking: ["checking", "cash"],
-                      creditCard: ["creditCard", "cash"],
-                      cash: ["cash", "saving"],
-                    };
-                    const possibleTypes = accountTypeMap[account.type] || [account.type];
-                    let accountResource = accountResources.find(
-                      (ar) => possibleTypes.includes(ar.account_type)
-                    );
-                    if (!accountResource && accountResources.length > index) {
-                      accountResource = accountResources[index];
-                    }
-                    return accountResource?.account_id || account.id;
-                  };
-
                   return (
                     <CategorySection key={type}>
                       <CategoryTitle>{getAccountTypeLabel(type, t)}</CategoryTitle>
-                      {typeAccounts.map((account, accountIndex) => {
-                        const accountIdToUse = getAccountUuid(account, accountIndex);
-                        return (
-                          <BlockchainBalanceCard
-                            key={`blockchain-${account.id}`}
-                            accountId={accountIdToUse}
-                            currency="SIM_COIN"
-                          />
-                        );
-                      })}
                       <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING }}>
                         {typeAccounts.map((account, accountIndex) => (
                             <AccountItemWrap key={account.id}>
@@ -395,6 +370,15 @@ export default function AccountScreen() {
 
             <Section>
               <SectionHeader>
+                <SectionTitle>{walletInfo?.isConnected ? t("blockchain.wallet") : t("blockchain.connectWallet")}</SectionTitle>
+              </SectionHeader>
+              <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING }}>
+                <WalletConnectButton />
+              </CardBordered>
+            </Section>
+
+            <Section>
+              <SectionHeader>
                 <SectionTitle>{t("account.actions")}</SectionTitle>
               </SectionHeader>
               <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING }}>
@@ -414,7 +398,7 @@ export default function AccountScreen() {
                   <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
                 </ActionRow>
                 <Separator indent={52} />
-                <ActionRow onPress={() => setTradeVisible(true)} activeOpacity={0.7}>
+                <ActionRow onPress={() => { setTradePrefillDefaults(false); setTradeVisible(true); }} activeOpacity={0.7}>
                   <ActionLeft>
                     <MaterialIcons name="trending-up" size={20} color={colors.text} />
                     <ActionText>{t("account.newTrade")}</ActionText>
@@ -422,10 +406,18 @@ export default function AccountScreen() {
                   <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
                 </ActionRow>
                 <Separator indent={52} />
-                <ActionRow onPress={() => setBlockchainTransferVisible(true)} activeOpacity={0.7}>
+                <ActionRow onPress={() => { setTradePrefillDefaults(true); setTradeVisible(true); }} activeOpacity={0.7}>
                   <ActionLeft>
-                    <MaterialIcons name="swap-horiz" size={20} color={colors.text} />
-                    <ActionText>{t("blockchain.transfer")}</ActionText>
+                    <MaterialIcons name="flash-on" size={20} color={colors.text} />
+                    <ActionText>{t("account.quickTrade")}</ActionText>
+                  </ActionLeft>
+                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
+                </ActionRow>
+                <Separator indent={52} />
+                <ActionRow onPress={() => setEthTransferVisible(true)} activeOpacity={0.7}>
+                  <ActionLeft>
+                    <MaterialIcons name="send" size={20} color={colors.text} />
+                    <ActionText>{t("blockchain.sendEth")}</ActionText>
                   </ActionLeft>
                   <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
                 </ActionRow>
@@ -471,12 +463,11 @@ export default function AccountScreen() {
       <NewTradeDrawer
         visible={tradeVisible}
         onClose={() => setTradeVisible(false)}
+        prefillDefaults={tradePrefillDefaults}
       />
-      <BlockchainTransferDrawer
-        visible={blockchainTransferVisible}
-        onClose={() => setBlockchainTransferVisible(false)}
-        accounts={accounts}
-        accountResources={accountResources}
+      <EthTransferDrawer
+        visible={ethTransferVisible}
+        onClose={() => setEthTransferVisible(false)}
       />
     </StyledSafeArea>
   );

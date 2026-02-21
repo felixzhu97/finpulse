@@ -43,6 +43,7 @@ export interface WalletInfo {
   address: string;
   isConnected: boolean;
   chainId?: number;
+  chainName?: string;
   balance?: string;
 }
 

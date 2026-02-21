@@ -51,7 +51,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-mobile-portfolio-components.puml`
 
-**Description**: Mobile Portfolio app (Expo + React Native): **Presentation** (hooks by domain: portfolio, market, account, risk, blockchain, common; screens, Redux, theme, i18n) calls **Infrastructure** directly—**API module** (by domain: portfolio, market, account, risk, blockchain; getPortfolioData, getQuotes, getWatchlists, getAccountData, getRiskMetrics, getBlockchainBalance, etc.) and **quoteStreamService** (WebSocket subscribe); no application layer or container. **Domain** is entities + DTOs only. **Infrastructure** also has HttpClient, createQuoteSocket, web3Service. Redux Toolkit (quotes with subscribedSymbols + extraSubscribedSymbols, preferences, portfolio); styled-components (ScreenRoot, ListRow, CardBordered, etc.); QuoteSocketSubscriber uses quoteStreamService; backend: GET /api/v1/portfolio, GET /api/v1/quotes, WS /ws/quotes, etc.
+**Description**: Mobile Portfolio app (Expo + React Native): **Presentation** (hooks: portfolio, market, account, risk, blockchain, common; screens, Redux, theme, i18n) calls **Infrastructure** directly—**API module** (getPortfolioData, getQuotes, **getQuotesHistoryBatch**, getWatchlists, getAccountData, getRiskMetrics, etc.) and **quoteStreamService** (WebSocket). **Account** tab: WalletConnectButton, EthTransferDrawer (Send ETH, real chain; default Sepolia); **useWeb3** and **Redux web3 slice** (connectWallet, disconnectWallet, refreshWalletBalance); web3Service + web3Config. **Domain** is entities + DTOs only. **Infrastructure**: HttpClient, createQuoteSocket, web3Service, config/web3Config. Redux: quotes (**historyLoaded**; subscribedSymbols, extraSubscribedSymbols; history/snapshot dispatched as each REST response arrives). **QuoteSocketSubscriber** subscribes only after historyLoaded; **visible-only** symbols (viewport + detail); 1s refresh. **useSymbolDisplayData** accepts optional subscribeSymbols. Watchlist: **WatchlistRow** (memo), NativeSparkline shows baseline when no data. Backend: GET /api/v1/portfolio, GET /api/v1/quotes, GET /api/v1/quotes/history?symbols=...&minutes=..., WS /ws/quotes.
 
 ## How to View Diagrams
 
@@ -82,6 +82,7 @@ After setup, diagrams render without network access.
 
 ## Recent Updates
 
+- **Watchlist real-time (Mobile)**: History loaded first (setHistory/setSnapshot dispatch per response); WebSocket starts after historyLoaded; visible-only subscription (onViewableItemsChanged); 1s refresh; WatchlistRow memo; NativeSparkline baseline-only when no data; chart gradient in light theme; seed dedupe by symbol; Redux serializableCheck.ignoredPaths for quotes/history.
 - **Redux optimization (Mobile)**: Unified quotes via Redux; extraSubscribedSymbols for drawer; single WebSocket; useAppSelector/useAppDispatch; removed useRealtimeQuotes.
 - **Redux + styled-components (Mobile)**: Portfolio state in Redux; main screens and list components use styled-components primitives.
 - **OOP Architecture**: Native chart code refactored with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.

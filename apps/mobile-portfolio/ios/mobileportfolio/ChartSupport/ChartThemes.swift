@@ -7,18 +7,19 @@ enum LineChartTheme {
         let fillTop: (Float, Float, Float, Float)
         let fillBottom: (Float, Float, Float, Float)
         
-        switch trend {
+        let fillAlpha: Float = dark ? 0.15 : 0.55
+    switch trend {
         case "up":
             lineColor = (255/255, 59/255, 48/255, 1)
-            fillTop = (255/255, 59/255, 48/255, 0.15)
+            fillTop = (255/255, 59/255, 48/255, fillAlpha)
             fillBottom = (255/255, 59/255, 48/255, 0)
         case "down":
             lineColor = (52/255, 199/255, 89/255, 1)
-            fillTop = (52/255, 199/255, 89/255, 0.15)
+            fillTop = (52/255, 199/255, 89/255, fillAlpha)
             fillBottom = (52/255, 199/255, 89/255, 0)
         default:
             lineColor = (142/255, 142/255, 147/255, 1)
-            fillTop = (142/255, 142/255, 147/255, 0.15)
+            fillTop = (142/255, 142/255, 147/255, fillAlpha)
             fillBottom = (142/255, 142/255, 147/255, 0)
         }
         

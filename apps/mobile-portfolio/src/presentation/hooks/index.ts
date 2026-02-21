@@ -33,4 +33,4 @@ export type {
   UseRiskSummaryResult,
 } from "./risk";
 
-export { useBlockchain, useWeb3 } from "./blockchain";
+export { useWeb3, SEPOLIA_CHAIN_ID } from "./blockchain";

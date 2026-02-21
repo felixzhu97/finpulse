@@ -8,7 +8,7 @@ import orderBy from "lodash/orderBy";
 import trim from "lodash/trim";
 import uniq from "lodash/uniq";
 import uniqBy from "lodash/uniqBy";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { ActivityIndicator, FlatList } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -63,6 +63,36 @@ function buildStocksFromInstruments(instruments: Instrument[]): { instrument_id:
   );
 }
 
+const WatchlistRow = memo(function WatchlistRow({
+  item,
+  historyValues,
+  onSelectItem,
+}: {
+  item: WatchlistStockRow;
+  historyValues: number[] | undefined;
+  onSelectItem: (payload: StockDetailItem) => void;
+}) {
+  const onPress = useCallback(() => {
+    onSelectItem({
+      symbol: item.symbol,
+      name: item.name ?? null,
+      price: item.price,
+      change: item.change,
+      historyValues,
+    });
+  }, [item.symbol, item.name, item.price, item.change, historyValues, onSelectItem]);
+  return (
+    <WatchlistItemRow
+      symbol={item.symbol}
+      name={item.name}
+      price={item.price}
+      change={item.change}
+      historyValues={historyValues}
+      onPress={onPress}
+    />
+  );
+});
+
 export default function WatchlistsScreen() {
   const { colors, isDark } = useTheme();
   const { t, i18n } = useTranslation();
@@ -90,12 +120,27 @@ export default function WatchlistsScreen() {
   );
 
   const initialPrices = useMemo(() => ({}), []);
+  const [visibleSymbols, setVisibleSymbols] = useState<string[]>([]);
+
+  const subscribeSymbols = visibleSymbols.length > 0 ? visibleSymbols : symbols;
 
   const { quoteMap, historyBySymbol, bySymbol } = useSymbolDisplayData(
     symbols,
-    initialPrices
+    initialPrices,
+    subscribeSymbols
   );
   const { refreshQuotes } = useQuotesForSymbols(symbols);
+
+  const onViewableItemsChanged = useRef(
+    (info: { viewableItems: Array<{ item: WatchlistStockRow }> }) => {
+      const syms = uniq(map(info.viewableItems, (v) => v.item.symbol.toUpperCase()));
+      setVisibleSymbols(syms);
+    }
+  ).current;
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 50,
+    minimumViewTime: 100,
+  }).current;
 
   const baseRows = useMemo(
     (): WatchlistStockRow[] =>
@@ -213,23 +258,14 @@ export default function WatchlistsScreen() {
               data={filteredAndSortedRows}
               initialNumToRender={12}
               maxToRenderPerBatch={10}
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
               keyExtractor={(item) => item.instrument_id}
               renderItem={({ item }) => (
-                <WatchlistItemRow
-                  symbol={item.symbol}
-                  name={item.name}
-                  price={item.price}
-                  change={item.change}
+                <WatchlistRow
+                  item={item}
                   historyValues={historyBySymbol[item.symbol.toUpperCase()]}
-                  onPress={() =>
-                    setDetailItem({
-                      symbol: item.symbol,
-                      name: item.name ?? null,
-                      price: item.price,
-                      change: item.change,
-                      historyValues: historyBySymbol[item.symbol.toUpperCase()],
-                    })
-                  }
+                  onSelectItem={setDetailItem}
                 />
               )}
               ListEmptyComponent={

@@ -9,6 +9,7 @@ export type { PortfolioDataResult } from "./portfolio";
 export {
   getQuotes,
   getQuotesHistory,
+  getQuotesHistoryBatch,
   getWatchlists,
   addWatchlistItem,
   removeWatchlistItem,
@@ -30,11 +31,3 @@ export {
 
 export { getRiskMetrics, computeVar } from "./risk";
 
-export {
-  getBlockchainBalance,
-  getBlockchainBlocks,
-  getBlockchainBlock,
-  getBlockchainTransaction,
-  submitTransfer,
-  seedBalance,
-} from "./blockchain";

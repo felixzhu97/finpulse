@@ -19,7 +19,7 @@
 
 **文件**：`c4-mobile-portfolio-components.puml`
 
-**说明**：移动端投资组合应用（Expo + React Native）**展示层**（hooks 按领域：portfolio、market、account、risk、blockchain、common；屏幕、Redux、主题、i18n）直接调用**基础设施**——**API 模块**（按领域：portfolio、market、account、risk、blockchain；getPortfolioData、getQuotes、getWatchlists、getAccountData、getRiskMetrics、getBlockchainBalance 等）与 **quoteStreamService**（WebSocket subscribe）；无应用层与容器。**领域层**仅含实体与 DTO。**基础设施**另有 HttpClient、createQuoteSocket、web3Service。Redux Toolkit（quotes 含 subscribedSymbols + extraSubscribedSymbols、preferences、portfolio）；styled-components（ScreenRoot、ListRow、CardBordered 等）；QuoteSocketSubscriber 使用 quoteStreamService；后端 GET /api/v1/portfolio、GET /api/v1/quotes、WS /ws/quotes 等。
+**说明**：移动端投资组合应用（Expo + React Native）**展示层**（hooks：portfolio、market、account、risk、blockchain、common；屏幕、Redux、主题、i18n）直接调用**基础设施**——**API 模块**（getPortfolioData、getQuotes、**getQuotesHistoryBatch**、getWatchlists、getAccountData、getRiskMetrics 等）与 **quoteStreamService**（WebSocket）。**账户**标签：WalletConnectButton、EthTransferDrawer（发送 ETH，真实链；默认 Sepolia）；**useWeb3** 与 **Redux web3 slice**（connectWallet、disconnectWallet、refreshWalletBalance）；web3Service + web3Config。**领域层**仅含实体与 DTO。**基础设施**：HttpClient、createQuoteSocket、web3Service、config/web3Config。Redux：quotes（**historyLoaded**；subscribedSymbols、extraSubscribedSymbols；history/snapshot 随 REST 响应分别派发）。**QuoteSocketSubscriber** 仅在 historyLoaded 后订阅；**仅可见**符号（视口+详情）；1s 刷新。**useSymbolDisplayData** 支持可选 subscribeSymbols。自选：**WatchlistRow**（memo），NativeSparkline 无数据时仅显示基线。后端：GET /api/v1/portfolio、GET /api/v1/quotes、GET /api/v1/quotes/history?symbols=...&minutes=...、WS /ws/quotes。
 
 ### 投资组合分析 API 组件
 
@@ -62,6 +62,7 @@ git clone https://github.com/plantuml-stdlib/C4-PlantUML.git .
 
 ## 最近更新
 
+- **自选实时行情（移动端）**：先加载历史（setHistory/setSnapshot 按响应分别派发）；WebSocket 在 historyLoaded 后启动；仅可见订阅（onViewableItemsChanged）；1s 刷新；WatchlistRow memo；NativeSparkline 无数据时仅基线；图表浅色主题渐变；seed 按 symbol 去重；Redux serializableCheck.ignoredPaths 忽略 quotes/history。
 - **Redux 优化（移动端）**：报价统一 Redux；extraSubscribedSymbols 支持抽屉；单 WebSocket；useAppSelector/useAppDispatch；移除 useRealtimeQuotes。
 - **Redux + styled-components（移动端）**：Portfolio 状态迁至 Redux；主屏与列表组件使用 styled-components 基元。
 - **OOP 架构**：原生图表代码重构，使用抽象基类（`BaseChartViewManager`、`BaseChartView`、`BaseChartRenderer`）和辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartDataCalculator）。共享工具：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes。

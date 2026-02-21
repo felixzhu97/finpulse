@@ -53,6 +53,16 @@ function buildNasdaqExtraInstruments() {
   }).filter(Boolean);
 }
 
+function dedupeInstrumentsBySymbol(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = (item.symbol || "").toUpperCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function buildNasdaqExtraMarketData(close, i) {
   const base = (close || 50) + (i % 300);
   const open = base;
@@ -354,43 +364,46 @@ async function seedResources() {
   ]);
   const accountIds = accounts.map((a) => a.account_id);
 
-  const instruments = await postBatch("/api/v1/instruments/batch", [
-    { symbol: "AAPL", name: "Apple Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "MSFT", name: "Microsoft Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "US912828VM18", name: "United States 2-Year Treasury Note", asset_class: "bond", currency: "USD", exchange: "OTC" },
-    { symbol: "SPY", name: "SPDR S&P 500 ETF Trust", asset_class: "etf", currency: "USD", exchange: "NYSE Arca" },
-    { symbol: "GOOGL", name: "Alphabet Inc. (Google)", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "AMZN", name: "Amazon.com, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "NVDA", name: "NVIDIA Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "QQQ", name: "Invesco QQQ Trust", asset_class: "etf", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "US912828XG18", name: "United States 10-Year Treasury Note", asset_class: "bond", currency: "USD", exchange: "OTC" },
-    { symbol: "AAPL250117C00230000", name: "AAPL Jan 2026 230 Call", asset_class: "option", currency: "USD", exchange: "CBOE" },
-    { symbol: "INTC", name: "Intel Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "AMD", name: "Advanced Micro Devices, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "ADBE", name: "Adobe Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "CRM", name: "Salesforce, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "NFLX", name: "Netflix, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "AVGO", name: "Broadcom Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "ORCL", name: "Oracle Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "CSCO", name: "Cisco Systems, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "PEP", name: "PepsiCo, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "COST", name: "Costco Wholesale Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "ISRG", name: "Intuitive Surgical, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "GILD", name: "Gilead Sciences, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "AMGN", name: "Amgen Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "SBUX", name: "Starbucks Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "TMUS", name: "T-Mobile US, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "VRTX", name: "Vertex Pharmaceuticals Incorporated", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "MDLZ", name: "Mondelez International, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "KLAC", name: "KLA Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "SNPS", name: "Synopsys, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "MRVL", name: "Marvell Technology, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "PANW", name: "Palo Alto Networks, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "CDNS", name: "Cadence Design Systems, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "ASML", name: "ASML Holding N.V.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    { symbol: "LRCX", name: "Lam Research Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
-    ...buildNasdaqExtraInstruments().slice(0, 176),
-  ]);
+  const instruments = await postBatch(
+    "/api/v1/instruments/batch",
+    dedupeInstrumentsBySymbol([
+      { symbol: "AAPL", name: "Apple Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "MSFT", name: "Microsoft Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "US912828VM18", name: "United States 2-Year Treasury Note", asset_class: "bond", currency: "USD", exchange: "OTC" },
+      { symbol: "SPY", name: "SPDR S&P 500 ETF Trust", asset_class: "etf", currency: "USD", exchange: "NYSE Arca" },
+      { symbol: "GOOGL", name: "Alphabet Inc. (Google)", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "AMZN", name: "Amazon.com, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "NVDA", name: "NVIDIA Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "QQQ", name: "Invesco QQQ Trust", asset_class: "etf", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "US912828XG18", name: "United States 10-Year Treasury Note", asset_class: "bond", currency: "USD", exchange: "OTC" },
+      { symbol: "AAPL250117C00230000", name: "AAPL Jan 2026 230 Call", asset_class: "option", currency: "USD", exchange: "CBOE" },
+      { symbol: "INTC", name: "Intel Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "AMD", name: "Advanced Micro Devices, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "ADBE", name: "Adobe Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "CRM", name: "Salesforce, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "NFLX", name: "Netflix, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "AVGO", name: "Broadcom Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "ORCL", name: "Oracle Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "CSCO", name: "Cisco Systems, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "PEP", name: "PepsiCo, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "COST", name: "Costco Wholesale Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "ISRG", name: "Intuitive Surgical, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "GILD", name: "Gilead Sciences, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "AMGN", name: "Amgen Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "SBUX", name: "Starbucks Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "TMUS", name: "T-Mobile US, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "VRTX", name: "Vertex Pharmaceuticals Incorporated", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "MDLZ", name: "Mondelez International, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "KLAC", name: "KLA Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "SNPS", name: "Synopsys, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "MRVL", name: "Marvell Technology, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "PANW", name: "Palo Alto Networks, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "CDNS", name: "Cadence Design Systems, Inc.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "ASML", name: "ASML Holding N.V.", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      { symbol: "LRCX", name: "Lam Research Corporation", asset_class: "equity", currency: "USD", exchange: "NASDAQ" },
+      ...buildNasdaqExtraInstruments().slice(0, 176),
+    ])
+  );
   const inst1 = instruments[0];
   const inst2 = instruments[1];
   const inst3 = instruments[2];

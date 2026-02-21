@@ -6,6 +6,7 @@ const MAX_HISTORY_POINTS = 45;
 interface QuotesState {
   quotes: QuoteSnapshot;
   history: Record<string, number[]>;
+  historyLoaded: boolean;
   status: QuoteConnectionStatus;
   subscribedSymbols: string[];
   extraSubscribedSymbols: string[];
@@ -14,6 +15,7 @@ interface QuotesState {
 const initialState: QuotesState = {
   quotes: {},
   history: {},
+  historyLoaded: false,
   status: "idle",
   subscribedSymbols: [],
   extraSubscribedSymbols: [],
@@ -46,6 +48,7 @@ const quotesSlice = createSlice({
       state.status = action.payload;
     },
     setHistory(state, action: PayloadAction<Record<string, number[]>>) {
+      state.historyLoaded = true;
       for (const [sym, prices] of Object.entries(action.payload)) {
         const key = sym.toUpperCase();
         if (prices?.length) {

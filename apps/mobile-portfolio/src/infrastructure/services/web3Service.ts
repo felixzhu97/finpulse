@@ -10,6 +10,7 @@ class Web3Service {
   initialize(config: Web3Config): void {
     this.config = config;
     this.provider = new ethers.JsonRpcProvider(config.rpcUrl);
+    this.provider.getNetwork().catch(() => {});
   }
 
   async connectWallet(privateKey?: string): Promise<WalletInfo> {
@@ -31,6 +32,7 @@ class Web3Service {
       address,
       isConnected: true,
       chainId: Number(network.chainId),
+      chainName: this.config?.chainName,
       balance: ethers.formatEther(balance),
     };
 
@@ -70,8 +72,7 @@ class Web3Service {
         value,
       });
       return tx;
-    } catch (error) {
-      console.error("Transaction failed:", error);
+    } catch {
       return null;
     }
   }
@@ -83,8 +84,7 @@ class Web3Service {
 
     try {
       return await this.signer.signMessage(message);
-    } catch (error) {
-      console.error("Message signing failed:", error);
+    } catch {
       return null;
     }
   }

@@ -8,9 +8,9 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
     Component(app_content, "AppContent", "React Native", "根布局：使用 usePreferences().loading，偏好加载完成前显示 spinner，随后渲染标签")
     Component(tabs_router, "标签路由", "Expo Router", "仪表板、自选、洞察、账户、Storybook（开发）")
     Component(overview_screen, "仪表板屏幕", "React Native", "组合摘要、原生图表、净资产、资产配置")
-    Component(watchlist_screen, "自选屏幕", "React Native", "股票列表（组合）、底部搜索、排序、详情抽屉")
+    Component(watchlist_screen, "自选屏幕", "React Native", "股票列表、仅可见 subscribeSymbols、WatchlistRow（memo）、搜索、排序、详情抽屉")
     Component(analytics_screen, "洞察屏幕", "React Native", "风险指标（波动率、夏普比率、VaR、Beta）、根据组合历史计算的 VaR")
-    Component(account_screen, "账户屏幕", "React Native", "个人资料、账户列表、操作；useAccountData 在标签聚焦时加载")
+    Component(account_screen, "账户屏幕", "React Native", "个人资料、账户列表、钱包（连接/断开）；操作：快捷交易、发送 ETH、注册、支付、交易、设置；useAccountData 在标签聚焦时加载")
     Component(storybook_screen, "Storybook 屏幕", "React Native", "仅开发环境的 /storybook 路由；包裹 StorybookUIRoot 并提供返回栏")
 
     ' Presentation Layer
@@ -23,14 +23,16 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(metric_card, "MetricCard", "React Native", "标签、数值、说明")
         Component(native_sparkline, "NativeSparkline", "原生视图", "每股迷你图")
         Component(stock_detail_drawer, "StockDetailDrawer", "React Native", "可拖拽抽屉、setExtraSubscribedSymbols、Redux 报价、分享")
-        Component(account_drawers, "账户抽屉", "React Native", "RegisterCustomerDrawer、NewPaymentDrawer、NewTradeDrawer、SettingsDrawer")
+        Component(account_drawers, "账户抽屉", "React Native", "RegisterCustomerDrawer、NewPaymentDrawer、NewTradeDrawer、EthTransferDrawer、SettingsDrawer")
+    Component(wallet_connect_btn, "WalletConnectButton", "React Native", "连接/断开钱包，Redux web3")
+    Component(eth_transfer_drawer, "EthTransferDrawer", "React Native", "发送 ETH，真实链（默认 Sepolia）")
         Component(sort_menu, "SortMenu", "React Native", "按名称、价格、涨跌、涨跌幅排序")
         Component(glass_search_bar, "底部搜索栏", "React Native", "GlassView，点击搜索图标打开")
         Component(glass_view, "GlassView", "React Native", "expo-blur，Liquid Glass")
         
         Component(use_portfolio_hook, "usePortfolio", "Hook", "组合数据 via useAsyncLoad")
         Component(use_account_data_hook, "useAccountData", "Hook", "客户、账户、账户资源，聚焦时加载")
-        Component(use_symbol_display_hook, "useSymbolDisplayData", "Hook", "Redux 管理的报价和历史")
+        Component(use_symbol_display_hook, "useSymbolDisplayData", "Hook", "Redux 报价与历史；subscribeSymbols（可见或全部）")
         Component(use_refresh_control_hook, "useRefreshControl", "Hook", "下拉刷新模式")
         Component(use_draggable_drawer_hook, "useDraggableDrawer", "Hook", "滑动/拖拽动画")
         Component(use_preferences_hook, "usePreferences", "Hook", "Redux 管理的用户偏好")
@@ -38,10 +40,12 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
         Component(use_risk_metrics_hook, "useRiskMetrics", "Hook", "风险指标 API")
         Component(use_risk_summary_hook, "useRiskSummary", "Hook", "风险摘要（高风险持仓占比、前五大持仓集中度）")
         Component(use_computed_var_hook, "useComputedVar", "Hook", "VaR 计算")
+        Component(use_web3_hook, "useWeb3", "Hook", "Redux web3 钱包状态，connect、disconnect、refreshBalance")
         
-        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes、history、subscribedSymbols、extraSubscribedSymbols")
+        Component(redux_quotes, "Redux quotes slice", "Redux Toolkit", "quotes、history、historyLoaded、subscribedSymbols、extraSubscribedSymbols")
+        Component(redux_web3, "Redux web3 slice", "Redux Toolkit", "walletInfo、loading、error；connectWallet、disconnectWallet、refreshWalletBalance")
         Component(redux_preferences, "Redux preferences slice", "Redux Toolkit", "theme、language、notifications")
-        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "订阅合并符号")
+        Component(quote_subscriber, "QuoteSocketSubscriber", "React Native", "historyLoaded 后订阅；合并符号（可见+详情）；1s 刷新")
         Component(redux_portfolio, "Redux portfolio slice", "Redux Toolkit", "selectedAccountId")
         
         Component(theme_system, "主题系统", "TypeScript", "浅色/深色配色；useTheme (useTheme.ts)")
@@ -61,7 +65,7 @@ Container_Boundary(mobile_portfolio, "移动端投资组合 (Expo + React Native
 
     ' Infrastructure Layer
     Boundary(infrastructure_layer, "基础设施层") {
-        Component(api_module, "API 模块", "TypeScript", "按领域：portfolio、market、account、risk、blockchain。getPortfolioData、getQuotes、getWatchlists、getAccountData、getRiskMetrics、getBlockchainBalance 等")
+        Component(api_module, "API 模块", "TypeScript", "按领域：portfolio、market、account、risk。getPortfolioData、getQuotes、getQuotesHistoryBatch、getWatchlists、getAccountData、getRiskMetrics 等")
         Component(http_client, "HttpClient", "TypeScript", "HTTP 客户端包装器")
         Component(quote_socket, "createQuoteSocket", "TypeScript", "WebSocket /ws/quotes")
         Component(api_config, "API Config", "TypeScript", "EXPO_PUBLIC_PORTFOLIO_API_URL")
@@ -83,7 +87,7 @@ Container_Ext(portfolio_api, "投资组合分析 API", "REST / WebSocket", "组�
 ' Presentation to Infrastructure (API and services)
 Rel(use_portfolio_hook, api_module, "调用 getPortfolioData", "")
 Rel(use_account_data_hook, api_module, "调用 getAccountData", "")
-Rel(use_symbol_display_hook, api_module, "调用 getQuotes、getQuotesHistory", "")
+Rel(use_symbol_display_hook, api_module, "调用 getQuotes、getQuotesHistoryBatch", "")
 Rel(use_preferences_hook, api_module, "调用 getUserPreference、updateUserPreference", "")
 Rel(use_risk_metrics_hook, api_module, "调用 getRiskMetrics", "")
 Rel(use_risk_summary_hook, api_module, "调用 getRiskSummary", "")
@@ -137,6 +141,12 @@ Rel(account_screen, use_refresh_control_hook, "使用", "")
 Rel(account_screen, account_drawers, "使用", "")
 Rel(account_screen, use_preferences_hook, "使用", "")
 Rel(account_screen, storybook_screen, "跳转到（开发 Storybook 入口）", "")
+Rel(account_screen, wallet_connect_btn, "使用", "")
+Rel(account_screen, eth_transfer_drawer, "使用（发送 ETH）", "")
+Rel(wallet_connect_btn, use_web3_hook, "使用", "")
+Rel(eth_transfer_drawer, use_web3_hook, "使用", "")
+Rel(use_web3_hook, redux_web3, "派发、选择", "")
+Rel(use_web3_hook, web3_service, "调用 connectWallet、disconnect、getBalance", "")
 
 ' Redux and State
 Rel(use_symbol_display_hook, redux_quotes, "派发、选择", "")

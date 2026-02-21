@@ -77,15 +77,15 @@ export function StockDetailDrawer({
   const [selectedPeriod, setSelectedPeriod] = useState<typeof PERIODS[number]>("1D");
   const [showAddToWatchlist, setShowAddToWatchlist] = useState(false);
 
-  const drawerSymbols = useMemo(() => (item && !displayData ? [item.symbol] : []), [item?.symbol, displayData]);
+  const drawerSymbols = useMemo(() => (item ? [item.symbol] : []), [item?.symbol]);
   const quotes = useAppSelector((s) => selectQuotesForSymbols(s, drawerSymbols));
 
   useEffect(() => {
-    dispatch(setExtraSubscribedSymbols(visible ? drawerSymbols : []));
+    dispatch(setExtraSubscribedSymbols(visible && item ? [item.symbol] : []));
     return () => {
       dispatch(setExtraSubscribedSymbols([]));
     };
-  }, [visible, drawerSymbols.join(","), dispatch]);
+  }, [visible, item?.symbol, dispatch]);
 
   const quote = item ? quotes[item.symbol.toUpperCase()] : undefined;
   const price = quote?.price ?? item?.price ?? 0;
