@@ -1,6 +1,6 @@
 """
 Sample batch job: write a Delta table to the data lake.
-Run from services/portfolio-analytics: python -m jobs.batch.delta_sample
+Run from apps/portfolio-analytics: python -m jobs.batch.delta_sample
 """
 from __future__ import annotations
 

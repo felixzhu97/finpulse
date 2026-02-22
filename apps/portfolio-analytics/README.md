@@ -66,12 +66,12 @@ Override with env: `DATABASE_URL`, `REDIS_URL`, `HISTORY_CACHE_TTL_SECONDS`, `KA
 pnpm run start:backend
 ```
 
-This starts Docker (Postgres, Redis, Kafka), creates/uses `.venv` in `services/portfolio-analytics`, runs migrations, and starts the API on port 8800.
+This starts Docker (Postgres, Redis, Kafka), creates/uses `.venv` in `apps/portfolio-analytics`, runs migrations, and starts the API on port 8800.
 
 **Option B – Step by step (from project root):**
 
 ```bash
-cd services/portfolio-analytics
+cd apps/portfolio-analytics
 python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
@@ -79,12 +79,12 @@ pip install -r requirements.txt
 export DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5433/portfolio
 export KAFKA_BOOTSTRAP_SERVERS=127.0.0.1:9092
 
-# Start DB/Kafka first (from project root: docker compose -f services/portfolio-analytics/docker-compose.yml up -d)
+# Start DB/Kafka first (from project root: docker compose -f apps/portfolio-analytics/docker-compose.yml up -d)
 .venv/bin/alembic upgrade head
 .venv/bin/uvicorn main:app --host 0.0.0.0 --port 8800 --reload
 ```
 
-Use `.venv/bin/alembic` and `.venv/bin/uvicorn` so the project’s virtualenv is used; otherwise `alembic`/`uvicorn` may not be found. Run from `services/portfolio-analytics` so `main` and `src` are on the Python path.
+Use `.venv/bin/alembic` and `.venv/bin/uvicorn` so the project’s virtualenv is used; otherwise `alembic`/`uvicorn` may not be found. Run from `apps/portfolio-analytics` so `main` and `src` are on the Python path.
 
 ### Alembic
 
@@ -126,7 +126,7 @@ Libraries used: **SciPy** (parametric VaR), **NumPy** (historical VaR, surveilla
 
 ### Testing
 
-- **Pytest** – from repo root: `pnpm run test` or `pnpm run test:api` (runs `pytest tests -v` in `services/portfolio-analytics`). Tests are under `tests/api/` by feature (accounts, blockchain, portfolio, trading, payments, etc.). **Async DB tests** use `httpx.AsyncClient` with `ASGITransport` and the app’s lifespan context (`blockchain_client` fixture in `conftest.py`) so the app and tests share the same event loop; session/engine are created in lifespan and bound to that loop. Unit tests live in `tests/unit/`. See `tests/README.md` for layout and concurrency testing notes.
+- **Pytest** – from repo root: `pnpm run test` or `pnpm run test:api` (runs `pytest tests -v` in `apps/portfolio-analytics`). Tests are under `tests/api/` by feature (accounts, blockchain, portfolio, trading, payments, etc.). **Async DB tests** use `httpx.AsyncClient` with `ASGITransport` and the app’s lifespan context (`blockchain_client` fixture in `conftest.py`) so the app and tests share the same event loop; session/engine are created in lifespan and bound to that loop. Unit tests live in `tests/unit/`. See `tests/README.md` for layout and concurrency testing notes.
 ### Messaging
 
 - **Portfolio events**

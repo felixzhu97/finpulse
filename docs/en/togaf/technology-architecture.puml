@@ -144,7 +144,7 @@ package "Portfolio Analytics Backend" <<Infra>> {
         component "Ollama, HF (optional); PyTorch, MLflow" as OptionalTech
     }
     note right of FastAPI
-        services/portfolio-analytics
+        apps/portfolio-analytics
         Clean Architecture: composition.py, container, crud_helpers, api/config
         GET/POST /api/v1/portfolio, seed
         GET /api/v1/quotes, WebSocket /ws/quotes
@@ -165,7 +165,7 @@ package "Testing" <<Build>> {
     component "pytest" as Pytest
     component "Jest" as Jest
     
-    note right of Pytest: Portfolio API tests\nservices/portfolio-analytics
+    note right of Pytest: Portfolio API tests\napps/portfolio-analytics
     note right of Jest: Unit tests\nMobile apps
 }
 

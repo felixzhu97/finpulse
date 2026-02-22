@@ -5,7 +5,7 @@ cd "$ROOT"
 
 echo "[start-backend] ROOT=$ROOT"
 echo "[start-backend] Starting Docker stack..."
-cd services/portfolio-analytics
+cd apps/portfolio-analytics
 docker compose down 2>/dev/null || true
 docker compose up -d
 cd "$ROOT"
@@ -18,7 +18,7 @@ for i in $(seq 1 20); do nc -z 127.0.0.1 9092 2>/dev/null && break; sleep 1; don
 sleep 2
 
 echo "[start-backend] Setting up Python venv..."
-cd services/portfolio-analytics
+cd apps/portfolio-analytics
 if [ ! -d .venv ]; then
   python3 -m venv .venv
 fi

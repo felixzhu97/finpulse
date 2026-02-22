@@ -190,7 +190,7 @@ package "Portfolio Analytics Backend" <<Infra>> {
         component "Ollama, HF（可选）；PyTorch, MLflow" as OptionalTech
     }
     note right of FastAPI
-        services/portfolio-analytics
+        apps/portfolio-analytics
         Clean Architecture：composition.py、container、crud_helpers、api/config
         GET/POST /api/v1/portfolio, seed
         AI 融入：payments（欺诈）、trades（监控）、

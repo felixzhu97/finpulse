@@ -25,7 +25,7 @@
 
 **文件**：`c4-components.puml`
 
-**说明**：投资组合分析 API 内部组件：投资组合路由（GET /portfolio、POST /seed）、资源路由（/api/v1/* CRUD 及 batch；AI 融入 payments、trades、customers、risk-metrics）、行情路由（GET /quotes、GET /quotes/history、WebSocket /ws/quotes）；服务（投资组合、分析、市场数据、行情历史）；RealtimeQuoteRepository（ORM、IRealtimeQuoteRepository）；Kafka 行情消费者。后端采用整洁架构（见下方图及 `services/portfolio-analytics/README.md`）。
+**说明**：投资组合分析 API 内部组件：投资组合路由（GET /portfolio、POST /seed）、资源路由（/api/v1/* CRUD 及 batch；AI 融入 payments、trades、customers、risk-metrics）、行情路由（GET /quotes、GET /quotes/history、WebSocket /ws/quotes）；服务（投资组合、分析、市场数据、行情历史）；RealtimeQuoteRepository（ORM、IRealtimeQuoteRepository）；Kafka 行情消费者。后端采用整洁架构（见下方图及 `apps/portfolio-analytics/README.md`）。
 
 ### 整洁架构（投资组合 API）
 
@@ -62,7 +62,7 @@ git clone https://github.com/plantuml-stdlib/C4-PlantUML.git .
 
 ## 最近更新
 
-- **投资组合 API (Go)**：非 AI 后端（`services/portfolio-api-go`）：Gin、DDD（domain、application、infrastructure）、Swagger；health、GET /api/v1/quotes、GET /api/v1/instruments；与 FastAPI 共享 TimescaleDB。已加入容器图。
+- **投资组合 API (Go)**：非 AI 后端（`apps/portfolio-api-go`）：Gin、DDD（domain、application、infrastructure）、Swagger；health、GET /api/v1/quotes、GET /api/v1/instruments；与 FastAPI 共享 TimescaleDB。已加入容器图。
 - **自选实时行情（移动端）**：先加载历史（setHistory/setSnapshot 按响应分别派发）；WebSocket 在 historyLoaded 后启动；仅可见订阅（onViewableItemsChanged）；1s 刷新；WatchlistRow memo；NativeSparkline 无数据时仅基线；图表浅色主题渐变；seed 按 symbol 去重；Redux serializableCheck.ignoredPaths 忽略 quotes/history。
 - **Redux 优化（移动端）**：报价统一 Redux；extraSubscribedSymbols 支持抽屉；单 WebSocket；useAppSelector/useAppDispatch；移除 useRealtimeQuotes。
 - **Redux + styled-components（移动端）**：Portfolio 状态迁至 Redux；主屏与列表组件使用 styled-components 基元。

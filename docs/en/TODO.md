@@ -7,7 +7,7 @@ Chinese version: [docs_ch/TODO.md](../docs_ch/TODO.md).
 
 ## Architecture & Documentation
 
-- [ ] Align PlantUML under `docs/en/togaf, docs/en/c4` with the codebase (apps, services/portfolio-analytics).
+- [ ] Align PlantUML under `docs/en/togaf, docs/en/c4` with the codebase (apps, apps/portfolio-analytics).
 - [ ] Keep `docs/en/togaf/README.md, docs/en/c4/README.md` in sync with the technology stack.
 - [ ] Review domain diagrams in `docs/domain` and TOGAF in `.cursor/rules/togaf-specification.mdc` when adding subsystems or flows.
 
@@ -29,10 +29,10 @@ Chinese version: [docs_ch/TODO.md](../docs_ch/TODO.md).
 - [ ] Ensure `@fintech/utils` exposes well-named utilities with tests; extract shared helpers to avoid duplicate logic.
 - [ ] Run type-check and lint across all packages before releases.
 
-## Server (`services/portfolio-analytics`)
+## Server (`apps/portfolio-analytics`)
 
 - [ ] Add health/readiness endpoints (e.g. `/health`, `/ready`) for API and dependencies (PostgreSQL, Kafka).
-- [ ] Keep OpenAPI and `services/portfolio-analytics/README.md` in sync with API routes and env vars.
+- [ ] Keep OpenAPI and `apps/portfolio-analytics/README.md` in sync with API routes and env vars.
 - [ ] Define production deployment (Docker, env config, scaling) and document in README or `docs/en/togaf, docs/en/c4`.
 
 ## Database (PostgreSQL, Kafka)
@@ -51,7 +51,7 @@ Chinese version: [docs_ch/TODO.md](../docs_ch/TODO.md).
 ## Risk Management
 
 - [ ] Clarify risk domains (market, credit, liquidity, operational) and keep `docs/en/domain` and `docs/en/togaf` aligned with portfolio and analytics flows.
-- [ ] Define core risk measures (e.g. VaR, stress tests, scenario analysis) and document inputs/outputs and assumptions in `services/portfolio-analytics` API docs.
+- [ ] Define core risk measures (e.g. VaR, stress tests, scenario analysis) and document inputs/outputs and assumptions in `apps/portfolio-analytics` API docs.
 - [ ] Ensure risk calculations are reproducible and backtestable; document data lineage and sources used for risk metrics.
 
 ## Compliance
@@ -69,7 +69,7 @@ Chinese version: [docs_ch/TODO.md](../docs_ch/TODO.md).
 ## Performance & Scalability
 
 - [ ] Define non-functional performance targets (P95/P99 latency, throughput) for critical web and API flows and record them in architecture docs.
-- [ ] Add basic performance tests or benchmarks for high-traffic endpoints in `services/portfolio-analytics` and key UI interactions in `apps/web`.
+- [ ] Add basic performance tests or benchmarks for high-traffic endpoints in `apps/portfolio-analytics` and key UI interactions in `apps/web`.
 - [ ] Document scaling strategies (horizontal/vertical, caching, queueing) and capacity planning assumptions in `docs/en/togaf` and service READMEs.
 
 ## Artificial Intelligence & ML

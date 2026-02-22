@@ -31,4 +31,4 @@ Write-endpoints that modify shared state (e.g. balances, ledger) should be desig
 ## Run
 
 From repo root: `pnpm test` or `pnpm run test:api`.  
-From `services/portfolio-analytics`: `python -m pytest tests -v`.
+From `apps/portfolio-analytics`: `python -m pytest tests -v`.

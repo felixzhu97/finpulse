@@ -16,7 +16,7 @@ Non-AI backend service. Same DB as `portfolio-analytics` (Python). Use port 8801
 
 **1. One-time: install deps** (needs network; if timeout, try another network or VPN)
 ```bash
-cd services/portfolio-api-go
+cd apps/portfolio-api-go
 GOPROXY=https://goproxy.cn,direct go mod tidy
 # or: GOPROXY=https://proxy.golang.org,direct go mod tidy
 ```
@@ -25,7 +25,7 @@ GOPROXY=https://goproxy.cn,direct go mod tidy
 
 **3. Start API**
 ```bash
-cd services/portfolio-api-go
+cd apps/portfolio-api-go
 go run ./cmd/server
 ```
 Or: `./scripts/start.sh` (builds then runs). Set `DATABASE_URL` and `PORT` (default 8801) if needed; copy `.env.example` to `.env` optional.

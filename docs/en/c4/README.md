@@ -33,7 +33,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-components.puml`
 
-**Description**: Portfolio Analytics API internal components: Portfolio Router (GET /portfolio, POST /seed), Resource Router (/api/v1/* CRUD and batch; AI integrated in payments, trades, customers, risk-metrics), Quotes Router (GET /quotes, GET /quotes/history, WebSocket /ws/quotes); services (Portfolio, Analytics, Market Data, Quote History); RealtimeQuoteRepository (ORM, IRealtimeQuoteRepository); Kafka Quote Consumer. The backend follows Clean Architecture (see diagram below and `services/portfolio-analytics/README.md`).
+**Description**: Portfolio Analytics API internal components: Portfolio Router (GET /portfolio, POST /seed), Resource Router (/api/v1/* CRUD and batch; AI integrated in payments, trades, customers, risk-metrics), Quotes Router (GET /quotes, GET /quotes/history, WebSocket /ws/quotes); services (Portfolio, Analytics, Market Data, Quote History); RealtimeQuoteRepository (ORM, IRealtimeQuoteRepository); Kafka Quote Consumer. The backend follows Clean Architecture (see diagram below and `apps/portfolio-analytics/README.md`).
 
 ### Clean Architecture (Portfolio API)
 
@@ -82,7 +82,7 @@ After setup, diagrams render without network access.
 
 ## Recent Updates
 
-- **Portfolio API (Go)**: Non-AI backend (`services/portfolio-api-go`): Gin, DDD (domain, application, infrastructure), Swagger; health, GET /api/v1/quotes, GET /api/v1/instruments; shares TimescaleDB with FastAPI. Shown in container diagram.
+- **Portfolio API (Go)**: Non-AI backend (`apps/portfolio-api-go`): Gin, DDD (domain, application, infrastructure), Swagger; health, GET /api/v1/quotes, GET /api/v1/instruments; shares TimescaleDB with FastAPI. Shown in container diagram.
 - **Watchlist real-time (Mobile)**: History loaded first (setHistory/setSnapshot dispatch per response); WebSocket starts after historyLoaded; visible-only subscription (onViewableItemsChanged); 1s refresh; WatchlistRow memo; NativeSparkline baseline-only when no data; chart gradient in light theme; seed dedupe by symbol; Redux serializableCheck.ignoredPaths for quotes/history.
 - **Redux optimization (Mobile)**: Unified quotes via Redux; extraSubscribedSymbols for drawer; single WebSocket; useAppSelector/useAppDispatch; removed useRealtimeQuotes.
 - **Redux + styled-components (Mobile)**: Portfolio state in Redux; main screens and list components use styled-components primitives.

@@ -78,8 +78,8 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 ### Backend Services
 
-- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. Clean Architecture: `composition.py` (lifespan), `container` (service factories), `crud_helpers` (generic CRUD), `api/config` (cache constants); SQLAlchemy 2.0 + asyncpg; Alembic migrations; config via `.env`. REST resources under `/api/v1/*` with **batch create** (`POST .../batch`) for seeding.
-- **Go** - Non-AI portfolio API (`services/portfolio-api-go`), port 8801. Health, `GET /api/v1/quotes`, `GET /api/v1/instruments`; shares same Postgres DB; run with `cd services/portfolio-api-go && go run ./cmd/server`.
+- **Python 3.10+ + FastAPI** - Portfolio analytics API (`apps/portfolio-analytics`), port 8800. Clean Architecture: `composition.py` (lifespan), `container` (service factories), `crud_helpers` (generic CRUD), `api/config` (cache constants); SQLAlchemy 2.0 + asyncpg; Alembic migrations; config via `.env`. REST resources under `/api/v1/*` with **batch create** (`POST .../batch`) for seeding.
+- **Go** - Non-AI portfolio API (`apps/portfolio-api-go`), port 8801. Health, `GET /api/v1/quotes`, `GET /api/v1/instruments`; shares same Postgres DB; run with `cd apps/portfolio-api-go && go run ./cmd/server`.
 - **TimescaleDB (PostgreSQL)** - Portfolio metadata and time-series history (hypertable); Docker, host port 5433
 - **Redis** - Cache for portfolio history (Docker, port 6379)
 - **Apache Kafka** - Event messaging for portfolio events and real-time market data (Docker, port 9092)
@@ -115,8 +115,8 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 
 - **apps/web** - Angular-based financial analytics web console (package name: `finpulse-web`).
 - **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; **Stocks** screen with real-time prices and per-stock sparklines (NativeSparkline, useSymbolDisplayData); **Account** tab with Quick trade, Send ETH (real Ethereum via Sepolia testnet by default), Connect/Disconnect wallet (Redux web3 slice, web3Service). Quote history uses **batch API** (`getQuotesHistoryBatch`) for fewer requests. Native views **NativeDemoCard** and six native charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Native code follows OOP principles: iOS uses **ChartSupport** (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes) and OOP helper classes; Android uses **view/chart/**, **view/sparkline/**, **view/democard/**. Charts support theme (light/dark), tooltips, x-axis labels, full-width rendering, and horizontal drag-to-scroll via `useScrollableChart` and `ScrollableChartContainer`.
-- **services/portfolio-analytics** - Python FastAPI backend (Clean Architecture: composition, container, crud_helpers); PostgreSQL; Kafka; REST resources + batch create; AI/ML (VaR, fraud, surveillance, sentiment, identity, forecast); config via `.env.example`; `pnpm run start:backend`; `pnpm run test:api`.
-- **services/portfolio-api-go** - Go non-AI API (health, quotes, instruments); same DB as portfolio-analytics; port 8801.
+- **apps/portfolio-analytics** - Python FastAPI backend (Clean Architecture: composition, container, crud_helpers); PostgreSQL; Kafka; REST resources + batch create; AI/ML (VaR, fraud, surveillance, sentiment, identity, forecast); config via `.env.example`; `pnpm run start:backend`; `pnpm run test:api`.
+- **apps/portfolio-api-go** - Go non-AI API (health, quotes, instruments); same DB as portfolio-analytics; port 8801.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
 
@@ -133,7 +133,7 @@ Benefits of this architecture:
 - Node.js 18+
 - pnpm 10.6.0+ (required, project uses pnpm workspaces)
 - Python 3.10+ (for backend FastAPI service)
-- Go 1.22+ (optional, for `services/portfolio-api-go`)
+- Go 1.22+ (optional, for `apps/portfolio-api-go`)
 - Docker (for PostgreSQL and Kafka when using `pnpm run start:backend`)
 
 ### Install Dependencies
@@ -189,7 +189,7 @@ This starts Docker (PostgreSQL + Kafka), the portfolio-analytics API at `http://
 **Manual setup:**
 
 ```bash
-cd services/portfolio-analytics
+cd apps/portfolio-analytics
 cp .env.example .env   # optional: edit .env for DB, Kafka, Ollama, HF model
 docker compose up -d
 python -m venv .venv
@@ -237,7 +237,7 @@ Optional Go API for health, quotes, and instruments (same DB as portfolio-analyt
 pnpm run start:backend:go
 ```
 
-From `services/portfolio-api-go`: `make deps` then `go run ./cmd/server` (or `make build` and `./bin/server`). Run Go API tests: `pnpm run test:api:go`.
+From `apps/portfolio-api-go`: `make deps` then `go run ./cmd/server` (or `make build` and `./bin/server`). Run Go API tests: `pnpm run test:api:go`.
 
 ### Build Production Version
 
@@ -325,14 +325,13 @@ pnpm --filter @fintech/utils type-check
 finpulse/
 ├── apps/
 │   ├── web/                      # Angular financial analytics web app (finpulse-web)
-│   └── mobile-portfolio/         # React Native (Expo) portfolio mobile app
+│   ├── mobile-portfolio/         # React Native (Expo) portfolio mobile app
+│   ├── portfolio-analytics/      # Python FastAPI, PostgreSQL, Kafka, AI/ML
+│   └── portfolio-api-go/         # Go (Gin) non-AI API; DDD; same DB; port 8801
 ├── scripts/
 │   ├── backend/start-backend.sh  # One-click: Docker (Postgres, Kafka) + Python API + seed
 │   ├── seed/generate-seed-data.js # Seed via batch APIs (run by start:backend or manually)
 │   └── db/                       # Schema and seed SQL
-├── services/
-│   ├── portfolio-analytics/      # Python FastAPI, PostgreSQL, Kafka, AI/ML
-│   └── portfolio-api-go/         # Go (Gin) non-AI API; DDD; same DB; port 8801
 ├── packages/
 │   ├── ui/                       # Shared UI (@fintech/ui)
 │   └── utils/                    # Shared utils (@fintech/utils)

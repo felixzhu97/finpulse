@@ -1,6 +1,6 @@
 """
 Batch VaR job: compute VaR for multiple portfolios and write to Delta + ClickHouse.
-Run from services/portfolio-analytics: python -m jobs.batch.var_batch [--input path.json]
+Run from apps/portfolio-analytics: python -m jobs.batch.var_batch [--input path.json]
 Input JSON: list of {"portfolio_id": "...", "returns": [0.01, -0.02, ...]}
 """
 from __future__ import annotations

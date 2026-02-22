@@ -86,8 +86,8 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 
 ### 后端服务
 
-- **Python 3.10+ + FastAPI** - 投资组合分析 API（`services/portfolio-analytics`），端口 8800。Clean Architecture（composition.py、container、crud_helpers、api/config）；通过 `.env` 配置。
-- **Go** - 非 AI 投资组合 API（`services/portfolio-api-go`），端口 8801。health、GET /api/v1/quotes、GET /api/v1/instruments；DDD；与 Python 服务共享 DB；`pnpm run start:backend:go`；API 测试 `pnpm run test:api:go`。
+- **Python 3.10+ + FastAPI** - 投资组合分析 API（`apps/portfolio-analytics`），端口 8800。Clean Architecture（composition.py、container、crud_helpers、api/config）；通过 `.env` 配置。
+- **Go** - 非 AI 投资组合 API（`apps/portfolio-api-go`），端口 8801。health、GET /api/v1/quotes、GET /api/v1/instruments；DDD；与 Python 服务共享 DB；`pnpm run start:backend:go`；API 测试 `pnpm run test:api:go`。
 - **PostgreSQL** - 投资组合持久化（Docker，主机端口 5433）
 - **Apache Kafka** - 投资组合事件消息（Docker，端口 9092）
 - **AI/ML** - 融入业务流（无独立 AI 路由）：`POST /payments` 返回欺诈检测；`POST /trades` 返回监控告警；`POST /customers` 返回身份评分；`POST /risk-metrics/compute` 根据组合历史计算 VaR。可选：Ollama、Hugging Face、TensorFlow 用于后续集成。
@@ -122,8 +122,8 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 - **apps/web** - 基于 Angular 的金融分析 Web 控制台。
 - **apps/mobile** - React Native 演示移动应用。
 - **apps/mobile-portfolio** - React Native（Expo）组合概览与指标应用；**Stocks** 屏幕展示实时价格与每股票 sparkline（NativeSparkline、useSymbolDisplayData）；含原生视图 **NativeDemoCard** 及六类原生图表：**NativeLineChart**、**NativeCandleChart**、**NativeAmericanLineChart**、**NativeBaselineChart**、**NativeHistogramChart**、**NativeLineOnlyChart**（iOS Metal，Android OpenGL ES）。图表支持主题（亮/暗）、提示、X 轴标签与水平拖拽滚动，共享 `useScrollableChart`、`ScrollableChartContainer`。
-- **services/portfolio-analytics** - Python FastAPI 后端（Clean Architecture）；PostgreSQL；Kafka；AI/ML 融入 payments、trades、customers、risk-metrics；配置见 `.env.example`；`pnpm run start:backend`；API 测试 `pnpm run test:api`。
-- **services/portfolio-api-go** - Go 非 AI API（Gin、DDD、Swagger）；与 portfolio-analytics 共享 DB；端口 8801；`pnpm run start:backend:go`；`pnpm run test:api:go`。
+- **apps/portfolio-analytics** - Python FastAPI 后端（Clean Architecture）；PostgreSQL；Kafka；AI/ML 融入 payments、trades、customers、risk-metrics；配置见 `.env.example`；`pnpm run start:backend`；API 测试 `pnpm run test:api`。
+- **apps/portfolio-api-go** - Go 非 AI API（Gin、DDD、Swagger）；与 portfolio-analytics 共享 DB；端口 8801；`pnpm run start:backend:go`；`pnpm run test:api:go`。
 - **packages/ui** - 共享 UI 组件库。
 - **packages/utils** - 共享工具函数库。
 
@@ -136,7 +136,7 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 - Node.js 18+
 - pnpm 10.6.0+（必须，项目使用 pnpm workspaces）
 - Python 3.10+（后端 FastAPI 服务）
-- Go 1.22+（可选，用于 `services/portfolio-api-go`）
+- Go 1.22+（可选，用于 `apps/portfolio-api-go`）
 - Docker（使用 `pnpm run start:backend` 时的 PostgreSQL 与 Kafka）
 
 ### 安装依赖
@@ -176,7 +176,7 @@ pnpm run start:backend
 **手动启动：**
 
 ```bash
-cd services/portfolio-analytics
+cd apps/portfolio-analytics
 cp .env.example .env   # 可选：按需编辑 DB、Kafka、Ollama、HF 模型
 docker compose up -d
 python -m venv .venv
@@ -185,7 +185,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8800 --reload
 ```
 
-API 测试：在项目根目录执行 `pnpm run test:api`，或在 `services/portfolio-analytics` 下激活 venv 后执行 `pytest tests -v`。
+API 测试：在项目根目录执行 `pnpm run test:api`，或在 `apps/portfolio-analytics` 下激活 venv 后执行 `pytest tests -v`。
 
 ### 生产构建
 
@@ -204,10 +204,8 @@ pnpm lint
 
 ```
 fintech-project/
-├── apps/           # Web / 移动应用
+├── apps/           # Web / 移动应用 / portfolio-analytics, portfolio-api-go
 ├── scripts/        # backend/, seed/, db/
-├── services/
-│   └── portfolio-analytics/   # FastAPI, PostgreSQL, Kafka (Clean Architecture)
 ├── packages/       # ui, utils
 ├── docs/           # 英文架构与领域文档
 ├── doc_zh/         # 中文文档（本目录）

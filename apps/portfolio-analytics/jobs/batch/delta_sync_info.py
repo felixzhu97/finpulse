@@ -1,6 +1,6 @@
 """
 Sync Delta table stats to ClickHouse: read Delta at DELTA_SAMPLE_PATH, write row count and sample.
-Run from services/portfolio-analytics: python -m jobs.batch.delta_sync_info
+Run from apps/portfolio-analytics: python -m jobs.batch.delta_sync_info
 """
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
 """
 Sample PyTorch training script with MLflow logging.
-Run from services/portfolio-analytics: python -m jobs.ml.train_sample
+Run from apps/portfolio-analytics: python -m jobs.ml.train_sample
 """
 from __future__ import annotations
 
