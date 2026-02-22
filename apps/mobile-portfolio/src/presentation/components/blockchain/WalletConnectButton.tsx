@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { ActivityIndicator, Alert, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import ReactNativeHapticFeedback from "react-native-haptic-feedback";
+// Haptic may be unavailable in Expo Go (native module not registered)
+function triggerHaptic(type: string): void {
+  try {
+    const mod = require("react-native-haptic-feedback");
+    mod.default?.trigger?.(type, { enableVibrateFallback: true });
+  } catch {
+    // no-op
+  }
+}
 import { useWeb3, SEPOLIA_CHAIN_ID } from "@/src/presentation/hooks";
 import { useTranslation } from "@/src/presentation/i18n";
 import { useTheme } from "@/src/presentation/theme";
@@ -99,7 +107,7 @@ export function WalletConnectButton() {
     try {
       const info = await connect();
       if (info != null) {
-        ReactNativeHapticFeedback.trigger("notificationSuccess", { enableVibrateFallback: true });
+        triggerHaptic("notificationSuccess");
       } else {
         Alert.alert(t("blockchain.error"), t("blockchain.connectFailed"));
       }

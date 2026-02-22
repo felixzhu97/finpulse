@@ -480,7 +480,7 @@ legend right
     • 混合架构 (TypeScript + Java)
     • REST API服务 (Spring Boot)
     • Portfolio Analytics: FastAPI + TimescaleDB + Redis + Kafka
-    • Backend: pnpm run start:backend, pnpm run stop:backend
+    • Backend: pnpm run start:server, pnpm run stop:backend
 endlegend
 
 @enduml

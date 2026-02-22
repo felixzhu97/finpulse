@@ -43,7 +43,7 @@ Numeric values (prices, quantities, rates) may be fictional; identifiers, names,
 
 - **Script**: `scripts/seed/generate-seed-data.js`
 - **Method**: Prefer `POST /api/v1/<resource>/batch`; legacy portfolio via `POST /api/v1/seed`.
-- **Run**: From repo root `pnpm run generate-seed-data` (or via `pnpm run start:backend`).
+- **Run**: From repo root `pnpm run generate-seed-data` (or via `pnpm run start:server`).
 
 For new resources, add `postBatch("/api/v1/<resource>/batch", [ ... ])` in `seedResources()` and update the final `console.log` resource count.
 

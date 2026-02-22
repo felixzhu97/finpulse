@@ -23,6 +23,13 @@ export type {
 } from "./account";
 
 export {
+  useAuth,
+  useAuthTokenSync,
+  useAuthRestore,
+  useAuthFetchCustomer,
+} from "./auth";
+
+export {
   useRiskMetrics,
   useComputedVar,
   useRiskSummary,

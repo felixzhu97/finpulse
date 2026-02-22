@@ -156,9 +156,9 @@ The app is a thin client: all portfolio and risk business logic runs on the Port
 | `GET /api/v1/risk-metrics` | Analytics risk metrics (volatility, Sharpe, VaR, beta) |
 | `POST /api/v1/risk-metrics/compute` | Compute VaR from portfolio history |
 
-1. From repo root: `pnpm run start:backend` (Docker + TimescaleDB + Redis + Kafka + API + seed + mock quote producer).
+1. From repo root: `pnpm run start:server` (Docker + TimescaleDB + Redis + Kafka + API + seed + mock quote producer).
 2. Or separately: `pnpm run start:kafka` for Kafka and mock quotes only.
-3. Override the base URL with `EXPO_PUBLIC_PORTFOLIO_API_URL` in `.env` if needed (e.g. `http://192.168.x.x:8800` when using a simulator or device).
+3. Override the base URL with `EXPO_PUBLIC_PORTFOLIO_API_URL` in `.env` if needed (e.g. `http://192.168.x.x:8801` when using a simulator or device).
 
 ### Real-time quotes and sparklines
 

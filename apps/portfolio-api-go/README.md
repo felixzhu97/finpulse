@@ -21,7 +21,7 @@ GOPROXY=https://goproxy.cn,direct go mod tidy
 # or: GOPROXY=https://proxy.golang.org,direct go mod tidy
 ```
 
-**2. Start Postgres** (same as portfolio-analytics; from repo root: `pnpm run start:backend` or start Docker for postgres only).
+**2. Start Postgres** (same as portfolio-analytics; from repo root: `pnpm run start:server` or start Docker for postgres only).
 
 **3. Start API**
 ```bash

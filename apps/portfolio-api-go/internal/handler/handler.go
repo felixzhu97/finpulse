@@ -12,6 +12,7 @@ import (
 type Handler struct {
 	QuotesSvc      *application.QuotesService
 	InstrumentsSvc *application.InstrumentsService
+	AuthSvc        *application.AuthService
 }
 
 func (h *Handler) Health(c *gin.Context) {

@@ -1,8 +1,11 @@
 {
-  "android": {
-    "package": "com.anonymous.mobileportfolio"
-  },
+  "android": { "package": "com.anonymous.mobileportfolio" },
   "ios": {
-    "bundleIdentifier": "com.anonymous.mobileportfolio"
+    "bundleIdentifier": "com.anonymous.mobileportfolio",
+    "infoPlist": {
+      "NSAppTransportSecurity": {
+        "NSAllowsArbitraryLoads": true
+      }
+    }
   }
 }

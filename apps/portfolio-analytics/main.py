@@ -22,6 +22,7 @@ async def log_requests(request: Request, call_next):
     path = request.url.path
     query = str(request.query_params) if request.query_params else ""
     method = request.method
+    logger.info("%s %s%s <- in", method, path, f"?{query}" if query else "")
     response = await call_next(request)
     elapsed = (time.time() - start) * 1000
     logger.info(

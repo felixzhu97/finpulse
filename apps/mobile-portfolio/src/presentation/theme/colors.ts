@@ -1,3 +1,6 @@
+/** Robinhood-style accent (Robin Neon) */
+export const RobinNeon = "#CCFF00";
+
 export const LightColors = {
   background: "#FFFFFF",
   surface: "#F5F5F7",
@@ -11,6 +14,8 @@ export const LightColors = {
   primary: "#1D1D1F",
   onPrimary: "#FFFFFF",
   primaryLight: "rgba(0,0,0,0.06)",
+  accent: RobinNeon,
+  onAccent: "#000000",
   success: "#34C759",
   error: "#FF3B30",
   warning: "#FF9500",
@@ -35,6 +40,9 @@ export const DarkColors = {
   primary: "rgba(255,255,255,0.9)",
   onPrimary: "#000000",
   primaryLight: "rgba(255,255,255,0.12)",
+  /** Primary CTA (Robinhood-style) */
+  accent: RobinNeon,
+  onAccent: "#000000",
   success: "#30D158",
   error: "#FF453A",
   warning: "#FF9F0A",

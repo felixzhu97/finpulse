@@ -3,8 +3,7 @@ set -e
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
-echo "[start-backend] ROOT=$ROOT"
-echo "[start-backend] Starting Docker stack..."
+echo "[start-backend] Starting Docker..."
 cd apps/portfolio-analytics
 docker compose down 2>/dev/null || true
 docker compose up -d
@@ -25,43 +24,45 @@ fi
 . .venv/bin/activate
 .venv/bin/python -m pip install -r requirements.txt || { echo "pip install failed; check network and PyPI"; exit 1; }
 
-echo "[start-backend] Freeing port 8800..."
 lsof -i :8800 -t 2>/dev/null | xargs kill 2>/dev/null || true
 sleep 1
-lsof -i :8800 -t 2>/dev/null | xargs kill -9 2>/dev/null || true
-sleep 1
-
-echo "[start-backend] Running migrations..."
 .venv/bin/alembic upgrade head 2>/dev/null || true
-echo "[start-backend] Starting API on :8800..."
-nohup .venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8800 > /tmp/portfolio-api.log 2>&1 &
+echo "[start-backend] Starting Python :8800..."
+.venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8800 &
 API_PID=$!
 cd "$ROOT"
 
-echo "[start-backend] Waiting for API health (up to 30s)..."
+echo "[start-backend] Waiting for Python :8800..."
 API_READY=
 for i in $(seq 1 30); do
-  CODE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 --max-time 5 http://127.0.0.1:8800/api/v1/portfolio 2>/dev/null || echo "000")
-  if [ "$CODE" = "200" ]; then
-    API_READY=1
-    echo "[start-backend] API ready (HTTP $CODE) after ${i}s"
-    break
-  fi
-  [ "$(( i % 5 ))" = "0" ] && echo "[start-backend] Attempt $i/30: HTTP $CODE"
+  curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 --max-time 5 http://127.0.0.1:8800/api/v1/portfolio 2>/dev/null | grep -q 200 && API_READY=1 && break
   sleep 1
 done
-if [ -z "$API_READY" ]; then
-  echo "[start-backend] WARN: API did not return 200. Last code: $CODE. Check /tmp/portfolio-api.log"
-  echo "[start-backend] Tail of API log:"
-  tail -n 20 /tmp/portfolio-api.log 2>/dev/null || true
+[ -n "$API_READY" ] && echo "[start-backend] Python ready"
+
+lsof -i :8801 -t 2>/dev/null | xargs kill 2>/dev/null || true
+sleep 1
+echo "[start-backend] Starting Go :8801..."
+cd "$ROOT/apps/portfolio-api-go"
+PYTHON_BACKEND_URL=http://127.0.0.1:8800 go run ./cmd/server &
+GO_PID=$!
+cd "$ROOT"
+
+echo "[start-backend] Waiting for Go :8801..."
+GO_READY=
+for i in $(seq 1 20); do
+  curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 --max-time 5 http://127.0.0.1:8801/health 2>/dev/null | grep -q 200 && GO_READY=1 && break
+  sleep 1
+done
+[ -n "$GO_READY" ] && echo "[start-backend] Go ready"
+
+if [ -n "$GO_READY" ]; then
+  PORTFOLIO_API_URL=http://127.0.0.1:8801 node scripts/seed/generate-seed-data.js
 fi
 
-if [ -n "$API_READY" ]; then
-  echo "[start-backend] Running seed script (PORTFOLIO_API_URL=http://127.0.0.1:8800)..."
-  PORTFOLIO_API_URL=http://127.0.0.1:8800 node scripts/seed/generate-seed-data.js
-else
-  echo "[start-backend] Skip seed: API not ready"
-fi
-
-echo "Backend: http://127.0.0.1:8800  (logs: tail -f /tmp/portfolio-api.log, stop: kill $API_PID)"
-echo "Mock quotes: persisted to DB via API lifespan"
+cleanup() { kill $API_PID $GO_PID 2>/dev/null; exit 0; }
+trap cleanup SIGINT SIGTERM
+echo ""
+echo "API: http://127.0.0.1:8801  (Ctrl+C to stop)"
+echo ""
+wait $API_PID $GO_PID

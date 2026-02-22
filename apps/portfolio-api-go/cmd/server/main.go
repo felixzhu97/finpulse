@@ -35,16 +35,27 @@ func main() {
 	}
 	quoteRepo := persistence.NewQuoteRepo(pool)
 	instrumentRepo := persistence.NewInstrumentRepo(pool)
+	authRepo := persistence.NewAuthRepo(pool)
+	customerRepo := persistence.NewCustomerRepo(pool)
+	authSvc := application.NewAuthService(authRepo, customerRepo)
 	h := &handler.Handler{
 		QuotesSvc:      application.NewQuotesService(quoteRepo),
 		InstrumentsSvc: application.NewInstrumentsService(instrumentRepo),
+		AuthSvc:        authSvc,
 	}
 	r := gin.New()
 	r.Use(gin.Recovery(), cors())
 	r.GET("/health", h.Health)
 	r.GET("/api/v1/quotes", h.Quotes)
 	r.GET("/api/v1/instruments", h.Instruments)
+	r.POST("/api/v1/auth/login", h.AuthLogin)
+	r.POST("/api/v1/auth/register", h.AuthRegister)
+	r.GET("/api/v1/auth/me", h.AuthMe)
+	r.POST("/api/v1/auth/logout", h.AuthLogout)
+	r.POST("/api/v1/auth/change-password", h.AuthChangePassword)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// Proxy any other path to Python backend (portfolio, customers, accounts, etc.)
+	r.NoRoute(handler.ProxyToPython(cfg.PythonBackendURL))
 	srv := &http.Server{Addr: ":" + cfg.Port, Handler: r}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

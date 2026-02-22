@@ -8,6 +8,26 @@ CREATE TABLE customer (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS user_credential (
+  credential_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customer (customer_id) ON DELETE CASCADE,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_user_credential_email ON user_credential (email);
+CREATE INDEX IF NOT EXISTS idx_user_credential_customer ON user_credential (customer_id);
+
+CREATE TABLE IF NOT EXISTS session (
+  session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customer (customer_id) ON DELETE CASCADE,
+  token TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_session_token ON session (token);
+CREATE INDEX IF NOT EXISTS idx_session_expires_at ON session (expires_at);
+
 CREATE TABLE user_preference (
   preference_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   customer_id UUID NOT NULL UNIQUE REFERENCES customer (customer_id) ON DELETE CASCADE,

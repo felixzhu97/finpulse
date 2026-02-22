@@ -11,6 +11,18 @@ Base: `/api/v1` for resources; app routes use full path. Query params: `limit`, 
 | POST | `/api/v1/seed` | Seed portfolio; body: portfolio payload |
 | WS | `/ws/quotes` | WebSocket; send `{ "type": "subscribe", "symbols": ["AAPL"] }` |
 
+## Auth (Go API – portfolio-api-go, default port 8801)
+
+All auth responses use JSON. Protected endpoints require header: `Authorization: Bearer <token>`.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/auth/login` | Body: `{ "email", "password" }`. Returns `{ "token", "customer" }`. |
+| POST | `/api/v1/auth/register` | Body: `{ "name", "email", "password" }`. Returns `{ "token", "customer" }`. |
+| GET | `/api/v1/auth/me` | Returns current customer (requires Bearer token). |
+| POST | `/api/v1/auth/logout` | Invalidates session (requires Bearer token). 204. |
+| POST | `/api/v1/auth/change-password` | Body: `{ "current_password", "new_password" }`. Returns `{ "ok": true }` (requires Bearer token). |
+
 ## Accounts
 
 | Method | Path |

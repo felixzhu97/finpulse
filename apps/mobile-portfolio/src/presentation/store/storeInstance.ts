@@ -3,6 +3,7 @@ import quotesReducer from "./quotesSlice";
 import preferencesReducer from "./preferencesSlice";
 import portfolioReducer from "./portfolioSlice";
 import web3Reducer from "./web3Slice";
+import authReducer from "./authSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     preferences: preferencesReducer,
     portfolio: portfolioReducer,
     web3: web3Reducer,
+    auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

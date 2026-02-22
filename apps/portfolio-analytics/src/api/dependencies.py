@@ -101,6 +101,7 @@ async def get_portfolio_service(
 
 get_customer_repo = _repo_from_session(customer_repo)
 get_user_preference_repo = _repo_from_session(user_preference_repo)
+
 get_account_repo = _repo_from_session(account_repo)
 get_instrument_repo = _repo_from_session(instrument_repo)
 get_portfolio_schema_repo = _repo_from_session(portfolio_schema_repo)

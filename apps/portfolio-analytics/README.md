@@ -63,7 +63,7 @@ Override with env: `DATABASE_URL`, `REDIS_URL`, `HISTORY_CACHE_TTL_SECONDS`, `KA
 **Option A – One command (from project root):**
 
 ```bash
-pnpm run start:backend
+pnpm run start:server
 ```
 
 This starts Docker (Postgres, Redis, Kafka), creates/uses `.venv` in `apps/portfolio-analytics`, runs migrations, and starts the API on port 8800.

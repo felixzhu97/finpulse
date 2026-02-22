@@ -84,9 +84,11 @@ export async function updateUserPreference(
   );
 }
 
-export async function getAccountData(): Promise<AccountDataResult> {
+export async function getAccountData(
+  authCustomer?: Customer | null
+): Promise<AccountDataResult> {
   const [customer, portfolioData, accountResources] = await Promise.all([
-    getCustomerFirst(),
+    authCustomer !== undefined ? Promise.resolve(authCustomer) : getCustomerFirst(),
     getPortfolioData(),
     httpClient.getList<AccountResource>("accounts", 100, 0),
   ]);
