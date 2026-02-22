@@ -15,6 +15,6 @@
 生成图片示例：
 
 ```bash
-cd doc_zh/domain
+cd docs/zh/product/domain
 plantuml -tsvg *.puml
 ```

@@ -20,7 +20,7 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - Portfolio management, market analysis, risk management, transaction management, reporting and compliance
 - Business flows: account opening, funding, trading, risk assessment, report generation
 
-**Document location**: `docs/en/togaf/business-architecture.puml` (English); `docs/zh/togaf/business-architecture.puml` (中文)
+**Document location**: `docs/en/rd/togaf/business-architecture.puml` (English); `docs/zh/rd/togaf/business-architecture.puml` (中文)
 
 ### Application Architecture
 
@@ -35,7 +35,7 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - Back-end services: `services/portfolio-analytics` (FastAPI + DDD; SQLAlchemy 2.0, asyncpg, Alembic; TimescaleDB, Redis, Kafka)
 - **Mobile native UI**: `apps/mobile-portfolio` uses **default dark theme** (black #000000 background; dark chart/card surfaces, light text). **Stocks** screen: StockListItem, NativeSparkline, useRealtimeQuotes, usePerSymbolHistory. **NativeDemoCard** and six charts: NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart (RCTViewManager / SimpleViewManager). Charts support theme (light/dark), tooltips, x-axis, drag-to-scroll; shared: useScrollableChart, ScrollableChartContainer, chartTooltip. **OOP**: **iOS** — ChartSupport/ (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes); per-chart; NativeSparkline; NativeDemoCard. **Android** — view/chart/, view/sparkline/, view/democard/; JS: src/components/native/.
 
-**Document location**: `docs/en/togaf/application-architecture.puml` (English); `docs/zh/togaf/application-architecture.puml` (中文)
+**Document location**: `docs/en/rd/togaf/application-architecture.puml` (English); `docs/zh/rd/togaf/application-architecture.puml` (中文)
 
 **Code locations**:
 
@@ -58,7 +58,7 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - Data storage: relational DB or data warehouse, logs and report storage
 - Data presentation: charts, reports, and analysis views in web and mobile
 
-**Document location**: `docs/en/togaf/data-architecture.puml` (English); `docs/zh/togaf/data-architecture.puml` (中文)
+**Document location**: `docs/en/rd/togaf/data-architecture.puml` (English); `docs/zh/rd/togaf/data-architecture.puml` (中文)
 
 **Code locations**:
 
@@ -81,7 +81,7 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 - Runtime: Node.js, Python
 - Deployment: Vercel, Python/FastAPI hosting
 
-**Document location**: `docs/en/togaf/technology-architecture.puml` (English); `docs/zh/togaf/technology-architecture.puml` (中文)
+**Document location**: `docs/en/rd/togaf/technology-architecture.puml` (English); `docs/zh/rd/togaf/technology-architecture.puml` (中文)
 
 ## ADM Core Phases
 
@@ -191,21 +191,21 @@ ADM is TOGAF’s architecture development method (simplified):
 ### Architecture Documents
 
 ```text
-docs/en/togaf/   (English)    docs/zh/togaf/   (中文)
+docs/en/rd/togaf/   (English)    docs/zh/rd/togaf/   (中文)
 ├── business-architecture.puml     ├── business-architecture.puml
 ├── application-architecture.puml   ├── application-architecture.puml
 ├── data-architecture.puml         ├── data-architecture.puml
 ├── technology-architecture.puml   ├── technology-architecture.puml
 └── README.md                      └── README.md
 
-docs/en/c4/   (English)    docs/zh/c4/   (中文)
+docs/en/rd/c4/   (English)    docs/zh/rd/c4/   (中文)
 ├── c4-system-context.puml         └── README.md (points to en)
 ├── c4-containers.puml
 ├── c4-components.puml
 ├── c4-web-app-components.puml
 └── README.md
 
-docs/en/domain/                    docs/zh/domain/
+docs/en/product/domain/                    docs/zh/product/domain/
 ├── finance-system.puml            ├── finance-system.puml
 ├── finance-system-domains.puml    ├── finance-system-domains.puml
 └── finance-system-flows.puml      └── finance-system-flows.puml
@@ -258,8 +258,8 @@ Business → Application → Data → Technology
 - Keep documentation aligned with implementation
 - Review alignment periodically
 - For changes that affect overall or cross-system architecture, update:
-  - `docs/en/togaf/README.md`, `docs/en/c4/README.md` and `docs/zh/togaf/README.md`, `docs/zh/c4/README.md`
-  - Relevant PlantUML diagrams in docs/en/togaf/, docs/en/c4/, docs/zh/togaf/, docs/zh/c4/
+  - `docs/en/rd/togaf/README.md`, `docs/en/rd/c4/README.md` and `docs/zh/rd/togaf/README.md`, `docs/zh/rd/c4/README.md`
+  - Relevant PlantUML diagrams in docs/en/rd/togaf/, docs/en/rd/c4/, docs/zh/rd/togaf/, docs/zh/rd/c4/
   - Corresponding items in `docs/en/TODO.md` and `docs/zh/TODO.md`
 
 ## Checklists
@@ -289,4 +289,4 @@ Business → Application → Data → Technology
 ## References
 
 - [TOGAF](https://www.opengroup.org/togaf)
-- Project architecture docs: `docs/en/togaf/README.md`, `docs/en/c4/README.md`, `docs/zh/togaf/README.md`, `docs/zh/c4/README.md`
+- Project architecture docs: `docs/en/rd/togaf/README.md`, `docs/en/rd/c4/README.md`, `docs/zh/rd/togaf/README.md`, `docs/zh/rd/c4/README.md`

@@ -5,11 +5,14 @@
 
 本目录为项目**中文文档**汇总。英文文档见根目录 `README.md` 与 `docs/`。
 
-| 子目录 | 说明 |
-|--------|------|
-| [architecture/](architecture/README.md) | TOGAF 架构图与说明（业务、应用、数据、技术） |
-| [domain/](domain/README.md) | 金融系统领域图（综合架构、领域、流程） |
-| [TODO.md](TODO.md) | 项目 TODO 中文版 |
+| 分类 | 子目录 | 说明 |
+|------|--------|------|
+| **product** | [product/domain/](product/domain/README.md) | 金融系统领域图（综合架构、领域、流程） |
+| **product** | [product/design-style.md](product/design-style.md) | Robinhood 风格设计规范 |
+| **data** | [data/er-diagram/](data/er-diagram/) | ER 图与数据模型 |
+| **rd** | [rd/api/](rd/api/) | API 文档 |
+| **rd** | [rd/togaf/](rd/togaf/README.md) | TOGAF 架构图与说明（业务、应用、数据、技术） |
+| — | [TODO.md](TODO.md) | 项目 TODO 中文版 |
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/felixzhu97s-projects/fintech-project)
 [![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
@@ -208,7 +211,7 @@ fintech-project/
 ├── scripts/        # backend/, seed/, db/
 ├── packages/       # ui, utils
 ├── docs/           # 英文架构与领域文档
-├── doc_zh/         # 中文文档（本目录）
+├── docs/zh/        # 中文文档（本目录）
 ├── package.json
 ├── pnpm-workspace.yaml
 └── pnpm-lock.yaml
@@ -216,8 +219,8 @@ fintech-project/
 
 ## 路线图与 TODO
 
-- 中文 TODO：[doc_zh/TODO.md](TODO.md)
-- 英文 TODO：`docs/TODO.md`。重要发布前请与 `docs/zh/togaf`、`docs/zh/c4` 及本目录架构文档一起审阅并更新。
+- 中文 TODO：[docs/zh/TODO.md](TODO.md)
+- 英文 TODO：`docs/en/TODO.md`。重要发布前请与 `docs/zh/rd/togaf`、`docs/zh/product/domain` 及本目录架构文档一起审阅并更新。
 
 ## 设计特点
 

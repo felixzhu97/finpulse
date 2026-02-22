@@ -17,9 +17,9 @@ After any change that affects behavior, structure, or contracts:
 
 - **README**: Update the root README and any README in the affected area (e.g. `apps/*/README.md`, `packages/*/README.md`, `docs/**/README.md`).
 - **Code/API changes**: Update relevant API docs and any `.puml` diagrams under `docs/` that describe the same area.
-- **Diagrams (English and Chinese)**: When updating diagrams, update both `docs/en/` and `docs/zh/` so they stay in sync (e.g. `docs/en/c4/`, `docs/zh/c4/`; `docs/en/domain/`, `docs/zh/domain/`; `docs/en/togaf/`, `docs/zh/togaf/`; `docs/en/er-diagram/`, `docs/zh/er-diagram/`).
+- **Diagrams (English and Chinese)**: When updating diagrams, update both `docs/en/` and `docs/zh/` so they stay in sync (e.g. `docs/en/rd/c4/`, `docs/zh/rd/c4/`; `docs/en/product/domain/`, `docs/zh/product/domain/`; `docs/en/rd/togaf/`, `docs/zh/rd/togaf/`; `docs/en/data/er-diagram/`, `docs/zh/data/er-diagram/`).
 - **New modules or layers**: Add or adjust C4/clean-architecture diagrams in both en and zh; keep layout in sync with code (e.g. `clean-architecture-portfolio-api.puml`).
-- **Data/DB changes**: Update `docs/en/er-diagram/` and `docs/zh/er-diagram/` and any schema or data-architecture docs.
+- **Data/DB changes**: Update `docs/en/data/er-diagram/` and `docs/zh/data/er-diagram/` and any schema or data-architecture docs.
 
 Do not leave docs or diagrams outdated; update them in the same change set when possible.
 

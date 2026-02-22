@@ -359,14 +359,14 @@ Shared utility function library containing common utility functions (such as `cn
 
 ## 📚 Documentation
 
-- **TOGAF Architecture** – `docs/en/togaf/` (English), `docs/zh/togaf/` (中文) – Business, Application, Data, and Technology architecture diagrams (PlantUML)
-- **C4 Model** – `docs/en/c4/` (English), `docs/zh/c4/` (中文) – C4 architecture diagrams (PlantUML)
-- **ER Diagram** – `docs/en/er-diagram/`, `docs/zh/er-diagram/` – Entity-relationship diagram for the fintech data model
+- **TOGAF Architecture** – `docs/en/rd/togaf/` (English), `docs/zh/rd/togaf/` (中文) – Business, Application, Data, and Technology architecture diagrams (PlantUML)
+- **C4 Model** – `docs/en/rd/c4/` (English), `docs/zh/rd/c4/` (中文) – C4 architecture diagrams (PlantUML)
+- **ER Diagram** – `docs/en/data/er-diagram/`, `docs/zh/data/er-diagram/` – Entity-relationship diagram for the fintech data model
 - **TODO** – `docs/en/TODO.md`, `docs/zh/TODO.md` – Cross-cutting TODO list for architecture, web, mobile, and shared packages
 
 ## 🗺️ Roadmap & TODO
 
-High-level tasks and roadmap items for the whole monorepo are tracked in `docs/en/TODO.md` and `docs/zh/TODO.md`. Before each significant release, review those files together with the architecture documents under `docs/en/togaf`, `docs/en/c4`, `docs/zh/togaf`, and `docs/zh/c4` and update items as work is completed.
+High-level tasks and roadmap items for the whole monorepo are tracked in `docs/en/TODO.md` and `docs/zh/TODO.md`. Before each significant release, review those files together with the architecture documents under `docs/en/rd/togaf`, `docs/en/rd/c4`, `docs/zh/rd/togaf`, and `docs/zh/rd/c4` and update items as work is completed.
 
 ## 🎨 Design Features
 

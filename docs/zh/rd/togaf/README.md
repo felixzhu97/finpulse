@@ -1,8 +1,8 @@
 # FinPulse 平台 TOGAF 企业架构文档
 
 > 基于 TOGAF 框架的 FinPulse 金融科技分析平台企业架构视图  
-> English: [docs/en/togaf/README.md](../../en/togaf/README.md)  
-> C4 模型: [docs/zh/c4/](../c4/)
+> English: [docs/en/rd/togaf/README.md](../../../en/rd/togaf/README.md)  
+> C4 模型: [docs/zh/rd/c4/](../c4/)
 
 ## 目录
 
@@ -12,7 +12,7 @@
 2. [应用架构图](#应用架构图-application-architecture) — `application-architecture.puml`
 3. [数据架构图](#数据架构图-data-architecture) — `data-architecture.puml`
 4. [技术架构图](#技术架构图-technology-architecture) — `technology-architecture.puml`
-5. 金融系统领域图（[../domain/](../domain/) 目录）
+5. 金融系统领域图（[../../product/domain/](../../product/domain/) 目录）
 
 ## 架构概述
 
@@ -52,7 +52,7 @@
 ## 如何使用
 
 ```bash
-cd docs/zh/togaf
+cd docs/zh/rd/togaf
 plantuml business-architecture.puml application-architecture.puml data-architecture.puml technology-architecture.puml
 plantuml -tsvg *.puml
 ```

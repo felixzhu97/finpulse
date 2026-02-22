@@ -68,8 +68,8 @@ Presentation (hooks, screens) → Infrastructure (api, services)
 
 ### Diagrams
 
-- **C4 component diagram** (en): `docs/en/c4/c4-mobile-portfolio-components.puml`
-- **C4 component diagram** (zh): `docs/zh/c4/c4-mobile-portfolio-components.puml`
+- **C4 component diagram** (en): `docs/en/rd/c4/c4-mobile-portfolio-components.puml`
+- **C4 component diagram** (zh): `docs/zh/rd/c4/c4-mobile-portfolio-components.puml`
 
 ## Storybook (native component catalog)
 

@@ -1,8 +1,8 @@
 # FinPulse TOGAF Enterprise Architecture
 
 > FinPulse fintech analytics platform enterprise architecture views based on the TOGAF framework.  
-> Chinese: [docs/zh/togaf/README.md](../../zh/togaf/README.md)  
-> C4 model: [docs/en/c4/](../c4/)
+> Chinese: [docs/zh/rd/togaf/README.md](../../../zh/rd/togaf/README.md)  
+> C4 model: [docs/en/rd/c4/](../c4/)
 
 ## Contents
 
@@ -12,7 +12,7 @@ This directory contains **English** PlantUML diagrams for the four TOGAF archite
 2. [Application Architecture](#application-architecture) — `application-architecture.puml`
 3. [Data Architecture](#data-architecture) — `data-architecture.puml`
 4. [Technology Architecture](#technology-architecture) — `technology-architecture.puml`
-5. Finance system domain views: `docs/en/domain/`; Chinese: `docs/zh/domain/`
+5. Finance system domain views: `docs/en/product/domain/`; Chinese: `docs/zh/product/domain/`
 
 ## Architecture Overview
 
@@ -67,7 +67,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 ## How to View Diagrams
 
 ```bash
-cd docs/en/togaf
+cd docs/en/rd/togaf
 plantuml business-architecture.puml application-architecture.puml data-architecture.puml technology-architecture.puml
 plantuml -tsvg *.puml
 ```
