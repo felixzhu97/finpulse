@@ -167,6 +167,13 @@ package "External Services" <<External>> {
         component "Finance API" as FinanceAPI
     }
 
+    component "Go API Gateway (port 8801)" as GoAPIGateway <<External>> {
+        component "Auth (login, register, me, logout, change-password)" as GoAuth
+        component "GET /quotes, GET /instruments" as GoQuotesInstruments
+        component "Proxy to Python" as GoProxy
+        note right: Single entry for app.\nProxies unimplemented routes to Python :8800.
+    }
+
     component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
         component "FastAPI app (Clean Architecture)" as FastAPIApp
         component "composition.py, container, crud_helpers, api/config" as FastAPIStructure
@@ -283,8 +290,9 @@ NLOC --> NativeChartsAndroid
 ExpoRN --> SharedChartLogic
 NativeCharts --> SharedChartLogic
 MobilePortfolio --> RNCharts
-MobilePortfolio --> PortfolioAnalyticsAPI
-MobilePortfolio --> QuotesWS
+MobilePortfolio --> GoAPIGateway
+GoAPIGateway --> PortfolioAnalyticsAPI
+GoAPIGateway --> QuotesWS
 FastAPIApp --> FastAPIStructure
 FastAPIApp --> PortfolioGet
 FastAPIApp --> QuotesGet

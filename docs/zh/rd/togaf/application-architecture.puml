@@ -288,6 +288,13 @@ package "外部服务层 (External Services)" <<External>> {
         component "金融数据API" as FinanceAPI
     }
 
+    component "Go API 网关 (port 8801)" as GoAPIGateway <<External>> {
+        component "认证 (login, register, me, logout, change-password)" as GoAuth
+        component "GET /quotes、GET /instruments" as GoQuotesInstruments
+        component "代理至 Python" as GoProxy
+        note right: 应用统一入口。\n未实现路由代理至 Python :8800。
+    }
+
     component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
         component "FastAPI app (Clean Architecture)" as FastAPIApp
         component "composition.py、container、crud_helpers、api/config" as FastAPIStructure
@@ -418,7 +425,8 @@ NLOC --> NativeChartsAndroid
 ExpoRN --> SharedChartLogic
 NativeCharts --> SharedChartLogic
 MobilePortfolio --> RNCharts
-MobilePortfolio --> PortfolioAnalyticsAPI
+MobilePortfolio --> GoAPIGateway
+GoAPIGateway --> PortfolioAnalyticsAPI
 FastAPIApp --> FastAPIStructure
 FastAPIApp --> PortfolioGet
 FastAPIApp --> AIMLAPI

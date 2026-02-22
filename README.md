@@ -200,7 +200,7 @@ uvicorn main:app --host 0.0.0.0 --port 8800 --reload
 
 Run API tests: `pnpm run test:api` (Python) or `pnpm run test:api:go` (Go) from repo root; or `pytest tests -v` / `go test ./cmd/server -v` from the respective service directory.
 
-`pnpm run start:server` starts Docker, Python (8800), and Go gateway (8801), then runs the seed script. The mobile app uses `http://localhost:8801` by default (single entry; Go proxies portfolio/customers etc. to Python). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data. To seed manually: `PORTFOLIO_API_URL=http://127.0.0.1:8801 AUTH_API_URL=http://127.0.0.1:8801 node scripts/seed/generate-seed-data.js`.
+`pnpm run start:server` starts Docker, Python (8800), and Go gateway (8801), then runs the seed script. The mobile app uses `http://localhost:8801` by default (single entry; Go handles auth, quotes, instruments and proxies portfolio/customers etc. to Python). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data. To seed manually: `PORTFOLIO_API_URL=http://127.0.0.1:8801 node scripts/seed/generate-seed-data.js`.
 
 ### Real-time market data (DB + WebSocket)
 

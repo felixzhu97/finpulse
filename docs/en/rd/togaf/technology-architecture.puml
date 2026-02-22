@@ -125,6 +125,15 @@ package "Deployment" <<Deploy>> {
     note right of PNPM: Monorepo\nWorkspace, deps
 }
 
+package "API Gateway & Backend" <<Infra>> {
+    component "Go (Gin) API Gateway" as GoGateway {
+        component "Auth (login, register, me, logout, change-password)" as GoAuthTech
+        component "GET /quotes, GET /instruments" as GoQuotesTech
+        component "Proxy to Python" as GoProxyTech
+        note right: apps/portfolio-api-go\nport 8801, single entry for app\nproxies to Python :8800
+    }
+}
+
 package "Portfolio Analytics Backend" <<Infra>> {
     component "FastAPI" as FastAPI
     component "uvicorn" as Uvicorn
@@ -232,7 +241,8 @@ RN --> SharedChartLogicTech
 NativeChartsTech --> SharedChartLogicTech
 RN --> RNWagmi
 
-RN --> FastAPI
+RN --> GoGateway
+GoGateway --> FastAPI
 Angular --> Vercel
 
 AngularCLI --> Vercel

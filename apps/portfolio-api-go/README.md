@@ -1,12 +1,14 @@
 # Portfolio API (Go)
 
-Non-AI backend service. Same DB as `portfolio-analytics` (Python). Use port 8801 by default so both can run next to each other.
+API gateway and auth service. Same DB as `portfolio-analytics` (Python). Port 8801 by default; proxies unimplemented routes to Python (8800). Single entry for the app.
 
 ## Endpoints
 
 - `GET /health` – health check
+- **Auth** (handled in Go): `POST /api/v1/auth/login`, `POST /api/v1/auth/register`, `GET /api/v1/auth/me`, `POST /api/v1/auth/logout`, `POST /api/v1/auth/change-password`
 - `GET /api/v1/quotes?symbols=AAPL,MSFT` – real-time quotes from `realtime_quote`
 - `GET /api/v1/instruments?limit=100&offset=0` – list instruments
+- All other `/api/v1/*` – proxied to Python backend (e.g. portfolio, customers, payments, trades, risk-metrics)
 
 ## Swagger
 

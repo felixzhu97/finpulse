@@ -176,6 +176,15 @@ package "部署平台" <<Deploy>> {
     note right of RESTEndpoint: REST API端点\nHTTP/HTTPS协议\nJSON数据格式\n标准RESTful接口
 }
 
+package "API 网关与后端" <<Infra>> {
+    component "Go (Gin) API 网关" as GoGateway {
+        component "认证 (login, register, me, logout, change-password)" as GoAuthTech
+        component "GET /quotes、GET /instruments" as GoQuotesTech
+        component "代理至 Python" as GoProxyTech
+        note right: apps/portfolio-api-go\nport 8801，应用统一入口\n代理至 Python :8800
+    }
+}
+
 package "Portfolio Analytics Backend" <<Infra>> {
     component "FastAPI" as FastAPI
     component "uvicorn" as Uvicorn
@@ -327,8 +336,9 @@ SQLAlchemyAsync --> TimescaleDB
 FastAPI --> Redis
 FastAPI --> Kafka
 FastAPI --> AIMLStack
-Expo --> FastAPI
-RN --> FastAPI
+Expo --> GoGateway
+RN --> GoGateway
+GoGateway --> FastAPI
 
 ' Monorepo工具关系
 PNPM --> NextJS
