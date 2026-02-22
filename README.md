@@ -66,8 +66,8 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 ### Frontend Frameworks
 
-- **Angular 21** - Web analytics console (`apps/web`)
-- **React Native + Expo** - Mobile apps (`apps/mobile`, `apps/mobile-portfolio`)
+- **Angular 21** - Web analytics console (`apps/web`, package `finpulse-web`)
+- **React Native + Expo** - Mobile app (`apps/mobile-portfolio`)
 - **React 19.2** - UI components and shared libraries
 - **TypeScript 5.0** - Type safety
 
@@ -113,8 +113,7 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 This project uses a **monorepo** architecture managed with pnpm workspaces:
 
-- **apps/web** - Angular-based financial analytics web console.
-- **apps/mobile** - React Native demo mobile app.
+- **apps/web** - Angular-based financial analytics web console (package name: `finpulse-web`).
 - **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; **Stocks** screen with real-time prices and per-stock sparklines (NativeSparkline, useSymbolDisplayData); **Account** tab with Quick trade, Send ETH (real Ethereum via Sepolia testnet by default), Connect/Disconnect wallet (Redux web3 slice, web3Service). Quote history uses **batch API** (`getQuotesHistoryBatch`) for fewer requests. Native views **NativeDemoCard** and six native charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Native code follows OOP principles: iOS uses **ChartSupport** (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes) and OOP helper classes; Android uses **view/chart/**, **view/sparkline/**, **view/democard/**. Charts support theme (light/dark), tooltips, x-axis labels, full-width rendering, and horizontal drag-to-scroll via `useScrollableChart` and `ScrollableChartContainer`.
 - **services/portfolio-analytics** - Python FastAPI backend (Clean Architecture: composition, container, crud_helpers); PostgreSQL; Kafka; REST resources + batch create; AI/ML (VaR, fraud, surveillance, sentiment, identity, forecast); config via `.env.example`; `pnpm run start:backend`; `pnpm run test:api`.
 - **services/portfolio-api-go** - Go non-AI API (health, quotes, instruments); same DB as portfolio-analytics; port 8801.
@@ -145,6 +144,8 @@ pnpm install
 ```
 
 pnpm will automatically recognize the `pnpm-workspace.yaml` configuration and install dependencies for all workspaces.
+
+**Root scripts** (from repo root): `dev` (web), `dev:mobile-portfolio`, `dev:mobile-portfolio:ios`, `dev:mobile-portfolio:android`, `start:backend` (Docker + Python API + seed), `start:backend:go` (Go API), `start:kafka`, `build`, `start`, `test` (= test:api), `test:api` (Python pytest), `test:api:go` (Go tests), `lint`, `stop:backend`.
 
 ### Development Mode
 
@@ -199,7 +200,7 @@ uvicorn main:app --host 0.0.0.0 --port 8800 --reload
 
 Run API tests: `pnpm run test:api` (Python) or `pnpm run test:api:go` (Go) from repo root; or `pytest tests -v` / `go test ./cmd/server -v` from the respective service directory.
 
-From repo root: `pnpm dev:api` runs the API (requires venv and Docker). Then run `pnpm generate-seed-data` to seed. The mobile portfolio app uses `http://localhost:8800` by default (`GET /api/v1/portfolio`). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data.
+`pnpm run start:backend` starts Docker, the API, and runs the seed script automatically. The mobile portfolio app uses `http://localhost:8800` by default (`GET /api/v1/portfolio`). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data. To seed manually with the API already running: `PORTFOLIO_API_URL=http://127.0.0.1:8800 node scripts/seed/generate-seed-data.js`.
 
 ### Real-time market data (DB + WebSocket)
 
@@ -244,8 +245,9 @@ From `services/portfolio-api-go`: `make deps` then `go run ./cmd/server` (or `ma
 # Build web application
 pnpm build
 
-# Or build all packages
-pnpm --filter "./apps/*" build
+# Or build app(s)
+pnpm --filter finpulse-web build
+pnpm --filter mobile-portfolio build
 
 # Start production server
 pnpm start
@@ -257,15 +259,16 @@ pnpm start
 # Run ESLint (in web application)
 pnpm lint
 
-# Or run lint for all packages
-pnpm --filter "./apps/*" lint
+# Or run lint for specific app
+pnpm --filter finpulse-web lint
 ```
 
 ### Workspace Scripts
 
 ```bash
 # Run scripts in specific packages
-pnpm --filter web <script>
+pnpm --filter finpulse-web <script>
+pnpm --filter mobile-portfolio <script>
 pnpm --filter @fintech/ui <script>
 pnpm --filter @fintech/utils <script>
 
@@ -282,17 +285,18 @@ pnpm list -r
 
 ```bash
 # Add dependencies to specific packages
-pnpm --filter web add <package>
+pnpm --filter finpulse-web add <package>
+pnpm --filter mobile-portfolio add <package>
 pnpm --filter @fintech/ui add <package>
 pnpm --filter @fintech/utils add <package>
 
 # Add dev dependencies
-pnpm --filter web add -D <package>
+pnpm --filter finpulse-web add -D <package>
 ```
 
 #### Adding Dependencies Between Packages
 
-If `apps/web` needs to use `@fintech/ui`, simply add to `apps/web/package.json`:
+If the web app (`apps/web`, package name `finpulse-web`) needs to use `@fintech/ui`, add to `apps/web/package.json`:
 
 ```json
 {
@@ -318,30 +322,26 @@ pnpm --filter @fintech/utils type-check
 ## 📁 Project Structure
 
 ```
-fintech-project/
+finpulse/
 ├── apps/
-│   ├── web/                      # Angular financial analytics web app
-│   ├── mobile/                   # React Native mobile demo app
-│   └── mobile-portfolio/         # React Native portfolio overview mobile app
+│   ├── web/                      # Angular financial analytics web app (finpulse-web)
+│   └── mobile-portfolio/         # React Native (Expo) portfolio mobile app
 ├── scripts/
-│   ├── backend/start-backend.sh # One-click: Docker (Postgres + Kafka) + API + seed
-│   ├── seed/generate-seed-data.js   # Seed via batch APIs; dedupeInstrumentsBySymbol for unique symbols (run by start:backend or after API is up)
-│   └── db/                        # Schema and seed SQL for fintech ER database
+│   ├── backend/start-backend.sh  # One-click: Docker (Postgres, Kafka) + Python API + seed
+│   ├── seed/generate-seed-data.js # Seed via batch APIs (run by start:backend or manually)
+│   └── db/                       # Schema and seed SQL
 ├── services/
-│   └── portfolio-analytics/    # FastAPI, PostgreSQL, Kafka (DDD)
+│   ├── portfolio-analytics/      # Python FastAPI, PostgreSQL, Kafka, AI/ML
+│   └── portfolio-api-go/         # Go (Gin) non-AI API; DDD; same DB; port 8801
 ├── packages/
-│   ├── ui/                       # UI component library (@fintech/ui)
-│   └── utils/                    # Utility function library (@fintech/utils)
-├── docs/                         # Documentation (en/ and zh/)
-│   ├── en/                       # English docs
-│   │   ├── architecture/         # TOGAF architecture diagrams (PlantUML)
-│   │   ├── domain/               # Finance system domain views
-│   │   └── er-diagram/           # Entity-relationship diagram
-│   └── zh/                       # Chinese docs (架构、领域、ER 图)
-├── package.json                  # Root package.json (workspaces configuration)
-├── pnpm-workspace.yaml           # pnpm workspaces configuration
-├── pnpm-lock.yaml                # Dependency lock file
-└── tsconfig.json                 # Root TypeScript configuration
+│   ├── ui/                       # Shared UI (@fintech/ui)
+│   └── utils/                    # Shared utils (@fintech/utils)
+├── docs/
+│   ├── en/                       # English: togaf/, c4/, domain/, er-diagram/
+│   └── zh/                       # Chinese: 架构、C4、领域、ER 图
+├── package.json
+├── pnpm-workspace.yaml
+└── pnpm-lock.yaml
 ```
 
 ### Package Descriptions
