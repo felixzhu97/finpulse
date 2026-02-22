@@ -79,11 +79,12 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 ### Backend Services
 
 - **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. Clean Architecture: `composition.py` (lifespan), `container` (service factories), `crud_helpers` (generic CRUD), `api/config` (cache constants); SQLAlchemy 2.0 + asyncpg; Alembic migrations; config via `.env`. REST resources under `/api/v1/*` with **batch create** (`POST .../batch`) for seeding.
+- **Go** - Non-AI portfolio API (`services/portfolio-api-go`), port 8801. Health, `GET /api/v1/quotes`, `GET /api/v1/instruments`; shares same Postgres DB; run with `cd services/portfolio-api-go && go run ./cmd/server`.
 - **TimescaleDB (PostgreSQL)** - Portfolio metadata and time-series history (hypertable); Docker, host port 5433
 - **Redis** - Cache for portfolio history (Docker, port 6379)
 - **Apache Kafka** - Event messaging for portfolio events and real-time market data (Docker, port 9092)
 - **AI/ML** - Integrated into business flows (no standalone AI router): `POST /payments` returns fraud detection; `POST /trades` returns surveillance alerts; `POST /customers` returns identity score; `POST /risk-metrics/compute` computes VaR from portfolio history. Optional: Ollama, Hugging Face, TensorFlow for future integrations.
-- **One-click start** - `pnpm run start:backend` (Docker + API + seed). Seed script uses batch APIs to minimise requests. **API tests** - `pnpm run test:api` (pytest; Ollama/HF/TF tests may skip if services unavailable; Hugging Face first run can take 1–3 min).
+- **One-click start** - `pnpm run start:backend` (Docker + API + seed). Seed script uses batch APIs to minimise requests. **API tests** - `pnpm run test:api` (Python pytest); `pnpm run test:api:go` (Go API unit tests). Ollama/HF/TF tests may skip if services unavailable; Hugging Face first run can take 1–3 min.
 
 ### UI & Visualization
 
@@ -116,6 +117,7 @@ This project uses a **monorepo** architecture managed with pnpm workspaces:
 - **apps/mobile** - React Native demo mobile app.
 - **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; **Stocks** screen with real-time prices and per-stock sparklines (NativeSparkline, useSymbolDisplayData); **Account** tab with Quick trade, Send ETH (real Ethereum via Sepolia testnet by default), Connect/Disconnect wallet (Redux web3 slice, web3Service). Quote history uses **batch API** (`getQuotesHistoryBatch`) for fewer requests. Native views **NativeDemoCard** and six native charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Native code follows OOP principles: iOS uses **ChartSupport** (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes) and OOP helper classes; Android uses **view/chart/**, **view/sparkline/**, **view/democard/**. Charts support theme (light/dark), tooltips, x-axis labels, full-width rendering, and horizontal drag-to-scroll via `useScrollableChart` and `ScrollableChartContainer`.
 - **services/portfolio-analytics** - Python FastAPI backend (Clean Architecture: composition, container, crud_helpers); PostgreSQL; Kafka; REST resources + batch create; AI/ML (VaR, fraud, surveillance, sentiment, identity, forecast); config via `.env.example`; `pnpm run start:backend`; `pnpm run test:api`.
+- **services/portfolio-api-go** - Go non-AI API (health, quotes, instruments); same DB as portfolio-analytics; port 8801.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
 
@@ -132,6 +134,7 @@ Benefits of this architecture:
 - Node.js 18+
 - pnpm 10.6.0+ (required, project uses pnpm workspaces)
 - Python 3.10+ (for backend FastAPI service)
+- Go 1.22+ (optional, for `services/portfolio-api-go`)
 - Docker (for PostgreSQL and Kafka when using `pnpm run start:backend`)
 
 ### Install Dependencies
@@ -194,7 +197,7 @@ pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8800 --reload
 ```
 
-Run API tests: `pnpm run test:api` (from repo root) or `pytest tests -v` from `services/portfolio-analytics` with venv active.
+Run API tests: `pnpm run test:api` (Python) or `pnpm run test:api:go` (Go) from repo root; or `pytest tests -v` / `go test ./cmd/server -v` from the respective service directory.
 
 From repo root: `pnpm dev:api` runs the API (requires venv and Docker). Then run `pnpm generate-seed-data` to seed. The mobile portfolio app uses `http://localhost:8800` by default (`GET /api/v1/portfolio`). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data.
 
@@ -224,6 +227,16 @@ pnpm dev:mobile-portfolio:ios
 ```
 
 No Kafka is required for real-time quotes; the mock writer persists data to the DB automatically when the API starts.
+
+### Backend service (Go, non-AI)
+
+Optional Go API for health, quotes, and instruments (same DB as portfolio-analytics; port 8801):
+
+```bash
+pnpm run start:backend:go
+```
+
+From `services/portfolio-api-go`: `make deps` then `go run ./cmd/server` (or `make build` and `./bin/server`). Run Go API tests: `pnpm run test:api:go`.
 
 ### Build Production Version
 

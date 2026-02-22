@@ -27,7 +27,7 @@ This directory contains **English** C4 PlantUML diagrams.
 
 **File**: `c4-containers.puml`
 
-**Description**: Web App, Mobile Portfolio, Portfolio Analytics API, TimescaleDB, Redis, Kafka.
+**Description**: Web App, Mobile Portfolio, Portfolio Analytics API (FastAPI), Portfolio API (Go, non-AI: health, quotes, instruments; DDD; same DB), TimescaleDB, Redis, Kafka. Frontends may call either API.
 
 ### Portfolio Analytics API Components
 
@@ -82,6 +82,7 @@ After setup, diagrams render without network access.
 
 ## Recent Updates
 
+- **Portfolio API (Go)**: Non-AI backend (`services/portfolio-api-go`): Gin, DDD (domain, application, infrastructure), Swagger; health, GET /api/v1/quotes, GET /api/v1/instruments; shares TimescaleDB with FastAPI. Shown in container diagram.
 - **Watchlist real-time (Mobile)**: History loaded first (setHistory/setSnapshot dispatch per response); WebSocket starts after historyLoaded; visible-only subscription (onViewableItemsChanged); 1s refresh; WatchlistRow memo; NativeSparkline baseline-only when no data; chart gradient in light theme; seed dedupe by symbol; Redux serializableCheck.ignoredPaths for quotes/history.
 - **Redux optimization (Mobile)**: Unified quotes via Redux; extraSubscribedSymbols for drawer; single WebSocket; useAppSelector/useAppDispatch; removed useRealtimeQuotes.
 - **Redux + styled-components (Mobile)**: Portfolio state in Redux; main screens and list components use styled-components primitives.

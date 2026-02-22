@@ -9,7 +9,7 @@
 本目录为**中文版** C4 PlantUML 架构图。
 
 1. **系统上下文** — `c4-system-context.puml`
-2. **容器（模块）** — `c4-containers.puml`
+2. **容器（模块）** — `c4-containers.puml`（含 Web 应用、移动端、FastAPI 投资组合分析 API、Go 投资组合 API（非 AI）、TimescaleDB、Redis、Kafka）
 3. **投资组合分析 API 组件** — `c4-components.puml`
 4. **整洁架构（投资组合 API）** — `clean-architecture-portfolio-api.puml`
 5. **Web 应用组件** — `c4-web-app-components.puml`
@@ -62,6 +62,7 @@ git clone https://github.com/plantuml-stdlib/C4-PlantUML.git .
 
 ## 最近更新
 
+- **投资组合 API (Go)**：非 AI 后端（`services/portfolio-api-go`）：Gin、DDD（domain、application、infrastructure）、Swagger；health、GET /api/v1/quotes、GET /api/v1/instruments；与 FastAPI 共享 TimescaleDB。已加入容器图。
 - **自选实时行情（移动端）**：先加载历史（setHistory/setSnapshot 按响应分别派发）；WebSocket 在 historyLoaded 后启动；仅可见订阅（onViewableItemsChanged）；1s 刷新；WatchlistRow memo；NativeSparkline 无数据时仅基线；图表浅色主题渐变；seed 按 symbol 去重；Redux serializableCheck.ignoredPaths 忽略 quotes/history。
 - **Redux 优化（移动端）**：报价统一 Redux；extraSubscribedSymbols 支持抽屉；单 WebSocket；useAppSelector/useAppDispatch；移除 useRealtimeQuotes。
 - **Redux + styled-components（移动端）**：Portfolio 状态迁至 Redux；主屏与列表组件使用 styled-components 基元。

@@ -14,6 +14,7 @@ System_Boundary(finpulse, "FinPulse") {
     
     Boundary(backend_boundary, "Backend Services") {
         Container(portfolio_api, "Portfolio Analytics API", "FastAPI", "Clean Architecture: composition.py, container, crud_helpers. REST, WebSocket; AI/ML (payments, trades, customers, risk-metrics); blockchain; portfolio, market data; batch VaR, ClickHouse, MLflow")
+        Container(portfolio_api_go, "Portfolio API (Go)", "Gin", "Non-AI: health, GET /api/v1/quotes, GET /api/v1/instruments; DDD (domain, application, infrastructure); Swagger; same DB")
     }
     
     Boundary(data_boundary, "Data Storage") {
@@ -41,6 +42,9 @@ Rel(portfolio_api, kafka, "Publishes and consumes", "Kafka")
 Rel(portfolio_api, clickhouse, "Reads analytics", "HTTP")
 Rel(portfolio_api, minio, "Batch jobs write", "S3")
 Rel(portfolio_api, market_api, "Fetches quotes", "REST")
+Rel(portfolio_api_go, timescale, "Reads", "SQL / pgx")
+Rel(web_app, portfolio_api_go, "API calls (optional)", "REST")
+Rel(mobile_portfolio, portfolio_api_go, "API calls (optional)", "REST")
 Rel(web_app, vercel, "Hosted on", "Vercel")
 
 LAYOUT_TOP_DOWN()

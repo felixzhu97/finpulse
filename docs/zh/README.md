@@ -87,10 +87,11 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 ### 后端服务
 
 - **Python 3.10+ + FastAPI** - 投资组合分析 API（`services/portfolio-analytics`），端口 8800。Clean Architecture（composition.py、container、crud_helpers、api/config）；通过 `.env` 配置。
+- **Go** - 非 AI 投资组合 API（`services/portfolio-api-go`），端口 8801。health、GET /api/v1/quotes、GET /api/v1/instruments；DDD；与 Python 服务共享 DB；`pnpm run start:backend:go`；API 测试 `pnpm run test:api:go`。
 - **PostgreSQL** - 投资组合持久化（Docker，主机端口 5433）
 - **Apache Kafka** - 投资组合事件消息（Docker，端口 9092）
 - **AI/ML** - 融入业务流（无独立 AI 路由）：`POST /payments` 返回欺诈检测；`POST /trades` 返回监控告警；`POST /customers` 返回身份评分；`POST /risk-metrics/compute` 根据组合历史计算 VaR。可选：Ollama、Hugging Face、TensorFlow 用于后续集成。
-- **一键启动** - `pnpm run start:backend`（Docker + API + 种子数据）。**API 测试** - `pnpm run test:api`（pytest；Ollama/HF/TF 测试在服务不可用时可能跳过；Hugging Face 首次运行约 1–3 分钟）。
+- **一键启动** - `pnpm run start:backend`（Docker + API + 种子数据）。**API 测试** - `pnpm run test:api`（Python pytest）；`pnpm run test:api:go`（Go 单元测试）。Ollama/HF/TF 测试在服务不可用时可能跳过。
 
 ### UI 与可视化
 
@@ -122,6 +123,7 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 - **apps/mobile** - React Native 演示移动应用。
 - **apps/mobile-portfolio** - React Native（Expo）组合概览与指标应用；**Stocks** 屏幕展示实时价格与每股票 sparkline（NativeSparkline、useSymbolDisplayData）；含原生视图 **NativeDemoCard** 及六类原生图表：**NativeLineChart**、**NativeCandleChart**、**NativeAmericanLineChart**、**NativeBaselineChart**、**NativeHistogramChart**、**NativeLineOnlyChart**（iOS Metal，Android OpenGL ES）。图表支持主题（亮/暗）、提示、X 轴标签与水平拖拽滚动，共享 `useScrollableChart`、`ScrollableChartContainer`。
 - **services/portfolio-analytics** - Python FastAPI 后端（Clean Architecture）；PostgreSQL；Kafka；AI/ML 融入 payments、trades、customers、risk-metrics；配置见 `.env.example`；`pnpm run start:backend`；API 测试 `pnpm run test:api`。
+- **services/portfolio-api-go** - Go 非 AI API（Gin、DDD、Swagger）；与 portfolio-analytics 共享 DB；端口 8801；`pnpm run start:backend:go`；`pnpm run test:api:go`。
 - **packages/ui** - 共享 UI 组件库。
 - **packages/utils** - 共享工具函数库。
 
@@ -134,6 +136,7 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 - Node.js 18+
 - pnpm 10.6.0+（必须，项目使用 pnpm workspaces）
 - Python 3.10+（后端 FastAPI 服务）
+- Go 1.22+（可选，用于 `services/portfolio-api-go`）
 - Docker（使用 `pnpm run start:backend` 时的 PostgreSQL 与 Kafka）
 
 ### 安装依赖

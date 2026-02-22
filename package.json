@@ -9,11 +9,13 @@
     "dev:mobile-portfolio:ios": "pnpm --filter mobile-portfolio ios",
     "dev:mobile-portfolio:android": "pnpm --filter mobile-portfolio android",
     "start:backend": "bash scripts/backend/start-backend.sh",
+    "start:backend:go": "cd services/portfolio-api-go && go run ./cmd/server",
     "start:kafka": "cd services/portfolio-analytics && docker compose up kafka zookeeper -d && sleep 5 && .venv/bin/python scripts/mock_realtime_quotes.py",
     "build": "pnpm --filter finpulse-web build",
     "start": "pnpm --filter finpulse-web start",
     "test": "pnpm run test:api",
     "test:api": "cd services/portfolio-analytics && .venv/bin/python -m pytest tests -v",
+    "test:api:go": "cd services/portfolio-api-go && go test ./cmd/server -v -count=1",
     "lint": "pnpm --filter finpulse-web lint",
     "stop:backend": "bash scripts/backend/stop-backend.sh"
   }
