@@ -4,7 +4,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
 echo "[start-backend] Starting Docker..."
-cd apps/portfolio-analytics
+cd apps/server-python
 docker compose down 2>/dev/null || true
 docker compose up -d
 cd "$ROOT"
@@ -17,7 +17,7 @@ for i in $(seq 1 20); do nc -z 127.0.0.1 9092 2>/dev/null && break; sleep 1; don
 sleep 2
 
 echo "[start-backend] Setting up Python venv..."
-cd apps/portfolio-analytics
+cd apps/server-python
 if [ ! -d .venv ]; then
   python3 -m venv .venv
 fi
@@ -43,7 +43,7 @@ done
 lsof -i :8801 -t 2>/dev/null | xargs kill 2>/dev/null || true
 sleep 1
 echo "[start-backend] Starting Go :8801..."
-cd "$ROOT/apps/portfolio-api-go"
+cd "$ROOT/apps/server-go"
 PYTHON_BACKEND_URL=http://127.0.0.1:8800 go run ./cmd/server &
 GO_PID=$!
 cd "$ROOT"

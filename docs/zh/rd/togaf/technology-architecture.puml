@@ -17,20 +17,28 @@ skinparam component {
 title TOGAF 技术架构 - FinPulse 金融科技平台
 
 package "前端技术栈" <<Frontend>> {
-    component "Next.js 16.0.10" as NextJS
+    component "Vite 6 + React 19" as AdminViteTech {
+        component "apps/admin" as AdminAppTech
+        component "React 19" as AdminReactTech
+        component "Tailwind 4" as AdminTailwindTech
+        note right: finpulse-admin\n端口 4200\n@fintech/ui, recharts, ag-grid-react
+    }
+    component "Vite 6 + React 19" as PortalViteTech {
+        component "apps/portal" as PortalAppTech
+        component "React 19" as PortalReactTech
+        component "Tailwind 4" as PortalTailwindTech
+        note right: finpulse-portal\n端口 3001\n@fintech/ui，Robinhood 风格
+    }
     component "React 19.2.0" as React
     component "React DOM 19.2.0" as ReactDOM
     component "TypeScript 5" as TypeScript
     component "Tailwind CSS 4.1.9" as Tailwind
     
-    note right of NextJS
-        <b>全栈React框架</b>
-        - App Router
-        - Server Components
-        - API Routes
-        - SSG/SSR
-        - 自动代码分割
-        - 图片优化
+    note right of AdminViteTech
+        <b>管理台</b>
+        - Vite 6
+        - React Router
+        - recharts, ag-grid-react
     end note
     
     note right of React: UI库\n函数组件、Hooks、Context API\nReact 19新特性
@@ -134,10 +142,10 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
     note right of StyledComponentsTech: 主题 UI\nStyledThemeProvider、基元\nuseTheme (useTheme.ts)
     note right of Expo: Expo SDK\nMetro, prebuild\niOS/Android
     note right of RN: React Native core\nrequireNativeComponent\nView managers
-    note right of NativeDemoCardTech: apps/mobile-portfolio\nDemo native card
+    note right of NativeDemoCardTech: apps/mobile\nDemo native card
     note right of NativeChartsTech: LineChart, CandleChart\nAmericanLineChart, BaselineChart\nHistogramChart, LineOnlyChart\nTheme light/dark, tooltips\nx-axis, drag-to-scroll
     note right of NativeOOPSupport: iOS: ChartCurve, ChartVertex,\nChartPipeline, ChartGrid, ChartThemes\nOOP 辅助类: ChartLayoutCalculator,\nValueFormatter, AxisLabelManager,\nChartRenderer, ChartDataCalculator,\nHistogramRenderer\nAndroid: ChartGl, ChartCurve,\n*ChartTheme; OOP 辅助类:\nChartLayoutCalculator, ValueFormatter,\nAxisLabelManager, HistogramRenderer\nsparkline/; democard/
-    note right of RNWagmi: mobile-portfolio: 默认深色主题\n黑色 (#000000) 背景
+    note right of RNWagmi: apps/mobile: 默认深色主题\n黑色 (#000000) 背景
 }
 
 package "构建工具链" <<Build>> {
@@ -181,7 +189,7 @@ package "API 网关与后端" <<Infra>> {
         component "认证 (login, register, me, logout, change-password)" as GoAuthTech
         component "GET /quotes、GET /instruments" as GoQuotesTech
         component "代理至 Python" as GoProxyTech
-        note right: apps/portfolio-api-go\nport 8801，应用统一入口\n代理至 Python :8800
+        note right: apps/server-go\nport 8801，应用统一入口\n代理至 Python :8800
     }
 }
 
@@ -199,7 +207,7 @@ package "Portfolio Analytics Backend" <<Infra>> {
         component "Ollama, HF（可选）；PyTorch, MLflow" as OptionalTech
     }
     note right of FastAPI
-        apps/portfolio-analytics
+        apps/server-python
         Clean Architecture：composition.py、container、crud_helpers、api/config
         GET/POST /api/v1/portfolio, seed
         AI 融入：payments（欺诈）、trades（监控）、
@@ -271,19 +279,28 @@ package "基础设施层" <<Infra>> {
 }
 
 ' 前端技术栈内部关系
-NextJS --> React
-NextJS --> ReactDOM
-NextJS --> TypeScript
-NextJS --> Tailwind
+AdminViteTech --> AdminAppTech
+AdminViteTech --> AdminReactTech
+AdminViteTech --> AdminTailwindTech
+AdminViteTech --> React
+AdminViteTech --> ReactDOM
+AdminViteTech --> TypeScript
+AdminViteTech --> Tailwind
+AdminAppTech --> TypeScript
 React --> ReactDOM
 React --> TypeScript
+PortalViteTech --> PortalAppTech
+PortalViteTech --> PortalReactTech
+PortalViteTech --> PortalTailwindTech
+PortalAppTech --> TypeScript
 
 ' UI框架关系
-NextJS --> RadixUI
-NextJS --> Lucide
-NextJS --> CMDK
-NextJS --> Sonner
-NextJS --> Vaul
+AdminViteTech --> RadixUI
+PortalAppTech --> RadixUI
+AdminViteTech --> Lucide
+AdminViteTech --> CMDK
+AdminViteTech --> Sonner
+AdminViteTech --> Vaul
 RadixUI --> RadixAccordion
 RadixUI --> RadixDialog
 RadixUI --> RadixDropdown
@@ -295,12 +312,12 @@ Sonner --> RadixToast
 RadixUI --> Tailwind
 
 ' 数据可视化关系
-NextJS --> Recharts
-NextJS --> LightweightCharts
-NextJS --> ChartJS
-NextJS --> ReactChartJS
-NextJS --> D3JS
-NextJS --> Sparklines
+AdminViteTech --> Recharts
+AdminViteTech --> LightweightCharts
+AdminViteTech --> ChartJS
+AdminViteTech --> ReactChartJS
+AdminViteTech --> D3JS
+AdminViteTech --> Sparklines
 React --> Recharts
 React --> ReactChartJS
 ReactChartJS --> ChartJS
@@ -308,16 +325,16 @@ D3JS --> D3Scale
 D3JS --> D3Color
 
 ' 工具库关系
-NextJS --> HookForm
+AdminViteTech --> HookForm
 HookForm --> HookFormResolvers
 HookFormResolvers --> Zod
-NextJS --> DateFns
-NextJS --> DayPicker
+AdminViteTech --> DateFns
+AdminViteTech --> DayPicker
 DayPicker --> DateFns
-NextJS --> Themes
-NextJS --> InputOTP
-NextJS --> EmblaCarousel
-NextJS --> ResizablePanels
+AdminViteTech --> Themes
+AdminViteTech --> InputOTP
+AdminViteTech --> EmblaCarousel
+AdminViteTech --> ResizablePanels
 
 ' 构建工具关系
 BuildSystem --> TSCompiler
@@ -341,7 +358,8 @@ RN --> GoGateway
 GoGateway --> FastAPI
 
 ' Monorepo工具关系
-PNPM --> NextJS
+PNPM --> AdminViteTech
+PNPM --> PortalViteTech
 PNPM --> React
 PNPM --> TypeScript
 PNPM --> Expo
@@ -383,12 +401,12 @@ AWSSQS --> SQSService
 AWSSNS --> SNSService
 AWSAPIGatewayV2 --> APIGatewayService
 AWSAPIGatewayMgmt --> APIGatewayService
-NextJS --> AWSS3
-NextJS --> AWSDynamoDB
-NextJS --> AWSLambda
-NextJS --> AWSSQS
-NextJS --> AWSSNS
-NextJS --> AWSAPIGatewayV2
+AdminViteTech --> AWSS3
+AdminViteTech --> AWSDynamoDB
+AdminViteTech --> AWSLambda
+AdminViteTech --> AWSSQS
+AdminViteTech --> AWSSNS
+AdminViteTech --> AWSAPIGatewayV2
 
 ' 测试工具关系
 Vitest --> TSCompiler
@@ -405,7 +423,7 @@ SpringBoot --> Flink
 SpringBoot --> Hadoop
 MavenBuild --> SpringBoot
 JavaCompiler --> Java
-NextJS --> RESTEndpoint
+AdminViteTech --> RESTEndpoint
 RESTEndpoint --> SpringBoot
 
 ' 部署关系
@@ -477,6 +495,7 @@ legend right
     |
     <b>技术特点：</b>
     • 全栈React框架 (Next.js 16)
+    • 门户应用 (Vite + React 19, apps/portal, 端口 3001)
     • 类型安全开发 (TypeScript 5)
     • 现代化UI组件 (Radix UI)
     • 多图表库支持 (Recharts/Lightweight Charts/Chart.js/D3)

@@ -77,8 +77,9 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 
 ### 前端框架
 
-- **Angular 21** - Web 分析控制台（`apps/web`）
-- **React Native + Expo** - 移动应用（`apps/mobile`、`apps/mobile-portfolio`）
+- **Angular 21** - Web 分析控制台（`apps/admin`）
+- **React 19 + Vite** - 门户应用（`apps/portal`，包名 `finpulse-portal`）；Robinhood 风格，使用 `@fintech/ui`、Tailwind，开发端口 3001
+- **React Native + Expo** - 移动应用（`apps/mobile`）
 - **React 19.2** - UI 组件与共享库
 - **TypeScript 5.0** - 类型安全
 
@@ -89,8 +90,8 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 
 ### 后端服务
 
-- **Python 3.10+ + FastAPI** - 投资组合分析 API（`apps/portfolio-analytics`），端口 8800。Clean Architecture（composition.py、container、crud_helpers、api/config）；通过 `.env` 配置。
-- **Go** - 非 AI 投资组合 API（`apps/portfolio-api-go`），端口 8801。health、GET /api/v1/quotes、GET /api/v1/instruments；DDD；与 Python 服务共享 DB；`pnpm run start:server:go`；API 测试 `pnpm run test:api:go`。
+- **Python 3.10+ + FastAPI** - 投资组合分析 API（`apps/server-python`），端口 8800。Clean Architecture（composition.py、container、crud_helpers、api/config）；通过 `.env` 配置。
+- **Go** - 非 AI 投资组合 API（`apps/server-go`），端口 8801。health、GET /api/v1/quotes、GET /api/v1/instruments；DDD；与 Python 服务共享 DB；`pnpm run start:server:go`；API 测试 `pnpm run test:api:go`。
 - **PostgreSQL** - 投资组合持久化（Docker，主机端口 5433）
 - **Apache Kafka** - 投资组合事件消息（Docker，端口 9092）
 - **AI/ML** - 融入业务流（无独立 AI 路由）：`POST /payments` 返回欺诈检测；`POST /trades` 返回监控告警；`POST /customers` 返回身份评分；`POST /risk-metrics/compute` 根据组合历史计算 VaR。可选：Ollama、Hugging Face、TensorFlow 用于后续集成。
@@ -122,11 +123,11 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 
 本项目采用 pnpm workspaces 管理的 **monorepo** 架构：
 
-- **apps/web** - 基于 Angular 的金融分析 Web 控制台。
-- **apps/mobile** - React Native 演示移动应用。
-- **apps/mobile-portfolio** - React Native（Expo）组合概览与指标应用；**Stocks** 屏幕展示实时价格与每股票 sparkline（NativeSparkline、useSymbolDisplayData）；含原生视图 **NativeDemoCard** 及六类原生图表：**NativeLineChart**、**NativeCandleChart**、**NativeAmericanLineChart**、**NativeBaselineChart**、**NativeHistogramChart**、**NativeLineOnlyChart**（iOS Metal，Android OpenGL ES）。图表支持主题（亮/暗）、提示、X 轴标签与水平拖拽滚动，共享 `useScrollableChart`、`ScrollableChartContainer`。
-- **apps/portfolio-analytics** - Python FastAPI 后端（Clean Architecture）；PostgreSQL；Kafka；AI/ML 融入 payments、trades、customers、risk-metrics；配置见 `.env.example`；`pnpm run start:server`；API 测试 `pnpm run test:api`。
-- **apps/portfolio-api-go** - Go 非 AI API（Gin、DDD、Swagger）；与 portfolio-analytics 共享 DB；端口 8801；`pnpm run start:server:go`；`pnpm run test:api:go`。
+- **apps/admin** - 基于 Angular 的金融分析 Web 控制台。
+- **apps/portal** - React（Vite）门户应用（包名 `finpulse-portal`）；Robinhood 风格 UI，`@fintech/ui`，开发端口 3001。
+- **apps/mobile** - React Native（Expo）组合概览与指标应用；**Stocks** 屏幕展示实时价格与每股票 sparkline（NativeSparkline、useSymbolDisplayData）；含原生视图 **NativeDemoCard** 及六类原生图表：**NativeLineChart**、**NativeCandleChart**、**NativeAmericanLineChart**、**NativeBaselineChart**、**NativeHistogramChart**、**NativeLineOnlyChart**（iOS Metal，Android OpenGL ES）。图表支持主题（亮/暗）、提示、X 轴标签与水平拖拽滚动，共享 `useScrollableChart`、`ScrollableChartContainer`。
+- **apps/server-python** - Python FastAPI 后端（Clean Architecture）；PostgreSQL；Kafka；AI/ML 融入 payments、trades、customers、risk-metrics；配置见 `.env.example`；`pnpm run start:server`；API 测试 `pnpm run test:api`。
+- **apps/server-go** - Go 非 AI API（Gin、DDD、Swagger）；与 server-python 共享 DB；端口 8801；`pnpm run start:server:go`；`pnpm run test:api:go`。
 - **packages/ui** - 共享 UI 组件库。
 - **packages/utils** - 共享工具函数库。
 
@@ -139,7 +140,7 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 - Node.js 18+
 - pnpm 10.6.0+（必须，项目使用 pnpm workspaces）
 - Python 3.10+（后端 FastAPI 服务）
-- Go 1.22+（可选，用于 `apps/portfolio-api-go`）
+- Go 1.22+（可选，用于 `apps/server-go`）
 - Docker（使用 `pnpm run start:server` 时的 PostgreSQL 与 Kafka）
 
 ### 安装依赖
@@ -158,12 +159,23 @@ pnpm dev
 
 访问 [http://localhost:3000](http://localhost:3000)。
 
-### 移动应用（mobile-portfolio）
+### 门户应用（portal）
+
+React + Vite 门户，使用 `@fintech/ui` 与 Tailwind（Robinhood 风格）。开发服务器端口 3001。
 
 ```bash
-pnpm dev:mobile-portfolio
-pnpm --filter mobile-portfolio ios
-pnpm --filter mobile-portfolio android
+pnpm dev:portal
+# 或：pnpm --filter finpulse-portal dev
+```
+
+访问 [http://localhost:3001](http://localhost:3001)。
+
+### 移动应用（finpulse-mobile）
+
+```bash
+pnpm dev:finpulse-mobile
+pnpm --filter finpulse-mobile ios
+pnpm --filter finpulse-mobile android
 ```
 
 ### 后端服务（Python FastAPI）
@@ -174,12 +186,12 @@ pnpm --filter mobile-portfolio android
 pnpm run start:server
 ```
 
-将启动 Docker（PostgreSQL + Kafka）、portfolio-analytics API（http://127.0.0.1:8800）并写入种子数据。
+将启动 Docker（PostgreSQL + Kafka）、server-python API（http://127.0.0.1:8800）并写入种子数据。
 
 **手动启动：**
 
 ```bash
-cd apps/portfolio-analytics
+cd apps/server-python
 cp .env.example .env   # 可选：按需编辑 DB、Kafka、Ollama、HF 模型
 docker compose up -d
 python -m venv .venv
@@ -188,7 +200,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8800 --reload
 ```
 
-API 测试：在项目根目录执行 `pnpm run test:api`，或在 `apps/portfolio-analytics` 下激活 venv 后执行 `pytest tests -v`。
+API 测试：在项目根目录执行 `pnpm run test:api`，或在 `apps/server-python` 下激活 venv 后执行 `pytest tests -v`。
 
 ### 生产构建
 
@@ -207,7 +219,7 @@ pnpm lint
 
 ```
 fintech-project/
-├── apps/           # Web / 移动应用 / portfolio-analytics, portfolio-api-go
+├── apps/           # Web / 移动应用 / server-python, server-go
 ├── scripts/        # backend/, seed/, db/
 ├── packages/       # ui, utils
 ├── docs/           # 英文架构与领域文档
@@ -228,7 +240,7 @@ fintech-project/
 
 ## 部署
 
-项目配置为自动部署到 Vercel；推送到 main 分支即触发部署。Monorepo 需在 Vercel 中配置根目录、构建命令（如 `pnpm --filter web build`）、输出目录（如 `apps/web/.next`）、安装命令（`pnpm install`）。
+项目配置为自动部署到 Vercel；推送到 main 分支即触发部署。Monorepo 需在 Vercel 中配置根目录、构建命令（如 `pnpm --filter finpulse-admin build`）、输出目录（如 `apps/admin/dist`）、安装命令（`pnpm install`）。
 
 ## 许可证
 

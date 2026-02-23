@@ -35,7 +35,7 @@
 
 **文件**：`application-architecture.puml`
 
-**描述**：分层应用组件及其交互。展示层包含移动端投资组合（含 styled-components 主题 UI：StyledThemeProvider、useTheme、基元）。
+**描述**：分层应用组件及其交互。展示层包含 Admin（apps/admin）、门户（apps/portal，React + Vite、@fintech/ui）、移动端投资组合（含 styled-components 主题 UI：StyledThemeProvider、useTheme、基元）。
 
 ### 数据架构图 (Data Architecture)
 

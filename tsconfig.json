@@ -12,7 +12,7 @@
   },
   "files": [],
   "references": [
-    { "path": "./apps/web" },
+    { "path": "./apps/admin" },
     { "path": "./packages/ui" },
     { "path": "./packages/utils" },
     { "path": "./packages/test-utils" }

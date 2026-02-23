@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm install && pnpm --filter finpulse-web build --configuration production",
-  "outputDirectory": "apps/web/dist/web/browser",
+  "buildCommand": "pnpm install && pnpm --filter finpulse-admin build",
+  "outputDirectory": "apps/admin/dist",
   "installCommand": "pnpm install",
   "framework": null,
   "rewrites": [

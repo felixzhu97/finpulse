@@ -117,7 +117,7 @@ htmlcov/
 *.ipynb_checkpoints/
 
 # Portfolio analytics (SQLite superseded by PostgreSQL)
-services/portfolio-analytics/portfolio.db
+services/server-python/portfolio.db
 
 # Docker (local overrides)
 docker-compose.override.yml

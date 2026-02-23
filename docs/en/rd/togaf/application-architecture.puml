@@ -17,12 +17,20 @@ skinparam component {
 title TOGAF Application Architecture - FinPulse Fintech Platform
 
 package "Presentation Layer" <<Presentation>> {
-    component "apps/web" as WebApp {
-        component "Angular 21 App" as AngularApp {
-            component "App Router" as AppRouter
+    component "apps/admin" as AdminApp {
+        component "React 19 + Vite" as AdminVite {
+            component "React Router" as AppRouter
             component "Components" as Components
-            component "Services" as Services
-            component "Layout" as Layout
+            component "Pages (Dashboard, Portfolio, etc.)" as Services
+            component "Layout (Sidebar, Header)" as Layout
+        }
+    }
+
+    component "apps/portal" as PortalApp {
+        component "React 19 + Vite" as PortalVite {
+            component "App Router" as PortalRouter
+            component "Components" as PortalComponents
+            component "Tailwind + theme" as PortalTheme
         }
     }
 
@@ -31,14 +39,12 @@ package "Presentation Layer" <<Presentation>> {
         component "Radix UI Primitives" as RadixPrimitives
     }
 
-    component "Chart Libraries (Web)" as ChartLibrariesWeb {
-        component "Chart.js" as ChartJS
-        component "ng2-charts" as Ng2Charts
-        component "chartjs-chart-financial" as ChartJSFinancial
-        component "ag-grid-angular" as AgGrid
+    component "Chart & Grid (Admin)" as ChartLibrariesWeb {
+        component "recharts" as ChartJS
+        component "ag-grid-react" as AgGrid
     }
 
-    component "apps/mobile-portfolio" as MobilePortfolio {
+    component "apps/mobile" as MobilePortfolio {
         component "Expo + React Native" as ExpoRN
         component "Clean Architecture" as CleanArch {
             component "Presentation Layer" as PresentationLayer {
@@ -151,8 +157,8 @@ package "Data Access Layer" <<Data>> {
     }
 
     component "State Management" as StateMgmt {
-        component "Angular Services" as AngularServices
-        component "RxJS" as RxJS
+        component "React state" as AngularServices
+        component "React Router" as RxJS
     }
 }
 
@@ -174,7 +180,7 @@ package "External Services" <<External>> {
         note right: Single entry for app.\nProxies unimplemented routes to Python :8800.
     }
 
-    component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
+    component "server-python (Portfolio Analytics API)" as PortfolioAnalyticsAPI <<External>> {
         component "FastAPI app (Clean Architecture)" as FastAPIApp
         component "composition.py, container, crud_helpers, api/config" as FastAPIStructure
         component "GET /api/v1/portfolio, POST /seed, GET /api/v1/portfolio/risk-summary, GET /api/v1/portfolio/asset-allocation-by-account-type" as PortfolioGet
@@ -310,30 +316,33 @@ FastAPIApp --> KafkaTopic
 FastAPIApp --> MarketDataServiceComponent
 MarketDataServiceComponent --> KafkaQuotesTopic
 
-AngularApp --> AppRouter
-AngularApp --> Components
-AngularApp --> Services
+AdminVite --> AppRouter
+AdminVite --> Components
+AdminVite --> Services
 AppRouter --> Layout
-WebApp --> UIComponent
-WebApp --> ChartLibrariesWeb
+AdminApp --> UIComponent
+AdminApp --> ChartLibrariesWeb
+PortalApp --> UIComponent
+PortalVite --> PortalRouter
+PortalVite --> PortalComponents
+PortalVite --> PortalTheme
 BaseUI --> RadixPrimitives
 ChartLibrariesWeb --> ChartJS
-ChartLibrariesWeb --> Ng2Charts
-Ng2Charts --> ChartJS
-ChartJSFinancial --> ChartJS
+ChartLibrariesWeb --> AgGrid
 
 PortfolioController --> AssetService
 MarketController --> TrendService
 TransactionController --> TransactionService
 RiskController --> RiskService
 
-WebApp --> PortfolioModule
-WebApp --> MarketModule
-WebApp --> TransactionModule
-WebApp --> RiskModule
+AdminApp --> PortfolioModule
+AdminApp --> MarketModule
+AdminApp --> TransactionModule
+AdminApp --> RiskModule
 PortfolioModule --> UtilsPkg
 MarketModule --> UtilsPkg
 RiskModule --> UtilsPkg
+PortalApp --> UtilsPkg
 
 PortfolioModule --> HttpClient
 MarketModule --> HttpClient
@@ -346,7 +355,8 @@ TransactionModule --> StateMgmt
 
 HttpClient --> PortfolioAnalyticsAPI
 HttpClient --> ThirdPartyAPI
-WebApp --> VercelServices
+AdminApp --> VercelServices
+PortalApp --> GoAPIGateway
 
 PortfolioAnalyticsAPI ..> PortfolioAPI : implements
 ThirdPartyAPI ..> MarketDataAPI : consumes
