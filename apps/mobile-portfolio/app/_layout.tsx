@@ -16,7 +16,7 @@ import styled from "styled-components/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubscriber";
 import { store } from "@/src/presentation/store";
-import { usePreferences } from "@/src/presentation/hooks";
+import { usePreferences, useAuthTokenSync, useAuthRestore, useAuthFetchCustomer } from "@/src/presentation/hooks";
 import { DarkColors, LightColors } from "@/src/presentation/theme/colors";
 import { StyledThemeProvider } from "@/src/presentation/theme/StyledThemeProvider";
 import "@/src/presentation/i18n/config";
@@ -34,6 +34,9 @@ SplashScreen.preventAutoHideAsync();
 function AppContent() {
   const { loading, theme: themePreference, language } = usePreferences();
   const systemColorScheme = useColorScheme();
+  useAuthTokenSync();
+  useAuthRestore();
+  useAuthFetchCustomer();
 
   useEffect(() => {
     if (language) {
@@ -83,8 +86,10 @@ function AppContent() {
             style={{ flex: 1, backgroundColor: theme.colors.background }}
           >
             <QuoteSocketSubscriber />
-            <Stack initialRouteName="(tabs)">
+            <Stack initialRouteName="index">
+              <Stack.Screen name="index" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen name="storybook" options={{ headerShown: false }} />
               <Stack.Screen name="+not-found" />
             </Stack>

@@ -12,6 +12,7 @@ import {
 } from "../../infrastructure/api";
 import { useAsyncLoad } from "./common";
 import { useAppDispatch, useAppSelector } from "../store";
+import { useAuth } from "./auth";
 import {
   setPreferences,
   setTheme,
@@ -31,7 +32,11 @@ export interface UseAccountDataResult {
 }
 
 export function useAccountData(): UseAccountDataResult {
-  const fetcher = useCallback(() => getAccountData(), []);
+  const { customer: authCustomer } = useAuth();
+  const fetcher = useCallback(
+    () => getAccountData(authCustomer ?? undefined),
+    [authCustomer]
+  );
   const { data, loading, error, refresh } = useAsyncLoad(fetcher, null, {
     skipInitialLoad: true,
   });

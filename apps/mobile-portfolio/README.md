@@ -24,7 +24,7 @@ Native chart components: line (gradient fill in light and dark theme), candlesti
 | Dashboard | `/(tabs)/` | Portfolio summary, net worth chart, asset allocation, native line chart |
 | Watchlist | `/(tabs)/watchlists` | Stock list (portfolio holdings) with real-time prices, sparklines, account rows; search (bottom sheet, closes on drawer/sort/tab), sort menu; pull-to-refresh; stock detail drawer (draggable, share) |
 | Insights | `/(tabs)/insights` | Risk metrics from API (volatility, Sharpe ratio, VaR, beta) via `GET /api/v1/risk-metrics`; computed VaR via `POST /api/v1/risk-metrics/compute` (useComputedVar hook) |
-| Account | `/(tabs)/account` | Profile, account list, **Wallet** (Connect/Disconnect via WalletConnectButton; Redux web3). Actions: Register Customer, New Payment, New Trade, **Quick trade**, **Send ETH** (EthTransferDrawer, real Ethereum; default Sepolia testnet), Settings. **useAccountData** loads on tab focus; in dev, Actions include **Storybook**. |
+| Account | `/(tabs)/account` | Profile, account list, **Wallet** (Connect/Disconnect via WalletConnectButton; Redux web3). Actions: Register Customer, New Payment, New Trade, **Quick trade**, **Send ETH** (EthTransferDrawer, real Ethereum; default Sepolia testnet), **Settings** (theme, language, notifications; **Change password** and **Log out** when logged in). **useAccountData** loads on tab focus; in dev, Actions include **Storybook**. |
 
 ## Project Structure (Clean Architecture)
 
@@ -68,8 +68,8 @@ Presentation (hooks, screens) → Infrastructure (api, services)
 
 ### Diagrams
 
-- **C4 component diagram** (en): `docs/en/c4/c4-mobile-portfolio-components.puml`
-- **C4 component diagram** (zh): `docs/zh/c4/c4-mobile-portfolio-components.puml`
+- **C4 component diagram** (en): `docs/en/rd/c4/c4-mobile-portfolio-components.puml`
+- **C4 component diagram** (zh): `docs/zh/rd/c4/c4-mobile-portfolio-components.puml`
 
 ## Storybook (native component catalog)
 
@@ -132,9 +132,13 @@ If `pod install` fails with **"RPC failed; curl 56 Recv failure: Operation timed
 
 2. If it still times out, try a different network, disable VPN, or retry later; the clone is from GitHub and can be sensitive to latency.
 
+## Auth
+
+Login and signup are handled by the Go API (same base URL as portfolio). **Auth flow**: `app/(auth)/login.tsx`, `signup.tsx`; token stored via `authBridge` (AsyncStorage); `useAuth`, `useAuthTokenSync`, `useAuthRestore`, `useAuthFetchCustomer` in `presentation/hooks/auth.ts`; Redux `authSlice` (token, customer, restored). After login, `Authorization: Bearer <token>` is sent by `httpClient`. **Settings** (when logged in): Change password, Log out; logout clears token and redirects to login.
+
 ## Backend
 
-The app is a thin client: all portfolio and risk business logic runs on the Portfolio Analytics API; the mobile app focuses on presentation, navigation, and light orchestration.
+The app is a thin client: all portfolio and risk business logic runs on the Portfolio Analytics API (reached via Go proxy); auth and gateway are in Go. The mobile app uses a **single base URL** (`EXPO_PUBLIC_PORTFOLIO_API_URL`, default `http://localhost:8801`).
 
 | Endpoint | Usage |
 |----------|--------|
@@ -152,13 +156,18 @@ The app is a thin client: all portfolio and risk business logic runs on the Port
 | `POST /api/v1/orders` | Create order |
 | `POST /api/v1/trades` | Create trade (returns `surveillance_alert`, `surveillance_score`) |
 | `GET/PUT /api/v1/user-preferences` | Account Settings (theme, language, notifications) |
+| `POST /api/v1/auth/login` | Login (email + password); returns token |
+| `POST /api/v1/auth/register` | Register; returns token |
+| `GET /api/v1/auth/me` | Current user (Bearer token) |
+| `POST /api/v1/auth/logout` | Logout (invalidate session) |
+| `POST /api/v1/auth/change-password` | Change password (Bearer token) |
 | `GET /api/v1/instruments` | Symbol/name lookup for trade flow |
 | `GET /api/v1/risk-metrics` | Analytics risk metrics (volatility, Sharpe, VaR, beta) |
 | `POST /api/v1/risk-metrics/compute` | Compute VaR from portfolio history |
 
-1. From repo root: `pnpm run start:backend` (Docker + TimescaleDB + Redis + Kafka + API + seed + mock quote producer).
+1. From repo root: `pnpm run start:server` (Docker + TimescaleDB + Redis + Kafka + API + seed + mock quote producer).
 2. Or separately: `pnpm run start:kafka` for Kafka and mock quotes only.
-3. Override the base URL with `EXPO_PUBLIC_PORTFOLIO_API_URL` in `.env` if needed (e.g. `http://192.168.x.x:8800` when using a simulator or device).
+3. Override the base URL with `EXPO_PUBLIC_PORTFOLIO_API_URL` in `.env` if needed (e.g. `http://192.168.x.x:8801` when using a simulator or device).
 
 ### Real-time quotes and sparklines
 
@@ -175,7 +184,7 @@ Single Redux-backed flow, one WebSocket; **history before real-time**:
 The app supports light and dark themes with automatic system theme detection and **styled-components** for theme-aware UI:
 
 - **Theme System**: `src/presentation/theme/colors.ts` defines light/dark color schemes. `useTheme.ts` provides the `useTheme()` hook (no circular dependency with `StyledThemeProvider`). `theme/index.ts` re-exports theme APIs; `themeTypes.ts` defines `AppTheme` and augments styled-components `DefaultTheme`.
-- **Styled Components**: Root layout wraps the app with `StyledThemeProvider`, which reads `useTheme()` and injects `{ colors }` into styled-components. Primitives (`primitives.ts`) include layout primitives (`ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, etc.), text primitives (`LabelText`, `ValueText`, `RowTitle`, etc.), and `withTheme()` for type-safe theme access. Main screens (Dashboard, Account, Watchlist, Insights) and list components use these styled components for consistent, theme-driven styling.
+- **Styled Components**: Root layout wraps the app with `StyledThemeProvider`, which reads `useTheme()` and injects `{ colors }` into styled-components. Primitives (`primitives.ts`) include layout primitives (`ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, etc.), text primitives (`LabelText`, `ValueText`, `RowTitle`, etc.), and `withTheme()` for type-safe theme access. Main screens (Dashboard, Account, Watchlist, Insights) and list components use these styled components for consistent, theme-driven styling. **Robinhood-style** UI: consistent section spacing (32px), card radius 16px, action row height 56px; auth screens (login/signup) use dark background and Robin Neon accent.
 - **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Initial loading is component-level: `AppContent` shows a spinner until `usePreferences().loading` is false. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
 - **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.
 

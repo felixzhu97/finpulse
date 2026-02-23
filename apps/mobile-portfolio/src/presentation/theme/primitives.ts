@@ -350,18 +350,18 @@ export const LoadingWrap = styled.View`
 `;
 
 export const InsightsBlock = styled.View`
-  gap: 24px;
+  gap: 32px;
 `;
 
 export const InsightsSection = styled.View`
-  gap: 12px;
+  gap: 14px;
 `;
 
 export const InsightsSectionHeader = styled.Text`
   font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.3px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   color: ${withTheme((t) => t.colors.text)};
 `;
 

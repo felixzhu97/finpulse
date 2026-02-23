@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import styled from "styled-components/native";
 import type { Account } from "@/src/domain/entities";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useAccountData } from "@/src/presentation/hooks";
+import { useAccountData, useAuth } from "@/src/presentation/hooks";
 import { SettingsDrawer } from "@/src/presentation/components/account/SettingsDrawer";
 import { RegisterCustomerDrawer } from "@/src/presentation/components/account/RegisterCustomerDrawer";
 import { NewPaymentDrawer } from "@/src/presentation/components/account/NewPaymentDrawer";
@@ -25,6 +25,8 @@ import {
 } from "@/src/presentation/theme/primitives";
 
 const ACCOUNT_CARD_PADDING = 20;
+const ACCOUNT_CARD_RADIUS = 16;
+const ACTION_INDENT = 56; // icon 20 + gap 14 + text start
 
 const StyledSafeArea = styled(SafeAreaView)`
   flex: 1;
@@ -36,7 +38,7 @@ const StyledScrollView = styled(ScrollView)`
 `;
 
 const Section = styled.View`
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   padding-horizontal: 16px;
 `;
 
@@ -44,19 +46,19 @@ const SectionHeader = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   padding-horizontal: 4px;
 `;
 
 const TotalBalance = styled.Text`
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.4px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
   color: ${(p) => p.theme.colors.text};
 `;
 
 const CategorySection = styled.View`
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 `;
 
 const CategoryTitle = styled.Text`
@@ -64,7 +66,7 @@ const CategoryTitle = styled.Text`
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   padding-horizontal: 4px;
   color: ${(p) => p.theme.colors.textSecondary};
 `;
@@ -72,17 +74,19 @@ const CategoryTitle = styled.Text`
 const UserHeader = styled.View`
   flex-direction: row;
   align-items: center;
-  padding-bottom: 16px;
+  padding-bottom: 20px;
 `;
 
 const Avatar = styled.View`
-  width: 52px;
-  height: 52px;
-  border-radius: 26px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
   align-items: center;
   justify-content: center;
-  margin-right: 14px;
+  margin-right: 16px;
   background-color: ${(p) => p.theme.colors.surface};
+  border-width: 1px;
+  border-color: ${(p) => p.theme.colors.border};
 `;
 
 const UserInfo = styled.View`
@@ -91,9 +95,9 @@ const UserInfo = styled.View`
 `;
 
 const UserName = styled.Text`
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   letter-spacing: -0.4px;
   color: ${(p) => p.theme.colors.text};
 `;
@@ -110,7 +114,7 @@ const UserDetailRow = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding-vertical: 16px;
+  padding-vertical: 14px;
   border-top-width: 1px;
   border-top-color: ${(p) => p.theme.colors.border};
 `;
@@ -126,14 +130,14 @@ const UserDetailValue = styled.Text`
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.2px;
-  color: ${(p) => p.theme.colors.textSecondary};
+  color: ${(p) => p.theme.colors.text};
 `;
 
 const AccountRow = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  min-height: 60px;
+  min-height: 56px;
 `;
 
 const AccountLeft = styled.View`
@@ -144,12 +148,12 @@ const AccountLeft = styled.View`
 `;
 
 const AccountIcon = styled.View`
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
+  margin-right: 14px;
   background-color: ${(p) => p.theme.colors.surface};
 `;
 
@@ -161,7 +165,7 @@ const AccountInfo = styled.View`
 const AccountName = styled.Text`
   font-size: 16px;
   font-weight: 500;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   letter-spacing: -0.3px;
   color: ${(p) => p.theme.colors.text};
 `;
@@ -177,9 +181,9 @@ const AccountRight = styled.View`
 `;
 
 const AccountBalance = styled.Text`
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   letter-spacing: -0.3px;
   color: ${(p) => p.theme.colors.text};
 `;
@@ -193,7 +197,7 @@ const AccountChange = styled.Text<{ positive: boolean }>`
 
 const Separator = styled.View<{ indent?: number }>`
   height: 1px;
-  margin-left: ${(p) => p.indent ?? 60}px;
+  margin-left: ${(p) => p.indent ?? ACTION_INDENT}px;
   background-color: ${(p) => p.theme.colors.border};
 `;
 
@@ -201,18 +205,18 @@ const ActionRow = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  min-height: 52px;
+  min-height: 56px;
 `;
 
 const ActionLeft = styled.View`
   flex-direction: row;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 `;
 
 const ActionText = styled.Text`
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: -0.3px;
   color: ${(p) => p.theme.colors.text};
 `;
@@ -249,6 +253,7 @@ export default function AccountScreen() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const { customer, accounts, accountResources, loading, error, refresh } = useAccountData();
+  const { isAuthenticated } = useAuth();
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [registerVisible, setRegisterVisible] = useState(false);
   const [paymentVisible, setPaymentVisible] = useState(false);
@@ -275,7 +280,8 @@ export default function AccountScreen() {
   return (
     <StyledSafeArea edges={["top"]}>
       <StyledScrollView
-        contentContainerStyle={{ paddingTop: 12, paddingBottom: 40 }}
+        contentContainerStyle={{ paddingTop: 16, paddingBottom: 48 }}
+        showsVerticalScrollIndicator={false}
       >
         {showLoading ? (
           <LoadingWrap>
@@ -292,7 +298,7 @@ export default function AccountScreen() {
           <>
             {customer && (
               <Section>
-                <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING }}>
+                <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING, borderRadius: ACCOUNT_CARD_RADIUS }}>
                   <UserHeader>
                     <Avatar>
                       <MaterialIcons name="person" size={24} color={colors.text} />
@@ -331,7 +337,7 @@ export default function AccountScreen() {
                   return (
                     <CategorySection key={type}>
                       <CategoryTitle>{getAccountTypeLabel(type, t)}</CategoryTitle>
-                      <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING }}>
+                      <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING, borderRadius: ACCOUNT_CARD_RADIUS }}>
                         {typeAccounts.map((account, accountIndex) => (
                             <AccountItemWrap key={account.id}>
                               <AccountRow activeOpacity={0.7}>
@@ -339,7 +345,7 @@ export default function AccountScreen() {
                                   <AccountIcon>
                                     <MaterialIcons
                                       name="account-balance-wallet"
-                                      size={20}
+                                      size={22}
                                       color={colors.text}
                                     />
                                   </AccountIcon>
@@ -358,7 +364,7 @@ export default function AccountScreen() {
                                   )}
                                 </AccountRight>
                               </AccountRow>
-                              {accountIndex < typeAccounts.length - 1 && <Separator indent={60} />}
+                              {accountIndex < typeAccounts.length - 1 && <Separator indent={ACTION_INDENT} />}
                             </AccountItemWrap>
                           ))}
                       </CardBordered>
@@ -372,7 +378,7 @@ export default function AccountScreen() {
               <SectionHeader>
                 <SectionTitle>{walletInfo?.isConnected ? t("blockchain.wallet") : t("blockchain.connectWallet")}</SectionTitle>
               </SectionHeader>
-              <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING }}>
+              <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING, borderRadius: ACCOUNT_CARD_RADIUS }}>
                 <WalletConnectButton />
               </CardBordered>
             </Section>
@@ -381,63 +387,67 @@ export default function AccountScreen() {
               <SectionHeader>
                 <SectionTitle>{t("account.actions")}</SectionTitle>
               </SectionHeader>
-              <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING }}>
-                <ActionRow onPress={() => setRegisterVisible(true)} activeOpacity={0.7}>
-                  <ActionLeft>
-                    <MaterialIcons name="person-add" size={20} color={colors.text} />
-                    <ActionText>{t("account.register")}</ActionText>
-                  </ActionLeft>
-                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
-                </ActionRow>
-                <Separator indent={52} />
+              <CardBordered style={{ overflow: "hidden", padding: ACCOUNT_CARD_PADDING, borderRadius: ACCOUNT_CARD_RADIUS }}>
+                {!isAuthenticated && (
+                <>
+                  <ActionRow onPress={() => setRegisterVisible(true)} activeOpacity={0.7}>
+                    <ActionLeft>
+                      <MaterialIcons name="person-add" size={22} color={colors.text} />
+                      <ActionText>{t("account.register")}</ActionText>
+                    </ActionLeft>
+                        <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
+                  </ActionRow>
+                  <Separator />
+                </>
+                )}
                 <ActionRow onPress={() => setPaymentVisible(true)} activeOpacity={0.7}>
                   <ActionLeft>
-                    <MaterialIcons name="payment" size={20} color={colors.text} />
+                    <MaterialIcons name="payment" size={22} color={colors.text} />
                     <ActionText>{t("account.newPayment")}</ActionText>
                   </ActionLeft>
-                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
+                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
                 </ActionRow>
-                <Separator indent={52} />
+                <Separator />
                 <ActionRow onPress={() => { setTradePrefillDefaults(false); setTradeVisible(true); }} activeOpacity={0.7}>
                   <ActionLeft>
-                    <MaterialIcons name="trending-up" size={20} color={colors.text} />
+                    <MaterialIcons name="trending-up" size={22} color={colors.text} />
                     <ActionText>{t("account.newTrade")}</ActionText>
                   </ActionLeft>
-                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
+                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
                 </ActionRow>
-                <Separator indent={52} />
+                <Separator />
                 <ActionRow onPress={() => { setTradePrefillDefaults(true); setTradeVisible(true); }} activeOpacity={0.7}>
                   <ActionLeft>
-                    <MaterialIcons name="flash-on" size={20} color={colors.text} />
+                    <MaterialIcons name="flash-on" size={22} color={colors.text} />
                     <ActionText>{t("account.quickTrade")}</ActionText>
                   </ActionLeft>
-                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
+                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
                 </ActionRow>
-                <Separator indent={52} />
+                <Separator />
                 <ActionRow onPress={() => setEthTransferVisible(true)} activeOpacity={0.7}>
                   <ActionLeft>
-                    <MaterialIcons name="send" size={20} color={colors.text} />
+                    <MaterialIcons name="send" size={22} color={colors.text} />
                     <ActionText>{t("blockchain.sendEth")}</ActionText>
                   </ActionLeft>
-                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
+                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
                 </ActionRow>
-                <Separator indent={52} />
+                <Separator />
                 <ActionRow onPress={() => setSettingsVisible(true)} activeOpacity={0.7}>
                   <ActionLeft>
-                    <MaterialIcons name="settings" size={20} color={colors.text} />
+                    <MaterialIcons name="settings" size={22} color={colors.text} />
                     <ActionText>{t("account.settings")}</ActionText>
                   </ActionLeft>
-                  <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
+                  <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
                 </ActionRow>
                 {__DEV__ && (
                   <>
-                    <Separator indent={52} />
+                    <Separator />
                     <ActionRow onPress={() => router.push("/storybook")} activeOpacity={0.7}>
                       <ActionLeft>
-                        <MaterialIcons name="developer-mode" size={20} color={colors.text} />
+                        <MaterialIcons name="developer-mode" size={22} color={colors.text} />
                         <ActionText>Storybook</ActionText>
                       </ActionLeft>
-                      <MaterialIcons name="chevron-right" size={18} color={colors.textTertiary} />
+                        <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
                     </ActionRow>
                   </>
                 )}

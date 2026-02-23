@@ -1,0 +1,566 @@
+@startuml application-architecture-zh
+!define PRESENTATION_LAYER #E3F2FD
+!define BUSINESS_LAYER #F3E5F5
+!define DATA_LAYER #E8F5E9
+!define EXTERNAL #FFF3E0
+
+
+skinparam component {
+    BackgroundColor<<Presentation>> PRESENTATION_LAYER
+    BackgroundColor<<Business>> BUSINESS_LAYER
+    BackgroundColor<<Data>> DATA_LAYER
+    BackgroundColor<<External>> EXTERNAL
+    BorderColor #333333
+    ArrowColor #333333
+}
+
+title TOGAF 应用架构 - FinPulse 金融科技平台
+
+package "展示层 (Presentation Layer)" <<Presentation>> {
+    component "apps/web" as WebApp {
+        component "Next.js 16应用" as NextApp {
+            component "App Router" as AppRouter
+            component "Server Components" as ServerComponents
+            component "API Routes" as APIRoutes
+            component "布局组件" as Layout
+            component "主题提供者" as ThemeProvider
+        }
+    }
+
+    component "@fintech/ui" as UIComponent {
+        component "基础UI组件" as BaseUI
+        component "Radix UI原语" as RadixPrimitives
+    }
+
+    component "@fintech/finance-charts" as FinanceCharts {
+        component "K线图" as CandlestickChart
+        component "折线图" as LineChart
+        component "面积图" as AreaChart
+        component "成交量图" as VolumeChart
+        component "热力图" as HeatmapChart
+        component "仪表盘图" as GaugeChart
+        component "雷达图" as RadarChart
+        component "瀑布图" as WaterfallChart
+    }
+
+    component "数据可视化库" as ChartLibraries {
+        component "Recharts" as Recharts
+        component "Lightweight Charts" as LightweightCharts
+        component "Chart.js" as ChartJS
+        component "D3.js" as D3JS
+        component "React Sparklines" as Sparklines
+    }
+
+    component "表单管理" as FormMgmt {
+        component "ReactHookForm" as FormLibrary
+        component "Zod验证器" as Validator
+    }
+
+    component "apps/mobile-portfolio" as MobilePortfolio {
+        component "Expo + React Native" as ExpoRN
+        component "整洁架构" as CleanArch {
+            component "展示层" as PresentationLayer {
+                component "组件" as MobileComponents
+                component "Hooks" as MobileHooks
+                component "Redux Store" as MobileRedux
+                component "主题和国际化 (styled-components、useTheme、基元)" as MobileThemeI18n
+            }
+            component "应用层" as ApplicationLayer {
+                component "用例" as MobileUseCases
+                component "依赖注入容器" as DependencyContainer
+            }
+            component "领域层" as DomainLayer {
+                component "实体" as MobileEntities
+                component "仓库接口" as MobileRepoInterfaces
+            }
+            component "基础设施层" as InfrastructureLayer {
+                component "仓库实现" as MobileRepositories
+                component "API 客户端" as MobileApiClients
+                component "服务和工具" as MobileServicesUtils
+            }
+        }
+        component "股票屏幕" as StocksScreen {
+            component "StockListItem" as StockListItem
+            component "NativeSparkline" as NativeSparkline
+            component "useSymbolDisplayData" as UseSymbolDisplayData
+        }
+        component "NativeDemoCard (demo native card)" as NativeDemoCard {
+            component "iOS RCTViewManager" as NativeDemoCardIOS
+            component "Android SimpleViewManager" as NativeDemoCardAndroid
+        }
+        component "Native Charts" as NativeCharts {
+            component "NativeLineChart" as NLC
+            component "NativeCandleChart" as NCC
+            component "NativeAmericanLineChart" as NALC
+            component "NativeBaselineChart" as NBC
+            component "NativeHistogramChart" as NHC
+            component "NativeLineOnlyChart" as NLOC
+            component "iOS Metal (MTKView)" as NativeChartsIOS
+            component "Android OpenGL ES 3" as NativeChartsAndroid
+        }
+        component "原生图表支持 (OOP)" as NativeChartSupport {
+            component "iOS ChartSupport" as IOSChartSupport
+            component "iOS 基类" as IOSBaseClasses {
+                component "BaseChartViewManager" as IOSBaseViewManager
+                component "BaseChartView" as IOSBaseView
+                component "BaseChartRenderer" as IOSBaseRenderer
+            }
+            component "iOS OOP 辅助类" as IOSOOPHelpers {
+                component "ChartLayoutCalculator" as IOSLayoutCalc
+                component "ValueFormatter" as IOSValueFormatter
+                component "AxisLabelManager" as IOSAxisManager
+                component "ChartDataCalculator" as IOSDataCalc
+            }
+            component "iOS 共享工具" as IOSSharedUtils {
+                component "ChartCurve, ChartVertex" as IOSCurveVertex
+                component "ChartPipeline, ChartGrid" as IOSPipelineGrid
+                component "ChartThemes" as IOSThemes
+            }
+            component "Android view/chart/" as AndroidChartPkg
+            component "Android OOP 辅助类" as AndroidOOPHelpers {
+                component "ChartLayoutCalculator" as AndroidLayoutCalc
+                component "ValueFormatter" as AndroidValueFormatter
+                component "AxisLabelManager" as AndroidAxisManager
+                component "HistogramRenderer" as AndroidHistRenderer
+            }
+        }
+        component "Shared chart logic" as SharedChartLogic {
+            component "useScrollableChart" as UseScrollableChart
+            component "ScrollableChartContainer" as ScrollableChartContainer
+            component "chartTooltip" as ChartTooltip
+        }
+        component "react-native-wagmi-charts" as RNCharts
+    }
+    note right of MobilePortfolio: 整洁架构：展示层 → 应用层 → 领域层。\n基础设施层实现领域接口。\n通过 DependencyContainer 进行依赖注入。\n薄客户端：业务逻辑在服务器端。\n主题：styled-components（StyledThemeProvider、基元、useTheme 来自 useTheme.ts）。
+}
+
+package "业务逻辑层 (Business Layer)" <<Business>> {
+    package "金融计算包组" {
+        component "@fintech/calculations" as CalculationsPkg {
+            component "投资组合计算" as PortfolioCalc
+            component "收益计算" as ReturnsCalc
+            component "风险计算" as RiskCalc
+            component "格式化工具" as Formatters
+        }
+
+        component "@fintech/bond-calculations" as BondCalcPkg {
+            component "收益率计算(YTM)" as YieldCalc
+            component "久期计算" as DurationCalc
+            component "凸度计算" as ConvexityCalc
+            component "债券估值" as BondValuation
+        }
+
+        component "@fintech/options-pricing" as OptionsPkg {
+            component "Black-Scholes" as BlackScholes
+            component "二叉树模型" as Binomial
+            component "Greeks计算" as Greeks
+            component "隐含波动率" as ImpliedVol
+        }
+
+        component "@fintech/portfolio-optimization" as PortfolioOptPkg {
+            component "马科维茨优化" as Markowitz
+            component "有效前沿" as EfficientFrontier
+            component "权重约束" as Constraints
+            component "夏普比率" as SharpeRatio
+        }
+
+        component "@fintech/statistical-analysis" as StatisticalPkg {
+            component "相关性分析" as Correlation
+            component "CAPM模型" as CAPM
+            component "Fama-French" as FamaFrench
+            component "回归分析" as Regression
+        }
+
+        component "@fintech/technical-indicators" as TechnicalPkg {
+            component "移动平均" as MovingAverages
+            component "动量指标" as Momentum
+            component "波动率指标" as Volatility
+            component "成交量指标" as Volume
+        }
+
+        component "@fintech/valuation" as ValuationPkg {
+            component "DCF估值" as DCF
+            component "相对估值" as RelativeValuation
+            component "DDM模型" as DDM
+        }
+    }
+
+    package "基础设施包组" {
+        component "@fintech/aws" as AWSPkg {
+            component "S3客户端" as S3Client
+            component "DynamoDB客户端" as DynamoDBClient
+            component "Lambda客户端" as LambdaClient
+            component "SQS客户端" as SQSClient
+            component "SNS客户端" as SNSClient
+            component "API Gateway客户端" as APIGatewayClient
+            component "AWS配置" as AWSConfig
+        }
+
+        component "@fintech/performance" as PerformancePkg {
+            component "防抖" as Debounce
+            component "节流" as Throttle
+            component "懒加载" as Lazy
+            component "记忆化" as Memoize
+            component "性能监控" as PerformanceMonitor
+        }
+
+        component "@fintech/test-utils" as TestUtilsPkg {
+            component "测试工具" as TestUtils
+            component "Mock数据" as MockData
+        }
+
+        component "@fintech/utils" as UtilsPkg {
+            component "工具函数" as Utils
+        }
+
+        component "@fintech/bigdata" as BigDataPkg {
+            component "SparkClient" as SparkClient
+            component "FlinkClient" as FlinkClient
+            component "HDFSClient" as HDFSClient
+            component "YARNClient" as YARNClient
+            component "HTTP客户端" as HttpClient
+        }
+    }
+
+    package "应用业务模块" {
+        component "投资组合模块" as PortfolioModule {
+            component "投资组合控制器" as PortfolioController
+            component "资产配置服务" as AssetService
+        }
+
+        component "市场数据模块" as MarketModule {
+            component "市场数据控制器" as MarketController
+            component "趋势分析服务" as TrendService
+        }
+
+        component "交易模块" as TransactionModule {
+            component "交易控制器" as TransactionController
+            component "交易记录服务" as TransactionService
+        }
+
+        component "风险管理模块" as RiskModule {
+            component "风险控制器" as RiskController
+            component "风险分析服务" as RiskService
+        }
+
+        component "用户模块" as UserModule {
+            component "用户控制器" as UserController
+            component "偏好管理服务" as PreferenceService
+        }
+    }
+}
+
+package "数据访问层 (Data Access Layer)" <<Data>> {
+    component "AWS数据服务" as AWSDataService {
+        component "DynamoDB数据访问" as DynamoDBDAO
+        component "S3对象存储" as S3Storage
+        component "数据缓存" as Cache
+    }
+
+    component "状态管理" as StateMgmt {
+        component "React状态" as ReactState
+        component "上下文管理" as Context
+        component "服务器状态" as ServerState
+    }
+
+    component "数据访问对象" as DAO {
+        component "投资组合DAO" as PortfolioDAO
+        component "市场数据DAO" as MarketDAO
+        component "交易记录DAO" as TransactionDAO
+    }
+}
+
+package "外部服务层 (External Services)" <<External>> {
+    component "AWS云服务" as AWSServices {
+        component "Lambda函数" as LambdaService
+        component "SQS队列" as SQSService
+        component "SNS通知" as SNSService
+        component "API Gateway" as APIGatewayService
+    }
+
+    component "Vercel服务" as VercelServices {
+        component "Vercel Analytics" as Analytics
+        component "Vercel部署平台" as VercelPlatform
+    }
+
+    component "第三方API" as ThirdPartyAPI {
+        component "市场数据API" as MarketAPI
+        component "金融数据API" as FinanceAPI
+    }
+
+    component "Go API 网关 (port 8801)" as GoAPIGateway <<External>> {
+        component "认证 (login, register, me, logout, change-password)" as GoAuth
+        component "GET /quotes、GET /instruments" as GoQuotesInstruments
+        component "代理至 Python" as GoProxy
+        note right: 应用统一入口。\n未实现路由代理至 Python :8800。
+    }
+
+    component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
+        component "FastAPI app (Clean Architecture)" as FastAPIApp
+        component "composition.py、container、crud_helpers、api/config" as FastAPIStructure
+        component "GET /api/v1/portfolio, POST /seed, GET /api/v1/portfolio/risk-summary, GET /api/v1/portfolio/asset-allocation-by-account-type" as PortfolioGet
+        component "AI/ML（融入业务）" as AIMLAPI {
+            component "Payments → 欺诈检测" as AIML1
+            component "Trades → 监控" as AIML2
+            component "Customers → 身份" as AIML3
+            component "Risk-metrics → VaR、POST /risk-metrics/compute-batch" as AIML4
+        }
+        component "Analytics (ClickHouse)" as AnalyticsAPI {
+            component "GET /analytics/portfolio-risk" as AnalyticsRisk
+            component "GET /analytics/delta-info" as AnalyticsDelta
+            component "POST /forecast/model (MLflow)" as ForecastModel
+        }
+        component "Blockchain /api/v1/blockchain" as BlockchainAPI {
+            component "POST /transfers, GET /balances" as BlockchainTransfers
+            component "GET /blocks, GET /transactions" as BlockchainQuery
+        }
+        component "SQLAlchemy 2.0 + asyncpg + Alembic" as SQLAlchemyStack
+        component "TimescaleDB (portfolio + history)" as TimescaleDB
+        component "Redis (服务端缓存)" as RedisDB
+        component "ClickHouse (分析)" as ClickHouseDB
+        component "MinIO (S3, Faust/Spark)" as MinIOStorage
+        component "Kafka (portfolio.events)" as KafkaTopic
+    }
+
+    component "大数据服务层 (Big Data Service Layer)" as BigDataServiceLayer {
+        component "Java Spring Boot服务" as SpringBootService {
+            component "SparkService" as SparkService
+            component "FlinkService" as FlinkService
+            component "HadoopService" as HadoopService
+            component "SparkController" as SparkController
+            component "FlinkController" as FlinkController
+            component "HadoopController" as HadoopController
+        }
+        component "Spark库" as SparkLib
+        component "Flink库" as FlinkLib
+        component "Hadoop库" as HadoopLib
+    }
+}
+
+' API 接口定义
+interface "投资组合API" as PortfolioAPI
+interface "市场数据API" as MarketDataAPI
+interface "交易API" as TransactionAPI
+interface "风险分析API" as RiskAPI
+interface "Spark API" as SparkAPI
+interface "Flink API" as FlinkAPI
+interface "Hadoop API" as HadoopAPI
+
+' Mobile portfolio Clean Architecture
+ExpoRN --> CleanArch
+CleanArch --> PresentationLayer
+CleanArch --> ApplicationLayer
+CleanArch --> DomainLayer
+CleanArch --> InfrastructureLayer
+PresentationLayer --> ApplicationLayer
+ApplicationLayer --> DomainLayer
+InfrastructureLayer --> DomainLayer
+ApplicationLayer --> InfrastructureLayer
+PresentationLayer --> MobileComponents
+PresentationLayer --> MobileHooks
+PresentationLayer --> MobileRedux
+PresentationLayer --> MobileThemeI18n
+ApplicationLayer --> MobileUseCases
+ApplicationLayer --> DependencyContainer
+DomainLayer --> MobileEntities
+DomainLayer --> MobileRepoInterfaces
+InfrastructureLayer --> MobileRepositories
+InfrastructureLayer --> MobileApiClients
+InfrastructureLayer --> MobileServicesUtils
+MobileRepositories --> MobileRepoInterfaces
+MobileUseCases --> MobileRepoInterfaces
+DependencyContainer --> MobileRepositories
+DependencyContainer --> MobileUseCases
+MobileHooks --> DependencyContainer
+
+' Mobile portfolio native views
+ExpoRN --> StocksScreen
+StocksScreen --> StockListItem
+StockListItem --> NativeSparkline
+StocksScreen --> UseSymbolDisplayData
+ExpoRN --> NativeDemoCard
+NativeDemoCard --> NativeDemoCardIOS
+NativeDemoCard --> NativeDemoCardAndroid
+ExpoRN --> NativeCharts
+NativeCharts --> NativeChartSupport
+NativeChartSupport --> IOSChartSupport
+NativeChartSupport --> IOSBaseClasses
+IOSBaseClasses --> IOSBaseViewManager
+IOSBaseClasses --> IOSBaseView
+IOSBaseClasses --> IOSBaseRenderer
+IOSBaseView --> IOSBaseRenderer
+NativeChartSupport --> IOSOOPHelpers
+IOSOOPHelpers --> IOSLayoutCalc
+IOSOOPHelpers --> IOSValueFormatter
+IOSOOPHelpers --> IOSAxisManager
+IOSOOPHelpers --> IOSDataCalc
+NativeChartSupport --> IOSSharedUtils
+IOSSharedUtils --> IOSCurveVertex
+IOSSharedUtils --> IOSPipelineGrid
+IOSSharedUtils --> IOSThemes
+NativeChartSupport --> AndroidChartPkg
+NativeChartSupport --> AndroidOOPHelpers
+AndroidOOPHelpers --> AndroidLayoutCalc
+AndroidOOPHelpers --> AndroidValueFormatter
+AndroidOOPHelpers --> AndroidAxisManager
+AndroidOOPHelpers --> AndroidHistRenderer
+NativeCharts --> NLC
+NativeCharts --> NCC
+NativeCharts --> NALC
+NativeCharts --> NBC
+NativeCharts --> NHC
+NativeCharts --> NLOC
+NLC --> NativeChartsIOS
+NLC --> NativeChartsAndroid
+NCC --> NativeChartsIOS
+NCC --> NativeChartsAndroid
+NALC --> NativeChartsIOS
+NALC --> NativeChartsAndroid
+NBC --> NativeChartsIOS
+NBC --> NativeChartsAndroid
+NHC --> NativeChartsIOS
+NHC --> NativeChartsAndroid
+NLOC --> NativeChartsIOS
+NLOC --> NativeChartsAndroid
+ExpoRN --> SharedChartLogic
+NativeCharts --> SharedChartLogic
+MobilePortfolio --> RNCharts
+MobilePortfolio --> GoAPIGateway
+GoAPIGateway --> PortfolioAnalyticsAPI
+FastAPIApp --> FastAPIStructure
+FastAPIApp --> PortfolioGet
+FastAPIApp --> AIMLAPI
+FastAPIApp --> AnalyticsAPI
+AnalyticsAPI --> ClickHouseDB
+FastAPIApp --> BlockchainAPI
+FastAPIApp --> SQLAlchemyStack
+SQLAlchemyStack --> TimescaleDB
+FastAPIApp --> RedisDB
+FastAPIApp --> ClickHouseDB
+FastAPIApp --> MinIOStorage
+FastAPIApp --> KafkaTopic
+
+' 展示层内部关系
+NextApp --> AppRouter
+NextApp --> ServerComponents
+NextApp --> APIRoutes
+AppRouter --> Layout
+Layout --> ThemeProvider
+NextApp --> UIComponent
+NextApp --> FinanceCharts
+NextApp --> FormMgmt
+BaseUI --> RadixPrimitives
+FormLibrary --> Validator
+
+' 图表组件到图表库的依赖
+FinanceCharts --> Recharts
+FinanceCharts --> LightweightCharts
+FinanceCharts --> ChartJS
+FinanceCharts --> D3JS
+FinanceCharts --> Sparklines
+
+' 应用业务模块到计算包的依赖
+PortfolioModule --> CalculationsPkg
+PortfolioModule --> PortfolioOptPkg
+RiskModule --> CalculationsPkg
+RiskModule --> StatisticalPkg
+MarketModule --> TechnicalPkg
+MarketModule --> StatisticalPkg
+PortfolioModule --> ValuationPkg
+
+' 金融计算包组内部关系
+PortfolioCalc --> ReturnsCalc
+PortfolioCalc --> RiskCalc
+Markowitz --> EfficientFrontier
+Markowitz --> Constraints
+BlackScholes --> Greeks
+Binomial --> BlackScholes
+
+' 应用业务模块内部关系
+PortfolioController --> AssetService
+MarketController --> TrendService
+TransactionController --> TransactionService
+RiskController --> RiskService
+UserController --> PreferenceService
+
+' 应用业务模块到基础设施包
+PortfolioModule --> PerformancePkg
+MarketModule --> PerformancePkg
+TransactionModule --> PerformancePkg
+PortfolioModule --> AWSPkg
+MarketModule --> AWSPkg
+TransactionModule --> AWSPkg
+RiskModule --> AWSPkg
+UserModule --> AWSPkg
+PortfolioModule --> BigDataPkg
+MarketModule --> BigDataPkg
+RiskModule --> BigDataPkg
+
+' 大数据客户端到服务层
+BigDataPkg --> SpringBootService
+SparkClient --> HttpClient
+FlinkClient --> HttpClient
+HDFSClient --> HttpClient
+YARNClient --> HttpClient
+
+' 业务逻辑层到数据访问层
+PortfolioModule --> AWSDataService
+MarketModule --> AWSDataService
+TransactionModule --> AWSDataService
+RiskModule --> AWSDataService
+UserModule --> AWSDataService
+PortfolioModule --> DAO
+MarketModule --> DAO
+TransactionModule --> DAO
+
+PortfolioModule --> StateMgmt
+MarketModule --> StateMgmt
+TransactionModule --> StateMgmt
+
+' 数据访问层到外部服务
+AWSDataService --> DynamoDBDAO
+AWSDataService --> S3Storage
+DynamoDBDAO --> AWSPkg
+S3Storage --> AWSPkg
+AWSPkg --> LambdaService
+AWSPkg --> SQSService
+AWSPkg --> SNSService
+AWSPkg --> APIGatewayService
+
+AWSDataService --> MarketAPI
+NextApp --> Analytics
+NextApp --> VercelPlatform
+
+' 大数据服务层内部关系
+SpringBootService --> SparkService
+SpringBootService --> FlinkService
+SpringBootService --> HadoopService
+SparkController --> SparkService
+FlinkController --> FlinkService
+HadoopController --> HadoopService
+SparkService --> SparkLib
+FlinkService --> FlinkLib
+HadoopService --> HadoopLib
+
+' 展示层使用图表
+NextApp --> FinanceCharts
+FinanceCharts --> CalculationsPkg
+FinanceCharts --> TechnicalPkg
+
+' 业务逻辑层实现接口
+PortfolioModule ..> PortfolioAPI : implements
+MarketModule ..> MarketDataAPI : implements
+TransactionModule ..> TransactionAPI : implements
+RiskModule ..> RiskAPI : implements
+SpringBootService ..> SparkAPI : implements
+SpringBootService ..> FlinkAPI : implements
+SpringBootService ..> HadoopAPI : implements
+
+legend right
+    |<#E3F2FD> 展示层 | 用户界面和交互
+    |<#F3E5F5> 业务逻辑层 | 核心业务功能
+    |<#E8F5E9> 数据访问层 | 数据管理和访问
+    |<#FFF3E0> 外部服务 | 第三方服务和API
+endlegend
+
+@enduml

@@ -1,0 +1,361 @@
+@startuml application-architecture
+!define PRESENTATION_LAYER #E3F2FD
+!define BUSINESS_LAYER #F3E5F5
+!define DATA_LAYER #E8F5E9
+!define EXTERNAL #FFF3E0
+
+
+skinparam component {
+    BackgroundColor<<Presentation>> PRESENTATION_LAYER
+    BackgroundColor<<Business>> BUSINESS_LAYER
+    BackgroundColor<<Data>> DATA_LAYER
+    BackgroundColor<<External>> EXTERNAL
+    BorderColor #333333
+    ArrowColor #333333
+}
+
+title TOGAF Application Architecture - FinPulse Fintech Platform
+
+package "Presentation Layer" <<Presentation>> {
+    component "apps/web" as WebApp {
+        component "Angular 21 App" as AngularApp {
+            component "App Router" as AppRouter
+            component "Components" as Components
+            component "Services" as Services
+            component "Layout" as Layout
+        }
+    }
+
+    component "@fintech/ui" as UIComponent {
+        component "Base UI" as BaseUI
+        component "Radix UI Primitives" as RadixPrimitives
+    }
+
+    component "Chart Libraries (Web)" as ChartLibrariesWeb {
+        component "Chart.js" as ChartJS
+        component "ng2-charts" as Ng2Charts
+        component "chartjs-chart-financial" as ChartJSFinancial
+        component "ag-grid-angular" as AgGrid
+    }
+
+    component "apps/mobile-portfolio" as MobilePortfolio {
+        component "Expo + React Native" as ExpoRN
+        component "Clean Architecture" as CleanArch {
+            component "Presentation Layer" as PresentationLayer {
+                component "Components" as MobileComponents
+                component "Hooks" as MobileHooks
+                component "Redux Store" as MobileRedux
+                component "Theme & i18n (styled-components, useTheme, primitives)" as MobileThemeI18n
+            }
+            component "Application Layer" as ApplicationLayer {
+                component "Use Cases" as MobileUseCases
+                component "DependencyContainer" as DependencyContainer
+            }
+            component "Domain Layer" as DomainLayer {
+                component "Entities" as MobileEntities
+                component "Repository Interfaces" as MobileRepoInterfaces
+            }
+            component "Infrastructure Layer" as InfrastructureLayer {
+                component "Repositories" as MobileRepositories
+                component "API Clients" as MobileApiClients
+                component "Services & Utils" as MobileServicesUtils
+            }
+        }
+        component "Stocks screen" as StocksScreen {
+            component "StockListItem" as StockListItem
+            component "NativeSparkline" as NativeSparkline
+            component "useSymbolDisplayData" as UseSymbolDisplayData
+        }
+        component "NativeDemoCard (demo native card)" as NativeDemoCard {
+            component "iOS RCTViewManager" as NativeDemoCardIOS
+            component "Android SimpleViewManager" as NativeDemoCardAndroid
+        }
+        component "Native Charts" as NativeCharts {
+            component "NativeLineChart" as NLC
+            component "NativeCandleChart" as NCC
+            component "NativeAmericanLineChart" as NALC
+            component "NativeBaselineChart" as NBC
+            component "NativeHistogramChart" as NHC
+            component "NativeLineOnlyChart" as NLOC
+            component "iOS Metal (MTKView)" as NativeChartsIOS
+            component "Android OpenGL ES 3" as NativeChartsAndroid
+        }
+        component "Native chart support (OOP)" as NativeChartSupport {
+            component "iOS ChartSupport" as IOSChartSupport
+            component "iOS Base Classes" as IOSBaseClasses {
+                component "BaseChartViewManager" as IOSBaseViewManager
+                component "BaseChartView" as IOSBaseView
+                component "BaseChartRenderer" as IOSBaseRenderer
+            }
+            component "iOS OOP Helpers" as IOSOOPHelpers {
+                component "ChartLayoutCalculator" as IOSLayoutCalc
+                component "ValueFormatter" as IOSValueFormatter
+                component "AxisLabelManager" as IOSAxisManager
+                component "ChartDataCalculator" as IOSDataCalc
+            }
+            component "iOS Shared Utils" as IOSSharedUtils {
+                component "ChartCurve, ChartVertex" as IOSCurveVertex
+                component "ChartPipeline, ChartGrid" as IOSPipelineGrid
+                component "ChartThemes" as IOSThemes
+            }
+            component "Android view/chart/" as AndroidChartPkg
+            component "Android OOP Helpers" as AndroidOOPHelpers {
+                component "ChartLayoutCalculator" as AndroidLayoutCalc
+                component "ValueFormatter" as AndroidValueFormatter
+                component "AxisLabelManager" as AndroidAxisManager
+                component "HistogramRenderer" as AndroidHistRenderer
+            }
+        }
+        component "Shared chart logic" as SharedChartLogic {
+            component "useScrollableChart" as UseScrollableChart
+            component "ScrollableChartContainer" as ScrollableChartContainer
+            component "chartTooltip" as ChartTooltip
+        }
+        component "react-native-wagmi-charts" as RNCharts
+    }
+    note right of MobilePortfolio: Clean Architecture: Presentation → Application → Domain.\nInfrastructure implements Domain interfaces.\nDependency injection via DependencyContainer.\nThin client: business logic on server.\nTheme: styled-components (StyledThemeProvider, primitives, useTheme from useTheme.ts).
+}
+
+package "Business Layer" <<Business>> {
+    component "@fintech/utils" as UtilsPkg {
+        component "Utils" as Utils
+    }
+
+    package "Application Modules (Web)" {
+        component "Portfolio Module" as PortfolioModule {
+            component "Portfolio Controller" as PortfolioController
+            component "Asset Service" as AssetService
+        }
+
+        component "Market Module" as MarketModule {
+            component "Market Controller" as MarketController
+            component "Trend Service" as TrendService
+        }
+
+        component "Transaction Module" as TransactionModule {
+            component "Transaction Controller" as TransactionController
+            component "Transaction Service" as TransactionService
+        }
+
+        component "Risk Module" as RiskModule {
+            component "Risk Controller" as RiskController
+            component "Risk Service" as RiskService
+        }
+    }
+}
+
+package "Data Access Layer" <<Data>> {
+    component "HTTP Client" as HttpClient {
+        component "Portfolio API Client" as PortfolioAPIClient
+        component "Market Data Client" as MarketDataClient
+    }
+
+    component "State Management" as StateMgmt {
+        component "Angular Services" as AngularServices
+        component "RxJS" as RxJS
+    }
+}
+
+package "External Services" <<External>> {
+    component "Vercel" as VercelServices {
+        component "Vercel Analytics" as Analytics
+        component "Vercel Platform" as VercelPlatform
+    }
+
+    component "Third-party APIs" as ThirdPartyAPI {
+        component "Market Data API" as MarketAPI
+        component "Finance API" as FinanceAPI
+    }
+
+    component "Go API Gateway (port 8801)" as GoAPIGateway <<External>> {
+        component "Auth (login, register, me, logout, change-password)" as GoAuth
+        component "GET /quotes, GET /instruments" as GoQuotesInstruments
+        component "Proxy to Python" as GoProxy
+        note right: Single entry for app.\nProxies unimplemented routes to Python :8800.
+    }
+
+    component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
+        component "FastAPI app (Clean Architecture)" as FastAPIApp
+        component "composition.py, container, crud_helpers, api/config" as FastAPIStructure
+        component "GET /api/v1/portfolio, POST /seed, GET /api/v1/portfolio/risk-summary, GET /api/v1/portfolio/asset-allocation-by-account-type" as PortfolioGet
+        component "GET /api/v1/quotes, WebSocket /ws/quotes" as QuotesGet
+        component "MarketDataService + KafkaMarketDataProvider" as MarketDataServiceComponent
+        component "AI/ML (integrated)" as AIMLAPI {
+            component "Payments → fraud" as AIML1
+            component "Trades → surveillance" as AIML2
+            component "Customers → identity" as AIML3
+            component "Risk-metrics → VaR, POST /risk-metrics/compute-batch" as AIML4
+        }
+        component "Analytics (ClickHouse)" as AnalyticsAPI {
+            component "GET /analytics/portfolio-risk" as AnalyticsRisk
+            component "GET /analytics/delta-info" as AnalyticsDelta
+            component "POST /forecast/model (MLflow)" as ForecastModel
+        }
+        component "Blockchain /api/v1/blockchain" as BlockchainAPI {
+            component "POST /transfers, GET /balances" as BlockchainTransfers
+            component "GET /blocks, GET /transactions" as BlockchainQuery
+        }
+        component "SQLAlchemy 2.0 + asyncpg + Alembic" as SQLAlchemyStack
+        component "TimescaleDB (portfolio + history)" as TimescaleDB
+        component "Redis (server-side cache)" as RedisDB
+        component "ClickHouse (analytics)" as ClickHouseDB
+        component "MinIO (S3, Faust/Spark)" as MinIOStorage
+        component "Kafka (portfolio.events)" as KafkaTopic
+        component "Kafka (market.quotes.enriched)" as KafkaQuotesTopic
+    }
+
+}
+
+interface "Portfolio API" as PortfolioAPI
+interface "Market Data API" as MarketDataAPI
+interface "Transaction API" as TransactionAPI
+interface "Risk API" as RiskAPI
+
+' Mobile portfolio Clean Architecture
+ExpoRN --> CleanArch
+CleanArch --> PresentationLayer
+CleanArch --> ApplicationLayer
+CleanArch --> DomainLayer
+CleanArch --> InfrastructureLayer
+PresentationLayer --> ApplicationLayer
+ApplicationLayer --> DomainLayer
+InfrastructureLayer --> DomainLayer
+ApplicationLayer --> InfrastructureLayer
+PresentationLayer --> MobileComponents
+PresentationLayer --> MobileHooks
+PresentationLayer --> MobileRedux
+PresentationLayer --> MobileThemeI18n
+ApplicationLayer --> MobileUseCases
+ApplicationLayer --> DependencyContainer
+DomainLayer --> MobileEntities
+DomainLayer --> MobileRepoInterfaces
+InfrastructureLayer --> MobileRepositories
+InfrastructureLayer --> MobileApiClients
+InfrastructureLayer --> MobileServicesUtils
+MobileRepositories --> MobileRepoInterfaces
+MobileUseCases --> MobileRepoInterfaces
+DependencyContainer --> MobileRepositories
+DependencyContainer --> MobileUseCases
+MobileHooks --> DependencyContainer
+
+' Mobile portfolio native views
+ExpoRN --> StocksScreen
+StocksScreen --> StockListItem
+StockListItem --> NativeSparkline
+StocksScreen --> UseSymbolDisplayData
+ExpoRN --> NativeDemoCard
+NativeDemoCard --> NativeDemoCardIOS
+NativeDemoCard --> NativeDemoCardAndroid
+ExpoRN --> NativeCharts
+NativeCharts --> NativeChartSupport
+NativeChartSupport --> IOSChartSupport
+NativeChartSupport --> IOSBaseClasses
+IOSBaseClasses --> IOSBaseViewManager
+IOSBaseClasses --> IOSBaseView
+IOSBaseClasses --> IOSBaseRenderer
+IOSBaseView --> IOSBaseRenderer
+NativeChartSupport --> IOSOOPHelpers
+IOSOOPHelpers --> IOSLayoutCalc
+IOSOOPHelpers --> IOSValueFormatter
+IOSOOPHelpers --> IOSAxisManager
+IOSOOPHelpers --> IOSDataCalc
+NativeChartSupport --> IOSSharedUtils
+IOSSharedUtils --> IOSCurveVertex
+IOSSharedUtils --> IOSPipelineGrid
+IOSSharedUtils --> IOSThemes
+NativeChartSupport --> AndroidChartPkg
+NativeChartSupport --> AndroidOOPHelpers
+AndroidOOPHelpers --> AndroidLayoutCalc
+AndroidOOPHelpers --> AndroidValueFormatter
+AndroidOOPHelpers --> AndroidAxisManager
+AndroidOOPHelpers --> AndroidHistRenderer
+NativeCharts --> NLC
+NativeCharts --> NCC
+NativeCharts --> NALC
+NativeCharts --> NBC
+NativeCharts --> NHC
+NativeCharts --> NLOC
+NLC --> NativeChartsIOS
+NLC --> NativeChartsAndroid
+NCC --> NativeChartsIOS
+NCC --> NativeChartsAndroid
+NALC --> NativeChartsIOS
+NALC --> NativeChartsAndroid
+NBC --> NativeChartsIOS
+NBC --> NativeChartsAndroid
+NHC --> NativeChartsIOS
+NHC --> NativeChartsAndroid
+NLOC --> NativeChartsIOS
+NLOC --> NativeChartsAndroid
+ExpoRN --> SharedChartLogic
+NativeCharts --> SharedChartLogic
+MobilePortfolio --> RNCharts
+MobilePortfolio --> GoAPIGateway
+GoAPIGateway --> PortfolioAnalyticsAPI
+GoAPIGateway --> QuotesWS
+FastAPIApp --> FastAPIStructure
+FastAPIApp --> PortfolioGet
+FastAPIApp --> QuotesGet
+FastAPIApp --> QuotesWS
+FastAPIApp --> AIMLAPI
+FastAPIApp --> AnalyticsAPI
+AnalyticsAPI --> ClickHouseDB
+FastAPIApp --> BlockchainAPI
+FastAPIApp --> SQLAlchemyStack
+SQLAlchemyStack --> TimescaleDB
+FastAPIApp --> RedisDB
+FastAPIApp --> ClickHouseDB
+FastAPIApp --> MinIOStorage
+FastAPIApp --> KafkaTopic
+FastAPIApp --> MarketDataServiceComponent
+MarketDataServiceComponent --> KafkaQuotesTopic
+
+AngularApp --> AppRouter
+AngularApp --> Components
+AngularApp --> Services
+AppRouter --> Layout
+WebApp --> UIComponent
+WebApp --> ChartLibrariesWeb
+BaseUI --> RadixPrimitives
+ChartLibrariesWeb --> ChartJS
+ChartLibrariesWeb --> Ng2Charts
+Ng2Charts --> ChartJS
+ChartJSFinancial --> ChartJS
+
+PortfolioController --> AssetService
+MarketController --> TrendService
+TransactionController --> TransactionService
+RiskController --> RiskService
+
+WebApp --> PortfolioModule
+WebApp --> MarketModule
+WebApp --> TransactionModule
+WebApp --> RiskModule
+PortfolioModule --> UtilsPkg
+MarketModule --> UtilsPkg
+RiskModule --> UtilsPkg
+
+PortfolioModule --> HttpClient
+MarketModule --> HttpClient
+TransactionModule --> HttpClient
+RiskModule --> HttpClient
+
+PortfolioModule --> StateMgmt
+MarketModule --> StateMgmt
+TransactionModule --> StateMgmt
+
+HttpClient --> PortfolioAnalyticsAPI
+HttpClient --> ThirdPartyAPI
+WebApp --> VercelServices
+
+PortfolioAnalyticsAPI ..> PortfolioAPI : implements
+ThirdPartyAPI ..> MarketDataAPI : consumes
+
+legend right
+    |<#E3F2FD> Presentation | UI and interaction
+    |<#F3E5F5> Business Layer | Core business
+    |<#E8F5E9> Data Access | Data management
+    |<#FFF3E0> External | Third-party services
+endlegend
+
+@enduml

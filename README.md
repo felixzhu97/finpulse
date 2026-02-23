@@ -66,8 +66,8 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 ### Frontend Frameworks
 
-- **Angular 21** - Web analytics console (`apps/web`)
-- **React Native + Expo** - Mobile apps (`apps/mobile`, `apps/mobile-portfolio`)
+- **Angular 21** - Web analytics console (`apps/web`, package `finpulse-web`)
+- **React Native + Expo** - Mobile app (`apps/mobile-portfolio`)
 - **React 19.2** - UI components and shared libraries
 - **TypeScript 5.0** - Type safety
 
@@ -78,12 +78,13 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 ### Backend Services
 
-- **Python 3.10+ + FastAPI** - Portfolio analytics API (`services/portfolio-analytics`), port 8800. Clean Architecture: `composition.py` (lifespan), `container` (service factories), `crud_helpers` (generic CRUD), `api/config` (cache constants); SQLAlchemy 2.0 + asyncpg; Alembic migrations; config via `.env`. REST resources under `/api/v1/*` with **batch create** (`POST .../batch`) for seeding.
+- **Python 3.10+ + FastAPI** - Portfolio analytics API (`apps/portfolio-analytics`), port 8800. Clean Architecture: `composition.py` (lifespan), `container` (service factories), `crud_helpers` (generic CRUD), `api/config` (cache constants); SQLAlchemy 2.0 + asyncpg; Alembic migrations; config via `.env`. REST resources under `/api/v1/*` with **batch create** (`POST .../batch`) for seeding.
+- **Go** - API gateway (`apps/portfolio-api-go`), port 8801. Serves auth, quotes, instruments; proxies all other routes to Python (8800). Single entry for the app when using `pnpm run start:server`.
 - **TimescaleDB (PostgreSQL)** - Portfolio metadata and time-series history (hypertable); Docker, host port 5433
 - **Redis** - Cache for portfolio history (Docker, port 6379)
 - **Apache Kafka** - Event messaging for portfolio events and real-time market data (Docker, port 9092)
 - **AI/ML** - Integrated into business flows (no standalone AI router): `POST /payments` returns fraud detection; `POST /trades` returns surveillance alerts; `POST /customers` returns identity score; `POST /risk-metrics/compute` computes VaR from portfolio history. Optional: Ollama, Hugging Face, TensorFlow for future integrations.
-- **One-click start** - `pnpm run start:backend` (Docker + API + seed). Seed script uses batch APIs to minimise requests. **API tests** - `pnpm run test:api` (pytest; Ollama/HF/TF tests may skip if services unavailable; Hugging Face first run can take 1–3 min).
+- **One-click start** - `pnpm run start:server` (Docker + API + seed). Seed script uses batch APIs to minimise requests. **API tests** - `pnpm run test:api` (Python pytest); `pnpm run test:api:go` (Go API unit tests). Ollama/HF/TF tests may skip if services unavailable; Hugging Face first run can take 1–3 min.
 
 ### UI & Visualization
 
@@ -112,10 +113,10 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 
 This project uses a **monorepo** architecture managed with pnpm workspaces:
 
-- **apps/web** - Angular-based financial analytics web console.
-- **apps/mobile** - React Native demo mobile app.
+- **apps/web** - Angular-based financial analytics web console (package name: `finpulse-web`).
 - **apps/mobile-portfolio** - React Native (Expo) mobile app for portfolio overview and metrics; **Stocks** screen with real-time prices and per-stock sparklines (NativeSparkline, useSymbolDisplayData); **Account** tab with Quick trade, Send ETH (real Ethereum via Sepolia testnet by default), Connect/Disconnect wallet (Redux web3 slice, web3Service). Quote history uses **batch API** (`getQuotesHistoryBatch`) for fewer requests. Native views **NativeDemoCard** and six native charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Native code follows OOP principles: iOS uses **ChartSupport** (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes) and OOP helper classes; Android uses **view/chart/**, **view/sparkline/**, **view/democard/**. Charts support theme (light/dark), tooltips, x-axis labels, full-width rendering, and horizontal drag-to-scroll via `useScrollableChart` and `ScrollableChartContainer`.
-- **services/portfolio-analytics** - Python FastAPI backend (Clean Architecture: composition, container, crud_helpers); PostgreSQL; Kafka; REST resources + batch create; AI/ML (VaR, fraud, surveillance, sentiment, identity, forecast); config via `.env.example`; `pnpm run start:backend`; `pnpm run test:api`.
+- **apps/portfolio-analytics** - Python FastAPI backend (Clean Architecture: composition, container, crud_helpers); PostgreSQL; Kafka; REST resources + batch create; AI/ML (VaR, fraud, surveillance, sentiment, identity, forecast); config via `.env.example`; `pnpm run start:server`; `pnpm run test:api`.
+- **apps/portfolio-api-go** - Go non-AI API (health, quotes, instruments); same DB as portfolio-analytics; port 8801.
 - **packages/ui** - Shared UI component library.
 - **packages/utils** - Shared utility function library.
 
@@ -132,7 +133,8 @@ Benefits of this architecture:
 - Node.js 18+
 - pnpm 10.6.0+ (required, project uses pnpm workspaces)
 - Python 3.10+ (for backend FastAPI service)
-- Docker (for PostgreSQL and Kafka when using `pnpm run start:backend`)
+- Go 1.22+ (optional, for `apps/portfolio-api-go`)
+- Docker (for PostgreSQL and Kafka when using `pnpm run start:server`)
 
 ### Install Dependencies
 
@@ -142,6 +144,8 @@ pnpm install
 ```
 
 pnpm will automatically recognize the `pnpm-workspace.yaml` configuration and install dependencies for all workspaces.
+
+**Root scripts** (from repo root): `dev` (web), `dev:mobile-portfolio`, `dev:mobile-portfolio:ios`, `dev:mobile-portfolio:android`, `start:server` (Docker + Python :8800 + Go gateway :8801 + seed; app uses Go as single entry), `start:server:go` (Go API only), `start:kafka`, `build`, `start`, `test` (= test:api), `test:api` (Python pytest), `test:api:go` (Go tests), `lint`, `stop:backend`.
 
 ### Development Mode
 
@@ -177,15 +181,15 @@ Native UI: **iOS** `ios/mobileportfolio/` — ChartSupport (ChartCurve, ChartVer
 **One-click start (from repo root):**
 
 ```bash
-pnpm run start:backend
+pnpm run start:server
 ```
 
-This starts Docker (PostgreSQL + Kafka), the portfolio-analytics API at `http://127.0.0.1:8800`, and seeds the database. Logs: `tail -f /tmp/portfolio-api.log`.
+This starts Docker (PostgreSQL + Kafka), the Python API at `http://127.0.0.1:8800`, then the Go gateway at `http://127.0.0.1:8801` (proxies unimplemented routes to Python), and seeds via Go. **Use `http://127.0.0.1:8801` as the single entry** in the app. Logs: `tail -f /tmp/portfolio-api.log` (Python), `tail -f /tmp/portfolio-api-go.log` (Go).
 
 **Manual setup:**
 
 ```bash
-cd services/portfolio-analytics
+cd apps/portfolio-analytics
 cp .env.example .env   # optional: edit .env for DB, Kafka, Ollama, HF model
 docker compose up -d
 python -m venv .venv
@@ -194,9 +198,9 @@ pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8800 --reload
 ```
 
-Run API tests: `pnpm run test:api` (from repo root) or `pytest tests -v` from `services/portfolio-analytics` with venv active.
+Run API tests: `pnpm run test:api` (Python) or `pnpm run test:api:go` (Go) from repo root; or `pytest tests -v` / `go test ./cmd/server -v` from the respective service directory.
 
-From repo root: `pnpm dev:api` runs the API (requires venv and Docker). Then run `pnpm generate-seed-data` to seed. The mobile portfolio app uses `http://localhost:8800` by default (`GET /api/v1/portfolio`). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data.
+`pnpm run start:server` starts Docker, Python (8800), and Go gateway (8801), then runs the seed script. The mobile app uses `http://localhost:8801` by default (single entry; Go handles auth, quotes, instruments and proxies portfolio/customers etc. to Python). Run `pnpm dev:mobile-portfolio` and pull-to-refresh to load data. To seed manually: `PORTFOLIO_API_URL=http://127.0.0.1:8801 node scripts/seed/generate-seed-data.js`.
 
 ### Real-time market data (DB + WebSocket)
 
@@ -217,7 +221,7 @@ Quick local setup:
 
 ```bash
 # 1) Start backend (Docker: Postgres, Redis; API with built-in mock quote writer)
-pnpm run start:backend
+pnpm run start:server
 
 # 2) Start mobile portfolio
 pnpm dev:mobile-portfolio:ios
@@ -225,14 +229,25 @@ pnpm dev:mobile-portfolio:ios
 
 No Kafka is required for real-time quotes; the mock writer persists data to the DB automatically when the API starts.
 
+### Backend service (Go, non-AI)
+
+Go gateway (start:server runs it; single entry :8801, proxies to Python :8800):
+
+```bash
+pnpm run start:server:go
+```
+
+From `apps/portfolio-api-go`: `make deps` then `go run ./cmd/server` (or `make build` and `./bin/server`). Run Go API tests: `pnpm run test:api:go`.
+
 ### Build Production Version
 
 ```bash
 # Build web application
 pnpm build
 
-# Or build all packages
-pnpm --filter "./apps/*" build
+# Or build app(s)
+pnpm --filter finpulse-web build
+pnpm --filter mobile-portfolio build
 
 # Start production server
 pnpm start
@@ -244,15 +259,16 @@ pnpm start
 # Run ESLint (in web application)
 pnpm lint
 
-# Or run lint for all packages
-pnpm --filter "./apps/*" lint
+# Or run lint for specific app
+pnpm --filter finpulse-web lint
 ```
 
 ### Workspace Scripts
 
 ```bash
 # Run scripts in specific packages
-pnpm --filter web <script>
+pnpm --filter finpulse-web <script>
+pnpm --filter mobile-portfolio <script>
 pnpm --filter @fintech/ui <script>
 pnpm --filter @fintech/utils <script>
 
@@ -269,17 +285,18 @@ pnpm list -r
 
 ```bash
 # Add dependencies to specific packages
-pnpm --filter web add <package>
+pnpm --filter finpulse-web add <package>
+pnpm --filter mobile-portfolio add <package>
 pnpm --filter @fintech/ui add <package>
 pnpm --filter @fintech/utils add <package>
 
 # Add dev dependencies
-pnpm --filter web add -D <package>
+pnpm --filter finpulse-web add -D <package>
 ```
 
 #### Adding Dependencies Between Packages
 
-If `apps/web` needs to use `@fintech/ui`, simply add to `apps/web/package.json`:
+If the web app (`apps/web`, package name `finpulse-web`) needs to use `@fintech/ui`, add to `apps/web/package.json`:
 
 ```json
 {
@@ -305,30 +322,25 @@ pnpm --filter @fintech/utils type-check
 ## 📁 Project Structure
 
 ```
-fintech-project/
+finpulse/
 ├── apps/
-│   ├── web/                      # Angular financial analytics web app
-│   ├── mobile/                   # React Native mobile demo app
-│   └── mobile-portfolio/         # React Native portfolio overview mobile app
+│   ├── web/                      # Angular financial analytics web app (finpulse-web)
+│   ├── mobile-portfolio/         # React Native (Expo) portfolio mobile app
+│   ├── portfolio-analytics/      # Python FastAPI, PostgreSQL, Kafka, AI/ML
+│   └── portfolio-api-go/         # Go (Gin) non-AI API; DDD; same DB; port 8801
 ├── scripts/
-│   ├── backend/start-backend.sh # One-click: Docker (Postgres + Kafka) + API + seed
-│   ├── seed/generate-seed-data.js   # Seed via batch APIs; dedupeInstrumentsBySymbol for unique symbols (run by start:backend or after API is up)
-│   └── db/                        # Schema and seed SQL for fintech ER database
-├── services/
-│   └── portfolio-analytics/    # FastAPI, PostgreSQL, Kafka (DDD)
+│   ├── backend/start-backend.sh  # One-click: Docker (Postgres, Kafka) + Python API + seed
+│   ├── seed/generate-seed-data.js # Seed via batch APIs (run by start:server or manually)
+│   └── db/                       # Schema and seed SQL
 ├── packages/
-│   ├── ui/                       # UI component library (@fintech/ui)
-│   └── utils/                    # Utility function library (@fintech/utils)
-├── docs/                         # Documentation (en/ and zh/)
-│   ├── en/                       # English docs
-│   │   ├── architecture/         # TOGAF architecture diagrams (PlantUML)
-│   │   ├── domain/               # Finance system domain views
-│   │   └── er-diagram/           # Entity-relationship diagram
-│   └── zh/                       # Chinese docs (架构、领域、ER 图)
-├── package.json                  # Root package.json (workspaces configuration)
-├── pnpm-workspace.yaml           # pnpm workspaces configuration
-├── pnpm-lock.yaml                # Dependency lock file
-└── tsconfig.json                 # Root TypeScript configuration
+│   ├── ui/                       # Shared UI (@fintech/ui)
+│   └── utils/                    # Shared utils (@fintech/utils)
+├── docs/
+│   ├── en/                       # English: togaf/, c4/, domain/, er-diagram/
+│   └── zh/                       # Chinese: 架构、C4、领域、ER 图
+├── package.json
+├── pnpm-workspace.yaml
+└── pnpm-lock.yaml
 ```
 
 ### Package Descriptions
@@ -347,14 +359,14 @@ Shared utility function library containing common utility functions (such as `cn
 
 ## 📚 Documentation
 
-- **TOGAF Architecture** – `docs/en/togaf/` (English), `docs/zh/togaf/` (中文) – Business, Application, Data, and Technology architecture diagrams (PlantUML)
-- **C4 Model** – `docs/en/c4/` (English), `docs/zh/c4/` (中文) – C4 architecture diagrams (PlantUML)
-- **ER Diagram** – `docs/en/er-diagram/`, `docs/zh/er-diagram/` – Entity-relationship diagram for the fintech data model
+- **TOGAF Architecture** – `docs/en/rd/togaf/` (English), `docs/zh/rd/togaf/` (中文) – Business, Application, Data, and Technology architecture diagrams (PlantUML)
+- **C4 Model** – `docs/en/rd/c4/` (English), `docs/zh/rd/c4/` (中文) – C4 architecture diagrams (PlantUML)
+- **ER Diagram** – `docs/en/data/er-diagram/`, `docs/zh/data/er-diagram/` – Entity-relationship diagram for the fintech data model
 - **TODO** – `docs/en/TODO.md`, `docs/zh/TODO.md` – Cross-cutting TODO list for architecture, web, mobile, and shared packages
 
 ## 🗺️ Roadmap & TODO
 
-High-level tasks and roadmap items for the whole monorepo are tracked in `docs/en/TODO.md` and `docs/zh/TODO.md`. Before each significant release, review those files together with the architecture documents under `docs/en/togaf`, `docs/en/c4`, `docs/zh/togaf`, and `docs/zh/c4` and update items as work is completed.
+High-level tasks and roadmap items for the whole monorepo are tracked in `docs/en/TODO.md` and `docs/zh/TODO.md`. Before each significant release, review those files together with the architecture documents under `docs/en/rd/togaf`, `docs/en/rd/c4`, `docs/zh/rd/togaf`, and `docs/zh/rd/c4` and update items as work is completed.
 
 ## 🎨 Design Features
 

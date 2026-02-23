@@ -35,11 +35,11 @@ const StyledScrollView = styled(ScrollView)`
 
 const ContentWrap = styled.View`
   padding-horizontal: 16px;
-  padding-bottom: 32px;
+  padding-bottom: 48px;
 `;
 
 const Section = styled.View`
-  margin-top: 24px;
+  margin-top: 32px;
 `;
 
 const SectionHeader = styled.View`
@@ -50,6 +50,8 @@ const NativeChartWrapper = styled.View`
   height: 200px;
   margin-bottom: 12px;
 `;
+
+const CARD_RADIUS = 16;
 
 export default function DashboardScreen() {
   const { isDark, colors } = useTheme();
@@ -102,8 +104,9 @@ export default function DashboardScreen() {
         </HeaderTitleBlock>
       </ScreenHeader>
       <StyledScrollView
-        contentContainerStyle={{ paddingBottom: 32 }}
+        contentContainerStyle={{ paddingBottom: 48 }}
         scrollEnabled={!chartScrollLock}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={loading}
@@ -144,7 +147,7 @@ export default function DashboardScreen() {
             />
           </Section>
           <Section>
-            <ChartCard>
+            <ChartCard style={{ borderRadius: CARD_RADIUS, padding: 20 }}>
               <ChartCardTitle>{t("dashboard.netWorthNativeChart")}</ChartCardTitle>
               <NativeChartWrapper>
                 <NativeLineChart

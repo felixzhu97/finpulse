@@ -1,4 +1,5 @@
 import { getBaseUrl } from "./config";
+import { getAuthToken } from "./authBridge";
 
 interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
@@ -25,12 +26,17 @@ class HttpClient {
       if (isDev) {
         console.log(`[API] ${method} ${path}`);
       }
+      const token = getAuthToken();
+      const requestHeaders: Record<string, string> = {
+        "Content-Type": "application/json",
+        ...headers,
+      };
+      if (token) {
+        requestHeaders["Authorization"] = `Bearer ${token}`;
+      }
       const response = await fetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          ...headers,
-        },
+        headers: requestHeaders,
         body: body ? JSON.stringify(body) : undefined,
       });
 

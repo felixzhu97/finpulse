@@ -1,0 +1,304 @@
+@startuml technology-architecture
+!define FRONTEND #E3F2FD
+!define BUILD #F3E5F5
+!define DEPLOY #E8F5E9
+!define INFRA #FFF3E0
+
+skinparam component {
+    BackgroundColor<<Frontend>> FRONTEND
+    BackgroundColor<<Build>> BUILD
+    BackgroundColor<<Deploy>> DEPLOY
+    BackgroundColor<<Infra>> INFRA
+    BorderColor #333333
+    ArrowColor #333333
+}
+
+title TOGAF Technology Architecture - FinPulse Fintech Platform
+
+package "Web Front-end Stack" <<Frontend>> {
+    component "Angular 21.1" as Angular
+    component "TypeScript 5" as TypeScript
+    component "Tailwind CSS 4.1.9" as Tailwind
+    
+    note right of Angular
+        <b>Web application</b>
+        - Angular CLI
+        - Routing
+        - Components, Services
+        - RxJS
+    end note
+    
+    note right of TypeScript: Type safety\nStatic check, strict
+    note right of Tailwind: Utility-first CSS\nResponsive, PostCSS 4.x
+}
+
+package "UI Framework & Components" <<Frontend>> {
+    component "Radix UI" as RadixUI {
+        component "Button" as RadixButton
+        component "Card" as RadixCard
+        component "Dropdown" as RadixDropdown
+        component "Input" as RadixInput
+        note right: Unstyled primitives\n@fintech/ui, Accessibility
+    }
+    component "Tailwind CSS" as TailwindUI
+    component "ag-grid-angular 33.0" as AgGrid
+    
+    note right of TailwindUI: Styling\nResponsive, utility-first
+    note right of AgGrid: Data grid\nTables, sorting, filtering
+}
+
+package "Web Data Visualization" <<Frontend>> {
+    component "Chart.js 4.4.3" as ChartJS
+    component "ng2-charts 8.0" as Ng2Charts
+    component "chartjs-chart-financial 0.2" as ChartJSFinancial
+    
+    note right of ChartJS: General charts\nThemes
+    note right of Ng2Charts: Angular wrapper\nChart.js bindings
+    note right of ChartJSFinancial: Candlestick\nFinancial charts
+}
+
+package "Mobile (React Native / Expo)" <<Frontend>> {
+    component "Expo 54" as Expo
+    component "React Native 0.81" as RN
+    component "react-native-wagmi-charts" as RNWagmi
+    component "NativeDemoCard (demo card)" as NativeDemoCardTech {
+        component "iOS RCTViewManager" as NativeDemoCardIOSTech
+        component "Android SimpleViewManager" as NativeDemoCardAndroidTech
+    }
+    component "Native Charts" as NativeChartsTech {
+        component "iOS Metal (MTKView)" as NativeChartsIOSTech
+        component "Android OpenGL ES 3" as NativeChartsAndroidTech
+    }
+    component "Native OOP support" as NativeOOPSupport {
+        component "iOS ChartSupport" as IOSChartSupportTech
+        component "iOS OOP Helpers" as IOSOOPHelpersTech {
+            component "ChartLayoutCalculator" as IOSLayoutCalcTech
+            component "ValueFormatter" as IOSValueFormatterTech
+            component "AxisLabelManager" as IOSAxisManagerTech
+            component "ChartRenderer" as IOSChartRendererTech
+            component "ChartDataCalculator" as IOSDataCalcTech
+            component "HistogramRenderer" as IOSHistRendererTech
+        }
+        component "Android view/chart, sparkline, democard" as AndroidPkgsTech
+        component "Android OOP Helpers" as AndroidOOPHelpersTech {
+            component "ChartLayoutCalculator" as AndroidLayoutCalcTech
+            component "ValueFormatter" as AndroidValueFormatterTech
+            component "AxisLabelManager" as AndroidAxisManagerTech
+            component "HistogramRenderer" as AndroidHistRendererTech
+        }
+    }
+    component "Shared chart logic" as SharedChartLogicTech {
+        component "useScrollableChart" as UseScrollableChartTech
+        component "ScrollableChartContainer" as ScrollableChartContainerTech
+        component "chartTooltip" as ChartTooltipTech
+    }
+    component "styled-components" as StyledComponentsTech
+    note right of StyledComponentsTech: Theme-aware UI\nStyledThemeProvider, primitives\nuseTheme (useTheme.ts)
+    note right of Expo: Expo SDK\nMetro, prebuild\niOS/Android
+    note right of RN: React Native core\nrequireNativeComponent\nView managers
+    note right of NativeDemoCardTech: apps/mobile-portfolio\nDemo native card
+    note right of NativeChartsTech: LineChart, CandleChart\nAmericanLineChart, BaselineChart\nHistogramChart, LineOnlyChart\nTheme light/dark, tooltips\nx-axis, drag-to-scroll
+    note right of NativeOOPSupport: iOS: ChartCurve, ChartVertex,\nChartPipeline, ChartGrid, ChartThemes\nOOP Helpers: ChartLayoutCalculator,\nValueFormatter, AxisLabelManager,\nChartRenderer, ChartDataCalculator,\nHistogramRenderer\nAndroid: ChartGl, ChartCurve,\n*ChartTheme; OOP Helpers:\nChartLayoutCalculator, ValueFormatter,\nAxisLabelManager, HistogramRenderer\nsparkline/; democard/
+    note right of RNWagmi: mobile-portfolio: default dark theme\nblack (#000000) background
+}
+
+package "Build Toolchain" <<Build>> {
+    component "Angular CLI 21" as AngularCLI
+    component "TypeScript 5 Compiler" as TSCompiler
+    component "PostCSS 8.5" as PostCSS
+    component "@tailwindcss/postcss 4.1.9" as TailwindPostCSS
+    component "ESLint" as ESLint
+    
+    note right of AngularCLI: ng build\nCode split, AOT
+    note right of TSCompiler: TS compile\nType check, project refs
+    note right of PostCSS: CSS\nTailwind, Autoprefixer
+}
+
+package "Deployment" <<Deploy>> {
+    component "Vercel" as Vercel
+    component "Vercel Analytics" as Analytics
+    component "Git Integration" as GitIntegration
+    component "pnpm 10.6.0" as PNPM
+    
+    note right of Vercel: Hosting\nAuto deploy, CDN, edge
+    note right of Analytics: Analytics\nWeb Vitals
+    note right of PNPM: Monorepo\nWorkspace, deps
+}
+
+package "API Gateway & Backend" <<Infra>> {
+    component "Go (Gin) API Gateway" as GoGateway {
+        component "Auth (login, register, me, logout, change-password)" as GoAuthTech
+        component "GET /quotes, GET /instruments" as GoQuotesTech
+        component "Proxy to Python" as GoProxyTech
+        note right: apps/portfolio-api-go\nport 8801, single entry for app\nproxies to Python :8800
+    }
+}
+
+package "Portfolio Analytics Backend" <<Infra>> {
+    component "FastAPI" as FastAPI
+    component "uvicorn" as Uvicorn
+    component "SQLAlchemy 2.0 + asyncpg" as SQLAlchemyAsync
+    component "Alembic" as Alembic
+    component "TimescaleDB (PostgreSQL)" as TimescaleDB
+    component "Redis" as Redis
+    component "Apache Kafka" as Kafka
+    component "Market data services" as MarketDataInfra {
+        component "GET /api/v1/quotes" as QuotesHTTPInfra
+        component "WebSocket /ws/quotes" as QuotesWSInfra
+        component "KafkaMarketDataProvider" as KafkaMarketDataProviderInfra
+    }
+    component "AI/ML stack" as AIMLStack {
+        component "scipy, numpy, scikit-learn" as StatsTech
+        component "statsmodels, VADER, sumy" as StatsTech2
+        component "Ollama, HF (optional); PyTorch, MLflow" as OptionalTech
+    }
+    note right of FastAPI
+        apps/portfolio-analytics
+        Clean Architecture: composition.py, container, crud_helpers, api/config
+        GET/POST /api/v1/portfolio, seed
+        GET /api/v1/quotes, WebSocket /ws/quotes
+        AI in: payments (fraud), trades (surveillance),
+        customers (identity), risk-metrics (VaR)
+        MinIO, ClickHouse, Airflow, MLflow, Faust (batch/stream)
+        python-dotenv (.env), port 8800
+    end note
+    note right of TimescaleDB: Portfolio metadata (JSONB)\nportfolio_history hypertable\nhost port 5433
+    note right of Redis: Server-side cache\n(history, portfolio aggregate, blockchain reads)\nport 6379, TTL 300s
+    note right of SQLAlchemyAsync: Async ORM\nasyncpg driver
+    note right of Kafka: portfolio.events topic\nportfolio.seeded events\nmarket.quotes.enriched topic\nreal-time quotes
+    note right of AIMLStack: Integrated in business flows\nOptional: Ollama, HF; PyTorch+MLflow inference
+}
+
+
+package "Testing" <<Build>> {
+    component "pytest" as Pytest
+    component "Jest" as Jest
+    
+    note right of Pytest: Portfolio API tests\napps/portfolio-analytics
+    note right of Jest: Unit tests\nMobile apps
+}
+
+package "Infrastructure" <<Infra>> {
+    component "Vercel CDN" as CDNNode
+    component "Edge" as EdgeNode
+    component "Domain & SSL" as DomainSSL
+}
+
+Angular --> TypeScript
+Angular --> Tailwind
+
+Angular --> RadixUI
+RadixUI --> TailwindUI
+Angular --> AgGrid
+
+Angular --> ChartJS
+Ng2Charts --> ChartJS
+ChartJSFinancial --> ChartJS
+
+AngularCLI --> TSCompiler
+AngularCLI --> PostCSS
+AngularCLI --> ESLint
+PostCSS --> TailwindPostCSS
+TailwindPostCSS --> Tailwind
+
+Uvicorn --> FastAPI
+FastAPI --> SQLAlchemyAsync
+FastAPI --> Alembic
+SQLAlchemyAsync --> TimescaleDB
+FastAPI --> Redis
+FastAPI --> Kafka
+FastAPI --> AIMLStack
+FastAPI --> MarketDataInfra
+KafkaMarketDataProviderInfra --> Kafka
+
+PNPM --> Angular
+PNPM --> TypeScript
+PNPM --> Expo
+
+Expo --> RN
+RN --> NativeDemoCardTech
+NativeDemoCardTech --> NativeDemoCardIOSTech
+NativeDemoCardTech --> NativeDemoCardAndroidTech
+RN --> NativeChartsTech
+NativeChartsTech --> NativeChartsIOSTech
+NativeChartsTech --> NativeChartsAndroidTech
+NativeChartsTech --> NativeOOPSupport
+NativeOOPSupport --> IOSChartSupportTech
+NativeOOPSupport --> IOSOOPHelpersTech
+IOSOOPHelpersTech --> IOSLayoutCalcTech
+IOSOOPHelpersTech --> IOSValueFormatterTech
+IOSOOPHelpersTech --> IOSAxisManagerTech
+IOSOOPHelpersTech --> IOSChartRendererTech
+IOSOOPHelpersTech --> IOSDataCalcTech
+IOSOOPHelpersTech --> IOSHistRendererTech
+NativeOOPSupport --> AndroidPkgsTech
+NativeOOPSupport --> AndroidOOPHelpersTech
+AndroidOOPHelpersTech --> AndroidLayoutCalcTech
+AndroidOOPHelpersTech --> AndroidValueFormatterTech
+AndroidOOPHelpersTech --> AndroidAxisManagerTech
+AndroidOOPHelpersTech --> AndroidHistRendererTech
+RN --> SharedChartLogicTech
+NativeChartsTech --> SharedChartLogicTech
+RN --> RNWagmi
+
+RN --> GoGateway
+GoGateway --> FastAPI
+Angular --> Vercel
+
+AngularCLI --> Vercel
+Vercel --> Analytics
+Vercel --> GitIntegration
+Vercel --> DomainSSL
+PNPM --> Vercel
+
+Vercel --> CDNNode
+Vercel --> EdgeNode
+
+package "Standards" {
+    component "Development" as DevStandard
+    component "Performance" as PerfStandard
+    component "Security" as SecStandard
+    component "Accessibility" as A11yStandard
+    
+    note right of DevStandard
+        - TypeScript strict
+        - ESLint
+        - Components, responsive
+        - Java, REST API, big data
+    end note
+    
+    note right of PerfStandard
+        - First load < 3s
+        - Code split, lazy load
+        - Cache
+    end note
+    
+    note right of SecStandard
+        - HTTPS, CSP, XSS
+        - Data validation
+        - REST auth, big data access
+    end note
+    
+    note right of A11yStandard
+        - WCAG 2.1 AA
+        - Keyboard, screen reader
+        - ARIA
+    end note
+}
+
+legend right
+    |<#E3F2FD> Front-end | UI stack
+    |<#F3E5F5> Build | Compile and package
+    |<#E8F5E9> Deploy | Hosting
+    |<#FFF3E0> Infrastructure | Services
+    |
+    <b>Highlights</b>
+    Angular 21, TypeScript 5, Radix UI, Tailwind
+    Chart.js, ng2-charts, chartjs-chart-financial, ag-grid
+    pnpm monorepo, Vercel
+    React Native, Expo, native charts (Metal/OpenGL ES)
+    Portfolio Analytics: FastAPI + PostgreSQL + Kafka
+    Backend: pnpm run start:server, pnpm run stop:backend
+endlegend
+
+@enduml

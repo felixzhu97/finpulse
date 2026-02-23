@@ -4,7 +4,7 @@ PostgreSQL schema and seed data for the fintech ER model (see [docs/er-diagram](
 
 ## Prerequisites
 
-- PostgreSQL 14+ (or use the project's Postgres via `docker-compose` in `services/portfolio-analytics/`).
+- PostgreSQL 14+ (or use the project's Postgres via `docker-compose` in `apps/portfolio-analytics/`).
 - Create a database (e.g. `fintech`) if you want a dedicated DB; otherwise run against an existing DB such as `portfolio`.
 
 ## Create database (optional)

@@ -3,7 +3,13 @@ const baseUrl =
   process.env.EXPO_PUBLIC_PORTFOLIO_API_URL ||
   "http://localhost:8800";
 
+const authBaseUrl =
+  process.env.AUTH_API_URL ||
+  process.env.EXPO_PUBLIC_AUTH_API_URL ||
+  baseUrl;
+
 const api = (path) => `${baseUrl.replace(/\/$/, "")}${path}`;
+const authApi = (path) => `${authBaseUrl.replace(/\/$/, "")}${path}`;
 
 const NASDAQ_STOCKS_EXTRA = [
   ["ABNB", "Airbnb, Inc."], ["ALGN", "Align Technology, Inc."], ["AMAT", "Applied Materials, Inc."], ["ANSS", "Ansys, Inc."], ["ARM", "Arm Holdings plc"],
@@ -611,8 +617,38 @@ async function seedResources() {
   ];
   await postBatch("/api/v1/valuations/batch", valuationItems);
 
+  try {
+    const authRes = await fetch(authApi("/api/v1/auth/register"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Demo User",
+        email: "demo@finpulse.app",
+        password: "demo123",
+      }),
+    });
+    if (authRes.ok) {
+      console.log("[seed] Auth (Go): demo user registered (demo@finpulse.app / demo123)");
+    } else if (authRes.status === 400) {
+      const t = await authRes.text();
+      if (t.includes("already registered")) {
+        console.log("[seed] Auth (Go): demo user already exists (demo@finpulse.app)");
+      } else {
+        throw new Error(`Auth register failed: ${authRes.status} ${t.slice(0, 200)}`);
+      }
+    } else {
+      throw new Error(`Auth register failed: ${authRes.status} ${await authRes.text()}`);
+    }
+  } catch (e) {
+    if (e.message && e.message.includes("fetch")) {
+      console.warn("[seed] Auth (Go) skipped: ensure Go API is running on", authBaseUrl);
+    } else {
+      throw e;
+    }
+  }
+
   const riskMetricsCount = riskMetricsData.length;
-  console.log("[seed] Domain resources seeded via batch APIs: customers(3), user-preferences(3), accounts(5), instruments(" + instruments.length + "), portfolios(4), watchlists(3), watchlist-items(9), positions(10), bonds(2), options(1), orders(4), trades(4), cash-transactions(4), payments(4), settlements(4), blockchain(all accounts seeded with SIM_COIN balance + transfers), market-data(" + marketDataItems.length + "), risk-metrics(" + riskMetricsCount + "), valuations(5).");
+  console.log("[seed] Domain resources seeded via batch APIs: customers(3), user-preferences(3), accounts(5), instruments(" + instruments.length + "), portfolios(4), watchlists(3), watchlist-items(9), positions(10), bonds(2), options(1), orders(4), trades(4), cash-transactions(4), payments(4), settlements(4), auth(demo user), blockchain(all accounts seeded with SIM_COIN balance + transfers), market-data(" + marketDataItems.length + "), risk-metrics(" + riskMetricsCount + "), valuations(5).");
 }
 
 async function seedBlockchain(accountIds) {

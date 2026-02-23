@@ -76,7 +76,8 @@ export default function InsightsScreen() {
 
   return (
     <InsightsScrollView
-      contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 48 }}
+      showsVerticalScrollIndicator={false}
     >
       {(loading && !metrics) || (summaryLoading && !summary) || (varLoading && !computedVar) ? (
         <InsightsLoadingContainer>

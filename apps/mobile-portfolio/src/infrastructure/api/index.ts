@@ -29,5 +29,19 @@ export {
   executeTrade,
 } from "./account";
 
+export {
+  login,
+  register,
+  getMe,
+  logout,
+  changePassword,
+} from "./auth";
+export type {
+  LoginRequest,
+  RegisterRequest,
+  LoginResponse,
+  ChangePasswordRequest,
+} from "./auth";
+
 export { getRiskMetrics, computeVar } from "./risk";
 
