@@ -7,17 +7,17 @@ Chinese version: [docs/zh/TODO.md](../zh/TODO.md).
 
 ## Architecture & Documentation
 
-- [ ] Align PlantUML under `docs/en/rd/togaf, docs/en/rd/c4` with the codebase (apps, apps/portfolio-analytics).
+- [ ] Align PlantUML under `docs/en/rd/togaf, docs/en/rd/c4` with the codebase (apps, apps/server-python).
 - [ ] Keep `docs/en/rd/togaf/README.md, docs/en/rd/c4/README.md` in sync with the technology stack.
 - [ ] Review domain diagrams in `docs/en/product/domain` and TOGAF in `.cursor/rules/togaf-specification.mdc` when adding subsystems or flows.
 
-## Web App (`apps/web`)
+## Web App (`apps/admin`)
 
-- [ ] Keep `apps/web/README.md` in sync with Angular version and module layout.
+- [ ] Keep `apps/admin/README.md` in sync with Angular version and module layout.
 - [ ] Add end-to-end flows for key portfolio and reporting use cases.
 - [ ] Expand unit and integration test coverage for critical components.
 
-## Mobile Apps (`apps/mobile`, `apps/mobile-portfolio`)
+## Mobile Apps (`apps/mobile`)
 
 - [ ] Add basic error and empty states for portfolio and account screens.
 - [ ] Align visual style with the shared design language used on web.
@@ -29,10 +29,10 @@ Chinese version: [docs/zh/TODO.md](../zh/TODO.md).
 - [ ] Ensure `@fintech/utils` exposes well-named utilities with tests; extract shared helpers to avoid duplicate logic.
 - [ ] Run type-check and lint across all packages before releases.
 
-## Server (`apps/portfolio-analytics`)
+## Server (`apps/server-python`)
 
 - [ ] Add health/readiness endpoints (e.g. `/health`, `/ready`) for API and dependencies (PostgreSQL, Kafka).
-- [ ] Keep OpenAPI and `apps/portfolio-analytics/README.md` in sync with API routes and env vars.
+- [ ] Keep OpenAPI and `apps/server-python/README.md` in sync with API routes and env vars.
 - [ ] Define production deployment (Docker, env config, scaling) and document in README or `docs/en/rd/togaf, docs/en/rd/c4`.
 
 ## Database (PostgreSQL, Kafka)
@@ -51,7 +51,7 @@ Chinese version: [docs/zh/TODO.md](../zh/TODO.md).
 ## Risk Management
 
 - [ ] Clarify risk domains (market, credit, liquidity, operational) and keep `docs/en/product/domain` and `docs/en/rd/togaf` aligned with portfolio and analytics flows.
-- [ ] Define core risk measures (e.g. VaR, stress tests, scenario analysis) and document inputs/outputs and assumptions in `apps/portfolio-analytics` API docs.
+- [ ] Define core risk measures (e.g. VaR, stress tests, scenario analysis) and document inputs/outputs and assumptions in `apps/server-python` API docs.
 - [ ] Ensure risk calculations are reproducible and backtestable; document data lineage and sources used for risk metrics.
 
 ## Compliance
@@ -69,7 +69,7 @@ Chinese version: [docs/zh/TODO.md](../zh/TODO.md).
 ## Performance & Scalability
 
 - [ ] Define non-functional performance targets (P95/P99 latency, throughput) for critical web and API flows and record them in architecture docs.
-- [ ] Add basic performance tests or benchmarks for high-traffic endpoints in `apps/portfolio-analytics` and key UI interactions in `apps/web`.
+- [ ] Add basic performance tests or benchmarks for high-traffic endpoints in `apps/server-python` and key UI interactions in `apps/admin`.
 - [ ] Document scaling strategies (horizontal/vertical, caching, queueing) and capacity planning assumptions in `docs/en/rd/togaf` and service READMEs.
 
 ## Artificial Intelligence & ML

@@ -28,12 +28,12 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 
 **In this project**:
 
-- Front-end applications: Web app (`apps/web`), portfolio mobile app (`apps/mobile-portfolio`), other mobile clients (`apps/mobile`)
+- Front-end applications: Web app (`apps/web`), portfolio mobile app (`apps/finpulse-mobile`), other mobile clients (`apps/mobile`)
 - UI component libraries: `@fintech/ui`, `@fintech/utils`
 - Business components: portfolio overview, market trends, asset allocation, risk analysis, transaction records, etc.
 - Application services: portfolio service, market data service, risk analysis service, reporting service
-- Back-end services: `services/portfolio-analytics` (FastAPI + DDD; SQLAlchemy 2.0, asyncpg, Alembic; TimescaleDB, Redis, Kafka)
-- **Mobile native UI**: `apps/mobile-portfolio` uses **default dark theme** (black #000000 background; dark chart/card surfaces, light text). **Stocks** screen: StockListItem, NativeSparkline, useRealtimeQuotes, usePerSymbolHistory. **NativeDemoCard** and six charts: NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart (RCTViewManager / SimpleViewManager). Charts support theme (light/dark), tooltips, x-axis, drag-to-scroll; shared: useScrollableChart, ScrollableChartContainer, chartTooltip. **OOP**: **iOS** — ChartSupport/ (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes); per-chart; NativeSparkline; NativeDemoCard. **Android** — view/chart/, view/sparkline/, view/democard/; JS: src/components/native/.
+- Back-end services: `apps/server-python` (FastAPI + DDD; SQLAlchemy 2.0, asyncpg, Alembic; TimescaleDB, Redis, Kafka)
+- **Mobile native UI**: `apps/finpulse-mobile` uses **default dark theme** (black #000000 background; dark chart/card surfaces, light text). **Stocks** screen: StockListItem, NativeSparkline, useRealtimeQuotes, usePerSymbolHistory. **NativeDemoCard** and six charts: NativeLineChart, NativeCandleChart, NativeAmericanLineChart, NativeBaselineChart, NativeHistogramChart, NativeLineOnlyChart (RCTViewManager / SimpleViewManager). Charts support theme (light/dark), tooltips, x-axis, drag-to-scroll; shared: useScrollableChart, ScrollableChartContainer, chartTooltip. **OOP**: **iOS** — ChartSupport/ (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes); per-chart; NativeSparkline; NativeDemoCard. **Android** — view/chart/, view/sparkline/, view/democard/; JS: src/components/native/.
 
 **Document location**: `docs/en/rd/togaf/application-architecture.puml` (English); `docs/zh/rd/togaf/application-architecture.puml` (中文)
 
@@ -41,10 +41,10 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 
 - `apps/web/` – Financial analytics web console
 - `apps/mobile/` – Mobile demo app
-- `apps/mobile-portfolio/` – Portfolio mobile app (Expo + RN; Stocks with NativeSparkline; NativeDemoCard and six native charts; iOS ChartSupport, Android view/chart/, view/sparkline/, view/democard/)
+- `apps/finpulse-mobile/` – Portfolio mobile app (Expo + RN; Stocks with NativeSparkline; NativeDemoCard and six native charts; iOS ChartSupport, Android view/chart/, view/sparkline/, view/democard/)
 - `packages/ui/` – UI component library
 - `packages/utils/` – Utility library
-- `services/portfolio-analytics/` – Portfolio analytics and data aggregation (SQLAlchemy 2.0, asyncpg, Alembic, TimescaleDB, Redis, Kafka)
+- `apps/server-python/` – Portfolio analytics and data aggregation (SQLAlchemy 2.0, asyncpg, Alembic, TimescaleDB, Redis, Kafka)
 
 ### Data Architecture
 
@@ -63,8 +63,8 @@ TOGAF (The Open Group Architecture Framework) is a standard framework for enterp
 **Code locations**:
 
 - `apps/web/` – Web UI consuming analytics data
-- `apps/mobile/`, `apps/mobile-portfolio/` – Mobile clients consuming analytics data
-- `services/portfolio-analytics/app` – Domain models, application services, REST API
+- `apps/mobile/`, `apps/finpulse-mobile/` – Mobile clients consuming analytics data
+- `apps/server-python/app` – Domain models, application services, REST API
 
 ### Technology Architecture
 
@@ -218,21 +218,21 @@ docs/en/product/domain/                    docs/zh/product/domain/
 **Application architecture** →
 
 - `apps/web/` – Web console
-- `apps/mobile/`, `apps/mobile-portfolio/` – Mobile apps (mobile-portfolio includes NativeDemoCard and six native chart views)
+- `apps/mobile/`, `apps/finpulse-mobile/` – Mobile apps (finpulse-mobile includes NativeDemoCard and six native chart views)
 - `packages/ui/` – UI component layer
 - `packages/utils/` – Utility layer
-- `services/portfolio-analytics/` – Portfolio analytics (FastAPI + DDD; SQLAlchemy, asyncpg, Alembic; TimescaleDB, Redis, Kafka)
+- `apps/server-python/` – Portfolio analytics (FastAPI + DDD; SQLAlchemy, asyncpg, Alembic; TimescaleDB, Redis, Kafka)
 
 **Data architecture** →
 
 - API clients in web and mobile consuming analytics and reporting data
-- Domain models and REST API in `services/portfolio-analytics/app`
+- Domain models and REST API in `apps/server-python/app`
 
 **Technology architecture** →
 
 - Root config: `package.json`, `pnpm-workspace.yaml`, `tsconfig.json`, `vercel.json`
-- Front-end: `apps/web/`, `apps/mobile/`, `apps/mobile-portfolio/` (native chart views + useScrollableChart/ScrollableChartContainer in iOS/Android)
-- Back-end: `services/portfolio-analytics/` (FastAPI; SQLAlchemy, asyncpg, Alembic; TimescaleDB, Redis)
+- Front-end: `apps/web/`, `apps/mobile/`, `apps/finpulse-mobile/` (native chart views + useScrollableChart/ScrollableChartContainer in iOS/Android)
+- Back-end: `apps/server-python/` (FastAPI; SQLAlchemy, asyncpg, Alembic; TimescaleDB, Redis)
 
 ## Governance Rules
 

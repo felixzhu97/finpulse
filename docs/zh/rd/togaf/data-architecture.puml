@@ -331,11 +331,11 @@ package "数据关系" {
     BlockData "1" --> "0..N" ChainTransactionData : 包含
 
     ' Portfolio Analytics storage
-    PortfolioData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
+    PortfolioData "1" --> "0..1" TimescaleDB : persisted (server-python)
     TimescaleDB "1" --> "0..1" RedisCache : 服务端缓存（历史、聚合、区块链读）
-    BlockData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
-    ChainTransactionData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
-    WalletBalanceData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
+    BlockData "1" --> "0..1" TimescaleDB : persisted (server-python)
+    ChainTransactionData "1" --> "0..1" TimescaleDB : persisted (server-python)
+    WalletBalanceData "1" --> "0..1" TimescaleDB : persisted (server-python)
     TimescaleDB "1" --> "0..N" KafkaPortfolioEvents : emits events
 
     ' AWS存储关系

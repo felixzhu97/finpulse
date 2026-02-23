@@ -67,9 +67,9 @@
 ## 实现说明
 
 - **主题 token**：使用集中 token（如 `colors.success`、`colors.error`、`colors.background`、`colors.card`、`colors.surface`），便于浅/深色与后续 Robin Neon 扩展一致。
-- **移动端（如 mobile-portfolio）**：默认**深色主题**（背景 #000000、深色卡片、浅色文字），与 Robinhood 应用观感一致。
+- **移动端（如 finpulse-mobile）**：默认**深色主题**（背景 #000000、深色卡片、浅色文字），与 Robinhood 应用观感一致。
 - **Web**：支持浅色与深色；使用同一套语义色与 Robin Neon 主操作色。
 
 ---
 
-*参考：Robinhood 视觉识别（2024）、应用内模式；项目 token 见 `apps/mobile-portfolio/src/presentation/theme/colors.ts`。*
+*参考：Robinhood 视觉识别（2024）、应用内模式；项目 token 见 `apps/mobile/src/presentation/theme/colors.ts`。*

@@ -264,11 +264,11 @@ package "Data Relationships" {
     UserData "1" --> "0..N" WalletBalanceData : has
     BlockData "1" --> "0..N" ChainTransactionData : contains
 
-    PortfolioData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
+    PortfolioData "1" --> "0..1" TimescaleDB : persisted (server-python)
     TimescaleDB "1" --> "0..1" RedisCache : server-side cache (history, aggregate, blockchain reads)
-    BlockData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
-    ChainTransactionData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
-    WalletBalanceData "1" --> "0..1" TimescaleDB : persisted (portfolio-analytics)
+    BlockData "1" --> "0..1" TimescaleDB : persisted (server-python)
+    ChainTransactionData "1" --> "0..1" TimescaleDB : persisted (server-python)
+    WalletBalanceData "1" --> "0..1" TimescaleDB : persisted (server-python)
     TimescaleDB "1" --> "0..N" KafkaPortfolioEvents : emits events
     MarketData "1" --> "0..N" KafkaQuotesEnriched : publishes enriched quotes
 

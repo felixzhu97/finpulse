@@ -1,0 +1,111 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Portfolio API",
+    "description": "Non-AI portfolio API; shares DB with server-python.",
+    "version": "1.0"
+  },
+  "host": "localhost:8801",
+  "basePath": "/",
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "tags": ["system"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/healthResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/quotes": {
+      "get": {
+        "summary": "Get real-time quotes by symbols",
+        "tags": ["market"],
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Comma-separated symbols (e.g. AAPL,MSFT)",
+            "name": "symbols",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/quoteItem"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/instruments": {
+      "get": {
+        "summary": "List instruments",
+        "tags": ["resources"],
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Max items",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/instrumentItem"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "healthResponse": {
+      "type": "object",
+      "properties": {
+        "status": { "type": "string" }
+      }
+    },
+    "quoteItem": {
+      "type": "object",
+      "properties": {
+        "price": { "type": "number" },
+        "change": { "type": "number" },
+        "changeRate": { "type": "number" },
+        "timestamp": { "type": "integer" }
+      }
+    },
+    "instrumentItem": {
+      "type": "object",
+      "properties": {
+        "instrument_id": { "type": "string" },
+        "symbol": { "type": "string" },
+        "name": { "type": "string" },
+        "asset_class": { "type": "string" },
+        "currency": { "type": "string" },
+        "exchange": { "type": "string" }
+      }
+    }
+  }
+}

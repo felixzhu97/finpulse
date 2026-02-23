@@ -9,6 +9,7 @@ title Financial System — Comprehensive Architecture
 
 package "Channels" {
   component "Web App" as WebApp
+  component "Portal App" as PortalApp
   component "Mobile App" as MobileApp
   component "API Clients" as ApiClients
 }
@@ -78,8 +79,10 @@ package "External Systems" {
 }
 
 WebApp --> ApiGateway
+PortalApp --> ApiGateway
 MobileApp --> ApiGateway
 ApiClients --> ApiGateway
+PortalApp --> PortfolioAnalyticsAPI
 MobileApp --> PortfolioAnalyticsAPI
 PortfolioAnalyticsAPI --> PortfolioStore
 PortfolioAnalyticsAPI --> PortfolioEvents

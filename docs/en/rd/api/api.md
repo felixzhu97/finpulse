@@ -11,7 +11,7 @@ Base: `/api/v1` for resources; app routes use full path. Query params: `limit`, 
 | POST | `/api/v1/seed` | Seed portfolio; body: portfolio payload |
 | WS | `/ws/quotes` | WebSocket; send `{ "type": "subscribe", "symbols": ["AAPL"] }` |
 
-## Auth (Go API – portfolio-api-go, default port 8801)
+## Auth (Go API – server-go, default port 8801)
 
 All auth responses use JSON. Protected endpoints require header: `Authorization: Bearer <token>`.
 

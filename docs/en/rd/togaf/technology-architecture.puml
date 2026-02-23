@@ -16,16 +16,26 @@ skinparam component {
 title TOGAF Technology Architecture - FinPulse Fintech Platform
 
 package "Web Front-end Stack" <<Frontend>> {
-    component "Angular 21.1" as Angular
+    component "Vite 6 + React 19" as AdminViteTech {
+        component "apps/admin" as AdminAppTech
+        component "React 19" as AdminReactTech
+        component "Tailwind 4" as AdminTailwindTech
+        note right: finpulse-admin\nport 4200\n@fintech/ui, recharts, ag-grid-react
+    }
+    component "Vite 6 + React 19" as PortalViteTech {
+        component "apps/portal" as PortalAppTech
+        component "React 19" as PortalReactTech
+        component "Tailwind 4" as PortalTailwindTech
+        note right: finpulse-portal\nport 3001\n@fintech/ui, Robinhood-style
+    }
     component "TypeScript 5" as TypeScript
     component "Tailwind CSS 4.1.9" as Tailwind
     
-    note right of Angular
-        <b>Web application</b>
-        - Angular CLI
-        - Routing
-        - Components, Services
-        - RxJS
+    note right of AdminViteTech
+        <b>Admin console</b>
+        - Vite 6
+        - React Router
+        - recharts, ag-grid-react
     end note
     
     note right of TypeScript: Type safety\nStatic check, strict
@@ -41,20 +51,18 @@ package "UI Framework & Components" <<Frontend>> {
         note right: Unstyled primitives\n@fintech/ui, Accessibility
     }
     component "Tailwind CSS" as TailwindUI
-    component "ag-grid-angular 33.0" as AgGrid
+    component "ag-grid-react 33.0" as AgGrid
     
     note right of TailwindUI: Styling\nResponsive, utility-first
-    note right of AgGrid: Data grid\nTables, sorting, filtering
+    note right of AgGrid: Data grid (admin)\nTables, sorting, filtering
 }
 
 package "Web Data Visualization" <<Frontend>> {
-    component "Chart.js 4.4.3" as ChartJS
-    component "ng2-charts 8.0" as Ng2Charts
-    component "chartjs-chart-financial 0.2" as ChartJSFinancial
+    component "recharts 2.15" as ChartJS
+    component "ag-grid-react" as AgGridCharts
     
-    note right of ChartJS: General charts\nThemes
-    note right of Ng2Charts: Angular wrapper\nChart.js bindings
-    note right of ChartJSFinancial: Candlestick\nFinancial charts
+    note right of ChartJS: Admin charts\nPerformance, allocation, trends
+    note right of AgGridCharts: Admin data grids\nPortfolio, transactions, clients, reports
 }
 
 package "Mobile (React Native / Expo)" <<Frontend>> {
@@ -96,20 +104,20 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
     note right of StyledComponentsTech: Theme-aware UI\nStyledThemeProvider, primitives\nuseTheme (useTheme.ts)
     note right of Expo: Expo SDK\nMetro, prebuild\niOS/Android
     note right of RN: React Native core\nrequireNativeComponent\nView managers
-    note right of NativeDemoCardTech: apps/mobile-portfolio\nDemo native card
+    note right of NativeDemoCardTech: apps/mobile\nDemo native card
     note right of NativeChartsTech: LineChart, CandleChart\nAmericanLineChart, BaselineChart\nHistogramChart, LineOnlyChart\nTheme light/dark, tooltips\nx-axis, drag-to-scroll
     note right of NativeOOPSupport: iOS: ChartCurve, ChartVertex,\nChartPipeline, ChartGrid, ChartThemes\nOOP Helpers: ChartLayoutCalculator,\nValueFormatter, AxisLabelManager,\nChartRenderer, ChartDataCalculator,\nHistogramRenderer\nAndroid: ChartGl, ChartCurve,\n*ChartTheme; OOP Helpers:\nChartLayoutCalculator, ValueFormatter,\nAxisLabelManager, HistogramRenderer\nsparkline/; democard/
-    note right of RNWagmi: mobile-portfolio: default dark theme\nblack (#000000) background
+    note right of RNWagmi: apps/mobile: default dark theme\nblack (#000000) background
 }
 
 package "Build Toolchain" <<Build>> {
-    component "Angular CLI 21" as AngularCLI
+    component "Vite 6" as ViteCLI
     component "TypeScript 5 Compiler" as TSCompiler
     component "PostCSS 8.5" as PostCSS
     component "@tailwindcss/postcss 4.1.9" as TailwindPostCSS
     component "ESLint" as ESLint
     
-    note right of AngularCLI: ng build\nCode split, AOT
+    note right of ViteCLI: vite build\nCode split, HMR
     note right of TSCompiler: TS compile\nType check, project refs
     note right of PostCSS: CSS\nTailwind, Autoprefixer
 }
@@ -130,7 +138,7 @@ package "API Gateway & Backend" <<Infra>> {
         component "Auth (login, register, me, logout, change-password)" as GoAuthTech
         component "GET /quotes, GET /instruments" as GoQuotesTech
         component "Proxy to Python" as GoProxyTech
-        note right: apps/portfolio-api-go\nport 8801, single entry for app\nproxies to Python :8800
+        note right: apps/server-go\nport 8801, single entry for app\nproxies to Python :8800
     }
 }
 
@@ -153,7 +161,7 @@ package "Portfolio Analytics Backend" <<Infra>> {
         component "Ollama, HF (optional); PyTorch, MLflow" as OptionalTech
     }
     note right of FastAPI
-        apps/portfolio-analytics
+        apps/server-python
         Clean Architecture: composition.py, container, crud_helpers, api/config
         GET/POST /api/v1/portfolio, seed
         GET /api/v1/quotes, WebSocket /ws/quotes
@@ -174,7 +182,7 @@ package "Testing" <<Build>> {
     component "pytest" as Pytest
     component "Jest" as Jest
     
-    note right of Pytest: Portfolio API tests\napps/portfolio-analytics
+    note right of Pytest: Portfolio API tests\napps/server-python
     note right of Jest: Unit tests\nMobile apps
 }
 
@@ -184,20 +192,28 @@ package "Infrastructure" <<Infra>> {
     component "Domain & SSL" as DomainSSL
 }
 
-Angular --> TypeScript
-Angular --> Tailwind
+AdminViteTech --> TypeScript
+AdminViteTech --> Tailwind
+AdminViteTech --> AdminAppTech
+AdminViteTech --> AdminReactTech
+AdminViteTech --> AdminTailwindTech
+PortalViteTech --> PortalAppTech
+PortalViteTech --> PortalReactTech
+PortalViteTech --> PortalTailwindTech
+PortalAppTech --> TypeScript
+AdminAppTech --> TypeScript
 
-Angular --> RadixUI
+AdminViteTech --> RadixUI
+PortalAppTech --> RadixUI
 RadixUI --> TailwindUI
-Angular --> AgGrid
+AdminViteTech --> AgGrid
 
-Angular --> ChartJS
-Ng2Charts --> ChartJS
-ChartJSFinancial --> ChartJS
+AdminViteTech --> ChartJS
+AdminViteTech --> AgGridCharts
 
-AngularCLI --> TSCompiler
-AngularCLI --> PostCSS
-AngularCLI --> ESLint
+ViteCLI --> TSCompiler
+ViteCLI --> PostCSS
+ViteCLI --> ESLint
 PostCSS --> TailwindPostCSS
 TailwindPostCSS --> Tailwind
 
@@ -211,7 +227,8 @@ FastAPI --> AIMLStack
 FastAPI --> MarketDataInfra
 KafkaMarketDataProviderInfra --> Kafka
 
-PNPM --> Angular
+PNPM --> AdminViteTech
+PNPM --> PortalViteTech
 PNPM --> TypeScript
 PNPM --> Expo
 
@@ -243,9 +260,9 @@ RN --> RNWagmi
 
 RN --> GoGateway
 GoGateway --> FastAPI
-Angular --> Vercel
+AdminViteTech --> Vercel
 
-AngularCLI --> Vercel
+ViteCLI --> Vercel
 Vercel --> Analytics
 Vercel --> GitIntegration
 Vercel --> DomainSSL
@@ -293,7 +310,7 @@ legend right
     |<#FFF3E0> Infrastructure | Services
     |
     <b>Highlights</b>
-    Angular 21, TypeScript 5, Radix UI, Tailwind
+    Admin + Portal (Vite 6 + React 19), TypeScript 5, Radix UI, Tailwind
     Chart.js, ng2-charts, chartjs-chart-financial, ag-grid
     pnpm monorepo, Vercel
     React Native, Expo, native charts (Metal/OpenGL ES)

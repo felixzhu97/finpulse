@@ -17,13 +17,20 @@ skinparam component {
 title TOGAF 应用架构 - FinPulse 金融科技平台
 
 package "展示层 (Presentation Layer)" <<Presentation>> {
-    component "apps/web" as WebApp {
-        component "Next.js 16应用" as NextApp {
-            component "App Router" as AppRouter
-            component "Server Components" as ServerComponents
-            component "API Routes" as APIRoutes
-            component "布局组件" as Layout
-            component "主题提供者" as ThemeProvider
+    component "apps/admin" as AdminApp {
+        component "React 19 + Vite 管理台" as NextApp {
+            component "React Router" as AppRouter
+            component "Pages (Dashboard, Portfolio 等)" as ServerComponents
+            component "Layout (Sidebar, Header)" as Layout
+            component "主题 (Tailwind)" as ThemeProvider
+        }
+    }
+
+    component "apps/portal" as PortalApp {
+        component "React 19 + Vite" as PortalVite {
+            component "App Router" as PortalRouter
+            component "组件" as PortalComponents
+            component "Tailwind + 主题" as PortalTheme
         }
     }
 
@@ -56,7 +63,7 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
         component "Zod验证器" as Validator
     }
 
-    component "apps/mobile-portfolio" as MobilePortfolio {
+    component "apps/mobile" as MobilePortfolio {
         component "Expo + React Native" as ExpoRN
         component "整洁架构" as CleanArch {
             component "展示层" as PresentationLayer {
@@ -443,12 +450,16 @@ FastAPIApp --> KafkaTopic
 ' 展示层内部关系
 NextApp --> AppRouter
 NextApp --> ServerComponents
-NextApp --> APIRoutes
 AppRouter --> Layout
 Layout --> ThemeProvider
 NextApp --> UIComponent
 NextApp --> FinanceCharts
-NextApp --> FormMgmt
+PortalApp --> UIComponent
+PortalVite --> PortalRouter
+PortalVite --> PortalComponents
+PortalVite --> PortalTheme
+PortalApp --> UtilsPkg
+PortalApp --> GoAPIGateway
 BaseUI --> RadixPrimitives
 FormLibrary --> Validator
 
@@ -528,8 +539,8 @@ AWSPkg --> SNSService
 AWSPkg --> APIGatewayService
 
 AWSDataService --> MarketAPI
-NextApp --> Analytics
-NextApp --> VercelPlatform
+AdminApp --> Analytics
+AdminApp --> VercelPlatform
 
 ' 大数据服务层内部关系
 SpringBootService --> SparkService
@@ -543,7 +554,7 @@ FlinkService --> FlinkLib
 HadoopService --> HadoopLib
 
 ' 展示层使用图表
-NextApp --> FinanceCharts
+AdminApp --> FinanceCharts
 FinanceCharts --> CalculationsPkg
 FinanceCharts --> TechnicalPkg
 

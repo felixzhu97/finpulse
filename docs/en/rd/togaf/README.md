@@ -45,7 +45,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 **Description**: Layered application components and their interactions.
 
 **Layers**:
-1. **Presentation**: Web (apps/web), mobile (apps/mobile, apps/mobile-portfolio with styled-components for theme-aware UI), UI library (packages/ui), charts
+1. **Presentation**: Admin (apps/admin), portal (apps/portal, React + Vite, @fintech/ui), mobile (apps/mobile with styled-components for theme-aware UI), UI library (packages/ui), charts
 2. **Business Layer**: Portfolio, market data, transaction, risk, user modules
 3. **Data Access**: Data services (DAO, cache), state management
 4. **External Services**: Portfolio Analytics API, Vercel Analytics, market data API, big data service layer

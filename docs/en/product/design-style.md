@@ -67,9 +67,9 @@
 ## Implementation notes
 
 - **Theme tokens**: Prefer central tokens (e.g. `colors.success`, `colors.error`, `colors.background`, `colors.card`, `colors.surface`) so light/dark and future Robin Neon accents stay consistent.
-- **Mobile (e.g. mobile-portfolio)**: Default to **dark theme** (#000000 background, dark cards, light text) to align with Robinhood’s in-app feel.
+- **Mobile (e.g. finpulse-mobile)**: Default to **dark theme** (#000000 background, dark cards, light text) to align with Robinhood’s in-app feel.
 - **Web**: Support light and dark; use the same semantic palette and Robin Neon for key actions where appropriate.
 
 ---
 
-*References: Robinhood visual identity (2024), in-app patterns; project tokens in `apps/mobile-portfolio/src/presentation/theme/colors.ts`.*
+*References: Robinhood visual identity (2024), in-app patterns; project tokens in `apps/mobile/src/presentation/theme/colors.ts`.*

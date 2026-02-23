@@ -7,6 +7,7 @@ skinparam component {
 
 package "渠道" {
   component "Web 应用" as WebApp
+  component "门户应用" as PortalApp
   component "移动应用" as MobileApp
   component "API 客户端" as ApiClients
 }
@@ -52,6 +53,7 @@ package "外部系统" {
 }
 
 WebApp --> ApiGateway
+PortalApp --> ApiGateway
 MobileApp --> ApiGateway
 ApiClients --> ApiGateway
 
