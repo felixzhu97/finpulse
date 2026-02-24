@@ -36,7 +36,7 @@ import {
 } from "@/src/presentation/theme/primitives";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTranslation } from "@/src/presentation/i18n";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const DRAWER_HEIGHT = Math.min(SCREEN_HEIGHT * 0.65, 480);

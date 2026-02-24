@@ -12,7 +12,7 @@ import "react-native-reanimated";
 import { Provider } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ActivityIndicator, useColorScheme } from "react-native";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubscriber";
 import { store } from "@/src/presentation/store";

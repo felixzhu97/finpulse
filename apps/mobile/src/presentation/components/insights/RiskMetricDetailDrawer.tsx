@@ -15,7 +15,7 @@ import {
   DrawerHeaderTitle,
   DrawerCloseButton,
 } from "@/src/presentation/theme/primitives";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 interface RiskMetricDetailDrawerProps {
   visible: boolean;

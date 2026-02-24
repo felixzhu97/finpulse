@@ -26,7 +26,7 @@ import {
   ScreenTitle,
   ScreenDate,
 } from "@/src/presentation/theme/primitives";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 const StyledScrollView = styled(ScrollView)`
   flex: 1;

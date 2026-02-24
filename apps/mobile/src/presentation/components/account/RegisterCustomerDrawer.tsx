@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 import { registerCustomer } from "@/src/infrastructure/api";
 import { useTheme, withTheme } from "@/src/presentation/theme";
 import type { Customer } from "@/src/domain/entities/customer";

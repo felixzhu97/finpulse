@@ -4,7 +4,7 @@ import { Modal, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 export type SortOption = "name" | "price" | "change" | "changePercent";
 

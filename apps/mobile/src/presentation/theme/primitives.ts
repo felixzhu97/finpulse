@@ -1,6 +1,6 @@
 import { Animated, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 import type { AppTheme } from "./themeTypes";
 
 export const withTheme = (fn: (theme: AppTheme) => string) => (p: { theme: AppTheme }) => fn(p.theme);

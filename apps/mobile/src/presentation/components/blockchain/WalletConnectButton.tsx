@@ -13,7 +13,7 @@ function triggerHaptic(type: string): void {
 import { useWeb3, SEPOLIA_CHAIN_ID } from "@/src/presentation/hooks";
 import { useTranslation } from "@/src/presentation/i18n";
 import { useTheme } from "@/src/presentation/theme";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 const Button = styled(TouchableOpacity)`
   flex-direction: row;

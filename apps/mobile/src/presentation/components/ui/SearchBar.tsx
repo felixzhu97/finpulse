@@ -1,7 +1,7 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState } from "react";
 import { Pressable, TextInput } from "react-native";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 interface SearchBarProps {
   placeholder?: string;

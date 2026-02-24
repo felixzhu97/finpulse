@@ -3,7 +3,7 @@ import { Animated, TextInput } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { GlassView } from "@/src/presentation/components/ui/GlassView";
 import { useTheme } from "@/src/presentation/theme";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 const SearchBarContainer = styled(Animated.View)`
   position: absolute;

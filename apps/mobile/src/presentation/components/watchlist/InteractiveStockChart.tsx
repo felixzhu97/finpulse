@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { Text } from "react-native";
 import { NativeLineChart } from "@/src/presentation/components/native/NativeLineChart";
 import { useTheme } from "@/src/presentation/theme";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 interface InteractiveStockChartProps {
   data: number[];

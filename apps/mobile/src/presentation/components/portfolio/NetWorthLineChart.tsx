@@ -4,7 +4,7 @@ import { LineChart } from "react-native-chart-kit";
 import type { PortfolioHistoryPoint } from "@/src/domain/entities/portfolio";
 import { useTheme } from "@/src/presentation/theme";
 import { formatChartLabel, formatCompactCurrency } from "@/src/presentation/utils";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 const X_LABEL_COUNT = 5;
 

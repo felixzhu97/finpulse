@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 import { useAuth } from "@/src/presentation/hooks/auth";
 import { useTranslation } from "@/src/presentation/i18n";
 import { RobinNeon } from "@/src/presentation/theme/colors";
