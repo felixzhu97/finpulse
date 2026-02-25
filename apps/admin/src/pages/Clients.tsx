@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef, GridReadyEvent } from 'ag-grid-community'
-import { Card, CardHeader, CardTitle, CardContent } from '@fintech/ui'
+import { Card, CardHeader, CardTitle, CardContent, AgGridWrap } from '@/styled'
 import { finpulseAgGridTheme } from '@/shared/ag-grid-theme'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
@@ -30,14 +30,14 @@ const rowData: Client[] = [
   { id: '8', name: 'Jennifer Taylor', email: 'j.taylor@email.com', phone: '+1 234-567-8907', portfolioValue: 1750000, totalAssets: 10, activeInvestments: 7, joinDate: '2023-12-05', status: 'Active', riskProfile: 'Aggressive' },
 ]
 
-const statusClass = (v: string) => ({ Active: 'bg-accent/10 text-accent', Inactive: 'bg-muted/10 text-muted-foreground', Pending: 'bg-chart-3/10 text-chart-3' }[v] ?? '')
-const riskClass = (v: string) => ({ Conservative: 'bg-chart-3/10 text-chart-3', Moderate: 'bg-chart-2/10 text-chart-2', Aggressive: 'bg-destructive/10 text-destructive' }[v] ?? '')
+const statusClass = (v: string) => ({ Active: 'bg-accent-10', Inactive: 'bg-muted-10', Pending: 'bg-chart-3-10' }[v] ?? '')
+const riskClass = (v: string) => ({ Conservative: 'bg-chart-3-10', Moderate: 'bg-chart-2-10', Aggressive: 'bg-destructive-10' }[v] ?? '')
 
 const columnDefs: ColDef<Client>[] = [
   { field: 'name', headerName: 'Name', sortable: true, filter: true, flex: 1, pinned: 'left' },
   { field: 'email', headerName: 'Email', sortable: true, filter: true, flex: 1 },
   { field: 'phone', headerName: 'Phone', sortable: true, filter: true, width: 150 },
-  { field: 'portfolioValue', headerName: 'Portfolio Value', sortable: true, filter: 'agNumberColumnFilter', width: 150, valueFormatter: (p) => (p.value != null ? `¥${(p.value / 1e6).toFixed(2)}M` : ''), cellClass: 'font-semibold' },
+  { field: 'portfolioValue', headerName: 'Portfolio Value', sortable: true, filter: 'agNumberColumnFilter', width: 150, valueFormatter: (p) => (p.value != null ? `¥${(p.value / 1e6).toFixed(2)}M` : ''), cellClass: 'cell-font-semibold' },
   { field: 'totalAssets', headerName: 'Total Assets', sortable: true, filter: 'agNumberColumnFilter', width: 120 },
   { field: 'activeInvestments', headerName: 'Active Investments', sortable: true, filter: 'agNumberColumnFilter', width: 150 },
   { field: 'joinDate', headerName: 'Join Date', sortable: true, filter: 'agDateColumnFilter', width: 120 },
@@ -53,13 +53,13 @@ export function Clients() {
   }
 
   return (
-    <Card className="bg-card border-border glass">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-2xl font-semibold">Clients</CardTitle>
-        <p className="text-sm text-muted-foreground mt-1">Manage your client portfolio and relationships</p>
+    <Card className="glass">
+      <CardHeader style={{ paddingBottom: '1rem' }}>
+        <CardTitle style={{ fontSize: '1.5rem' }}>Clients</CardTitle>
+        <p style={{ margin: 0, marginTop: 4, fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Manage your client portfolio and relationships</p>
       </CardHeader>
       <CardContent>
-        <div className="ag-theme-quartz h-[600px] w-full rounded-xl overflow-hidden">
+        <AgGridWrap className="ag-theme-quartz">
           <AgGridReact<Client>
             ref={gridRef}
             rowData={rowData}
@@ -72,7 +72,7 @@ export function Clients() {
             theme={finpulseAgGridTheme}
             onGridReady={onGridReady}
           />
-        </div>
+        </AgGridWrap>
       </CardContent>
     </Card>
   )

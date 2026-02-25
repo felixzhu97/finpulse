@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Card, CardHeader, CardTitle, CardContent, Button } from '@fintech/ui'
+import styled from '@emotion/styled'
+import { Card, CardHeader, CardTitle, CardContent, StyledButton } from '@/styled'
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts'
 
 const timeRanges = ['1W', '1M', '3M', '6M', '1Y', 'All']
@@ -19,32 +20,78 @@ const data = [
   { date: 'Dec', value: 12847382, benchmark: 11700000 },
 ]
 
+const HeaderRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.5rem;
+`
+
+const RangeGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: oklch(0.2 0.02 260 / 0.5);
+  border-radius: 0.5rem;
+`
+
+const ChartWrap = styled.div`
+  height: 300px;
+`
+
+const LegendRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+`
+
+const LegendItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`
+
+const LegendDot = styled.div`
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+`
+
 export function PerformanceChart() {
   const [activeRange, setActiveRange] = useState('1Y')
 
   return (
-    <Card className="bg-card border-border glass">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div>
-          <CardTitle className="text-lg font-semibold">Portfolio Performance</CardTitle>
-          <p className="text-sm text-muted-foreground">vs Benchmark Index</p>
-        </div>
-        <div className="flex items-center gap-1 p-1 bg-secondary/50 rounded-lg">
-          {timeRanges.map((range) => (
-            <Button
-              key={range}
-              variant={activeRange === range ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveRange(range)}
-              className={activeRange === range ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
-            >
-              {range}
-            </Button>
-          ))}
-        </div>
+    <Card className="glass">
+      <CardHeader>
+        <HeaderRow>
+          <div>
+            <CardTitle>Portfolio Performance</CardTitle>
+            <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>vs Benchmark Index</p>
+          </div>
+          <RangeGroup>
+            {timeRanges.map((range) => (
+              <StyledButton
+                key={range}
+                variant={activeRange === range ? 'default' : 'ghost'}
+                size="sm"
+                active={activeRange === range}
+                type="button"
+                onClick={() => setActiveRange(range)}
+              >
+                {range}
+              </StyledButton>
+            ))}
+          </RangeGroup>
+        </HeaderRow>
       </CardHeader>
-      <CardContent className="pt-4">
-        <div className="h-[300px]">
+      <CardContent style={{ paddingTop: '1rem' }}>
+        <ChartWrap>
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data}>
               <defs>
@@ -74,17 +121,17 @@ export function PerformanceChart() {
               <Area type="monotone" dataKey="benchmark" stroke="oklch(0.7 0.22 160)" fill="url(#benchmark)" strokeWidth={2} name="Benchmark" />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-        <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-border">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-primary" />
-            <span className="text-sm text-muted-foreground">Portfolio</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-accent" />
-            <span className="text-sm text-muted-foreground">Benchmark</span>
-          </div>
-        </div>
+        </ChartWrap>
+        <LegendRow>
+          <LegendItem>
+            <LegendDot style={{ background: 'var(--primary)' }} />
+            <span style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Portfolio</span>
+          </LegendItem>
+          <LegendItem>
+            <LegendDot style={{ background: 'var(--accent)' }} />
+            <span style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Benchmark</span>
+          </LegendItem>
+        </LegendRow>
       </CardContent>
     </Card>
   )

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import styled from '@emotion/styled'
 
 interface MenuItem {
   icon: string
@@ -40,99 +41,221 @@ const bottomItems: MenuItem[] = [
   { icon: 'help', label: 'Help', route: '#' },
 ]
 
+const Aside = styled.aside<{ collapsed: boolean }>`
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: ${(p) => (p.collapsed ? '5rem' : '16rem')};
+  background: var(--sidebar);
+  border-right: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s;
+  z-index: 50;
+`
+
+const SidebarHeader = styled.div`
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--sidebar-border);
+`
+
+const LogoWrap = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+`
+
+const LogoIcon = styled.div`
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(to bottom right, var(--primary), var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse-glow 2s ease-in-out infinite;
+`
+
+const LogoText = styled.span`
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: linear-gradient(to right, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+`
+
+const Nav = styled.nav`
+  flex: 1;
+  padding: 1.5rem 0.75rem;
+  overflow-y: auto;
+`
+
+const NavList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+`
+
+const NavItem = styled.a`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  &:hover {
+    background: var(--secondary);
+    color: var(--foreground);
+  }
+`
+
+const StyledNavLink = styled(NavLink)`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  &:hover {
+    background: var(--secondary);
+    color: var(--foreground);
+  }
+  &.active {
+    background: oklch(0.65 0.2 250 / 0.1);
+    color: var(--primary);
+    box-shadow: 0 0 20px oklch(0.65 0.2 250 / 0.2), inset 0 0 20px oklch(0.65 0.2 250 / 0.05);
+  }
+`
+
+const NavLabel = styled.span`
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`
+
+const IconSvg = styled.svg`
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+`
+
+const Bottom = styled.div`
+  padding: 1rem 0.75rem;
+  border-top: 1px solid var(--sidebar-border);
+`
+
+const BottomButton = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: none;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  &:hover {
+    background: var(--secondary);
+    color: var(--foreground);
+  }
+`
+
+const ToggleBtn = styled.button<{ collapsed: boolean }>`
+  position: absolute;
+  right: -0.75rem;
+  top: 5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  &:hover {
+    background: var(--secondary);
+  }
+`
+
 function Icon({ name }: { name: string }) {
   const d = ICONS[name] ?? ICONS.dashboard
   return (
-    <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <IconSvg fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={d} />
-    </svg>
+    </IconSvg>
   )
 }
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
-  return <SidebarInner collapsed={collapsed} setCollapsed={setCollapsed} />
-}
-
-function SidebarInner({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: (v: boolean) => void }) {
   return (
-    <aside
-      className={`fixed left-0 top-0 h-screen bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-300 z-50 ${collapsed ? 'w-20' : 'w-64'}`}
-    >
-      <div className="h-16 flex items-center px-4 border-b border-sidebar-border">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center animate-pulse-glow">
-            <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <Aside collapsed={collapsed}>
+      <SidebarHeader>
+        <LogoWrap>
+          <LogoIcon>
+            <svg width="24" height="24" fill="none" stroke="var(--primary-foreground)" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-          </div>
-          {!collapsed && (
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              FinPulse
-            </span>
-          )}
-        </div>
-      </div>
-
-      <nav className="flex-1 py-6 px-3 overflow-y-auto">
-        <div className="space-y-1">
+          </LogoIcon>
+          {!collapsed && <LogoText>FinPulse</LogoText>}
+        </LogoWrap>
+      </SidebarHeader>
+      <Nav>
+        <NavList>
           {menuItems.map((item) =>
             item.route.startsWith('#') ? (
-              <a
-                key={item.route + item.label}
-                href={item.route}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 group text-muted-foreground hover:bg-secondary hover:text-foreground"
-              >
+              <NavItem key={item.route + item.label} href={item.route}>
                 <Icon name={item.icon} />
-                {!collapsed && <span className="font-medium truncate">{item.label}</span>}
-              </a>
+                {!collapsed && <NavLabel>{item.label}</NavLabel>}
+              </NavItem>
             ) : (
-              <NavLink
-                key={item.route}
-                to={item.route}
-                end={item.route === '/'}
-                className={({ isActive }) =>
-                  `w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 group ${isActive ? 'bg-primary/10 text-primary glow-border' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`
-                }
-              >
+              <StyledNavLink key={item.route} to={item.route} end={item.route === '/'} className={({ isActive }) => (isActive ? 'active' : '')}>
                 <Icon name={item.icon} />
-                {!collapsed && <span className="font-medium truncate">{item.label}</span>}
-              </NavLink>
+                {!collapsed && <NavLabel>{item.label}</NavLabel>}
+              </StyledNavLink>
             )
           )}
-        </div>
-      </nav>
-
-      <div className="py-4 px-3 border-t border-sidebar-border">
-        <div className="space-y-1">
+        </NavList>
+      </Nav>
+      <Bottom>
+        <NavList>
           {bottomItems.map((item) => (
-            <button
-              key={item.icon}
-              type="button"
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground transition-all duration-200"
-            >
+            <BottomButton key={item.icon} type="button">
               <Icon name={item.icon} />
-              {!collapsed && <span className="font-medium">{item.label}</span>}
-            </button>
+              {!collapsed && <NavLabel>{item.label}</NavLabel>}
+            </BottomButton>
           ))}
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-      >
+        </NavList>
+      </Bottom>
+      <ToggleBtn type="button" collapsed={collapsed} onClick={() => setCollapsed(!collapsed)} aria-label={collapsed ? 'Expand' : 'Collapse'}>
         {collapsed ? (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         ) : (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         )}
-      </button>
-    </aside>
+      </ToggleBtn>
+    </Aside>
   )
 }

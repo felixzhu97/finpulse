@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef, GridReadyEvent } from 'ag-grid-community'
-import { Card, CardHeader, CardTitle, CardContent } from '@fintech/ui'
+import { Card, CardHeader, CardTitle, CardContent, AgGridWrap } from '@/styled'
 import { finpulseAgGridTheme } from '@/shared/ag-grid-theme'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
@@ -28,8 +28,8 @@ const rowData: Report[] = [
   { id: '8', title: 'Client Portfolio Summary', type: 'Performance', generatedDate: '2026-01-25', period: 'January 2026', status: 'Failed', fileSize: '-', format: 'PDF' },
 ]
 
-const typeClass = (v: string) => ({ Performance: 'bg-primary/10 text-primary', Risk: 'bg-destructive/10 text-destructive', Tax: 'bg-chart-3/10 text-chart-3', Compliance: 'bg-accent/10 text-accent', Custom: 'bg-muted/10 text-muted-foreground' }[v] ?? '')
-const statusClass = (v: string) => ({ Ready: 'bg-accent/10 text-accent', Generating: 'bg-chart-3/10 text-chart-3', Failed: 'bg-destructive/10 text-destructive' }[v] ?? '')
+const typeClass = (v: string) => ({ Performance: 'bg-primary-10', Risk: 'bg-destructive-10', Tax: 'bg-chart-3-10', Compliance: 'bg-accent-10', Custom: 'bg-muted-10' }[v] ?? '')
+const statusClass = (v: string) => ({ Ready: 'bg-accent-10', Generating: 'bg-chart-3-10', Failed: 'bg-destructive-10' }[v] ?? '')
 
 const columnDefs: ColDef<Report>[] = [
   { field: 'title', headerName: 'Report Title', sortable: true, filter: true, flex: 2, pinned: 'left' },
@@ -49,13 +49,13 @@ export function Reports() {
   }
 
   return (
-    <Card className="bg-card border-border glass">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-2xl font-semibold">Reports</CardTitle>
-        <p className="text-sm text-muted-foreground mt-1">Generate and download financial reports</p>
+    <Card className="glass">
+      <CardHeader style={{ paddingBottom: '1rem' }}>
+        <CardTitle style={{ fontSize: '1.5rem' }}>Reports</CardTitle>
+        <p style={{ margin: 0, marginTop: 4, fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Generate and download financial reports</p>
       </CardHeader>
       <CardContent>
-        <div className="ag-theme-quartz h-[600px] w-full rounded-xl overflow-hidden">
+        <AgGridWrap className="ag-theme-quartz">
           <AgGridReact<Report>
             ref={gridRef}
             rowData={rowData}
@@ -68,7 +68,7 @@ export function Reports() {
             theme={finpulseAgGridTheme}
             onGridReady={onGridReady}
           />
-        </div>
+        </AgGridWrap>
       </CardContent>
     </Card>
   )

@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef, GridReadyEvent } from 'ag-grid-community'
-import { Card, CardHeader, CardTitle, CardContent } from '@fintech/ui'
+import { Card, CardHeader, CardTitle, CardContent, AgGridWrap } from '@/styled'
 import { finpulseAgGridTheme } from '@/shared/ag-grid-theme'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
@@ -30,8 +30,8 @@ const rowData: Transaction[] = [
   { id: '8', date: '2026-01-20', type: 'Buy', symbol: 'GOOGL', name: 'Alphabet', quantity: 1, price: 142.5, amount: 142.5, status: 'Failed', fee: 0 },
 ]
 
-const typeClass = (v: string) => ({ Buy: 'text-accent', Sell: 'text-destructive', Deposit: 'text-chart-3', Withdrawal: 'text-chart-4' }[v] ?? '')
-const statusClass = (v: string) => ({ Completed: 'bg-accent/10 text-accent', Pending: 'bg-chart-3/10 text-chart-3', Failed: 'bg-destructive/10 text-destructive' }[v] ?? '')
+const typeClass = (v: string) => ({ Buy: 'cell-accent', Sell: 'cell-destructive', Deposit: 'cell-chart-3', Withdrawal: 'cell-chart-4' }[v] ?? '')
+const statusClass = (v: string) => ({ Completed: 'bg-accent-10', Pending: 'bg-chart-3-10', Failed: 'bg-destructive-10' }[v] ?? '')
 
 const columnDefs: ColDef<Transaction>[] = [
   { field: 'date', headerName: 'Date', sortable: true, filter: 'agDateColumnFilter', width: 120 },
@@ -40,7 +40,7 @@ const columnDefs: ColDef<Transaction>[] = [
   { field: 'name', headerName: 'Name', sortable: true, filter: true, flex: 1 },
   { field: 'quantity', headerName: 'Quantity', sortable: true, filter: 'agNumberColumnFilter', width: 100, valueFormatter: (p) => (p.value != null && p.value !== 0 ? String(p.value) : '-') },
   { field: 'price', headerName: 'Price', sortable: true, filter: 'agNumberColumnFilter', width: 100, valueFormatter: (p) => (p.value ? `¥${Number(p.value).toFixed(2)}` : '-') },
-  { field: 'amount', headerName: 'Amount', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : ''), cellClass: 'font-semibold' },
+  { field: 'amount', headerName: 'Amount', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : ''), cellClass: 'cell-font-semibold' },
   { field: 'fee', headerName: 'Fee', sortable: true, filter: 'agNumberColumnFilter', width: 80, valueFormatter: (p) => (p.value ? `¥${Number(p.value).toFixed(2)}` : '-') },
   { field: 'status', headerName: 'Status', sortable: true, filter: true, width: 120, cellClass: (p) => statusClass(p.value ?? '') },
 ]
@@ -53,13 +53,13 @@ export function Transactions() {
   }
 
   return (
-    <Card className="bg-card border-border glass">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-2xl font-semibold">Transactions</CardTitle>
-        <p className="text-sm text-muted-foreground mt-1">View and manage all your transaction history</p>
+    <Card className="glass">
+      <CardHeader style={{ paddingBottom: '1rem' }}>
+        <CardTitle style={{ fontSize: '1.5rem' }}>Transactions</CardTitle>
+        <p style={{ margin: 0, marginTop: 4, fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>View and manage all your transaction history</p>
       </CardHeader>
       <CardContent>
-        <div className="ag-theme-quartz h-[600px] w-full rounded-xl overflow-hidden">
+        <AgGridWrap className="ag-theme-quartz">
           <AgGridReact<Transaction>
             ref={gridRef}
             rowData={rowData}
@@ -72,7 +72,7 @@ export function Transactions() {
             theme={finpulseAgGridTheme}
             onGridReady={onGridReady}
           />
-        </div>
+        </AgGridWrap>
       </CardContent>
     </Card>
   )

@@ -6,34 +6,35 @@ import { WatchList } from '@/components/dashboard/WatchList'
 import { QuickActions } from '@/components/dashboard/QuickActions'
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions'
 import { RiskAnalysis } from '@/components/dashboard/RiskAnalysis'
+import { PageGrid, Col12, Col8, Col4, Col5, Col7, Col3 } from '@/styled'
 
 export function Dashboard() {
   return (
-    <div className="grid grid-cols-12 gap-6">
-      <div className="col-span-12">
+    <PageGrid>
+      <Col12>
         <PortfolioOverview />
-      </div>
-      <div className="col-span-8">
+      </Col12>
+      <Col8>
         <PerformanceChart />
-      </div>
-      <div className="col-span-4">
+      </Col8>
+      <Col4>
         <AssetAllocation />
-      </div>
-      <div className="col-span-5">
+      </Col4>
+      <Col5>
         <MarketTrends />
-      </div>
-      <div className="col-span-4">
+      </Col5>
+      <Col4>
         <WatchList />
-      </div>
-      <div className="col-span-3">
+      </Col4>
+      <Col3>
         <QuickActions />
-      </div>
-      <div className="col-span-7">
+      </Col3>
+      <Col7>
         <RecentTransactions />
-      </div>
-      <div className="col-span-5">
+      </Col7>
+      <Col5>
         <RiskAnalysis />
-      </div>
-    </div>
+      </Col5>
+    </PageGrid>
   )
 }
