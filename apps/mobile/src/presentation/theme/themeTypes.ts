@@ -4,6 +4,6 @@ export interface AppTheme {
   colors: ColorScheme;
 }
 
-declare module "styled-components/native" {
-  interface DefaultTheme extends AppTheme {}
+declare module "@emotion/react" {
+  export interface Theme extends AppTheme {}
 }

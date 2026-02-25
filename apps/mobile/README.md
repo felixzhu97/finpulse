@@ -12,7 +12,7 @@ Portfolio management mobile app for viewing investment accounts, performance cha
 | Charts | react-native-wagmi-charts, react-native-chart-kit, react-native-svg |
 | Native Charts | iOS Metal (Swift), Android (Kotlin) |
 | Navigation | React Navigation (bottom-tabs) |
-| UI | styled-components (theme-aware), expo-blur (Liquid Glass), useDraggableDrawer (bottom sheets) |
+| UI | Emotion (@emotion/native, theme-aware), expo-blur (Liquid Glass), useDraggableDrawer (bottom sheets) |
 | Internationalization | i18next, react-i18next (English, Chinese) |
 
 Native chart components: line (gradient fill in light and dark theme), candlestick (K-line), American OHLC, baseline, histogram, line-only, with horizontal scroll and tooltips. **NativeSparkline** shows only baseline when history data length &lt; 2. Native code follows OOP principles with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes for layout calculation, value formatting, axis label management, and rendering logic.
@@ -181,10 +181,10 @@ Single Redux-backed flow, one WebSocket; **history before real-time**:
 
 ## Theming
 
-The app supports light and dark themes with automatic system theme detection and **styled-components** for theme-aware UI:
+The app supports light and dark themes with automatic system theme detection and **Emotion** (@emotion/native) for theme-aware UI:
 
-- **Theme System**: `src/presentation/theme/colors.ts` defines light/dark color schemes. `useTheme.ts` provides the `useTheme()` hook (no circular dependency with `StyledThemeProvider`). `theme/index.ts` re-exports theme APIs; `themeTypes.ts` defines `AppTheme` and augments styled-components `DefaultTheme`.
-- **Styled Components**: Root layout wraps the app with `StyledThemeProvider`, which reads `useTheme()` and injects `{ colors }` into styled-components. Primitives (`primitives.ts`) include layout primitives (`ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, etc.), text primitives (`LabelText`, `ValueText`, `RowTitle`, etc.), and `withTheme()` for type-safe theme access. Main screens (Dashboard, Account, Watchlist, Insights) and list components use these styled components for consistent, theme-driven styling. **Robinhood-style** UI: consistent section spacing (32px), card radius 16px, action row height 56px; auth screens (login/signup) use dark background and Robin Neon accent.
+- **Theme System**: `src/presentation/theme/colors.ts` defines light/dark color schemes. `useTheme.ts` provides the `useTheme()` hook (no circular dependency with `StyledThemeProvider`). `theme/index.ts` re-exports theme APIs; `themeTypes.ts` defines `AppTheme` and augments `@emotion/react` `Theme`.
+- **Styled Components**: Root layout wraps the app with `StyledThemeProvider`, which reads `useTheme()` and injects `{ colors }` into Emotion's `ThemeProvider`. Primitives (`primitives.ts`) include layout primitives (`ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, etc.), text primitives (`LabelText`, `ValueText`, `RowTitle`, etc.), and `withTheme()` for type-safe theme access. Main screens (Dashboard, Account, Watchlist, Insights) and list components use these styled components for consistent, theme-driven styling. **Robinhood-style** UI: consistent section spacing (32px), card radius 16px, action row height 56px; auth screens (login/signup) use dark background and Robin Neon accent.
 - **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Initial loading is component-level: `AppContent` shows a spinner until `usePreferences().loading` is false. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
 - **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.
 

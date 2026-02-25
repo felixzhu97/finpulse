@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 import type { Account } from "@/src/domain/entities";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useAccountData, useAuth } from "@/src/presentation/hooks";
@@ -64,8 +64,7 @@ const CategorySection = styled.View`
 const CategoryTitle = styled.Text`
   font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.02px;
   margin-bottom: 10px;
   padding-horizontal: 4px;
   color: ${(p) => p.theme.colors.textSecondary};
@@ -280,7 +279,7 @@ export default function AccountScreen() {
   return (
     <StyledSafeArea edges={["top"]}>
       <StyledScrollView
-        contentContainerStyle={{ paddingTop: 16, paddingBottom: 48 }}
+        contentContainerStyle={{ paddingTop: 16, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
         {showLoading ? (

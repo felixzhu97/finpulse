@@ -2,7 +2,7 @@ import { memo } from "react";
 import { Dimensions } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 import { useTheme } from "@/src/presentation/theme";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 type AllocationItem = { label: string; value: number };
 
@@ -11,10 +11,11 @@ interface AssetAllocationChartProps {
 }
 
 const Container = styled.View`
-  border-radius: 12px;
+  border-radius: 16px;
   border-width: 1px;
   border-color: ${(p) => p.theme.colors.border};
-  padding-vertical: 8px;
+  padding-vertical: 12px;
+  padding-horizontal: 12px;
   background-color: ${(p) => p.theme.colors.card};
 `;
 
@@ -26,10 +27,17 @@ export const AssetAllocationChart = memo(function AssetAllocationChart({ items }
 
   const width = Dimensions.get("window").width - 32;
 
+  const palette = [
+    colors.accent,
+    "#64748b",
+    "#94a3b8",
+    colors.warning,
+    colors.error,
+  ];
   const chartData = items.map((item, index) => ({
     name: item.label,
     value: item.value,
-    color: ["#818cf8", "#38bdf8", "#4ade80", "#fb923c", "#a78bfa"][index % 5],
+    color: palette[index % palette.length],
     legendFontColor: colors.textSecondary,
     legendFontSize: 12,
   }));

@@ -237,27 +237,15 @@ export function StockDetailDrawer({
                         minHeight: 32,
                         justifyContent: "center",
                         alignItems: "center",
-                          backgroundColor: isSelected
-                            ? isDark
-                              ? "rgba(0, 122, 255, 0.15)"
-                              : "rgba(0, 122, 255, 0.1)"
-                            : isDark
-                            ? "rgba(255, 255, 255, 0.05)"
-                            : "rgba(0, 0, 0, 0.04)",
-                          borderColor: isSelected
-                            ? isDark
-                              ? "rgba(0, 122, 255, 0.4)"
-                              : "rgba(0, 122, 255, 0.3)"
-                            : "transparent",
+                        backgroundColor: isSelected ? colors.primaryLight : (isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.04)"),
+                        borderColor: isSelected ? colors.accent : "transparent",
                       }}
                     >
                       <Text
                         style={{
                           fontSize: 14,
                           fontWeight: isSelected ? "600" : "500",
-                          color: isSelected
-                            ? (isDark ? "#5AC8FA" : "#007AFF")
-                            : (isDark ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 0, 0, 0.6)"),
+                          color: isSelected ? colors.accent : colors.textSecondary,
                         }}
                       >
                         {p}
@@ -276,7 +264,7 @@ export function StockDetailDrawer({
                 />
               </View>
               <View style={{ borderTopWidth: 1, paddingTop: 20, marginTop: 4, borderTopColor: colors.border }}>
-                <Text style={{ fontSize: 12, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 16, color: colors.text }}>Key Statistics</Text>
+                <Text style={{ fontSize: 13, fontWeight: "600", letterSpacing: 0.02, marginBottom: 16, color: colors.textSecondary }}>Key Statistics</Text>
                 <View>
                   <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
                     <Text style={{ fontSize: 16, fontWeight: "400", color: colors.textSecondary }}>Open</Text>
@@ -304,7 +292,7 @@ export function StockDetailDrawer({
               </View>
               {watchlistContext ? (
                 <View style={{ borderTopWidth: 1, paddingTop: 20, marginTop: 8, borderTopColor: colors.border }}>
-                  <Text style={{ fontSize: 12, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 16, color: colors.textTertiary }}>Watchlist</Text>
+                  <Text style={{ fontSize: 13, fontWeight: "600", letterSpacing: 0.02, marginBottom: 16, color: colors.textSecondary }}>Watchlist</Text>
                   {watchlistContext.memberships.map((m) => (
                     <Pressable
                       key={m.watchlistItemId}
@@ -329,9 +317,9 @@ export function StockDetailDrawer({
                       <MaterialIcons
                         name="add-circle-outline"
                         size={20}
-                        color={colors.primary}
+                        color={colors.accent}
                       />
-                      <Text style={{ flex: 1, fontSize: 17, fontWeight: "400", color: colors.primary }}>
+                      <Text style={{ flex: 1, fontSize: 17, fontWeight: "400", color: colors.accent }}>
                         Add to Watchlist
                       </Text>
                     </Pressable>
@@ -350,7 +338,7 @@ export function StockDetailDrawer({
                 onPress={() => setShowAddToWatchlist(false)}
               >
                 <View style={{ borderTopLeftRadius: 14, borderTopRightRadius: 14, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 32, backgroundColor: colors.cardSolid }}>
-                  <Text style={{ fontSize: 13, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 12, color: colors.textTertiary }}>Add to Watchlist</Text>
+                  <Text style={{ fontSize: 13, fontWeight: "600", letterSpacing: 0.02, marginBottom: 12, color: colors.textSecondary }}>Add to Watchlist</Text>
                   {watchlistContext?.watchlistOptions.map((w) => (
                     <Pressable
                       key={w.watchlist_id}
@@ -360,14 +348,14 @@ export function StockDetailDrawer({
                         setShowAddToWatchlist(false);
                       }}
                       >
-                      <Text style={{ fontSize: 17, fontWeight: "400", color: colors.primary }}>{w.name}</Text>
+                      <Text style={{ fontSize: 17, fontWeight: "400", color: colors.accent }}>{w.name}</Text>
                     </Pressable>
                   ))}
                   <Pressable
                     style={{ marginTop: 16, paddingVertical: 14, alignItems: "center" }}
                     onPress={() => setShowAddToWatchlist(false)}
                   >
-                    <Text style={{ fontSize: 17, fontWeight: "600", color: colors.primary }}>Cancel</Text>
+                    <Text style={{ fontSize: 17, fontWeight: "600", color: colors.textSecondary }}>Cancel</Text>
                   </Pressable>
                 </View>
               </Pressable>

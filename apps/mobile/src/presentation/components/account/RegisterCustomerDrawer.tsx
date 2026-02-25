@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 import { registerCustomer } from "@/src/infrastructure/api";
 import { useTheme, withTheme } from "@/src/presentation/theme";
 import type { Customer } from "@/src/domain/entities/customer";
@@ -107,7 +107,7 @@ const SubmitButton = styled(TouchableOpacity)<{ disabled?: boolean }>`
   align-items: center;
   justify-content: center;
   margin-top: 8px;
-  background-color: ${withTheme((t) => t.colors.primary)};
+  background-color: ${withTheme((t) => t.colors.accent)};
   opacity: ${(p: { disabled?: boolean }) => (p.disabled ? 0.5 : 1)};
 `;
 
@@ -157,7 +157,7 @@ const DoneButton = styled(TouchableOpacity)`
   padding-vertical: 12px;
   padding-horizontal: 32px;
   border-radius: 10px;
-  background-color: ${withTheme((t) => t.colors.primary)};
+  background-color: ${withTheme((t) => t.colors.accent)};
 `;
 
 const DoneButtonText = styled.Text`

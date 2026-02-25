@@ -1,5 +1,6 @@
 import { useMemo, useState, useCallback } from "react";
 import { ActivityIndicator, RefreshControl } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import { NativeLineChart } from "@/src/presentation/components/native";
@@ -19,14 +20,13 @@ import {
   SectionTitle,
   BlockWithGap,
   ChartCard,
-  ChartCardTitle,
   SafeAreaScreen,
   ScreenHeader,
   HeaderTitleBlock,
   ScreenTitle,
   ScreenDate,
 } from "@/src/presentation/theme/primitives";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 const StyledScrollView = styled(ScrollView)`
   flex: 1;
@@ -35,7 +35,7 @@ const StyledScrollView = styled(ScrollView)`
 
 const ContentWrap = styled.View`
   padding-horizontal: 16px;
-  padding-bottom: 48px;
+  padding-bottom: 40px;
 `;
 
 const Section = styled.View`
@@ -97,6 +97,7 @@ export default function DashboardScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <SafeAreaScreen>
+        <StatusBar style={isDark ? "light" : "dark"} />
       <ScreenHeader>
         <HeaderTitleBlock>
           <ScreenTitle>{t("dashboard.title")}</ScreenTitle>
@@ -104,14 +105,14 @@ export default function DashboardScreen() {
         </HeaderTitleBlock>
       </ScreenHeader>
       <StyledScrollView
-        contentContainerStyle={{ paddingBottom: 48 }}
+        contentContainerStyle={{ paddingBottom: 40 }}
         scrollEnabled={!chartScrollLock}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={loading}
             onRefresh={onRefresh}
-            tintColor={colors.primary}
+            tintColor={colors.accent}
           />
         }
       >
@@ -147,8 +148,10 @@ export default function DashboardScreen() {
             />
           </Section>
           <Section>
+            <SectionHeader>
+              <SectionTitle>{t("dashboard.netWorthNativeChart")}</SectionTitle>
+            </SectionHeader>
             <ChartCard style={{ borderRadius: CARD_RADIUS, padding: 20 }}>
-              <ChartCardTitle>{t("dashboard.netWorthNativeChart")}</ChartCardTitle>
               <NativeChartWrapper>
                 <NativeLineChart
                   data={lineData}

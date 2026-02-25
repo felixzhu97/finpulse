@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef, GridReadyEvent } from 'ag-grid-community'
-import { Card, CardHeader, CardTitle, CardContent } from '@fintech/ui'
+import { Card, CardHeader, CardTitle, CardContent, AgGridWrap } from '@/styled'
 import { finpulseAgGridTheme } from '@/shared/ag-grid-theme'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
@@ -37,10 +37,10 @@ const columnDefs: ColDef<PortfolioItem>[] = [
   { field: 'quantity', headerName: 'Quantity', sortable: true, filter: 'agNumberColumnFilter', width: 100 },
   { field: 'avgPrice', headerName: 'Avg Price', sortable: true, filter: 'agNumberColumnFilter', width: 110, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : '') },
   { field: 'currentPrice', headerName: 'Current Price', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : '') },
-  { field: 'marketValue', headerName: 'Market Value', sortable: true, filter: 'agNumberColumnFilter', width: 130, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : ''), cellClass: 'font-semibold' },
+  { field: 'marketValue', headerName: 'Market Value', sortable: true, filter: 'agNumberColumnFilter', width: 130, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : ''), cellClass: 'cell-font-semibold' },
   { field: 'costBasis', headerName: 'Cost Basis', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : '') },
-  { field: 'gainLoss', headerName: 'Gain/Loss', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `${p.value >= 0 ? '+' : ''}¥${Number(p.value).toFixed(2)}` : ''), cellClass: (p) => (p.value >= 0 ? 'text-accent font-semibold' : 'text-destructive font-semibold') },
-  { field: 'gainLossPercent', headerName: 'Gain/Loss %', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `${p.value >= 0 ? '+' : ''}${Number(p.value).toFixed(2)}%` : ''), cellClass: (p) => (p.value >= 0 ? 'text-accent font-semibold' : 'text-destructive font-semibold') },
+  { field: 'gainLoss', headerName: 'Gain/Loss', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `${p.value >= 0 ? '+' : ''}¥${Number(p.value).toFixed(2)}` : ''), cellClass: (p) => (p.value >= 0 ? 'cell-accent cell-font-semibold' : 'cell-destructive cell-font-semibold') },
+  { field: 'gainLossPercent', headerName: 'Gain/Loss %', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `${p.value >= 0 ? '+' : ''}${Number(p.value).toFixed(2)}%` : ''), cellClass: (p) => (p.value >= 0 ? 'cell-accent cell-font-semibold' : 'cell-destructive cell-font-semibold') },
   { field: 'allocation', headerName: 'Allocation %', sortable: true, filter: 'agNumberColumnFilter', width: 130, valueFormatter: (p) => (p.value != null ? `${Number(p.value).toFixed(1)}%` : '') },
 ]
 
@@ -52,13 +52,13 @@ export function Portfolio() {
   }
 
   return (
-    <Card className="bg-card border-border glass">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-2xl font-semibold">Portfolio</CardTitle>
-        <p className="text-sm text-muted-foreground mt-1">View your complete investment portfolio</p>
+    <Card className="glass">
+      <CardHeader style={{ paddingBottom: '1rem' }}>
+        <CardTitle style={{ fontSize: '1.5rem' }}>Portfolio</CardTitle>
+        <p style={{ margin: 0, marginTop: 4, fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>View your complete investment portfolio</p>
       </CardHeader>
       <CardContent>
-        <div className="ag-theme-quartz h-[600px] w-full rounded-xl overflow-hidden">
+        <AgGridWrap className="ag-theme-quartz">
           <AgGridReact<PortfolioItem>
             ref={gridRef}
             rowData={rowData}
@@ -71,7 +71,7 @@ export function Portfolio() {
             theme={finpulseAgGridTheme}
             onGridReady={onGridReady}
           />
-        </div>
+        </AgGridWrap>
       </CardContent>
     </Card>
   )

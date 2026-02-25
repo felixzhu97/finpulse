@@ -4,7 +4,7 @@ import { Modal, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 export type SortOption = "name" | "price" | "change" | "changePercent";
 
@@ -113,7 +113,7 @@ export const SortMenu = memo(function SortMenu({ currentSort, onSelect, onOpen }
                 <Option key={option.value} onPress={() => handleSelect(option.value)}>
                   <OptionText>{option.label}</OptionText>
                   {currentSort === option.value && (
-                    <MaterialIcons name="check" size={20} color={colors.primary} />
+                    <MaterialIcons name="check" size={20} color={colors.accent} />
                   )}
                 </Option>
               ))}

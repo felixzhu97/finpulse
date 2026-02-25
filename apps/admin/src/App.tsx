@@ -6,14 +6,15 @@ import { Portfolio } from '@/pages/Portfolio'
 import { Transactions } from '@/pages/Transactions'
 import { Clients } from '@/pages/Clients'
 import { Reports } from '@/pages/Reports'
+import { AppRoot, MainCol, Main } from '@/styled'
 
 export default function App() {
   return (
-    <div className="flex min-h-screen bg-background">
+    <AppRoot>
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-64">
+      <MainCol>
         <Header />
-        <main className="flex-1 p-6 overflow-auto">
+        <Main>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/portfolio" element={<Portfolio />} />
@@ -21,8 +22,8 @@ export default function App() {
             <Route path="/clients" element={<Clients />} />
             <Route path="/reports" element={<Reports />} />
           </Routes>
-        </main>
-      </div>
-    </div>
+        </Main>
+      </MainCol>
+    </AppRoot>
   )
 }

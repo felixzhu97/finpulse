@@ -1,5 +1,5 @@
+import { ThemeProvider } from "@emotion/react";
 import { ReactNode } from "react";
-import { ThemeProvider as StyledThemeProviderBase } from "styled-components/native";
 import { useTheme } from "./useTheme";
 
 interface StyledThemeProviderProps {
@@ -9,7 +9,5 @@ interface StyledThemeProviderProps {
 export function StyledThemeProvider({ children }: StyledThemeProviderProps) {
   const { colors } = useTheme();
   const theme = { colors };
-  return (
-    <StyledThemeProviderBase theme={theme}>{children}</StyledThemeProviderBase>
-  );
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }

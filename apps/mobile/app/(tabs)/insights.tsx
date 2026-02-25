@@ -1,12 +1,25 @@
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Dimensions, Platform } from "react-native";
+import { ActivityIndicator, Dimensions, Platform, RefreshControl } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { BarChart } from "react-native-chart-kit";
 import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
 import { RiskMetricDetailDrawer } from "@/src/presentation/components/insights";
 import { useComputedVar, useRiskMetrics, useRiskSummary } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
+import { formatScreenDateLong } from "@/src/presentation/utils";
 import {
+  SafeAreaScreen,
+  ScreenHeader,
+  HeaderTitleBlock,
+  ScreenTitle,
+  ScreenDate,
+  CenteredContainer,
+  ErrorText,
+  RetryButton,
+  RetryButtonText,
+  LoadingWrap,
   InsightsScrollView,
   InsightsBlock,
   InsightsSection,
@@ -18,14 +31,10 @@ import {
   InsightsChartCard,
   InsightsSummaryCard,
   SummaryBody,
-  InsightsErrorText,
-  InsightsRetryText,
-  InsightsCentered,
-  InsightsLoadingContainer,
 } from "@/src/presentation/theme/primitives";
 
 export default function InsightsScreen() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const { t } = useTranslation();
   const { metrics, loading, error, refresh } = useRiskMetrics();
   const { summary, loading: summaryLoading, error: summaryError, refresh: refreshSummary } = useRiskSummary();
@@ -43,29 +52,11 @@ export default function InsightsScreen() {
   const highRiskPercent = (highRatio * 100).toFixed(1);
   const concentrationPercent = (topConcentration * 100).toFixed(1);
 
-  const highRiskText =
-    highRatio > 0.4
-      ? t("insights.highExposureText")
-      : t("insights.moderateExposureText");
-
-  const concentrationText =
-    topConcentration > 0.5
-      ? t("insights.highConcentrationText")
-      : t("insights.balancedConcentrationText");
-
   const screenWidth = Dimensions.get("window").width;
   const chartWidth = screenWidth - 80;
 
   const hasError = (error || summaryError || varError) && !metrics && !summary && !computedVar;
-
-  if (hasError) {
-    return (
-      <InsightsCentered>
-        <InsightsErrorText>{t("insights.unableToLoad")}</InsightsErrorText>
-        <InsightsRetryText onPress={handleRefresh}>{t("insights.tapToRetry")}</InsightsRetryText>
-      </InsightsCentered>
-    );
-  }
+  const isLoading = (loading && !metrics) || (summaryLoading && !summary) || (varLoading && !computedVar);
 
   const hasApiMetrics =
     metrics &&
@@ -74,16 +65,63 @@ export default function InsightsScreen() {
       metrics.var != null ||
       metrics.beta != null);
 
+  if (hasError) {
+    return (
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        <SafeAreaScreen>
+          <StatusBar style={isDark ? "light" : "dark"} />
+          <ScreenHeader>
+            <HeaderTitleBlock>
+              <ScreenTitle>{t("tabs.insights")}</ScreenTitle>
+              <ScreenDate>{formatScreenDateLong(new Date())}</ScreenDate>
+            </HeaderTitleBlock>
+          </ScreenHeader>
+          <CenteredContainer>
+            <ErrorText>{t("insights.unableToLoad")}</ErrorText>
+            <RetryButton onPress={handleRefresh}>
+              <RetryButtonText>{t("common.retry")}</RetryButtonText>
+            </RetryButton>
+          </CenteredContainer>
+        </SafeAreaScreen>
+        <RiskMetricDetailDrawer
+          visible={detailDrawerVisible}
+          metricKey={selectedMetric?.key ?? null}
+          metricValue={selectedMetric?.value ?? null}
+          onClose={() => {
+            setDetailDrawerVisible(false);
+            setSelectedMetric(null);
+          }}
+        />
+      </SafeAreaView>
+    );
+  }
+
   return (
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <SafeAreaScreen>
+        <StatusBar style={isDark ? "light" : "dark"} />
+        <ScreenHeader>
+          <HeaderTitleBlock>
+            <ScreenTitle>{t("tabs.insights")}</ScreenTitle>
+            <ScreenDate>{formatScreenDateLong(new Date())}</ScreenDate>
+          </HeaderTitleBlock>
+        </ScreenHeader>
+        {isLoading ? (
+          <LoadingWrap>
+            <ActivityIndicator size="small" color={colors.textSecondary} />
+          </LoadingWrap>
+        ) : (
     <InsightsScrollView
-      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 48 }}
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 40 }}
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={loading}
+          onRefresh={handleRefresh}
+          tintColor={colors.accent}
+        />
+      }
     >
-      {(loading && !metrics) || (summaryLoading && !summary) || (varLoading && !computedVar) ? (
-        <InsightsLoadingContainer>
-          <ActivityIndicator size="small" color={colors.textSecondary} />
-        </InsightsLoadingContainer>
-      ) : (
         <InsightsBlock>
           <InsightsSection>
             <InsightsSectionHeader>{t("insights.overview")}</InsightsSectionHeader>
@@ -180,10 +218,14 @@ export default function InsightsScreen() {
                 backgroundGradientTo: colors.card,
                 backgroundGradientToOpacity: 0,
                 color: (opacity = 1) => {
-                  if (Platform.OS === "ios") {
-                    return `rgba(0, 122, 255, ${opacity})`;
+                  const hex = colors.accent;
+                  if (hex.startsWith("#") && hex.length === 7) {
+                    const r = parseInt(hex.slice(1, 3), 16);
+                    const g = parseInt(hex.slice(3, 5), 16);
+                    const b = parseInt(hex.slice(5, 7), 16);
+                    return `rgba(${r},${g},${b},${opacity})`;
                   }
-                  return colors.primary;
+                  return colors.accent;
                 },
                 labelColor: (opacity = 1) => {
                   const textColor = colors.textSecondary;
@@ -216,16 +258,18 @@ export default function InsightsScreen() {
             </InsightsSummaryCard>
           </InsightsSection>
         </InsightsBlock>
-      )}
-      <RiskMetricDetailDrawer
-        visible={detailDrawerVisible}
-        metricKey={selectedMetric?.key ?? null}
-        metricValue={selectedMetric?.value ?? null}
-        onClose={() => {
-          setDetailDrawerVisible(false);
-          setSelectedMetric(null);
-        }}
-      />
     </InsightsScrollView>
+        )}
+        <RiskMetricDetailDrawer
+          visible={detailDrawerVisible}
+          metricKey={selectedMetric?.key ?? null}
+          metricValue={selectedMetric?.value ?? null}
+          onClose={() => {
+            setDetailDrawerVisible(false);
+            setSelectedMetric(null);
+          }}
+        />
+      </SafeAreaScreen>
+    </SafeAreaView>
   );
 }

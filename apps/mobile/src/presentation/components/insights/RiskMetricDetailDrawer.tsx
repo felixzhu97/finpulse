@@ -15,7 +15,7 @@ import {
   DrawerHeaderTitle,
   DrawerCloseButton,
 } from "@/src/presentation/theme/primitives";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 interface RiskMetricDetailDrawerProps {
   visible: boolean;
@@ -34,7 +34,7 @@ const Content = styled.ScrollView`
 
 const ValueContainer = styled.View`
   padding: 16px;
-  border-radius: 12px;
+  border-radius: 16px;
   margin-bottom: 20px;
   background-color: ${(p) => p.theme.colors.surface};
 `;

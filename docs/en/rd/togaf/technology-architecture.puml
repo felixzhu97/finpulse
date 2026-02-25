@@ -19,13 +19,13 @@ package "Web Front-end Stack" <<Frontend>> {
     component "Vite 6 + React 19" as AdminViteTech {
         component "apps/admin" as AdminAppTech
         component "React 19" as AdminReactTech
-        component "Tailwind 4" as AdminTailwindTech
+        component "Emotion" as AdminEmotionTech
         note right: finpulse-admin\nport 4200\n@fintech/ui, recharts, ag-grid-react
     }
     component "Vite 6 + React 19" as PortalViteTech {
         component "apps/portal" as PortalAppTech
         component "React 19" as PortalReactTech
-        component "Tailwind 4" as PortalTailwindTech
+        component "Emotion" as PortalEmotionTech
         note right: finpulse-portal\nport 3001\n@fintech/ui, Robinhood-style
     }
     component "TypeScript 5" as TypeScript
@@ -100,8 +100,8 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
         component "ScrollableChartContainer" as ScrollableChartContainerTech
         component "chartTooltip" as ChartTooltipTech
     }
-    component "styled-components" as StyledComponentsTech
-    note right of StyledComponentsTech: Theme-aware UI\nStyledThemeProvider, primitives\nuseTheme (useTheme.ts)
+    component "@emotion/native" as EmotionNativeTech
+    note right of EmotionNativeTech: Theme-aware UI\nStyledThemeProvider, primitives\nuseTheme, Robinhood-style (#00C805)
     note right of Expo: Expo SDK\nMetro, prebuild\niOS/Android
     note right of RN: React Native core\nrequireNativeComponent\nView managers
     note right of NativeDemoCardTech: apps/mobile\nDemo native card
@@ -193,13 +193,12 @@ package "Infrastructure" <<Infra>> {
 }
 
 AdminViteTech --> TypeScript
-AdminViteTech --> Tailwind
 AdminViteTech --> AdminAppTech
 AdminViteTech --> AdminReactTech
-AdminViteTech --> AdminTailwindTech
+AdminViteTech --> AdminEmotionTech
 PortalViteTech --> PortalAppTech
 PortalViteTech --> PortalReactTech
-PortalViteTech --> PortalTailwindTech
+PortalViteTech --> PortalEmotionTech
 PortalAppTech --> TypeScript
 AdminAppTech --> TypeScript
 
@@ -254,6 +253,7 @@ AndroidOOPHelpersTech --> AndroidLayoutCalcTech
 AndroidOOPHelpersTech --> AndroidValueFormatterTech
 AndroidOOPHelpersTech --> AndroidAxisManagerTech
 AndroidOOPHelpersTech --> AndroidHistRendererTech
+RN --> EmotionNativeTech
 RN --> SharedChartLogicTech
 NativeChartsTech --> SharedChartLogicTech
 RN --> RNWagmi
@@ -310,7 +310,7 @@ legend right
     |<#FFF3E0> Infrastructure | Services
     |
     <b>Highlights</b>
-    Admin + Portal (Vite 6 + React 19), TypeScript 5, Radix UI, Tailwind
+    Admin + Portal (Vite 6 + React 19), TypeScript 5, Radix UI, Emotion
     Chart.js, ng2-charts, chartjs-chart-financial, ag-grid
     pnpm monorepo, Vercel
     React Native, Expo, native charts (Metal/OpenGL ES)

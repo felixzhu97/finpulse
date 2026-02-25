@@ -1,4 +1,5 @@
-import { Card, CardHeader, CardTitle, CardContent, Progress } from '@fintech/ui'
+import styled from '@emotion/styled'
+import { Card, CardHeader, CardTitle, CardContent, StyledProgress } from '@/styled'
 
 const ICONS: Record<string, string> = {
   activity: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
@@ -16,10 +17,10 @@ const riskMetrics = [
 
 function getStatusClass(status: string) {
   switch (status) {
-    case 'good': return 'bg-accent/10 text-accent'
-    case 'medium': return 'bg-chart-3/10 text-chart-3'
-    case 'bad': return 'bg-destructive/10 text-destructive'
-    default: return 'bg-muted text-muted-foreground'
+    case 'good': return 'bg-accent-10'
+    case 'medium': return 'bg-chart-3-10'
+    case 'bad': return 'bg-destructive-10'
+    default: return 'bg-muted-10'
   }
 }
 
@@ -32,51 +33,103 @@ function getStatusText(status: string) {
   }
 }
 
+const HeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.5rem;
+`
+
+const RiskBadge = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  background: oklch(0.7 0.22 160 / 0.1);
+`
+
+const MetricBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`
+
+const MetricRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const MetricLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`
+
+const StatusPill = styled.span`
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+`
+
+const Footer = styled.div`
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+`
+
+const FooterRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+`
+
 export function RiskAnalysis() {
   return (
-    <Card className="bg-card border-border glass h-full">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold">Risk Analysis</CardTitle>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/10">
-            <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <Card className="glass" style={{ height: '100%' }}>
+      <CardHeader>
+        <HeaderRow>
+          <CardTitle>Risk Analysis</CardTitle>
+          <RiskBadge>
+            <svg width="16" height="16" fill="none" stroke="var(--accent)" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={ICONS.shield} />
             </svg>
-            <span className="text-xs font-medium text-accent">Low Risk</span>
-          </div>
-        </div>
+            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--accent)' }}>Low Risk</span>
+          </RiskBadge>
+        </HeaderRow>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {riskMetrics.map((metric) => (
-          <div key={metric.name} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <MetricBlock key={metric.name}>
+            <MetricRow>
+              <MetricLeft>
+                <svg width="16" height="16" fill="none" stroke="var(--muted-foreground)" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={ICONS[metric.icon] ?? ''} />
                 </svg>
-                <span className="text-sm font-medium">{metric.name}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold">
+                <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{metric.name}</span>
+              </MetricLeft>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>
                   {metric.name === 'Sharpe Ratio' ? metric.value.toFixed(2) : `${metric.value}%`}
                 </span>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusClass(metric.status)}`}>
+                <StatusPill className={getStatusClass(metric.status)}>
                   {getStatusText(metric.status)}
-                </span>
+                </StatusPill>
               </div>
-            </div>
-            <Progress value={(metric.value / metric.max) * 100} className="h-2 bg-secondary" />
-          </div>
+            </MetricRow>
+            <StyledProgress value={(metric.value / metric.max) * 100} />
+          </MetricBlock>
         ))}
-        <div className="pt-4 border-t border-border">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Overall Risk Score</span>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-accent">82</span>
-              <span className="text-muted-foreground">/100</span>
+        <Footer>
+          <FooterRow>
+            <span style={{ color: 'var(--muted-foreground)' }}>Overall Risk Score</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent)' }}>82</span>
+              <span style={{ color: 'var(--muted-foreground)' }}>/100</span>
             </div>
-          </div>
-        </div>
+          </FooterRow>
+        </Footer>
       </CardContent>
     </Card>
   )

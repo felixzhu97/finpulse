@@ -1,5 +1,5 @@
 import type { PortfolioHistoryPoint } from "@/src/domain/entities/portfolio";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 interface PortfolioPerformanceChartProps {
   points: PortfolioHistoryPoint[];

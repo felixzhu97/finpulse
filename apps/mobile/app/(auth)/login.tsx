@@ -10,11 +10,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 import { useTheme } from "@/src/presentation/theme";
 import { useAuth } from "@/src/presentation/hooks/auth";
 import { useTranslation } from "@/src/presentation/i18n";
-import { RobinNeon } from "@/src/presentation/theme/colors";
+import { withTheme } from "@/src/presentation/theme/primitives";
 
 const Page = styled(SafeAreaView)`
   flex: 1;
@@ -26,34 +26,35 @@ const Page = styled(SafeAreaView)`
 const Title = styled.Text`
   font-size: 28px;
   font-weight: 700;
-  letter-spacing: -0.5px;
-  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.6px;
+  color: rgba(255, 255, 255, 0.92);
   margin-bottom: 8px;
 `;
 
 const Subtitle = styled.Text`
   font-size: 16px;
   font-weight: 400;
+  letter-spacing: -0.1px;
   color: rgba(255, 255, 255, 0.6);
   margin-bottom: 40px;
 `;
 
 const Input = styled.TextInput`
   height: 52px;
-  border-radius: 16px;
+  border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.06);
   border-width: 1px;
   border-color: rgba(255, 255, 255, 0.1);
   padding-horizontal: 16px;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.92);
   margin-bottom: 16px;
 `;
 
 const PrimaryButton = styled(Pressable)`
   height: 56px;
-  border-radius: 16px;
-  background-color: ${RobinNeon};
+  border-radius: 12px;
+  background-color: ${withTheme((t) => t.colors.accent)};
   align-items: center;
   justify-content: center;
   margin-top: 24px;
@@ -62,12 +63,13 @@ const PrimaryButton = styled(Pressable)`
 const PrimaryButtonText = styled.Text`
   font-size: 17px;
   font-weight: 600;
-  color: #000000;
+  letter-spacing: -0.2px;
+  color: ${withTheme((t) => t.colors.onAccent)};
 `;
 
 const ErrorText = styled.Text`
   font-size: 14px;
-  color: #ff453a;
+  color: ${withTheme((t) => t.colors.error)};
   margin-top: 8px;
 `;
 
@@ -88,7 +90,7 @@ const LinkPressable = styled(Pressable)``;
 const LinkHighlight = styled.Text`
   font-size: 15px;
   font-weight: 600;
-  color: ${RobinNeon};
+  color: ${withTheme((t) => t.colors.accent)};
 `;
 
 export default function LoginScreen() {
@@ -96,8 +98,10 @@ export default function LoginScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { login } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const defaultEmail = typeof process !== "undefined" ? process.env?.EXPO_PUBLIC_DEMO_EMAIL ?? "" : "";
+  const defaultPassword = typeof process !== "undefined" ? process.env?.EXPO_PUBLIC_DEMO_PASSWORD ?? "" : "";
+  const [email, setEmail] = useState(defaultEmail);
+  const [password, setPassword] = useState(defaultPassword);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -151,7 +155,7 @@ export default function LoginScreen() {
 
         <PrimaryButton onPress={handleSubmit} disabled={loading}>
           {loading ? (
-            <ActivityIndicator size="small" color="#000000" />
+            <ActivityIndicator size="small" color={colors.onAccent} />
           ) : (
             <PrimaryButtonText>{t("auth.logIn")}</PrimaryButtonText>
           )}

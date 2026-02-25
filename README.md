@@ -67,7 +67,7 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 ### Frontend Frameworks
 
 - **React 19 + Vite** - Admin analytics console (`apps/admin`, package `finpulse-admin`)
-- **React 19 + Vite** - Portal app (`apps/portal`, package `finpulse-portal`); uses `@fintech/ui` and Tailwind, Robinhood-style
+- **React 19 + Vite** - Portal app (`apps/portal`, package `finpulse-portal`); uses `@fintech/ui` and Emotion, Robinhood-style
 - **React Native + Expo** - Mobile app (`apps/mobile`)
 - **React 19.2** - UI components and shared libraries
 - **TypeScript 5.0** - Type safety
@@ -90,12 +90,12 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 ### UI & Visualization
 
 - **Radix UI** - Unstyled, accessible component primitives (in `@fintech/ui`)
-- **Tailwind CSS 4.1** - Utility-first CSS framework
+- **Emotion** - CSS-in-JS for Admin (`@emotion/react`, `@emotion/styled`) and Portal (`@emotion/react`, `@emotion/styled`); Robinhood-style palette (green accent `#00C805`, dark/light themes)
 - **Lucide React** - Icon library
 - **recharts + ag-grid-react** - Admin console charts and data grids; **Chart.js + chartjs-chart-financial** - Financial (candlestick) where used
 - **react-native-wagmi-charts** - Professional mobile stock charts (line, candlestick, crosshair)
 - **react-native-chart-kit** - Lightweight mobile charts for portfolio metrics
-- **styled-components** - Theme-aware styled components for mobile (Expo/React Native); `StyledThemeProvider`, primitives (Card, LabelText, ValueText, HelperText), `withTheme` for type-safe theme access
+- **@emotion/native** - Theme-aware styled components for mobile (Expo/React Native); `StyledThemeProvider`, primitives (Card, LabelText, ValueText, ScreenHeader, etc.), `withTheme` for type-safe theme access; Robinhood-style (green up/red down for charts, accent for CTAs)
 
 ### Utility Libraries
 
@@ -115,8 +115,8 @@ FinPulse is a modern fintech analytics platform that provides investors with com
 This project uses a **monorepo** architecture managed with pnpm workspaces:
 
 - **apps/admin** - React (Vite) admin analytics console (package name: `finpulse-admin`).
-- **apps/portal** - React (Vite) portal app (package name: `finpulse-portal`); Robinhood-style UI with `@fintech/ui`, dev server port 3001.
-- **apps/mobile** - React Native (Expo) mobile app for portfolio overview and metrics; **Stocks** screen with real-time prices and per-stock sparklines (NativeSparkline, useSymbolDisplayData); **Account** tab with Quick trade, Send ETH (real Ethereum via Sepolia testnet by default), Connect/Disconnect wallet (Redux web3 slice, web3Service). Quote history uses **batch API** (`getQuotesHistoryBatch`) for fewer requests. Native views **NativeDemoCard** and six native charts: **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart** (Metal on iOS, OpenGL ES on Android). Native code follows OOP principles: iOS uses **ChartSupport** (ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes) and OOP helper classes; Android uses **view/chart/**, **view/sparkline/**, **view/democard/**. Charts support theme (light/dark), tooltips, x-axis labels, full-width rendering, and horizontal drag-to-scroll via `useScrollableChart` and `ScrollableChartContainer`.
+- **apps/portal** - React (Vite) portal app (package name: `finpulse-portal`); Robinhood-style UI with `@fintech/ui` and Emotion, dev server port 3001.
+- **apps/mobile** - React Native (Expo) mobile app for portfolio overview and metrics; **Emotion** (@emotion/native) for Robinhood-style UI (green accent `#00C805`, green up/red down for sparklines and charts). **Stocks** screen with real-time prices and per-stock sparklines (NativeSparkline, useSymbolDisplayData); **Account** tab with Quick trade, Send ETH (Sepolia testnet), Connect/Disconnect wallet (Redux web3). Quote history uses **batch API** (`getQuotesHistoryBatch`). Native views **NativeDemoCard** and six native charts (Metal on iOS, OpenGL ES on Android): **NativeLineChart**, **NativeCandleChart**, **NativeAmericanLineChart**, **NativeBaselineChart**, **NativeHistogramChart**, **NativeLineOnlyChart**. Charts and sparklines use Robinhood colors (up=green, down=red). iOS ChartSupport and Android view/chart/ follow OOP principles; `useScrollableChart` and `ScrollableChartContainer` for horizontal drag.
 - **apps/server-python** - Python FastAPI backend (Clean Architecture: composition, container, crud_helpers); PostgreSQL; Kafka; REST resources + batch create; AI/ML (VaR, fraud, surveillance, sentiment, identity, forecast); config via `.env.example`; `pnpm run start:server`; `pnpm run test:api`.
 - **apps/server-go** - Go non-AI API (health, quotes, instruments); same DB as server-python; port 8801.
 - **packages/ui** - Shared UI component library.
@@ -163,7 +163,7 @@ Visit [http://localhost:4200](http://localhost:4200) to view the admin applicati
 
 ### Portal app (portal)
 
-React + Vite portal using `@fintech/ui` and Tailwind (Robinhood-style). Dev server on port 3001.
+React + Vite portal using `@fintech/ui` and Emotion (Robinhood-style). Dev server on port 3001.
 
 ```bash
 pnpm dev:portal
@@ -363,16 +363,16 @@ finpulse/
 ### Package Descriptions
 
 #### `apps/admin`
-React (Vite) admin analytics console. Uses `recharts` for performance and allocation charts, `ag-grid-react` for data grids. Depends on `@fintech/ui` and `@fintech/utils`.
+React (Vite) admin analytics console with Emotion styling (Robinhood-style). Uses `recharts` for charts, `ag-grid-react` for data grids. Depends on `@fintech/ui` and `@fintech/utils`.
 
 #### `apps/portal`
-React (Vite) portal app with Robinhood-style UI. Uses `@fintech/ui`, `@fintech/utils`, Tailwind CSS 4, and React 19. Dev server runs on port 3001 (`pnpm dev:portal`).
+React (Vite) portal app with Robinhood-style UI. Uses `@fintech/ui`, `@fintech/utils`, Emotion, and React 19. Dev server runs on port 3001 (`pnpm dev:portal`).
 
 #### `apps/mobile`
 Expo + React Native app for portfolio overview, net worth trend, asset allocation, and stock charts. **Layering**: domain (entities, dto), infrastructure (api + network + services + config/web3Config), presentation (hooks, Redux: quotes with **historyLoaded**, preferences, portfolio, **web3**). **Account** tab: Quick trade, Send ETH (Sepolia default), Connect/Disconnect wallet (WalletConnectButton, Redux web3, web3Service). **Watchlist**: history fetched first (getQuotesHistoryBatch + getQuotes, dispatch on each response); WebSocket starts after history loaded; **visible-only** subscription + 1s refresh; **WatchlistRow** (memo) for list performance; **NativeSparkline** shows baseline only when no data. Native charts (Metal/OpenGL ES): NativeLineChart (gradient in light theme), NativeCandleChart, etc.; **NativeSparkline**; JS: `useScrollableChart`, `ScrollableChartContainer`. Redux middleware: `serializableCheck.ignoredPaths` for quotes/history. Seed script: **dedupeInstrumentsBySymbol** so instruments have unique symbols.
 
 #### `packages/ui`
-Shared UI component library, a collection of components built on Radix UI and Tailwind CSS. Can be reused across multiple applications.
+Shared UI component library built on Radix UI. Can be reused across Admin, Portal, and other apps. Admin and Portal use Emotion for app-level styling (Robinhood palette).
 
 #### `packages/utils`
 Shared utility function library containing common utility functions (such as `cn` for style merging).
@@ -390,9 +390,9 @@ High-level tasks and roadmap items for the whole monorepo are tracked in `docs/e
 
 ## 🎨 Design Features
 
-- **Modern UI** - Glassmorphism design with smooth animations
-- **Responsive Layout** - Perfect adaptation to various screen sizes
-- **Dark Theme** - Default dark mode; finpulse-mobile uses black (#000000) background and dark chart/card surfaces with light text
+- **Robinhood-style UI** - Green accent (`#00C805`), green up/red down for charts, dark-first option
+- **Responsive Layout** - Adaptation to various screen sizes
+- **Dark Theme** - Default dark mode; finpulse-mobile uses black (#000000) background, dark chart/card surfaces, and Robinhood colors
 - **Accessibility** - Follows WCAG standards for good accessibility
 - **Performance Optimization** - Angular build optimization and lazy loading for fast loading
 

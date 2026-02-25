@@ -13,7 +13,7 @@ function triggerHaptic(type: string): void {
 import { useWeb3, SEPOLIA_CHAIN_ID } from "@/src/presentation/hooks";
 import { useTranslation } from "@/src/presentation/i18n";
 import { useTheme } from "@/src/presentation/theme";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 const Button = styled(TouchableOpacity)`
   flex-direction: row;
@@ -23,15 +23,15 @@ const Button = styled(TouchableOpacity)`
   padding-horizontal: 22px;
   border-radius: 12px;
   gap: 8px;
-  background-color: ${(p) => p.theme.colors.primary};
+  background-color: ${(p) => p.theme.colors.accent};
   min-height: 50px;
 `;
 
 const ButtonText = styled.Text`
-  color: ${(p) => p.theme.colors.onPrimary};
+  color: ${(p) => p.theme.colors.onAccent};
   font-size: 17px;
   font-weight: 600;
-  letter-spacing: -0.41px;
+  letter-spacing: -0.2px;
 `;
 
 const ErrorText = styled.Text`
@@ -157,10 +157,10 @@ export function WalletConnectButton() {
     <View>
       <Button onPress={handleConnect} disabled={showLoading} activeOpacity={0.7}>
         {showLoading ? (
-          <ActivityIndicator size="small" color={colors.onPrimary} />
+          <ActivityIndicator size="small" color={colors.onAccent} />
         ) : (
           <>
-            <MaterialIcons name="link" size={20} color={colors.onPrimary} />
+            <MaterialIcons name="link" size={20} color={colors.onAccent} />
             <ButtonText>{t("blockchain.connectWallet")}</ButtonText>
           </>
         )}

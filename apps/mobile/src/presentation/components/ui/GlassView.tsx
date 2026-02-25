@@ -1,7 +1,7 @@
 import { BlurView } from "expo-blur";
 import type { ReactNode } from "react";
 import { Platform, type StyleProp, type ViewStyle } from "react-native";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 interface GlassViewProps {
   style?: StyleProp<ViewStyle>;

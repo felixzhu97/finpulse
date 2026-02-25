@@ -21,6 +21,7 @@ export default function Layout() {
           borderTopWidth: Platform.OS === "ios" ? 0.5 : 1,
           borderTopColor: colors.tabBarBorder,
         },
+        tabBarLabelStyle: { fontSize: 12, fontWeight: "500" },
       }}
     >
       <Tabs.Screen

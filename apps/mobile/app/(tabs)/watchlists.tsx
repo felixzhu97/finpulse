@@ -261,7 +261,7 @@ export default function WatchlistsScreen() {
               onViewableItemsChanged={onViewableItemsChanged}
               viewabilityConfig={viewabilityConfig}
               keyExtractor={(item) => item.instrument_id}
-              contentContainerStyle={{ paddingBottom: 48 }}
+              contentContainerStyle={{ paddingBottom: 40 }}
               showsVerticalScrollIndicator={false}
               renderItem={({ item }) => (
                 <WatchlistRow

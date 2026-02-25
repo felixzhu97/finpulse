@@ -2,7 +2,7 @@ import type { WatchlistItem } from "@/src/domain/entities/watchlist";
 import type { Instrument } from "@/src/domain/entities/instrument";
 import type { StockDetailItem } from "./StockDetailDrawer";
 import { WatchlistItemRow } from "./WatchlistItemRow";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 interface WatchlistCardProps {
   title: string;

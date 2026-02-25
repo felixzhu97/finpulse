@@ -6,7 +6,7 @@ React (Vite) portal application with Robinhood-style UI. Part of the FinPulse mo
 
 - **React 19** + **TypeScript**
 - **Vite 6** – dev server and build
-- **Tailwind CSS 4** – styling (same theme as `apps/admin`)
+- **Emotion** (@emotion/react, @emotion/styled) – Robinhood-style styling
 - **@fintech/ui** – shared UI components (Radix-based)
 - **@fintech/utils** – shared utilities
 
@@ -30,6 +30,6 @@ pnpm --filter finpulse-portal dev
 
 - `src/main.tsx` – entry
 - `src/App.tsx` – root component
-- `src/index.css` – Tailwind + theme variables (Robinhood-style dark theme)
+- `src/index.css` – Theme variables (Robinhood-style dark theme)
 - `vite.config.ts` – Vite config, `@/` alias
 - `index.html` – HTML entry

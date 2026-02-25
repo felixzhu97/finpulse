@@ -1,4 +1,5 @@
-import { Card, CardContent } from '@fintech/ui'
+import styled from '@emotion/styled'
+import { Card, CardContent, Grid4 } from '@/styled'
 
 interface Stat {
   title: string
@@ -23,52 +24,112 @@ const stats: Stat[] = [
   { title: 'Active Trades', value: '47', change: '-3', trend: 'down', icon: 'activity', color: 'chart-5' },
 ]
 
+const StatCard = styled(Card)`
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  &:hover {
+    border-color: oklch(0.78 0.19 145 / 0.35);
+  }
+`
+
+const StatInner = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+`
+
+const StatLeft = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`
+
+const StatTitle = styled.p`
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+`
+
+const StatValue = styled.p`
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+`
+
+const ChangeRow = styled.div<{ trend: 'up' | 'down' }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: ${(p) => (p.trend === 'up' ? 'var(--accent)' : 'var(--destructive)')};
+`
+
+const ChangeMuted = styled.span`
+  margin-left: 0.25rem;
+  color: var(--muted-foreground);
+`
+
+const IconBoxVar = styled.div<{ color: string }>`
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+`
+
+const colorMap: Record<string, string> = {
+  primary: 'var(--primary)',
+  accent: 'var(--accent)',
+  'chart-3': 'var(--chart-3)',
+  'chart-5': 'var(--chart-5)',
+}
+
+const bgMap: Record<string, string> = {
+  primary: 'oklch(0.65 0.2 250 / 0.1)',
+  accent: 'oklch(0.7 0.22 160 / 0.1)',
+  'chart-3': 'oklch(0.75 0.18 80 / 0.1)',
+  'chart-5': 'oklch(0.7 0.15 300 / 0.1)',
+}
+
 export function PortfolioOverview() {
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <Grid4>
       {stats.map((stat) => (
-        <Card
-          key={stat.title}
-          className="p-5 bg-card border-border hover:border-primary/50 transition-all duration-300 group cursor-pointer glass glow-border"
-        >
-          <CardContent>
-            <div className="flex items-start justify-between">
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground font-medium">{stat.title}</p>
-                <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
-                <div
-                  className={`inline-flex items-center gap-1 text-sm font-medium ${stat.trend === 'up' ? 'text-accent' : 'text-destructive'}`}
-                >
+        <StatCard key={stat.title} className="glass glow-border">
+          <CardContent style={{ padding: '1.25rem' }}>
+            <StatInner>
+              <StatLeft>
+                <StatTitle>{stat.title}</StatTitle>
+                <StatValue>{stat.value}</StatValue>
+                <ChangeRow trend={stat.trend}>
                   {stat.trend === 'up' ? (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17l5-5m0 0l-5-5m5 5H6" />
                     </svg>
                   )}
                   {stat.change}
-                  <span className="text-muted-foreground ml-1">This month</span>
-                </div>
-              </div>
-              <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform bg-${stat.color}/10`}
-              >
-                <svg
-                  className="w-6 h-6"
-                  style={{ color: `var(--${stat.color})` }}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                  <ChangeMuted>This month</ChangeMuted>
+                </ChangeRow>
+              </StatLeft>
+              <IconBoxVar color={stat.color} style={{ background: bgMap[stat.color], color: colorMap[stat.color] }}>
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={ICONS[stat.icon] ?? ''} />
                 </svg>
-              </div>
-            </div>
+              </IconBoxVar>
+            </StatInner>
           </CardContent>
-        </Card>
+        </StatCard>
       ))}
-    </div>
+    </Grid4>
   )
 }

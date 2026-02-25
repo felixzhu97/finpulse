@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text } from "react-native";
 import { LineChart, CandlestickChart } from "react-native-wagmi-charts";
-import styled from "styled-components/native";
+import styled from "@emotion/native";
 
 type LinePoint = { timestamp: number; value: number };
 type CandlePoint = { timestamp: number; open: number; high: number; low: number; close: number };
