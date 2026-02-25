@@ -34,7 +34,7 @@ const Content = styled.ScrollView`
 
 const ValueContainer = styled.View`
   padding: 16px;
-  border-radius: 12px;
+  border-radius: 16px;
   margin-bottom: 20px;
   background-color: ${(p) => p.theme.colors.surface};
 `;

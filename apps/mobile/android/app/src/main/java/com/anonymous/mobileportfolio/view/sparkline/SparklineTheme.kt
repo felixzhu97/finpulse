@@ -4,8 +4,8 @@ import android.graphics.Color
 
 object SparklineTheme {
 
-    private const val UP_COLOR = "#ff3b30"
-    private const val DOWN_COLOR = "#34c759"
+    private const val UP_COLOR = "#00C805"
+    private const val DOWN_COLOR = "#FF3B30"
     private const val FLAT_COLOR = "#8e8e93"
 
     fun lineColorForTrend(trend: String): Int = when (trend) {

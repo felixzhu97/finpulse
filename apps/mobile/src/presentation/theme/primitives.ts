@@ -67,7 +67,7 @@ export const ListRowSparkline = styled.View`
 `;
 
 export const RowTitle = styled.Text`
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.3px;
   color: ${withTheme((t) => t.colors.text)};
@@ -81,7 +81,7 @@ export const RowSubtitle = styled.Text`
 `;
 
 export const RowValue = styled.Text`
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.3px;
   color: ${withTheme((t) => t.colors.text)};
