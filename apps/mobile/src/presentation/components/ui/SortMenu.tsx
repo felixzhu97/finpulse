@@ -113,7 +113,7 @@ export const SortMenu = memo(function SortMenu({ currentSort, onSelect, onOpen }
                 <Option key={option.value} onPress={() => handleSelect(option.value)}>
                   <OptionText>{option.label}</OptionText>
                   {currentSort === option.value && (
-                    <MaterialIcons name="check" size={20} color={colors.primary} />
+                    <MaterialIcons name="check" size={20} color={colors.accent} />
                   )}
                 </Option>
               ))}

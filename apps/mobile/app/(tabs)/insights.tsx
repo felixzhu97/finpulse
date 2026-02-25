@@ -76,7 +76,7 @@ export default function InsightsScreen() {
 
   return (
     <InsightsScrollView
-      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 48 }}
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 40 }}
       showsVerticalScrollIndicator={false}
     >
       {(loading && !metrics) || (summaryLoading && !summary) || (varLoading && !computedVar) ? (
@@ -180,10 +180,14 @@ export default function InsightsScreen() {
                 backgroundGradientTo: colors.card,
                 backgroundGradientToOpacity: 0,
                 color: (opacity = 1) => {
-                  if (Platform.OS === "ios") {
-                    return `rgba(0, 122, 255, ${opacity})`;
+                  const hex = colors.accent;
+                  if (hex.startsWith("#") && hex.length === 7) {
+                    const r = parseInt(hex.slice(1, 3), 16);
+                    const g = parseInt(hex.slice(3, 5), 16);
+                    const b = parseInt(hex.slice(5, 7), 16);
+                    return `rgba(${r},${g},${b},${opacity})`;
                   }
-                  return colors.primary;
+                  return colors.accent;
                 },
                 labelColor: (opacity = 1) => {
                   const textColor = colors.textSecondary;

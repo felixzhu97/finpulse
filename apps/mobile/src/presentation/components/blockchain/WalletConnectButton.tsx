@@ -23,15 +23,15 @@ const Button = styled(TouchableOpacity)`
   padding-horizontal: 22px;
   border-radius: 12px;
   gap: 8px;
-  background-color: ${(p) => p.theme.colors.primary};
+  background-color: ${(p) => p.theme.colors.accent};
   min-height: 50px;
 `;
 
 const ButtonText = styled.Text`
-  color: ${(p) => p.theme.colors.onPrimary};
+  color: ${(p) => p.theme.colors.onAccent};
   font-size: 17px;
   font-weight: 600;
-  letter-spacing: -0.41px;
+  letter-spacing: -0.2px;
 `;
 
 const ErrorText = styled.Text`

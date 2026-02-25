@@ -35,7 +35,7 @@ const StyledScrollView = styled(ScrollView)`
 
 const ContentWrap = styled.View`
   padding-horizontal: 16px;
-  padding-bottom: 48px;
+  padding-bottom: 40px;
 `;
 
 const Section = styled.View`
@@ -104,14 +104,14 @@ export default function DashboardScreen() {
         </HeaderTitleBlock>
       </ScreenHeader>
       <StyledScrollView
-        contentContainerStyle={{ paddingBottom: 48 }}
+        contentContainerStyle={{ paddingBottom: 40 }}
         scrollEnabled={!chartScrollLock}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={loading}
             onRefresh={onRefresh}
-            tintColor={colors.primary}
+            tintColor={colors.accent}
           />
         }
       >

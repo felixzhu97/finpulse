@@ -157,7 +157,7 @@ export function NewPaymentDrawer({ visible, onClose, onSuccess }: NewPaymentDraw
                 <DrawerFieldGroup>
                   <DrawerLabel>{t("account.selectAccount")}</DrawerLabel>
                   {loadingAccounts ? (
-                    <ActivityIndicator size="small" color={colors.primary} />
+                    <ActivityIndicator size="small" color={colors.onAccent} />
                   ) : (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }}>
                       {accounts.map((acc) => {
@@ -257,14 +257,15 @@ const DoneButton = styled(TouchableOpacity)`
   margin-top: 24px;
   padding-vertical: 12px;
   padding-horizontal: 32px;
-  border-radius: 10px;
-  background-color: ${(p) => p.theme.colors.primary};
+  border-radius: 12px;
+  background-color: ${(p) => p.theme.colors.accent};
 `;
 
 const DoneButtonText = styled.Text`
-  color: #fff;
+  color: ${(p) => p.theme.colors.onAccent};
   font-size: 16px;
   font-weight: 600;
+  letter-spacing: -0.2px;
 `;
 
 const AccountChip = styled(TouchableOpacity)<{ selected: boolean }>`
@@ -274,10 +275,10 @@ const AccountChip = styled(TouchableOpacity)<{ selected: boolean }>`
   margin-right: 8px;
   border-width: 1px;
   background-color: ${(p) => (p.selected ? p.theme.colors.primaryLight : p.theme.colors.surface)};
-  border-color: ${(p) => (p.selected ? p.theme.colors.primary : p.theme.colors.border)};
+  border-color: ${(p) => (p.selected ? p.theme.colors.accent : p.theme.colors.border)};
 `;
 
 const AccountChipText = styled.Text<{ selected: boolean }>`
   font-size: 14px;
-  color: ${(p) => (p.selected ? p.theme.colors.primary : p.theme.colors.text)};
+  color: ${(p) => (p.selected ? p.theme.colors.accent : p.theme.colors.text)};
 `;

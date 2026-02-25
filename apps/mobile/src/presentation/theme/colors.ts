@@ -1,5 +1,4 @@
-/** Robinhood-style accent (Robin Neon) */
-export const RobinNeon = "#CCFF00";
+export const RobinNeon = "#00C805";
 
 export const LightColors = {
   background: "#FFFFFF",
@@ -13,15 +12,15 @@ export const LightColors = {
   borderSecondary: "rgba(0,0,0,0.08)",
   primary: "#1D1D1F",
   onPrimary: "#FFFFFF",
-  primaryLight: "rgba(0,0,0,0.06)",
+  primaryLight: "rgba(0,200,5,0.12)",
   accent: RobinNeon,
   onAccent: "#000000",
-  success: "#34C759",
+  success: RobinNeon,
   error: "#FF3B30",
   warning: "#FF9500",
   tabBar: "#FFFFFF",
   tabBarBorder: "rgba(0,0,0,0.1)",
-  tabIconActive: "#1D1D1F",
+  tabIconActive: RobinNeon,
   tabIconInactive: "rgba(0,0,0,0.5)",
   glass: "rgba(255,255,255,0.7)",
   backdrop: "rgba(0,0,0,0.4)",
@@ -32,26 +31,25 @@ export const DarkColors = {
   surface: "rgba(255,255,255,0.06)",
   card: "rgba(255,255,255,0.08)",
   cardSolid: "#141414",
-  text: "rgba(255,255,255,0.9)",
+  text: "rgba(255,255,255,0.92)",
   textSecondary: "rgba(255,255,255,0.6)",
   textTertiary: "rgba(255,255,255,0.5)",
   border: "rgba(255,255,255,0.1)",
   borderSecondary: "rgba(255,255,255,0.08)",
-  primary: "rgba(255,255,255,0.9)",
+  primary: "rgba(255,255,255,0.92)",
   onPrimary: "#000000",
-  primaryLight: "rgba(255,255,255,0.12)",
-  /** Primary CTA (Robinhood-style) */
+  primaryLight: "rgba(0,200,5,0.15)",
   accent: RobinNeon,
   onAccent: "#000000",
-  success: "#30D158",
+  success: RobinNeon,
   error: "#FF453A",
   warning: "#FF9F0A",
   tabBar: "#000000",
   tabBarBorder: "rgba(255,255,255,0.1)",
-  tabIconActive: "rgba(255,255,255,0.9)",
+  tabIconActive: RobinNeon,
   tabIconInactive: "rgba(255,255,255,0.5)",
-  glass: "rgba(0,0,0,0.7)",
-  backdrop: "rgba(0,0,0,0.4)",
+  glass: "rgba(0,0,0,0.75)",
+  backdrop: "rgba(0,0,0,0.5)",
 };
 
 export type ColorScheme = typeof LightColors;

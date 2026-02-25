@@ -201,15 +201,16 @@ export const ScreenRoot = styled.View`
 `;
 
 export const SectionTitle = styled.Text`
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  margin-bottom: 4px;
-  color: ${withTheme((t) => t.colors.text)};
+  letter-spacing: 0.02px;
+  margin-bottom: 8px;
+  color: ${withTheme((t) => t.colors.textSecondary)};
 `;
 
 export const ContentPadding = styled.View`
   padding: 16px;
-  padding-bottom: 32px;
+  padding-bottom: 40px;
 `;
 
 export const CenteredContainer = styled.View`
@@ -229,7 +230,7 @@ export const RetryText = styled.Text`
   margin-top: 12px;
   font-size: 15px;
   font-weight: 500;
-  color: ${withTheme((t) => t.colors.primary)};
+  color: ${withTheme((t) => t.colors.accent)};
 `;
 
 export const ChartCard = styled.View`
@@ -276,7 +277,7 @@ export const ScreenHeader = styled.View`
   align-items: flex-end;
   padding-horizontal: 16px;
   padding-top: 8px;
-  padding-bottom: 12px;
+  padding-bottom: 16px;
 `;
 
 export const HeaderTitleBlock = styled.View``;
@@ -284,7 +285,7 @@ export const HeaderTitleBlock = styled.View``;
 export const ScreenTitle = styled.Text`
   font-size: 28px;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.6px;
   color: ${withTheme((t) => t.colors.text)};
 `;
 
@@ -292,6 +293,7 @@ export const ScreenDate = styled.Text`
   font-size: 13px;
   margin-top: 4px;
   font-weight: 400;
+  letter-spacing: -0.1px;
   color: ${withTheme((t) => t.colors.textSecondary)};
 `;
 
@@ -311,15 +313,19 @@ export const IconButton = styled.Pressable`
 
 export const RetryButton = styled.Pressable`
   margin-top: 12px;
-  padding-vertical: 10px;
-  padding-horizontal: 20px;
-  border-radius: 10px;
-  background-color: ${withTheme((t) => t.colors.primary)};
+  padding-vertical: 12px;
+  padding-horizontal: 24px;
+  border-radius: 12px;
+  background-color: ${withTheme((t) => t.colors.accent)};
+  align-items: center;
+  justify-content: center;
 `;
 
 export const RetryButtonText = styled.Text`
-  color: #fff;
+  color: ${withTheme((t) => t.colors.onAccent)};
+  font-size: 16px;
   font-weight: 600;
+  letter-spacing: -0.2px;
 `;
 
 export const EmptyContainer = styled.View`
@@ -358,11 +364,11 @@ export const InsightsSection = styled.View`
 `;
 
 export const InsightsSectionHeader = styled.Text`
-  font-size: 17px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: -0.3px;
+  letter-spacing: 0.02px;
   margin-bottom: 8px;
-  color: ${withTheme((t) => t.colors.text)};
+  color: ${withTheme((t) => t.colors.textSecondary)};
 `;
 
 export const OverviewGrid = styled.View`
@@ -420,7 +426,7 @@ export const InsightsRetryText = styled.Text`
   margin-top: 16px;
   font-size: 17px;
   font-weight: 500;
-  color: ${withTheme((t) => t.colors.primary)};
+  color: ${withTheme((t) => t.colors.accent)};
 `;
 
 export const InsightsCentered = styled.View`
@@ -555,17 +561,18 @@ export const DrawerInput = styled.TextInput`
 
 export const DrawerSubmitButton = styled(TouchableOpacity)`
   padding-vertical: 14px;
-  border-radius: 10px;
+  border-radius: 12px;
   align-items: center;
   justify-content: center;
   margin-top: 8px;
-  background-color: ${withTheme((t) => t.colors.primary)};
+  background-color: ${withTheme((t) => t.colors.accent)};
 `;
 
 export const DrawerSubmitButtonText = styled.Text`
-  color: #fff;
+  color: ${withTheme((t) => t.colors.onAccent)};
   font-size: 16px;
   font-weight: 600;
+  letter-spacing: -0.2px;
 `;
 
 export const DrawerErrorText = styled.Text`

@@ -211,7 +211,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                             justifyContent: "center",
                             borderWidth: 1,
                             backgroundColor: isSelected ? colors.primaryLight : colors.surface,
-                            borderColor: isSelected ? colors.primary : colors.border,
+                            borderColor: isSelected ? colors.accent : colors.border,
                             opacity: saving ? 0.5 : 1,
                           }}
                           onPress={() => handleThemeSelect(option.value)}
@@ -221,7 +221,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                           <Text
                             style={{
                               fontSize: 15,
-                              color: isSelected ? colors.primary : colors.textSecondary,
+                              color: isSelected ? colors.accent : colors.textSecondary,
                               fontWeight: isSelected ? "600" : "400",
                             }}
                           >
@@ -250,7 +250,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                             justifyContent: "center",
                             borderWidth: 1,
                             backgroundColor: isSelected ? colors.primaryLight : colors.surface,
-                            borderColor: isSelected ? colors.primary : colors.border,
+                            borderColor: isSelected ? colors.accent : colors.border,
                             opacity: saving ? 0.5 : 1,
                           }}
                           onPress={() => handleLanguageSelect(option.value)}
@@ -260,7 +260,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                           <Text
                             style={{
                               fontSize: 15,
-                              color: isSelected ? colors.primary : colors.textSecondary,
+                              color: isSelected ? colors.accent : colors.textSecondary,
                               fontWeight: isSelected ? "600" : "400",
                             }}
                           >
@@ -295,7 +295,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                           onPress={() => setShowChangePassword(true)}
                           activeOpacity={0.7}
                         >
-                          <Text style={{ fontSize: 15, color: colors.primary }}>{t("auth.changePassword")}</Text>
+                          <Text style={{ fontSize: 15, color: colors.accent }}>{t("auth.changePassword")}</Text>
                         </TouchableOpacity>
                       ) : (
                         <View style={{ gap: 12 }}>
@@ -329,8 +329,8 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
                             <TouchableOpacity style={{ flex: 1, paddingVertical: 12, borderRadius: 10, backgroundColor: colors.surface, alignItems: "center" }} onPress={() => { setShowChangePassword(false); setChangePasswordError(null); setChangePasswordSuccess(false); }} activeOpacity={0.7}>
                               <Text style={{ fontSize: 15, color: colors.text }}>{t("account.back")}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={{ flex: 1, paddingVertical: 12, borderRadius: 10, backgroundColor: colors.primary, alignItems: "center" }} onPress={handleChangePasswordSubmit} disabled={saving} activeOpacity={0.7}>
-                              <Text style={{ fontSize: 15, fontWeight: "600", color: colors.onPrimary }}>{t("account.submit")}</Text>
+                            <TouchableOpacity style={{ flex: 1, paddingVertical: 12, borderRadius: 12, backgroundColor: colors.accent, alignItems: "center" }} onPress={handleChangePasswordSubmit} disabled={saving} activeOpacity={0.7}>
+                              <Text style={{ fontSize: 15, fontWeight: "600", color: colors.onAccent }}>{t("account.submit")}</Text>
                             </TouchableOpacity>
                           </View>
                         </View>
@@ -348,7 +348,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
 
                 {saving && (
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 }}>
-                    <ActivityIndicator size="small" color={colors.primary} />
+                    <ActivityIndicator size="small" color={colors.onAccent} />
                     <Text style={{ fontSize: 13, color: colors.textSecondary }}>{t("common.saving")}</Text>
                   </View>
                 )}

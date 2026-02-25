@@ -197,8 +197,8 @@ export function NewTradeDrawer({ visible, onClose, onSuccess, prefillDefaults }:
                     </Text>
                   </View>
                 )}
-                <TouchableOpacity style={{ marginTop: 24, paddingVertical: 12, paddingHorizontal: 32, borderRadius: 10, backgroundColor: colors.primary }} onPress={handleClose}>
-                  <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>{t("common.close")}</Text>
+                <TouchableOpacity style={{ marginTop: 24, paddingVertical: 12, paddingHorizontal: 32, borderRadius: 12, backgroundColor: colors.accent }} onPress={handleClose}>
+                  <Text style={{ color: colors.onAccent, fontSize: 16, fontWeight: "600" }}>{t("common.close")}</Text>
                 </TouchableOpacity>
               </View>
             ) : step === "order" ? (
@@ -214,11 +214,11 @@ export function NewTradeDrawer({ visible, onClose, onSuccess, prefillDefaults }:
                         alignItems: "center",
                         borderWidth: 1,
                         backgroundColor: side === "buy" ? colors.primaryLight : colors.surface,
-                        borderColor: colors.border,
+                        borderColor: side === "buy" ? colors.accent : colors.border,
                       }}
                       onPress={() => setSide("buy")}
                     >
-                      <Text style={{ color: side === "buy" ? colors.primary : colors.text }}>{t("account.buy")}</Text>
+                      <Text style={{ color: side === "buy" ? colors.accent : colors.text }}>{t("account.buy")}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{
@@ -251,11 +251,11 @@ export function NewTradeDrawer({ visible, onClose, onSuccess, prefillDefaults }:
                             marginRight: 8,
                             borderWidth: 1,
                             backgroundColor: selected ? colors.primaryLight : colors.surface,
-                            borderColor: colors.border,
+                            borderColor: selected ? colors.accent : colors.border,
                           }}
                           onPress={() => setAccountId(acc.account_id)}
                         >
-                          <Text style={{ fontSize: 14, color: selected ? colors.primary : colors.text }}>
+                          <Text style={{ fontSize: 14, color: selected ? colors.accent : colors.text }}>
                             {acc.account_type}
                           </Text>
                         </TouchableOpacity>
@@ -278,11 +278,11 @@ export function NewTradeDrawer({ visible, onClose, onSuccess, prefillDefaults }:
                             marginRight: 8,
                             borderWidth: 1,
                             backgroundColor: selected ? colors.primaryLight : colors.surface,
-                            borderColor: colors.border,
+                            borderColor: selected ? colors.accent : colors.border,
                           }}
                           onPress={() => setInstrumentId(i.instrument_id)}
                         >
-                          <Text style={{ fontSize: 14, color: selected ? colors.primary : colors.text }}>
+                          <Text style={{ fontSize: 14, color: selected ? colors.accent : colors.text }}>
                             {i.symbol}
                           </Text>
                         </TouchableOpacity>
