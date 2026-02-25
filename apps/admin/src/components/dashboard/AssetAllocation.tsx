@@ -3,11 +3,11 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/styled'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 
 const data = [
-  { name: 'Stocks', value: 45, color: 'oklch(0.65 0.2 250)' },
-  { name: 'Bonds', value: 25, color: 'oklch(0.7 0.22 160)' },
+  { name: 'Stocks', value: 45, color: 'oklch(0.78 0.19 145)' },
+  { name: 'Bonds', value: 25, color: 'oklch(0.72 0.16 280)' },
   { name: 'Funds', value: 15, color: 'oklch(0.75 0.18 80)' },
   { name: 'Cash', value: 10, color: 'oklch(0.7 0.15 300)' },
-  { name: 'Other', value: 5, color: 'oklch(0.6 0.02 260)' },
+  { name: 'Other', value: 5, color: 'oklch(0.5 0.02 260)' },
 ]
 
 const ChartWrap = styled.div`
@@ -73,13 +73,13 @@ export function AssetAllocation() {
                 dataKey="value"
               >
                 {data.map((entry) => (
-                  <Cell key={entry.name} fill={entry.color} stroke="oklch(0.14 0.015 260)" strokeWidth={2} />
+                  <Cell key={entry.name} fill={entry.color} stroke="var(--card)" strokeWidth={2} />
                 ))}
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'oklch(0.14 0.015 260 / 0.95)',
-                  border: '1px solid oklch(0.25 0.02 260)',
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
                   borderRadius: 8,
                 }}
                 formatter={(value: number) => [`${value}%`, '']}

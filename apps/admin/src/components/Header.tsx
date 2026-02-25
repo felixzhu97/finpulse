@@ -5,8 +5,8 @@ import { StyledButton, StyledInput, StyledBadge, StyledAvatar } from '@/styled'
 const StyledHeader = styled.header`
   height: 4rem;
   border-bottom: 1px solid var(--border);
-  background: oklch(0.14 0.015 260 / 0.5);
-  backdrop-filter: blur(4px);
+  background: oklch(0.09 0.005 260 / 0.9);
+  backdrop-filter: blur(8px);
   position: sticky;
   top: 0;
   z-index: 40;
@@ -37,11 +37,11 @@ const SearchIcon = styled.svg`
 
 const SearchInput = styled(StyledInput)`
   padding-left: 2.5rem;
-  background: oklch(0.2 0.02 260 / 0.5);
+  background: var(--secondary);
   border-color: var(--border);
   &:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px oklch(0.65 0.2 250 / 0.2);
+    box-shadow: 0 0 0 2px oklch(0.78 0.19 145 / 0.2);
   }
 `
 
@@ -69,8 +69,8 @@ const MarketBadge = styled.div`
   gap: 0.5rem;
   padding: 0.375rem 0.75rem;
   border-radius: 9999px;
-  background: oklch(0.7 0.22 160 / 0.1);
-  border: 1px solid oklch(0.7 0.22 160 / 0.2);
+  background: oklch(0.78 0.19 145 / 0.12);
+  border: 1px solid oklch(0.78 0.19 145 / 0.2);
 `
 
 const MarketDot = styled.span`
@@ -159,7 +159,7 @@ export function Header() {
         <Actions>
           <MarketBadge>
             <MarketDot />
-            <span style={{ fontSize: '0.875rem', color: 'var(--accent)', fontWeight: 500 }}>Market Open</span>
+            <span style={{ fontSize: '0.875rem', color: 'var(--primary)', fontWeight: 500 }}>Market Open</span>
           </MarketBadge>
 
           <StyledButton variant="ghost" size="icon" type="button">

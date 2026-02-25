@@ -29,7 +29,7 @@ const StatCard = styled(Card)`
   cursor: pointer;
   transition: border-color 0.3s;
   &:hover {
-    border-color: oklch(0.65 0.2 250 / 0.5);
+    border-color: oklch(0.78 0.19 145 / 0.35);
   }
 `
 

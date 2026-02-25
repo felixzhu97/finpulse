@@ -33,8 +33,8 @@ const RangeGroup = styled.div`
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem;
-  background: oklch(0.2 0.02 260 / 0.5);
-  border-radius: 0.5rem;
+  background: var(--secondary);
+  border-radius: var(--radius);
 `
 
 const ChartWrap = styled.div`
@@ -96,29 +96,29 @@ export function PerformanceChart() {
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="portfolio" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="oklch(0.65 0.2 250)" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="oklch(0.65 0.2 250)" stopOpacity={0} />
+                  <stop offset="0%" stopColor="oklch(0.78 0.19 145)" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="oklch(0.78 0.19 145)" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="benchmark" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="oklch(0.7 0.22 160)" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="oklch(0.7 0.22 160)" stopOpacity={0} />
+                  <stop offset="0%" stopColor="oklch(0.55 0.02 260)" stopOpacity={0.25} />
+                  <stop offset="100%" stopColor="oklch(0.55 0.02 260)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.25 0.02 260)" />
-              <XAxis dataKey="date" stroke="oklch(0.6 0.02 260)" fontSize={11} />
-              <YAxis stroke="oklch(0.6 0.02 260)" fontSize={11} tickFormatter={(v) => `¥${(v / 1e6).toFixed(1)}M`} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={11} />
+              <YAxis stroke="var(--muted-foreground)" fontSize={11} tickFormatter={(v) => `¥${(v / 1e6).toFixed(1)}M`} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'oklch(0.14 0.015 260 / 0.95)',
-                  border: '1px solid oklch(0.25 0.02 260)',
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--border)',
                   borderRadius: 8,
                 }}
-                labelStyle={{ color: 'oklch(0.98 0 0)' }}
+                labelStyle={{ color: 'var(--foreground)' }}
                 formatter={(value: number) => [`¥${(value / 1e6).toFixed(2)}M`, '']}
                 labelFormatter={(label) => label}
               />
-              <Area type="monotone" dataKey="value" stroke="oklch(0.65 0.2 250)" fill="url(#portfolio)" strokeWidth={2} name="Portfolio" />
-              <Area type="monotone" dataKey="benchmark" stroke="oklch(0.7 0.22 160)" fill="url(#benchmark)" strokeWidth={2} name="Benchmark" />
+              <Area type="monotone" dataKey="value" stroke="oklch(0.78 0.19 145)" fill="url(#portfolio)" strokeWidth={2} name="Portfolio" />
+              <Area type="monotone" dataKey="benchmark" stroke="var(--muted-foreground)" fill="url(#benchmark)" strokeWidth={2} name="Benchmark" />
             </AreaChart>
           </ResponsiveContainer>
         </ChartWrap>

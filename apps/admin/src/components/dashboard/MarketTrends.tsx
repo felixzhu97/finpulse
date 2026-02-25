@@ -77,7 +77,7 @@ export function MarketTrends() {
                   <Line
                     type="monotone"
                     dataKey="v"
-                    stroke={market.trend === 'up' ? 'oklch(0.7 0.22 160)' : 'oklch(0.6 0.2 25)'}
+                    stroke={market.trend === 'up' ? 'oklch(0.78 0.19 145)' : 'oklch(0.55 0.22 25)'}
                     strokeWidth={2}
                     dot={false}
                   />

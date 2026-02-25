@@ -15,36 +15,37 @@ export const MainCol = styled.div`
 
 export const Main = styled.main`
   flex: 1;
-  padding: 1.5rem;
+  padding: 2rem;
   overflow: auto;
 `
 
 export const Card = styled.div`
   background-color: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 `
 
 export const CardHeader = styled.div`
-  padding: 1.5rem 1.5rem 0.5rem;
+  padding: 1.25rem 1.5rem 0.5rem;
 `
 
 export const CardTitle = styled.h3`
   margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--foreground);
 `
 
 export const CardContent = styled.div`
-  padding: 1rem 1.5rem 1.5rem;
+  padding: 0 1.5rem 1.5rem;
 `
 
 export const PageGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 1.5rem;
+  gap: 2rem;
 `
 
 export const Col12 = styled.div` grid-column: span 12; `
@@ -57,7 +58,7 @@ export const Col3 = styled.div` grid-column: span 3; `
 export const Grid4 = styled.div`
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 1.25rem;
 `
 
 export const StyledButton = styled.button<{ variant?: 'default' | 'ghost'; size?: 'default' | 'sm' | 'icon'; active?: boolean }>`
@@ -66,17 +67,18 @@ export const StyledButton = styled.button<{ variant?: 'default' | 'ghost'; size?
   justify-content: center;
   gap: 0.5rem;
   white-space: nowrap;
-  border-radius: 0.375rem;
+  border-radius: var(--radius);
   font-size: 0.875rem;
   font-weight: 500;
+  letter-spacing: -0.01em;
   border: none;
   cursor: pointer;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, color 0.15s, opacity 0.15s;
   ${(p) => (p.size === 'icon' ? 'width: 2.25rem; height: 2.25rem; padding: 0;' : p.size === 'sm' ? 'height: 2rem; padding-left: 0.75rem; padding-right: 0.75rem;' : 'height: 2.25rem; padding-left: 1rem; padding-right: 1rem;')}
   ${(p) =>
     p.variant === 'ghost'
       ? `background: transparent; color: var(--muted-foreground); &:hover { background: var(--secondary); color: var(--foreground); }`
-      : `background: var(--primary); color: var(--primary-foreground); &:hover { opacity: 0.9; }`}
+      : `background: var(--primary); color: var(--primary-foreground); &:hover { opacity: 0.92; }`}
   ${(p) => p.active && `background: var(--primary); color: var(--primary-foreground);`}
   &:disabled { pointer-events: none; opacity: 0.5; }
 `
@@ -87,11 +89,12 @@ export const StyledInput = styled.input`
   padding: 0 0.75rem;
   font-size: 0.875rem;
   border: 1px solid var(--border);
-  border-radius: 0.375rem;
+  border-radius: var(--radius);
   background: var(--secondary);
   color: var(--foreground);
   outline: none;
-  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px oklch(0.65 0.2 250 / 0.2); }
+  transition: border-color 0.15s, box-shadow 0.15s;
+  &:focus { border-color: var(--primary); box-shadow: 0 0 0 2px oklch(0.78 0.19 145 / 0.2); }
 `
 
 export const StyledBadge = styled.span`
@@ -111,7 +114,7 @@ export const StyledAvatar = styled.div`
 `
 
 export const StyledProgress = styled.div<{ value: number }>`
-  height: 0.5rem;
+  height: 0.375rem;
   background: var(--secondary);
   border-radius: 9999px;
   overflow: hidden;
@@ -122,7 +125,7 @@ export const StyledProgress = styled.div<{ value: number }>`
     width: ${(p) => Math.min(100, Math.max(0, p.value))}%;
     background: var(--primary);
     border-radius: 9999px;
-    transition: width 0.2s;
+    transition: width 0.2s ease;
   }
 `
 
@@ -140,6 +143,6 @@ export const Subtitle = styled.p`
 export const AgGridWrap = styled.div`
   height: 600px;
   width: 100%;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-lg);
   overflow: hidden;
 `

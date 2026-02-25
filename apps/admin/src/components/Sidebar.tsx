@@ -72,21 +72,19 @@ const LogoWrap = styled.div`
 const LogoIcon = styled.div`
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 0.75rem;
-  background: linear-gradient(to bottom right, var(--primary), var(--accent));
+  border-radius: var(--radius);
+  background: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: pulse-glow 2.5s ease-in-out infinite;
 `
 
 const LogoText = styled.span`
   font-size: 1.25rem;
   font-weight: 700;
-  background: linear-gradient(to right, var(--primary), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  letter-spacing: -0.03em;
+  color: var(--primary);
 `
 
 const Nav = styled.nav`
@@ -106,9 +104,9 @@ const NavItem = styled.a`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius);
+  transition: background 0.15s, color 0.15s;
   color: var(--muted-foreground);
   text-decoration: none;
   &:hover {
@@ -122,9 +120,9 @@ const StyledNavLink = styled(NavLink)`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius);
+  transition: background 0.15s, color 0.15s;
   color: var(--muted-foreground);
   text-decoration: none;
   &:hover {
@@ -132,9 +130,9 @@ const StyledNavLink = styled(NavLink)`
     color: var(--foreground);
   }
   &.active {
-    background: oklch(0.65 0.2 250 / 0.1);
+    background: oklch(0.78 0.19 145 / 0.12);
     color: var(--primary);
-    box-shadow: 0 0 20px oklch(0.65 0.2 250 / 0.2), inset 0 0 20px oklch(0.65 0.2 250 / 0.05);
+    box-shadow: 0 0 0 1px oklch(0.78 0.19 145 / 0.12);
   }
 `
 
