@@ -74,7 +74,7 @@ src/
 - **Vite 6**: Build tool and dev server
 - **React Router 7**: Routing
 - **TypeScript**: Type safety
-- **Tailwind CSS 4**: Utility-first CSS
+- **Emotion** (@emotion/react, @emotion/styled): Robinhood-style styling
 - **@fintech/ui**: Shared UI components (Radix-based)
 - **recharts**: Charts
 - **ag-grid-react**: Data grids

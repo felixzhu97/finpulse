@@ -35,7 +35,7 @@
 
 **文件**：`application-architecture.puml`
 
-**描述**：分层应用组件及其交互。展示层包含 Admin（apps/admin）、门户（apps/portal，React + Vite、@fintech/ui）、移动端投资组合（含 styled-components 主题 UI：StyledThemeProvider、useTheme、基元）。
+**描述**：分层应用组件及其交互。展示层包含 Admin（apps/admin）、门户（apps/portal，React + Vite、@fintech/ui、Emotion）、移动端投资组合（含 Emotion 主题 UI，Robinhood 风格）。
 
 ### 数据架构图 (Data Architecture)
 
@@ -80,7 +80,7 @@ plantuml -tsvg *.puml
 ## 最近更新
 
 - **Redux 优化（移动端投资组合）**：报价统一走 Redux；`extraSubscribedSymbols` 支持抽屉符号；单 WebSocket；统一使用 useAppSelector/useAppDispatch。
-- **Redux + styled-components（移动端投资组合）**：Portfolio 状态迁至 Redux（portfolio slice）；主屏与列表组件统一使用 styled-components 基元（ScreenRoot、ListRow、CardBordered、SafeAreaScreen 等）实现主题 UI。
+- **Redux + Emotion（移动端投资组合）**：Portfolio 状态迁至 Redux（portfolio slice）；主屏与列表组件统一使用 Emotion 基元（ScreenRoot、ListRow、CardBordered、SafeAreaScreen 等）实现 Robinhood 风格主题 UI。
 - **整洁架构（移动端投资组合）**：Presentation → Application → Domain；Infrastructure 仅由 DependencyContainer 注入。共享 hooks：**useAsyncLoad**、**runWithLoading**、**useRefreshControl**、**useAccountData**。
 - **OOP 架构**：原生图表代码重构，使用抽象基类（`BaseChartViewManager`、`BaseChartView`、`BaseChartRenderer`）和辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartDataCalculator）。共享工具：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes。
 - **代码简化**：移除未使用代码（usePerSymbolHistory、重复 PeriodDataProcessor），简化逻辑，提升可维护性

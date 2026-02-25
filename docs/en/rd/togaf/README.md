@@ -45,7 +45,7 @@ This document follows **TOGAF (The Open Group Architecture Framework)** and desc
 **Description**: Layered application components and their interactions.
 
 **Layers**:
-1. **Presentation**: Admin (apps/admin), portal (apps/portal, React + Vite, @fintech/ui), mobile (apps/mobile with styled-components for theme-aware UI), UI library (packages/ui), charts
+1. **Presentation**: Admin (apps/admin), portal (apps/portal, React + Vite, @fintech/ui, Emotion), mobile (apps/mobile with Emotion for theme-aware UI, Robinhood-style), UI library (packages/ui), charts
 2. **Business Layer**: Portfolio, market data, transaction, risk, user modules
 3. **Data Access**: Data services (DAO, cache), state management
 4. **External Services**: Portfolio Analytics API, Vercel Analytics, market data API, big data service layer
@@ -95,7 +95,7 @@ Technology Architecture
 ## Recent Updates
 
 - **Redux optimization (Mobile Portfolio)**: Unified quotes via Redux; `extraSubscribedSymbols` for drawer symbols; single WebSocket; useAppSelector/useAppDispatch throughout.
-- **Redux + styled-components (Mobile Portfolio)**: Portfolio state in Redux (portfolio slice); main screens and list components use styled-components primitives (ScreenRoot, ListRow, CardBordered, SafeAreaScreen, etc.) for theme-aware UI.
+- **Redux + Emotion (Mobile Portfolio)**: Portfolio state in Redux (portfolio slice); main screens and list components use Emotion primitives (ScreenRoot, ListRow, CardBordered, SafeAreaScreen, etc.) for theme-aware Robinhood-style UI.
 - **Clean Architecture (Mobile Portfolio)**: Presentation → Application → Domain; Infrastructure only in DependencyContainer. Shared hooks: **useAsyncLoad**, **runWithLoading**, **useRefreshControl**, **useAccountData**.
 - **OOP Architecture**: Native chart code refactored with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
 - **Code Simplification**: Removed unused code (usePerSymbolHistory, duplicate PeriodDataProcessor), simplified logic, improved maintainability through inheritance and abstraction

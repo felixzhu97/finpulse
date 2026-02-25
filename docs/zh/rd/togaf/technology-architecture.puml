@@ -20,13 +20,13 @@ package "前端技术栈" <<Frontend>> {
     component "Vite 6 + React 19" as AdminViteTech {
         component "apps/admin" as AdminAppTech
         component "React 19" as AdminReactTech
-        component "Tailwind 4" as AdminTailwindTech
+        component "Emotion" as AdminEmotionTech
         note right: finpulse-admin\n端口 4200\n@fintech/ui, recharts, ag-grid-react
     }
     component "Vite 6 + React 19" as PortalViteTech {
         component "apps/portal" as PortalAppTech
         component "React 19" as PortalReactTech
-        component "Tailwind 4" as PortalTailwindTech
+        component "Emotion" as PortalEmotionTech
         note right: finpulse-portal\n端口 3001\n@fintech/ui，Robinhood 风格
     }
     component "React 19.2.0" as React
@@ -138,8 +138,8 @@ package "Mobile (React Native / Expo)" <<Frontend>> {
         component "ScrollableChartContainer" as ScrollableChartContainerTech
         component "chartTooltip" as ChartTooltipTech
     }
-    component "styled-components" as StyledComponentsTech
-    note right of StyledComponentsTech: 主题 UI\nStyledThemeProvider、基元\nuseTheme (useTheme.ts)
+    component "@emotion/native" as EmotionNativeTech
+    note right of EmotionNativeTech: 主题 UI\nStyledThemeProvider、基元\nuseTheme，Robinhood 风格 (#00C805)
     note right of Expo: Expo SDK\nMetro, prebuild\niOS/Android
     note right of RN: React Native core\nrequireNativeComponent\nView managers
     note right of NativeDemoCardTech: apps/mobile\nDemo native card
@@ -281,7 +281,7 @@ package "基础设施层" <<Infra>> {
 ' 前端技术栈内部关系
 AdminViteTech --> AdminAppTech
 AdminViteTech --> AdminReactTech
-AdminViteTech --> AdminTailwindTech
+AdminViteTech --> AdminEmotionTech
 AdminViteTech --> React
 AdminViteTech --> ReactDOM
 AdminViteTech --> TypeScript
@@ -291,7 +291,7 @@ React --> ReactDOM
 React --> TypeScript
 PortalViteTech --> PortalAppTech
 PortalViteTech --> PortalReactTech
-PortalViteTech --> PortalTailwindTech
+PortalViteTech --> PortalEmotionTech
 PortalAppTech --> TypeScript
 
 ' UI框架关系
@@ -388,6 +388,7 @@ AndroidOOPHelpersTech --> AndroidLayoutCalcTech
 AndroidOOPHelpersTech --> AndroidValueFormatterTech
 AndroidOOPHelpersTech --> AndroidAxisManagerTech
 AndroidOOPHelpersTech --> AndroidHistRendererTech
+RN --> EmotionNativeTech
 RN --> SharedChartLogicTech
 NativeChartsTech --> SharedChartLogicTech
 RN --> RNWagmi

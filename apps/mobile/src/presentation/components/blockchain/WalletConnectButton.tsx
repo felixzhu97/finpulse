@@ -157,10 +157,10 @@ export function WalletConnectButton() {
     <View>
       <Button onPress={handleConnect} disabled={showLoading} activeOpacity={0.7}>
         {showLoading ? (
-          <ActivityIndicator size="small" color={colors.onPrimary} />
+          <ActivityIndicator size="small" color={colors.onAccent} />
         ) : (
           <>
-            <MaterialIcons name="link" size={20} color={colors.onPrimary} />
+            <MaterialIcons name="link" size={20} color={colors.onAccent} />
             <ButtonText>{t("blockchain.connectWallet")}</ButtonText>
           </>
         )}

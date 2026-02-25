@@ -78,7 +78,7 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 ### 前端框架
 
 - **Angular 21** - Web 分析控制台（`apps/admin`）
-- **React 19 + Vite** - 门户应用（`apps/portal`，包名 `finpulse-portal`）；Robinhood 风格，使用 `@fintech/ui`、Tailwind，开发端口 3001
+- **React 19 + Vite** - 门户应用（`apps/portal`，包名 `finpulse-portal`）；Robinhood 风格，使用 `@fintech/ui`、Emotion，开发端口 3001
 - **React Native + Expo** - 移动应用（`apps/mobile`）
 - **React 19.2** - UI 组件与共享库
 - **TypeScript 5.0** - 类型安全
@@ -100,7 +100,7 @@ FinPulse 是现代金融科技分析平台，为投资者提供投资组合管�
 ### UI 与可视化
 
 - **Radix UI** - 无样式可访问组件原语（`@fintech/ui`）
-- **Tailwind CSS 4.1** - 实用优先 CSS 框架
+- **Emotion** - Admin/Portal 使用 @emotion/react、@emotion/styled；移动端使用 @emotion/native；Robinhood 风格
 - **Lucide React** - 图标库
 - **Chart.js + ng2-charts + chartjs-chart-financial** - Web 图表与金融（K 线）图
 - **react-native-wagmi-charts** - 移动端专业股票图（折线、K 线、十字线）
@@ -161,7 +161,7 @@ pnpm dev
 
 ### 门户应用（portal）
 
-React + Vite 门户，使用 `@fintech/ui` 与 Tailwind（Robinhood 风格）。开发服务器端口 3001。
+React + Vite 门户，使用 `@fintech/ui` 与 Emotion（Robinhood 风格）。开发服务器端口 3001。
 
 ```bash
 pnpm dev:portal
