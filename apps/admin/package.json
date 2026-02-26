@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@fintech/utils": "workspace:*",
-    "ag-grid-community": "^33.0.0",
-    "ag-grid-react": "^33.0.0",
+    "ag-grid-community": "^35.0.0",
+    "ag-grid-react": "^35.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.0.0",

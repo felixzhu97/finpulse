@@ -10,15 +10,24 @@ FinPulse provides portfolio management, market analysis, and risk management. Bu
 
 ## Screenshots
 
+### Mobile
 <p align="center">
-  <img src="./screenshots/finpulse-mobile-dashboard.png" width="200" alt="Dashboard">
-  <img src="./screenshots/finpulse-mobile-watchlist.png" width="200" alt="Watchlist">
-  <img src="./screenshots/finpulse-mobile-stock-detail.png" width="200" alt="Stock Detail">
+  <img src="./screenshots/finpulse-mobile-dashboard.png" width="200" alt="Mobile Dashboard">
+  <img src="./screenshots/finpulse-mobile-watchlist.png" width="200" alt="Mobile Watchlist">
+  <img src="./screenshots/finpulse-mobile-stock-detail.png" width="200" alt="Mobile Stock Detail">
 </p>
 <p align="center">
-  <img src="./screenshots/finpulse-mobile-insights.png" width="200" alt="Insights">
-  <img src="./screenshots/finpulse-mobile-account.png" width="200" alt="Account">
-  <img src="./screenshots/finpulse-mobile-new-payment.png" width="200" alt="New Payment">
+  <img src="./screenshots/finpulse-mobile-insights.png" width="200" alt="Mobile Insights">
+  <img src="./screenshots/finpulse-mobile-account.png" width="200" alt="Mobile Account">
+  <img src="./screenshots/finpulse-mobile-new-payment.png" width="200" alt="Mobile New Payment">
+</p>
+
+### Admin
+<p align="center">
+  <img src="./screenshots/finpulse-admin-dashboard.png" width="280" alt="Admin Dashboard">
+  <img src="./screenshots/finpulse-admin-portfolio.png" width="280" alt="Admin Portfolio">
+  <img src="./screenshots/finpulse-admin-transactions.png" width="280" alt="Admin Transactions">
+  <img src="./screenshots/finpulse-admin-clients.png" width="280" alt="Admin Clients">
 </p>
 
 ## Tech Stack

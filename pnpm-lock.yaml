@@ -16,18 +16,15 @@ importers:
       '@emotion/styled':
         specifier: ^11.11.0
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.8)(react@19.2.0))(@types/react@19.2.8)(react@19.2.0)
-      '@fintech/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@fintech/utils':
         specifier: workspace:*
         version: link:../../packages/utils
       ag-grid-community:
-        specifier: ^33.0.0
-        version: 33.3.2
+        specifier: ^35.0.0
+        version: 35.1.0
       ag-grid-react:
-        specifier: ^33.0.0
-        version: 33.3.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        specifier: ^35.0.0
+        version: 35.1.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react:
         specifier: ^19.0.0
         version: 19.2.0
@@ -2983,14 +2980,14 @@ packages:
   aes-js@4.0.0-beta.5:
     resolution: {integrity: sha512-G965FqalsNyrPqgEGON7nIx1e/OVENSgiEIzyC63haUMuvNnwIgIjMs52hlTCKhkBny7A2ORNlfY9Zu+jmGk1Q==}
 
-  ag-charts-types@11.3.2:
-    resolution: {integrity: sha512-trPGqgGYiTeLgtf9nLuztDYOPOFOLbqHn1g2D99phf7QowcwdX0TPx0wfWG8Hm90LjB8IH+G2s3AZe2vrdAtMQ==}
+  ag-charts-types@13.1.0:
+    resolution: {integrity: sha512-DytRM3CXli+Y013SC1Mr8lQBrhVTACK+11ilDHOhwUM0sRpmGuR51XFGcBKOliW1Vas1AycP31Cm3Pp0jx3hqw==}
 
-  ag-grid-community@33.3.2:
-    resolution: {integrity: sha512-9bx0e/+ykOyLvUxHqmdy0cRVANH6JAtv0yZdnBZEXYYqBAwN+G5a4NY+2I1KvoOCYzbk8SnStG7y4hCdVAAWOQ==}
+  ag-grid-community@35.1.0:
+    resolution: {integrity: sha512-yWFQfRNjv3KUBkHHzFdDOYGjPcDMU0B8Up4qG651diFlGRUGEGVs94SK73niWvk1FDZdpV9oWrwq3f30/qAoVg==}
 
-  ag-grid-react@33.3.2:
-    resolution: {integrity: sha512-5bv4JIJvGov23sduIUIyQTqpa/qhoQrRkQm5pFOQb7RMwusfx6xBPrkLwIIlCJiQ8g0OOinxWzZ2kQ2Zml6tLw==}
+  ag-grid-react@35.1.0:
+    resolution: {integrity: sha512-n8pJh4RTpos8stzz91nEhTCZZdLy9bjQYAGxIxJ8ocVagnEsAk9T5Vz/VEKUhOGz36il68n7TVbVWSuUA3a+mg==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -9897,15 +9894,15 @@ snapshots:
 
   aes-js@4.0.0-beta.5: {}
 
-  ag-charts-types@11.3.2: {}
+  ag-charts-types@13.1.0: {}
 
-  ag-grid-community@33.3.2:
+  ag-grid-community@35.1.0:
     dependencies:
-      ag-charts-types: 11.3.2
+      ag-charts-types: 13.1.0
 
-  ag-grid-react@33.3.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  ag-grid-react@35.1.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
-      ag-grid-community: 33.3.2
+      ag-grid-community: 35.1.0
       prop-types: 15.8.1
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)

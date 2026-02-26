@@ -1,4 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
+import { AllCommunityModule } from 'ag-grid-community'
+import { AgGridProvider } from 'ag-grid-react'
 import { Sidebar } from '@/components/Sidebar'
 import { Header } from '@/components/Header'
 import { Dashboard } from '@/pages/Dashboard'
@@ -8,8 +10,11 @@ import { Clients } from '@/pages/Clients'
 import { Reports } from '@/pages/Reports'
 import { AppRoot, MainCol, Main } from '@/styled'
 
+const modules = [AllCommunityModule]
+
 export default function App() {
   return (
+    <AgGridProvider modules={modules}>
     <AppRoot>
       <Sidebar />
       <MainCol>
@@ -25,5 +30,6 @@ export default function App() {
         </Main>
       </MainCol>
     </AppRoot>
+    </AgGridProvider>
   )
 }

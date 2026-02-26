@@ -2,7 +2,6 @@ import { useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef, GridReadyEvent } from 'ag-grid-community'
 import { Card, CardHeader, CardTitle, CardContent, AgGridWrap } from '@/styled'
-import { finpulseAgGridTheme } from '@/shared/ag-grid-theme'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 
@@ -59,7 +58,7 @@ export function Transactions() {
         <p style={{ margin: 0, marginTop: 4, fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>View and manage all your transaction history</p>
       </CardHeader>
       <CardContent>
-        <AgGridWrap className="ag-theme-quartz">
+        <AgGridWrap className="ag-theme-quartz-dark ag-robinhood">
           <AgGridReact<Transaction>
             ref={gridRef}
             rowData={rowData}
@@ -69,7 +68,7 @@ export function Transactions() {
             paginationPageSize={20}
             rowSelection="multiple"
             animateRows
-            theme={finpulseAgGridTheme}
+            theme="legacy"
             onGridReady={onGridReady}
           />
         </AgGridWrap>

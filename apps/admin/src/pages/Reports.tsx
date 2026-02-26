@@ -2,7 +2,6 @@ import { useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef, GridReadyEvent } from 'ag-grid-community'
 import { Card, CardHeader, CardTitle, CardContent, AgGridWrap } from '@/styled'
-import { finpulseAgGridTheme } from '@/shared/ag-grid-theme'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 
@@ -55,7 +54,7 @@ export function Reports() {
         <p style={{ margin: 0, marginTop: 4, fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Generate and download financial reports</p>
       </CardHeader>
       <CardContent>
-        <AgGridWrap className="ag-theme-quartz">
+        <AgGridWrap className="ag-theme-quartz-dark ag-robinhood">
           <AgGridReact<Report>
             ref={gridRef}
             rowData={rowData}
@@ -65,7 +64,7 @@ export function Reports() {
             paginationPageSize={20}
             rowSelection="multiple"
             animateRows
-            theme={finpulseAgGridTheme}
+            theme="legacy"
             onGridReady={onGridReady}
           />
         </AgGridWrap>

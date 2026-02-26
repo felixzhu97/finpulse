@@ -91,6 +91,18 @@ const AvatarImg = styled.img`
   object-fit: cover;
 `
 
+const AvatarFallback = styled.span`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  background: var(--muted);
+`
+
 const UserInfo = styled.div`
   text-align: left;
   @media (max-width: 1024px) {
@@ -138,6 +150,7 @@ const AvatarButton = styled(StyledButton)`
 
 export function Header() {
   const [darkMode, setDarkMode] = useState(true)
+  const [avatarError, setAvatarError] = useState(false)
 
   const toggleDarkMode = () => {
     const next = !darkMode
@@ -188,8 +201,11 @@ export function Header() {
           </NotificationBtn>
 
           <AvatarButton variant="ghost" type="button">
-            <StyledAvatar style={{ width: 32, height: 32, border: '2px solid oklch(0.65 0.2 250 / 0.5)' }}>
-              <AvatarImg src="/assets/buffett-avatar.png" alt="Warren Buffett" />
+            <StyledAvatar style={{ width: 32, height: 32, border: '2px solid oklch(0.65 0.2 250 / 0.5)', position: 'relative' }}>
+              {!avatarError ? (
+                <AvatarImg src="/professional-asian-man-avatar.png" alt="John Chen" onError={() => setAvatarError(true)} />
+              ) : null}
+              {avatarError ? <AvatarFallback>JC</AvatarFallback> : null}
             </StyledAvatar>
             <UserInfo>
               <UserName>John Chen</UserName>

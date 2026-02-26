@@ -181,15 +181,19 @@ const ToggleBtn = styled.button<{ collapsed: boolean }>`
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 9999px;
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: 1px solid oklch(0.78 0.19 145 / 0.4);
+  box-shadow: 0 0 0 1px oklch(0.09 0.005 260), 0 2px 4px rgba(0,0,0,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.15s;
+  z-index: 10;
+  transition: background-color 0.15s, transform 0.15s;
   &:hover {
-    background: var(--secondary);
+    background: oklch(0.78 0.19 145 / 0.9);
+    transform: scale(1.05);
   }
 `
 

@@ -118,3 +118,50 @@ body {
 .bg-chart-2-10 { background: oklch(0.75 0.18 80 / 0.12); color: var(--chart-2); }
 .bg-chart-3-10 { background: oklch(0.72 0.16 280 / 0.12); color: var(--chart-3); }
 .bg-primary-10 { background: oklch(0.78 0.19 145 / 0.12); color: var(--primary); }
+
+.ag-robinhood.ag-theme-quartz-dark {
+  --ag-background-color: #0d0d0d;
+  --ag-foreground-color: rgba(255, 255, 255, 0.95);
+  --ag-border-color: rgba(255, 255, 255, 0.06);
+  --ag-secondary-border-color: rgba(255, 255, 255, 0.04);
+  --ag-header-background-color: #0d0d0d;
+  --ag-control-panel-background-color: #0d0d0d;
+  --ag-active-color: #00C805;
+  --ag-row-hover-color: rgba(0, 200, 5, 0.08);
+  --ag-selected-row-background-color: rgba(0, 200, 5, 0.06);
+  --ag-borders: none;
+  --ag-header-height: 44px;
+  --ag-row-height: 48px;
+  --ag-cell-horizontal-padding: 16px;
+  --ag-grid-size: 8px;
+  --ag-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ag-font-size: 14px;
+  --ag-wrapper-border-radius: 12px;
+}
+.ag-robinhood .ag-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-weight: 500;
+}
+.ag-robinhood .ag-header-cell {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.5);
+}
+.ag-robinhood .ag-cell {
+  font-feature-settings: "tnum", "ss01";
+}
+.ag-robinhood .ag-paging-panel {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  min-height: 44px;
+  padding: 0 16px;
+}
+.ag-robinhood .ag-root-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.ag-robinhood .cell-accent {
+  color: #00C805;
+}
+.ag-robinhood .cell-destructive {
+  color: #FF453A;
+}
