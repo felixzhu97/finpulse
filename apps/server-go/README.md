@@ -1,14 +1,22 @@
 # Portfolio API (Go)
 
-API gateway and auth service. Same DB as `server-python` (Python). Port 8801 by default; proxies unimplemented routes to Python (8800). Single entry for the app.
+API gateway and core services. Same DB as `server-python`. Port 8801 by default. Migrated from Python: auth, quotes, instruments, blockchain, customers, accounts, watchlists. Analytics (VaR, forecast, risk-metrics, valuations) proxied to Python.
 
-## Endpoints
+## Endpoints (Go)
 
 - `GET /health` – health check
-- **Auth** (handled in Go): `POST /api/v1/auth/login`, `POST /api/v1/auth/register`, `GET /api/v1/auth/me`, `POST /api/v1/auth/logout`, `POST /api/v1/auth/change-password`
-- `GET /api/v1/quotes?symbols=AAPL,MSFT` – real-time quotes from `realtime_quote`
+- **Auth**: `POST /api/v1/auth/login`, `POST /api/v1/auth/register`, `GET /api/v1/auth/me`, `POST /api/v1/auth/logout`, `POST /api/v1/auth/change-password`
+- `GET /api/v1/quotes?symbols=AAPL,MSFT` – real-time quotes
 - `GET /api/v1/instruments?limit=100&offset=0` – list instruments
-- All other `/api/v1/*` – proxied to Python backend (e.g. portfolio, customers, payments, trades, risk-metrics)
+- **Blockchain**: `POST /api/v1/blockchain/seed-balance`, `GET /api/v1/blockchain/blocks`, `GET /api/v1/blockchain/blocks/:block_index`, `POST /api/v1/blockchain/transfers`, `GET /api/v1/blockchain/transactions/:tx_id`, `GET /api/v1/blockchain/balances`
+- **Customers**: CRUD at `/api/v1/customers` (list, get, create, batch, update, delete)
+- **Accounts**: CRUD at `/api/v1/accounts`
+- **Watchlists**: CRUD at `/api/v1/watchlists`, `/api/v1/watchlist-items`
+
+## Proxied to Python
+
+- `/api/v1/risk-metrics/*`, `/api/v1/analytics/*`, `/api/v1/forecast/*`, `/api/v1/valuations/*` – analytics (VaR, forecast, ClickHouse, MLflow)
+- Portfolio, trades, payments – via fallback proxy (migrate in future)
 
 ## Swagger
 
@@ -30,7 +38,7 @@ GOPROXY=https://goproxy.cn,direct go mod tidy
 cd apps/server-go
 go run ./cmd/server
 ```
-Or: `./scripts/start.sh` (builds then runs). Set `DATABASE_URL` and `PORT` (default 8801) if needed; copy `.env.example` to `.env` optional.
+Or: `./scripts/start.sh` (builds then runs). Set `DATABASE_URL`, `REDIS_URL` (optional, for blockchain cache), `PORT` (default 8801), `PYTHON_BACKEND_URL`; copy `.env.example` to `.env` optional.
 
 ## Build
 

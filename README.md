@@ -33,7 +33,7 @@ FinPulse provides portfolio management, market analysis, and risk management. Bu
 ## Tech Stack
 
 - **Frontend**: React 19 + Vite, React Native + Expo, Emotion, Radix UI
-- **Backend**: Python FastAPI, Go (gateway), TimescaleDB, Redis, Kafka
+- **Backend**: Python FastAPI (analytics), Go (gateway + CRUD: auth, blockchain, customers, accounts, watchlists), TimescaleDB, Redis, Kafka
 - **Tools**: pnpm workspaces, TypeScript 5
 
 ## Quick Start

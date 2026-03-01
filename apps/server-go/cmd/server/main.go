@@ -12,10 +12,12 @@ import (
 	"finpulse/server-go/internal/application"
 	"finpulse/server-go/internal/config"
 	"finpulse/server-go/internal/handler"
+	"finpulse/server-go/internal/infrastructure/cache"
 	"finpulse/server-go/internal/infrastructure/persistence"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -38,10 +40,31 @@ func main() {
 	authRepo := persistence.NewAuthRepo(pool)
 	customerRepo := persistence.NewCustomerRepo(pool)
 	authSvc := application.NewAuthService(authRepo, customerRepo)
+	blockchainLedger := persistence.NewBlockchainLedgerRepo(pool)
+	walletRepo := persistence.NewWalletBalanceRepo(pool)
+	blockchainSvc := application.NewBlockchainService(pool, blockchainLedger, walletRepo)
+	var cacheInstance handler.Cache
+	if cfg.RedisURL != "" {
+		if opts, err := redis.ParseURL(cfg.RedisURL); err == nil {
+			redisClient := redis.NewClient(opts)
+			if err := redisClient.Ping(context.Background()).Err(); err == nil {
+				cacheInstance = cache.NewRedisCache(redisClient)
+			}
+		}
+	}
+	accountRepo := persistence.NewAccountRepo(pool)
+	watchlistRepo := persistence.NewWatchlistRepo(pool)
+	watchlistItemRepo := persistence.NewWatchlistItemRepo(pool)
 	h := &handler.Handler{
-		QuotesSvc:      application.NewQuotesService(quoteRepo),
-		InstrumentsSvc: application.NewInstrumentsService(instrumentRepo),
-		AuthSvc:        authSvc,
+		QuotesSvc:         application.NewQuotesService(quoteRepo),
+		InstrumentsSvc:    application.NewInstrumentsService(instrumentRepo),
+		AuthSvc:           authSvc,
+		BlockchainSvc:     blockchainSvc,
+		CustomerRepo:      customerRepo,
+		AccountRepo:       accountRepo,
+		WatchlistRepo:     watchlistRepo,
+		WatchlistItemRepo: watchlistItemRepo,
+		Cache:             cacheInstance,
 	}
 	r := gin.New()
 	r.Use(gin.Recovery(), cors())
@@ -53,9 +76,38 @@ func main() {
 	r.GET("/api/v1/auth/me", h.AuthMe)
 	r.POST("/api/v1/auth/logout", h.AuthLogout)
 	r.POST("/api/v1/auth/change-password", h.AuthChangePassword)
+	r.POST("/api/v1/blockchain/seed-balance", h.BlockchainSeedBalance)
+	r.GET("/api/v1/blockchain/blocks", h.BlockchainListBlocks)
+	r.GET("/api/v1/blockchain/blocks/:block_index", h.BlockchainGetBlock)
+	r.POST("/api/v1/blockchain/transfers", h.BlockchainTransfer)
+	r.GET("/api/v1/blockchain/transactions/:tx_id", h.BlockchainGetTransaction)
+	r.GET("/api/v1/blockchain/balances", h.BlockchainGetBalance)
+	r.GET("/api/v1/customers", h.CustomersList)
+	r.GET("/api/v1/customers/:customer_id", h.CustomersGet)
+	r.POST("/api/v1/customers", h.CustomersCreate)
+	r.POST("/api/v1/customers/batch", h.CustomersCreateBatch)
+	r.PUT("/api/v1/customers/:customer_id", h.CustomersUpdate)
+	r.DELETE("/api/v1/customers/:customer_id", h.CustomersDelete)
+	r.GET("/api/v1/accounts", h.AccountsList)
+	r.GET("/api/v1/accounts/:account_id", h.AccountsGet)
+	r.POST("/api/v1/accounts", h.AccountsCreate)
+	r.POST("/api/v1/accounts/batch", h.AccountsCreateBatch)
+	r.PUT("/api/v1/accounts/:account_id", h.AccountsUpdate)
+	r.DELETE("/api/v1/accounts/:account_id", h.AccountsDelete)
+	r.GET("/api/v1/watchlists", h.WatchlistsList)
+	r.GET("/api/v1/watchlists/:watchlist_id", h.WatchlistsGet)
+	r.POST("/api/v1/watchlists", h.WatchlistsCreate)
+	r.POST("/api/v1/watchlists/batch", h.WatchlistsCreateBatch)
+	r.PUT("/api/v1/watchlists/:watchlist_id", h.WatchlistsUpdate)
+	r.DELETE("/api/v1/watchlists/:watchlist_id", h.WatchlistsDelete)
+	r.GET("/api/v1/watchlist-items", h.WatchlistItemsList)
+	r.GET("/api/v1/watchlist-items/:watchlist_item_id", h.WatchlistItemsGet)
+	r.POST("/api/v1/watchlist-items", h.WatchlistItemsCreate)
+	r.POST("/api/v1/watchlist-items/batch", h.WatchlistItemsCreateBatch)
+	r.PUT("/api/v1/watchlist-items/:watchlist_item_id", h.WatchlistItemsUpdate)
+	r.DELETE("/api/v1/watchlist-items/:watchlist_item_id", h.WatchlistItemsDelete)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	// Proxy any other path to Python backend (portfolio, customers, accounts, etc.)
-	r.NoRoute(handler.ProxyToPython(cfg.PythonBackendURL))
+	r.NoRoute(handler.ProxyAnalyticsOnly(cfg.PythonAnalyticsURL, cfg.PythonBackendURL))
 	srv := &http.Server{Addr: ":" + cfg.Port, Handler: r}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
