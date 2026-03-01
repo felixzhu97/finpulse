@@ -1,13 +1,10 @@
 from src.core.application.use_cases.analytics_service import AnalyticsApplicationService
-from src.core.application.use_cases.blockchain_service import BlockchainApplicationService
 from src.core.application.use_cases.market_data_service import MarketDataService
 from src.core.application.use_cases.portfolio_service import PortfolioApplicationService
 from src.core.application.use_cases.quote_history_service import QuoteHistoryService
 from src.infrastructure.database.repositories import (
     PortfolioHistoryRepository,
     PortfolioRepository,
-    blockchain_ledger_repo,
-    wallet_balance_repo,
 )
 from src.infrastructure.external_services.analytics import (
     FraudDetectorProvider,
@@ -34,13 +31,6 @@ def portfolio_service(session, redis_client) -> PortfolioApplicationService:
     return PortfolioApplicationService(
         repository=portfolio_repo,
         event_publisher=EventPublisher(),
-    )
-
-
-def blockchain_service(session) -> BlockchainApplicationService:
-    return BlockchainApplicationService(
-        ledger=blockchain_ledger_repo(session),
-        wallet_repository=wallet_balance_repo(session),
     )
 
 
