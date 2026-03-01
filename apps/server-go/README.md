@@ -1,22 +1,18 @@
 # Portfolio API (Go)
 
-API gateway and core services. Same DB as `server-python`. Port 8801 by default. Migrated from Python: auth, quotes, instruments, blockchain, customers, accounts, watchlists. Analytics (VaR, forecast, risk-metrics, valuations) proxied to Python.
+API gateway and core services. Same DB as `server-python`. Port 8801 by default. Single API entry; CRUD for all core entities. Analytics (VaR, forecast, risk-metrics, valuations) proxied to Python.
 
 ## Endpoints (Go)
 
 - `GET /health` – health check
 - **Auth**: `POST /api/v1/auth/login`, `POST /api/v1/auth/register`, `GET /api/v1/auth/me`, `POST /api/v1/auth/logout`, `POST /api/v1/auth/change-password`
-- `GET /api/v1/quotes?symbols=AAPL,MSFT` – real-time quotes
-- `GET /api/v1/instruments?limit=100&offset=0` – list instruments
+- **Quotes**: `GET /api/v1/quotes?symbols=AAPL,MSFT`
 - **Blockchain**: `POST /api/v1/blockchain/seed-balance`, `GET /api/v1/blockchain/blocks`, `GET /api/v1/blockchain/blocks/:block_index`, `POST /api/v1/blockchain/transfers`, `GET /api/v1/blockchain/transactions/:tx_id`, `GET /api/v1/blockchain/balances`
-- **Customers**: CRUD at `/api/v1/customers` (list, get, create, batch, update, delete)
-- **Accounts**: CRUD at `/api/v1/accounts`
-- **Watchlists**: CRUD at `/api/v1/watchlists`, `/api/v1/watchlist-items`
+- **CRUD** (list, get, create, batch, update, delete): customers, accounts, user-preferences, instruments, bonds, options, portfolios, positions, watchlists, watchlist-items, orders, trades, cash-transactions, payments, settlements, market-data
 
 ## Proxied to Python
 
 - `/api/v1/risk-metrics/*`, `/api/v1/analytics/*`, `/api/v1/forecast/*`, `/api/v1/valuations/*` – analytics (VaR, forecast, ClickHouse, MLflow)
-- Portfolio, trades, payments – via fallback proxy (migrate in future)
 
 ## Swagger
 
