@@ -13,6 +13,7 @@ import (
 	"finpulse/server-go/internal/config"
 	"finpulse/server-go/internal/handler"
 	"finpulse/server-go/internal/infrastructure/cache"
+	"finpulse/server-go/internal/infrastructure/crypto"
 	"finpulse/server-go/internal/infrastructure/persistence"
 
 	"github.com/gin-gonic/gin"
@@ -41,11 +42,13 @@ func main() {
 	optionRepo := persistence.NewOptionRepo(pool)
 	authRepo := persistence.NewAuthRepo(pool)
 	customerRepo := persistence.NewCustomerRepo(pool)
-	authSvc := application.NewAuthService(authRepo, customerRepo)
+	passwordHasher := crypto.NewBcryptPasswordHasher()
+	authSvc := application.NewAuthService(authRepo, customerRepo, passwordHasher)
+	txMgr := persistence.NewPgxTxManager(pool)
 	blockchainLedger := persistence.NewBlockchainLedgerRepo(pool)
 	walletRepo := persistence.NewWalletBalanceRepo(pool)
-	blockchainSvc := application.NewBlockchainService(pool, blockchainLedger, walletRepo)
-	var cacheInstance handler.Cache
+	blockchainSvc := application.NewBlockchainService(txMgr, blockchainLedger, walletRepo)
+	var cacheInstance application.Cache
 	if cfg.RedisURL != "" {
 		if opts, err := redis.ParseURL(cfg.RedisURL); err == nil {
 			redisClient := redis.NewClient(opts)
@@ -66,28 +69,42 @@ func main() {
 	paymentRepo := persistence.NewPaymentRepo(pool)
 	settlementRepo := persistence.NewSettlementRepo(pool)
 	marketDataRepo := persistence.NewMarketDataRepo(pool)
+	customerSvc := application.NewCustomerService(customerRepo)
+	accountSvc := application.NewAccountService(accountRepo)
+	bondSvc := application.NewBondService(bondRepo)
+	optionSvc := application.NewOptionService(optionRepo)
+	watchlistSvc := application.NewWatchlistService(watchlistRepo)
+	watchlistItemSvc := application.NewWatchlistItemService(watchlistItemRepo)
+	userPreferenceSvc := application.NewUserPreferenceService(userPreferenceRepo)
+	portfolioSvc := application.NewPortfolioService(portfolioRepo)
+	positionSvc := application.NewPositionService(positionRepo)
+	orderSvc := application.NewOrderService(orderRepo)
+	tradeSvc := application.NewTradeService(tradeRepo)
+	cashTransactionSvc := application.NewCashTransactionService(cashTransactionRepo)
+	paymentSvc := application.NewPaymentService(paymentRepo)
+	settlementSvc := application.NewSettlementService(settlementRepo)
+	marketDataSvc := application.NewMarketDataService(marketDataRepo)
 	h := &handler.Handler{
-		QuotesSvc:           application.NewQuotesService(quoteRepo),
-		InstrumentsSvc:      application.NewInstrumentsService(instrumentRepo),
-		InstrumentRepo:      instrumentRepo,
-		BondRepo:            bondRepo,
-		OptionRepo:          optionRepo,
-		AuthSvc:             authSvc,
-		BlockchainSvc:       blockchainSvc,
-		CustomerRepo:        customerRepo,
-		AccountRepo:         accountRepo,
-		WatchlistRepo:       watchlistRepo,
-		WatchlistItemRepo:   watchlistItemRepo,
-		UserPreferenceRepo:  userPreferenceRepo,
-		PortfolioRepo:       portfolioRepo,
-		PositionRepo:        positionRepo,
-		OrderRepo:           orderRepo,
-		TradeRepo:           tradeRepo,
-		CashTransactionRepo: cashTransactionRepo,
-		PaymentRepo:         paymentRepo,
-		SettlementRepo:      settlementRepo,
-		MarketDataRepo:      marketDataRepo,
-		Cache:               cacheInstance,
+		QuotesSvc:            application.NewQuotesService(quoteRepo),
+		InstrumentsSvc:       application.NewInstrumentsService(instrumentRepo),
+		AuthSvc:              authSvc,
+		BlockchainSvc:        blockchainSvc,
+		CustomerSvc:          customerSvc,
+		AccountSvc:           accountSvc,
+		BondSvc:              bondSvc,
+		OptionSvc:            optionSvc,
+		WatchlistSvc:         watchlistSvc,
+		WatchlistItemSvc:     watchlistItemSvc,
+		UserPreferenceSvc:    userPreferenceSvc,
+		PortfolioSvc:         portfolioSvc,
+		PositionSvc:          positionSvc,
+		OrderSvc:             orderSvc,
+		TradeSvc:             tradeSvc,
+		CashTransactionSvc:   cashTransactionSvc,
+		PaymentSvc:           paymentSvc,
+		SettlementSvc:        settlementSvc,
+		MarketDataSvc:        marketDataSvc,
+		Cache:                cacheInstance,
 	}
 	r := gin.New()
 	r.Use(gin.Recovery(), cors())

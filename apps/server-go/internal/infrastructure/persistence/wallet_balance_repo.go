@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"finpulse/server-go/internal/application"
 	"finpulse/server-go/internal/domain"
 
 	"github.com/jackc/pgx/v5"
@@ -33,9 +34,10 @@ func (r *WalletBalanceRepo) GetBalance(ctx context.Context, accountID, currency 
 	return balance, nil
 }
 
-func (r *WalletBalanceRepo) GetBalanceForUpdate(ctx context.Context, tx pgx.Tx, accountID, currency string) (*domain.WalletBalance, error) {
+func (r *WalletBalanceRepo) GetBalanceForUpdate(ctx context.Context, tx application.Tx, accountID, currency string) (*domain.WalletBalance, error) {
+	pgxTx := tx.(pgx.Tx)
 	var w domain.WalletBalance
-	err := tx.QueryRow(ctx,
+	err := pgxTx.QueryRow(ctx,
 		`SELECT account_id::text, currency, balance, updated_at FROM wallet_balance WHERE account_id = $1::uuid AND currency = $2 FOR UPDATE`,
 		accountID, currency,
 	).Scan(&w.AccountID, &w.Currency, &w.Balance, &w.UpdatedAt)
@@ -45,8 +47,9 @@ func (r *WalletBalanceRepo) GetBalanceForUpdate(ctx context.Context, tx pgx.Tx, 
 	return &w, nil
 }
 
-func (r *WalletBalanceRepo) UpdateBalance(ctx context.Context, tx pgx.Tx, accountID, currency string, delta float64) (*domain.WalletBalance, error) {
-	_, err := tx.Exec(ctx,
+func (r *WalletBalanceRepo) UpdateBalance(ctx context.Context, tx application.Tx, accountID, currency string, delta float64) (*domain.WalletBalance, error) {
+	pgxTx := tx.(pgx.Tx)
+	_, err := pgxTx.Exec(ctx,
 		`INSERT INTO wallet_balance (account_id, currency, balance, updated_at)
 		 VALUES ($1::uuid, $2, $3, now())
 		 ON CONFLICT (account_id, currency) DO UPDATE SET
@@ -57,7 +60,7 @@ func (r *WalletBalanceRepo) UpdateBalance(ctx context.Context, tx pgx.Tx, accoun
 		return nil, err
 	}
 	var w domain.WalletBalance
-	err = tx.QueryRow(ctx,
+	err = pgxTx.QueryRow(ctx,
 		`SELECT account_id::text, currency, balance, updated_at FROM wallet_balance WHERE account_id = $1::uuid AND currency = $2`,
 		accountID, currency,
 	).Scan(&w.AccountID, &w.Currency, &w.Balance, &w.UpdatedAt)

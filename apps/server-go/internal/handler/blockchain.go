@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
 
 	"finpulse/server-go/internal/application"
 	"finpulse/server-go/internal/domain"
@@ -98,7 +97,7 @@ func (h *Handler) BlockchainGetBlock(c *gin.Context) {
 	}
 	block, txs, err := h.BlockchainSvc.GetBlockWithTransactions(c.Request.Context(), idx)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, application.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"detail": "Block not found"})
 			return
 		}
@@ -159,7 +158,7 @@ func (h *Handler) BlockchainGetTransaction(c *gin.Context) {
 	}
 	tx, err := h.BlockchainSvc.GetTransaction(c.Request.Context(), txID)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, application.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"detail": "Transaction not found"})
 			return
 		}

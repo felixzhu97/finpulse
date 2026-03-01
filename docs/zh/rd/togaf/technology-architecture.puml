@@ -186,10 +186,10 @@ package "部署平台" <<Deploy>> {
 
 package "API 网关与后端" <<Infra>> {
     component "Go (Gin) API 网关" as GoGateway {
-        component "认证 (login, register, me, logout, change-password)" as GoAuthTech
-        component "GET /quotes、GET /instruments" as GoQuotesTech
+        component "认证、quotes、blockchain" as GoAuthTech
+        component "CRUD (customers, accounts, instruments, ...)" as GoCRUDTech
         component "代理至 Python" as GoProxyTech
-        note right: apps/server-go\nport 8801，应用统一入口\n代理至 Python :8800
+        note right: apps/server-go\nport 8801，统一入口\nhandlers 按域拆分\n代理至 Python :8800
     }
 }
 

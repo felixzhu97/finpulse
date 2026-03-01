@@ -2,6 +2,10 @@
 
 API gateway and core services. Same DB as `server-python`. Port 8801 by default. Single API entry; CRUD for all core entities. Analytics (VaR, forecast, risk-metrics, valuations) proxied to Python.
 
+## Handler Structure
+
+Split by domain: `handler.go`, `helpers.go` (core); `customer_account`, `instrument`, `bond_option`, `watchlist`, `user_preference`, `portfolio_position`, `order_trade`, `payment_settlement`, `market_data` (CRUD); `auth`, `blockchain`, `proxy`.
+
 ## Endpoints (Go)
 
 - `GET /health` – health check

@@ -135,10 +135,10 @@ package "Deployment" <<Deploy>> {
 
 package "API Gateway & Backend" <<Infra>> {
     component "Go (Gin) API Gateway" as GoGateway {
-        component "Auth (login, register, me, logout, change-password)" as GoAuthTech
-        component "GET /quotes, GET /instruments" as GoQuotesTech
+        component "Auth, quotes, blockchain" as GoAuthTech
+        component "CRUD (customers, accounts, instruments, ...)" as GoCRUDTech
         component "Proxy to Python" as GoProxyTech
-        note right: apps/server-go\nport 8801, single entry for app\nproxies to Python :8800
+        note right: apps/server-go\nport 8801, single entry\nhandlers split by domain\nproxies to Python :8800
     }
 }
 

@@ -2,7 +2,9 @@ package persistence
 
 import (
 	"context"
+	"errors"
 
+	"finpulse/server-go/internal/application"
 	"finpulse/server-go/internal/domain"
 
 	"github.com/jackc/pgx/v5"
@@ -24,6 +26,9 @@ func (r *AccountRepo) GetByID(ctx context.Context, accountID string) (*domain.Ac
 		accountID,
 	).Scan(&a.AccountID, &a.CustomerID, &a.AccountType, &a.Currency, &a.Status, &a.OpenedAt)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, application.ErrNotFound
+		}
 		return nil, err
 	}
 	return &a, nil
@@ -87,7 +92,7 @@ func (r *AccountRepo) Save(ctx context.Context, a *domain.Account) (*domain.Acco
 		return nil, err
 	}
 	if res.RowsAffected() == 0 {
-		return nil, pgx.ErrNoRows
+		return nil, application.ErrNotFound
 	}
 	return r.GetByID(ctx, a.AccountID)
 }

@@ -2,7 +2,9 @@ package persistence
 
 import (
 	"context"
+	"errors"
 
+	"finpulse/server-go/internal/application"
 	"finpulse/server-go/internal/domain"
 
 	"github.com/jackc/pgx/v5"
@@ -24,6 +26,9 @@ func (r *OptionRepo) GetByID(ctx context.Context, optionID string) (*domain.Opti
 		optionID,
 	).Scan(&o.OptionID, &o.InstrumentID, &o.UnderlyingInstrumentID, &o.Strike, &o.Expiry, &o.OptionType, &o.RiskFreeRate, &o.Volatility, &o.BSPrice, &o.Delta, &o.Gamma, &o.Theta, &o.Vega, &o.Rho, &o.ImpliedVolatility)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, application.ErrNotFound
+		}
 		return nil, err
 	}
 	return &o, nil
@@ -87,7 +92,7 @@ func (r *OptionRepo) Save(ctx context.Context, o *domain.Option) (*domain.Option
 		return nil, err
 	}
 	if res.RowsAffected() == 0 {
-		return nil, pgx.ErrNoRows
+		return nil, application.ErrNotFound
 	}
 	return r.GetByID(ctx, o.OptionID)
 }

@@ -61,7 +61,6 @@ func setupRouter() *gin.Engine {
 	h := &handler.Handler{
 		QuotesSvc:      application.NewQuotesService(q),
 		InstrumentsSvc: application.NewInstrumentsService(inst),
-		InstrumentRepo: inst,
 	}
 	r := gin.New()
 	r.Use(gin.Recovery(), cors())

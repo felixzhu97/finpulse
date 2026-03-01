@@ -2,7 +2,9 @@ package persistence
 
 import (
 	"context"
+	"errors"
 
+	"finpulse/server-go/internal/application"
 	"finpulse/server-go/internal/domain"
 
 	"github.com/jackc/pgx/v5"
@@ -24,6 +26,9 @@ func (r *InstrumentRepo) GetByID(ctx context.Context, instrumentID string) (*dom
 		instrumentID,
 	).Scan(&row.InstrumentID, &row.Symbol, &row.Name, &row.AssetClass, &row.Currency, &row.Exchange)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, application.ErrNotFound
+		}
 		return nil, err
 	}
 	return &row, nil
@@ -88,7 +93,7 @@ func (r *InstrumentRepo) Save(ctx context.Context, i *domain.Instrument) (*domai
 		return nil, err
 	}
 	if res.RowsAffected() == 0 {
-		return nil, pgx.ErrNoRows
+		return nil, application.ErrNotFound
 	}
 	return r.GetByID(ctx, i.InstrumentID)
 }

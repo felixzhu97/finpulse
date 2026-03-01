@@ -6,13 +6,12 @@ import (
 	"strings"
 
 	"finpulse/server-go/internal/domain"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
 	authRepo     AuthRepo
 	customerRepo CustomerRepo
+	hasher       PasswordHasher
 }
 
 var (
@@ -29,28 +28,8 @@ type AuthRepo interface {
 	UpdatePasswordHash(ctx context.Context, customerID, passwordHash string) error
 }
 
-type CustomerRepo interface {
-	GetByID(ctx context.Context, customerID string) (*domain.Customer, error)
-	Insert(ctx context.Context, name string, email *string, kycStatus *string) (*domain.Customer, error)
-}
-
-func NewAuthService(authRepo AuthRepo, customerRepo CustomerRepo) *AuthService {
-	return &AuthService{authRepo: authRepo, customerRepo: customerRepo}
-}
-
-const bcryptCost = 10
-
-func hashPassword(password string) (string, error) {
-	b, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
-	if err != nil {
-		return "", err
-	}
-	return string(b), nil
-}
-
-func verifyPassword(plain, hashed string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(plain))
-	return err == nil
+func NewAuthService(authRepo AuthRepo, customerRepo CustomerRepo, hasher PasswordHasher) *AuthService {
+	return &AuthService{authRepo: authRepo, customerRepo: customerRepo, hasher: hasher}
 }
 
 func normalizeEmail(s string) string {
@@ -60,7 +39,7 @@ func normalizeEmail(s string) string {
 func (s *AuthService) Login(ctx context.Context, req domain.LoginRequest) (domain.LoginResponse, error) {
 	email := normalizeEmail(req.Email)
 	customerID, passwordHash, found, err := s.authRepo.GetCredentialByEmail(ctx, email)
-	if err != nil || !found || !verifyPassword(req.Password, passwordHash) {
+	if err != nil || !found || !s.hasher.Verify(req.Password, passwordHash) {
 		return domain.LoginResponse{}, ErrInvalidCredentials
 	}
 	token, err := s.authRepo.CreateSession(ctx, customerID)
@@ -87,7 +66,7 @@ func (s *AuthService) Register(ctx context.Context, req domain.RegisterRequest) 
 	if err != nil {
 		return domain.LoginResponse{}, err
 	}
-	hash, err := hashPassword(req.Password)
+	hash, err := s.hasher.Hash(req.Password)
 	if err != nil {
 		return domain.LoginResponse{}, err
 	}
@@ -123,10 +102,10 @@ func (s *AuthService) ChangePassword(ctx context.Context, customerID string, req
 	if err != nil || !found {
 		return ErrInvalidCredentials
 	}
-	if !verifyPassword(req.CurrentPassword, passwordHash) {
+	if !s.hasher.Verify(req.CurrentPassword, passwordHash) {
 		return ErrInvalidCredentials
 	}
-	hash, err := hashPassword(req.NewPassword)
+	hash, err := s.hasher.Hash(req.NewPassword)
 	if err != nil {
 		return err
 	}

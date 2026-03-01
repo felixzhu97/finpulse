@@ -2,7 +2,9 @@ package persistence
 
 import (
 	"context"
+	"errors"
 
+	"finpulse/server-go/internal/application"
 	"finpulse/server-go/internal/domain"
 
 	"github.com/jackc/pgx/v5"
@@ -24,6 +26,9 @@ func (r *WatchlistItemRepo) GetByID(ctx context.Context, watchlistItemID string)
 		watchlistItemID,
 	).Scan(&w.WatchlistItemID, &w.WatchlistID, &w.InstrumentID, &w.AddedAt)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, application.ErrNotFound
+		}
 		return nil, err
 	}
 	return &w, nil
@@ -87,7 +92,7 @@ func (r *WatchlistItemRepo) Save(ctx context.Context, w *domain.WatchlistItem) (
 		return nil, err
 	}
 	if res.RowsAffected() == 0 {
-		return nil, pgx.ErrNoRows
+		return nil, application.ErrNotFound
 	}
 	return r.GetByID(ctx, w.WatchlistItemID)
 }

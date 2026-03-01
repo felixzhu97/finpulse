@@ -2,8 +2,10 @@ package persistence
 
 import (
 	"context"
+	"errors"
 	"time"
 
+	"finpulse/server-go/internal/application"
 	"finpulse/server-go/internal/domain"
 
 	"github.com/jackc/pgx/v5"
@@ -25,6 +27,9 @@ func (r *UserPreferenceRepo) GetByID(ctx context.Context, preferenceID string) (
 		preferenceID,
 	).Scan(&u.PreferenceID, &u.CustomerID, &u.Theme, &u.Language, &u.NotificationsEnabled, &u.UpdatedAt)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, application.ErrNotFound
+		}
 		return nil, err
 	}
 	return &u, nil
@@ -92,7 +97,7 @@ func (r *UserPreferenceRepo) Save(ctx context.Context, u *domain.UserPreference)
 		return nil, err
 	}
 	if res.RowsAffected() == 0 {
-		return nil, pgx.ErrNoRows
+		return nil, application.ErrNotFound
 	}
 	return r.GetByID(ctx, u.PreferenceID)
 }

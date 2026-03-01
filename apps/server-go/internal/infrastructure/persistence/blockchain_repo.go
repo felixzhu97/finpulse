@@ -2,7 +2,9 @@ package persistence
 
 import (
 	"context"
+	"errors"
 
+	"finpulse/server-go/internal/application"
 	"finpulse/server-go/internal/domain"
 	"finpulse/server-go/internal/infrastructure/crypto"
 
@@ -18,19 +20,20 @@ func NewBlockchainLedgerRepo(pool *pgxpool.Pool) *BlockchainLedgerRepo {
 	return &BlockchainLedgerRepo{pool: pool}
 }
 
-func (r *BlockchainLedgerRepo) AppendBlock(ctx context.Context, tx pgx.Tx, block domain.Block, txs []domain.ChainTransaction) error {
+func (r *BlockchainLedgerRepo) AppendBlock(ctx context.Context, tx application.Tx, block domain.Block, txs []domain.ChainTransaction) error {
+	pgxTx := tx.(pgx.Tx)
 	hash := block.Hash
 	if hash == "" {
 		hash = crypto.ComputeBlockHash(block.Index, block.Timestamp, block.PreviousHash, block.TransactionIDs)
 	}
-	_, err := tx.Exec(ctx,
+	_, err := pgxTx.Exec(ctx,
 		`INSERT INTO block (block_index, timestamp, previous_hash, hash) VALUES ($1, $2, $3, $4)`,
 		block.Index, block.Timestamp, block.PreviousHash, hash)
 	if err != nil {
 		return err
 	}
 	for _, t := range txs {
-		_, err = tx.Exec(ctx,
+		_, err = pgxTx.Exec(ctx,
 			`INSERT INTO chain_transaction (tx_id, block_index, sender_account_id, receiver_account_id, amount, currency, created_at)
 			 VALUES ($1::uuid, $2, $3::uuid, $4::uuid, $5, $6, $7)`,
 			t.TxID, t.BlockIndex, t.SenderAccountID, t.ReceiverAccountID, t.Amount, t.Currency, t.CreatedAt)
@@ -48,6 +51,9 @@ func (r *BlockchainLedgerRepo) GetBlockByIndex(ctx context.Context, blockIndex i
 		blockIndex,
 	).Scan(&b.Index, &b.Timestamp, &b.PreviousHash, &b.Hash)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, application.ErrNotFound
+		}
 		return nil, err
 	}
 	rows, err := r.pool.Query(ctx,
@@ -73,6 +79,9 @@ func (r *BlockchainLedgerRepo) GetLatestBlock(ctx context.Context) (*domain.Bloc
 		`SELECT block_index, timestamp, previous_hash, hash FROM block ORDER BY block_index DESC LIMIT 1`,
 	).Scan(&b.Index, &b.Timestamp, &b.PreviousHash, &b.Hash)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, application.ErrNotFound
+		}
 		return nil, err
 	}
 	rows, err := r.pool.Query(ctx,
@@ -92,15 +101,19 @@ func (r *BlockchainLedgerRepo) GetLatestBlock(ctx context.Context) (*domain.Bloc
 	return &b, rows.Err()
 }
 
-func (r *BlockchainLedgerRepo) GetLatestBlockForUpdate(ctx context.Context, tx pgx.Tx) (*domain.Block, error) {
+func (r *BlockchainLedgerRepo) GetLatestBlockForUpdate(ctx context.Context, tx application.Tx) (*domain.Block, error) {
+	pgxTx := tx.(pgx.Tx)
 	var b domain.Block
-	err := tx.QueryRow(ctx,
+	err := pgxTx.QueryRow(ctx,
 		`SELECT block_index, timestamp, previous_hash, hash FROM block ORDER BY block_index DESC LIMIT 1 FOR UPDATE`,
 	).Scan(&b.Index, &b.Timestamp, &b.PreviousHash, &b.Hash)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, application.ErrNotFound
+		}
 		return nil, err
 	}
-	rows, err := tx.Query(ctx,
+	rows, err := pgxTx.Query(ctx,
 		`SELECT tx_id::text FROM chain_transaction WHERE block_index = $1`,
 		b.Index)
 	if err != nil {
@@ -176,6 +189,9 @@ func (r *BlockchainLedgerRepo) GetTransaction(ctx context.Context, txID string) 
 		txID,
 	).Scan(&tx.TxID, &tx.BlockIndex, &tx.SenderAccountID, &tx.ReceiverAccountID, &tx.Amount, &tx.Currency, &tx.CreatedAt)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, application.ErrNotFound
+		}
 		return nil, err
 	}
 	return &tx, nil
