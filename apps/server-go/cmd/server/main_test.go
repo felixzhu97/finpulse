@@ -30,6 +30,26 @@ func (m *mockInstrumentRepo) List(ctx context.Context, limit, offset int) ([]dom
 	return m.instruments, nil
 }
 
+func (m *mockInstrumentRepo) GetByID(ctx context.Context, instrumentID string) (*domain.Instrument, error) {
+	return nil, nil
+}
+
+func (m *mockInstrumentRepo) Add(ctx context.Context, i *domain.Instrument) (*domain.Instrument, error) {
+	return i, nil
+}
+
+func (m *mockInstrumentRepo) AddMany(ctx context.Context, entities []domain.Instrument) ([]domain.Instrument, error) {
+	return entities, nil
+}
+
+func (m *mockInstrumentRepo) Save(ctx context.Context, i *domain.Instrument) (*domain.Instrument, error) {
+	return i, nil
+}
+
+func (m *mockInstrumentRepo) Remove(ctx context.Context, instrumentID string) (bool, error) {
+	return true, nil
+}
+
 func setupRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	q := &mockQuoteRepo{quotes: []domain.Quote{
@@ -41,12 +61,13 @@ func setupRouter() *gin.Engine {
 	h := &handler.Handler{
 		QuotesSvc:      application.NewQuotesService(q),
 		InstrumentsSvc: application.NewInstrumentsService(inst),
+		InstrumentRepo: inst,
 	}
 	r := gin.New()
 	r.Use(gin.Recovery(), cors())
 	r.GET("/health", h.Health)
 	r.GET("/api/v1/quotes", h.Quotes)
-	r.GET("/api/v1/instruments", h.Instruments)
+	r.GET("/api/v1/instruments", h.InstrumentsList)
 	return r
 }
 

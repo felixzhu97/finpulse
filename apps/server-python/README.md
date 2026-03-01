@@ -49,7 +49,7 @@ For core-only: `docker compose up -d postgres redis zookeeper kafka`.
 Default connection:
 
 - **TimescaleDB (PostgreSQL):** `postgresql://postgres:postgres@127.0.0.1:5433/portfolio` – portfolio metadata in JSONB; portfolio history in hypertable `portfolio_history`
-- **Redis:** `redis://127.0.0.1:6379/0` – server-side cache (shared client in app lifespan). Used for: portfolio history range (`portfolio:history:{id}:{days}d`, TTL from `HISTORY_CACHE_TTL_SECONDS`), portfolio aggregate response (`portfolio:aggregate:demo-portfolio`, 300s), and blockchain read responses (blocks list, block+transactions, transaction by id, balance; prefix `blockchain:*`, 300s). Writes (seed, transfer, seed-balance) invalidate the relevant cache keys so reads stay consistent.
+- **Redis:** `redis://127.0.0.1:6379/0` – server-side cache (shared client in app lifespan). Used for: portfolio history range (`portfolio:history:{id}:{days}d`, TTL from `HISTORY_CACHE_TTL_SECONDS`), portfolio aggregate response (`portfolio:aggregate:demo-portfolio`, 300s). `POST /seed` invalidates portfolio cache. (Blockchain cache is in Go.)
 - **Kafka:** `localhost:9092`. Topics:
   - `portfolio.events` – portfolio seed events (created on first produce)
   - `market.quotes.enriched` – enriched real-time market quotes (symbol-keyed, produced by external provider or Flink jobs)
@@ -107,22 +107,26 @@ alembic current        # Show current revision
 - `GET /api/v1/quotes/history?symbols=...&minutes=5` – returns historical price series from `quote_tick` (or `quote_ohlc_1min` fallback); powered by `QuoteHistoryService`.
 - `WebSocket /ws/quotes` – accepts `{"type":"subscribe","symbols":["AAPL","MSFT"]}` or `"update"` messages and pushes `{"type":"snapshot","quotes":{...}}` snapshots using the same quote structure as the HTTP endpoint.
 
-**REST resources** (under `/api/v1/`): customers, user-preferences, accounts, instruments, portfolios, positions, watchlists, watchlist-items, bonds, options, orders, trades, cash-transactions, payments, settlements, market-data, risk-metrics, valuations. Each resource has list, get-by-id, create, update, delete. **Batch create**: for each resource, `POST /api/v1/<resource>/batch` accepts a JSON array of create payloads and returns an array of created entities (e.g. `POST /api/v1/customers/batch`, `POST /api/v1/instruments/batch`). The seed script (`scripts/seed/generate-seed-data.js`) uses these batch endpoints to minimise the number of HTTP calls during seeding.
+**Python-only endpoints**: Portfolio aggregate, quotes, risk-summary, asset-allocation, analytics. CRUD for customers, accounts, instruments, portfolios, positions, watchlists, bonds, options, orders, trades, payments, settlements, market-data, user-preferences, and blockchain is served by **Go** at port 8801 (primary API entry). The seed script (`scripts/seed/generate-seed-data.js`) calls the Go API for batch seeding.
 
-**Blockchain simulation** (under `/api/v1/blockchain/`): in-app chain (blocks + chain transactions + wallet balances). Endpoints: `GET /blockchain/blocks` (list blocks), `GET /blockchain/blocks/{block_index}` (block with transactions), `POST /blockchain/transfers` (submit transfer; body: sender_account_id, receiver_account_id, amount, currency), `GET /blockchain/transactions/{tx_id}`, `GET /blockchain/balances?account_id=...&currency=SIM_COIN`. Read responses are cached in Redis (prefix `blockchain:*`, TTL 300s); `POST /blockchain/seed-balance` and `POST /blockchain/transfers` invalidate the relevant cache. Default currency `SIM_COIN`; balances are per account and can be shown as an asset type in portfolio views. See `docs/en/product/domain/blockchain-simulation.md`.
+**Python endpoints** (port 8800; also reachable via Go proxy when clients use `http://127.0.0.1:8801`):
+
+- Portfolio: `GET /api/v1/portfolio`, `POST /api/v1/seed`, `GET /api/v1/portfolio/risk-summary`, `GET /api/v1/portfolio/asset-allocation-by-account-type`
+- Quotes: `GET /api/v1/quotes`, `WebSocket /ws/quotes`, `GET /api/v1/quotes/history`
+- Analytics: `/api/v1/risk-metrics`, `/api/v1/valuations`, `/api/v1/analytics/*`, `/api/v1/forecast/*`
+
+**Blockchain**: Endpoints are implemented by the Go server. See `docs/en/product/domain/blockchain-simulation.md`.
 
 ### AI, ML and DL (integrated into business flows)
 
-LLM, ML and DL are integrated into business operations rather than exposed as standalone endpoints:
+AI/ML is integrated into analytics and risk flows. CRUD for payments, trades, customers is in Go; when Go proxies analytics or enrichment requests to Python, these compute services run:
 
 | Business flow | AI/ML integration |
 |---------------|-------------------|
-| **Payments** | `POST /payments` enriches response with `fraud_recommendation` (allow/review/block) and `fraud_score` via scikit-learn Isolation Forest. |
-| **Trades** | `POST /trades` enriches response with `surveillance_alert` and `surveillance_score` via NumPy z-score anomaly detection. |
-| **Customers** | `POST /customers` enriches response with `ai_identity_score` via rule-based document/identity scoring. |
-| **Risk metrics** | `POST /risk-metrics/compute` computes VaR from portfolio history using SciPy (parametric) or NumPy (historical). |
+| **Risk metrics** | `POST /risk-metrics/compute` computes VaR from portfolio history using SciPy (parametric) or NumPy (historical). `POST /risk-metrics/compute-batch` for batch VaR. |
+| **Analytics** | Forecast, sentiment, summarisation via `AnalyticsApplicationService`; ClickHouse, MLflow integration. |
 
-Libraries used: **SciPy** (parametric VaR), **NumPy** (historical VaR, surveillance), **scikit-learn** (fraud detection), **statsmodels** (forecast), **VADER** (sentiment), **sumy/nltk** (summarisation). Optional: **Ollama**, **Hugging Face** via `AnalyticsApplicationService`; **PyTorch** and **MLflow** for model training and inference.
+Libraries used: **SciPy** (parametric VaR), **NumPy** (historical VaR), **statsmodels** (forecast), **VADER** (sentiment), **sumy/nltk** (summarisation). Optional: **Ollama**, **Hugging Face** via `AnalyticsApplicationService`; **PyTorch** and **MLflow** for model training and inference.
 
 ### Testing
 

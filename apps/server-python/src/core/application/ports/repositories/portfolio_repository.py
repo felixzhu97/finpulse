@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from uuid import UUID
 
-from src.core.domain.entities.portfolio import Portfolio, PortfolioSchema, Position
+from src.core.domain.entities.portfolio import Portfolio
 from src.core.domain.value_objects.portfolio import HistoryPoint
 
 
@@ -28,45 +27,3 @@ class IPortfolioHistoryRepository(ABC):
         pass
 
 
-class IPortfolioSchemaRepository(ABC):
-    @abstractmethod
-    async def get_by_id(self, portfolio_id: UUID) -> Optional[PortfolioSchema]:
-        pass
-
-    @abstractmethod
-    async def list(self, limit: int = 100, offset: int = 0) -> List[PortfolioSchema]:
-        pass
-
-    @abstractmethod
-    async def add(self, portfolio: PortfolioSchema) -> PortfolioSchema:
-        pass
-
-    @abstractmethod
-    async def save(self, portfolio: PortfolioSchema) -> Optional[PortfolioSchema]:
-        pass
-
-    @abstractmethod
-    async def remove(self, portfolio_id: UUID) -> bool:
-        pass
-
-
-class IPositionRepository(ABC):
-    @abstractmethod
-    async def get_by_id(self, position_id: UUID) -> Optional[Position]:
-        pass
-
-    @abstractmethod
-    async def list(self, limit: int = 100, offset: int = 0) -> List[Position]:
-        pass
-
-    @abstractmethod
-    async def add(self, position: Position) -> Position:
-        pass
-
-    @abstractmethod
-    async def save(self, position: Position) -> Optional[Position]:
-        pass
-
-    @abstractmethod
-    async def remove(self, position_id: UUID) -> bool:
-        pass

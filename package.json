@@ -9,7 +9,7 @@
     "dev:mobile": "pnpm --filter finpulse-mobile start",
     "dev:mobile:ios": "pnpm --filter finpulse-mobile ios",
     "dev:mobile:android": "pnpm --filter finpulse-mobile android",
-    "start:server": "bash scripts/backend/start-backend.sh",
+    "dev:server": "bash scripts/backend/start-backend.sh",
     "build": "pnpm --filter finpulse-admin build",
     "start": "pnpm --filter finpulse-admin start",
     "test": "pnpm run test:api",

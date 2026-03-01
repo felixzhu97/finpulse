@@ -296,30 +296,30 @@ package "外部服务层 (External Services)" <<External>> {
     }
 
     component "Go API 网关 (port 8801)" as GoAPIGateway <<External>> {
-        component "认证 (login, register, me, logout, change-password)" as GoAuth
-        component "GET /quotes、GET /instruments" as GoQuotesInstruments
-        component "代理至 Python" as GoProxy
-        note right: 应用统一入口。\n未实现路由代理至 Python :8800。
+        component "认证、Quotes、CRUD" as GoCRUD
+        component "Customers、Accounts、User-preferences" as GoIdentity
+        component "Instruments、Bonds、Options" as GoInstruments
+        component "Portfolios、Positions、Watchlists" as GoPortfolio
+        component "Orders、Trades、Cash-transactions、Payments、Settlements" as GoTrading
+        component "Market-data、Blockchain" as GoMarket
+        component "代理 analytics 至 Python" as GoProxy
+        note right: 统一 API 入口。\n代理 risk-metrics、analytics、forecast、valuations 至 Python :8800。
     }
 
     component "Portfolio Analytics API" as PortfolioAnalyticsAPI <<External>> {
         component "FastAPI app (Clean Architecture)" as FastAPIApp
-        component "composition.py、container、crud_helpers、api/config" as FastAPIStructure
-        component "GET /api/v1/portfolio, POST /seed, GET /api/v1/portfolio/risk-summary, GET /api/v1/portfolio/asset-allocation-by-account-type" as PortfolioGet
-        component "AI/ML（融入业务）" as AIMLAPI {
-            component "Payments → 欺诈检测" as AIML1
-            component "Trades → 监控" as AIML2
-            component "Customers → 身份" as AIML3
-            component "Risk-metrics → VaR、POST /risk-metrics/compute-batch" as AIML4
+        component "composition.py、container、api/config" as FastAPIStructure
+        component "Portfolio 聚合、Quotes" as PortfolioGet
+        component "GET /portfolio, POST /seed, risk-summary, asset-allocation" as PortfolioEndpoints
+        component "GET /quotes, WebSocket /ws/quotes, /quotes/history" as QuotesGet
+        component "AI/ML 计算" as AIMLAPI {
+            component "Risk-metrics → VaR, compute-batch" as AIML4
         }
         component "Analytics (ClickHouse)" as AnalyticsAPI {
             component "GET /analytics/portfolio-risk" as AnalyticsRisk
             component "GET /analytics/delta-info" as AnalyticsDelta
             component "POST /forecast/model (MLflow)" as ForecastModel
-        }
-        component "Blockchain /api/v1/blockchain" as BlockchainAPI {
-            component "POST /transfers, GET /balances" as BlockchainTransfers
-            component "GET /blocks, GET /transactions" as BlockchainQuery
+            component "risk-metrics, valuations" as AnalyticsRiskVal
         }
         component "SQLAlchemy 2.0 + asyncpg + Alembic" as SQLAlchemyStack
         component "TimescaleDB (portfolio + history)" as TimescaleDB
@@ -436,10 +436,11 @@ MobilePortfolio --> GoAPIGateway
 GoAPIGateway --> PortfolioAnalyticsAPI
 FastAPIApp --> FastAPIStructure
 FastAPIApp --> PortfolioGet
+FastAPIApp --> PortfolioEndpoints
+FastAPIApp --> QuotesGet
 FastAPIApp --> AIMLAPI
 FastAPIApp --> AnalyticsAPI
 AnalyticsAPI --> ClickHouseDB
-FastAPIApp --> BlockchainAPI
 FastAPIApp --> SQLAlchemyStack
 SQLAlchemyStack --> TimescaleDB
 FastAPIApp --> RedisDB
