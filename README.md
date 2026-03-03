@@ -33,7 +33,8 @@ FinPulse provides portfolio management, market analysis, and risk management. Bu
 ## Tech Stack
 
 - **Frontend**: React 19 + Vite, React Native + Expo, Emotion, Radix UI
-- **Backend**: Python FastAPI (analytics, portfolio aggregate, quotes, AI/ML), Go (gateway + CRUD: auth, blockchain, customers, accounts, portfolios, instruments, bonds, options, watchlists, orders, trades, payments, settlements, market-data, user-preferences), TimescaleDB, Redis, Kafka
+- **Packages**: `@fintech/analytics` (behavior tracking, A/B via GrowthBook), `@fintech/ui`, `@fintech/utils`
+- **Backend**: Python FastAPI (analytics, portfolio aggregate, quotes, behavior events, AI/ML), Go (gateway + CRUD: auth, blockchain, customers, accounts, portfolios, instruments, bonds, options, watchlists, orders, trades, payments, settlements, market-data, user-preferences), TimescaleDB, Redis, Kafka
 - **Tools**: pnpm workspaces, TypeScript 5
 
 ## Quick Start
@@ -48,7 +49,11 @@ pnpm dev:finpulse-mobile   # Mobile (Expo)
 pnpm run start:server # Backend (Docker + Python :8800 + Go :8801 + seed)
 ```
 
-Use `http://127.0.0.1:8801` as API entry when backend is running.
+Use `http://127.0.0.1:8801` as API entry when backend is running. For Admin behavior view, set `VITE_API_BASE_URL` (e.g. `http://127.0.0.1:8801/api/v1` or leave default for dev proxy). For Mobile analytics, set `EXPO_PUBLIC_API_BASE_URL` (e.g. `http://localhost:8801`; `/api/v1` is appended automatically).
+
+## Behavior Analytics
+
+Portal, Admin, and Mobile use `@fintech/analytics`: `AnalyticsProvider` + `useAnalytics().track()` / `identify()`. Events are sent to `POST /api/v1/analytics/events` (Console transport in dev if no API base). Admin **Behavior** page (`/behavior`) lists events and shows user detail (userId, email, name) in a drawer on row click.
 
 ## Project Structure
 
@@ -61,6 +66,7 @@ finpulse/
 │   ├── server-python/ # FastAPI backend
 │   └── server-go/     # Go API gateway
 ├── packages/
+│   ├── analytics/     # @fintech/analytics (track, identify, GrowthBook A/B, console/HTTP transport)
 │   ├── ui/            # @fintech/ui
 │   └── utils/         # @fintech/utils
 ├── scripts/           # Backend start, seed, db

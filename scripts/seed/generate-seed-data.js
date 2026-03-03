@@ -1,6 +1,6 @@
 const baseUrl =
   process.env.PORTFOLIO_API_URL ||
-  process.env.EXPO_PUBLIC_PORTFOLIO_API_URL ||
+  process.env.EXPO_PUBLIC_API_BASE_URL ||
   "http://localhost:8800";
 
 const authBaseUrl =

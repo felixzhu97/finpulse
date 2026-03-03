@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@fintech/analytics": "workspace:*",
     "@fintech/ui": "workspace:*",
     "@fintech/utils": "workspace:*",
     "react": "^19.2.0",

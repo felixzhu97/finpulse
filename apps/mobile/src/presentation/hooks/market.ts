@@ -1,4 +1,10 @@
 import { useCallback, useEffect, useMemo } from "react";
+import {
+  WATCHLIST_ADD,
+  WATCHLIST_CREATE,
+  WATCHLIST_REMOVE,
+} from "@fintech/analytics";
+import { useAnalytics } from "@fintech/analytics/react";
 import type { Instrument } from "../../domain/entities/instrument";
 import type { Watchlist } from "../../domain/entities/watchlist";
 import type { WatchlistWithItems } from "../../domain/dto";
@@ -116,6 +122,7 @@ export interface UseWatchlistsResult {
 }
 
 export function useWatchlists(): UseWatchlistsResult {
+  const analytics = useAnalytics();
   const fetcher = useCallback(() => getWatchlists(), []);
   const { data, loading, error, refresh } = useAsyncLoad(fetcher, EMPTY);
 
@@ -125,31 +132,34 @@ export function useWatchlists(): UseWatchlistsResult {
   const addItem = useCallback(
     async (watchlistId: string, instrumentId: string) => {
       const item = await apiAddWatchlistItem(watchlistId, instrumentId);
+      analytics.track(WATCHLIST_ADD, { success: !!item });
       if (item) {
         await refresh();
         return true;
       }
       return false;
     },
-    [refresh]
+    [analytics, refresh]
   );
 
   const removeItem = useCallback(
     async (watchlistItemId: string) => {
       const ok = await apiRemoveWatchlistItem(watchlistItemId);
+      analytics.track(WATCHLIST_REMOVE, { success: ok });
       if (ok) await refresh();
       return ok;
     },
-    [refresh]
+    [analytics, refresh]
   );
 
   const createWatchlist = useCallback(
     async (name: string) => {
       const created = await apiCreateWatchlist(name);
+      analytics.track(WATCHLIST_CREATE, { success: !!created });
       if (created) await refresh();
       return created;
     },
-    [refresh]
+    [analytics, refresh]
   );
 
   return {

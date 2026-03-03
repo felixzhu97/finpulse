@@ -21,7 +21,7 @@ package "Presentation Layer" <<Presentation>> {
         component "React 19 + Vite" as AdminVite {
             component "React Router" as AppRouter
             component "Components" as Components
-            component "Pages (Dashboard, Portfolio, etc.)" as Services
+            component "Pages (Dashboard, Portfolio, Behavior)" as Services
             component "Layout (Sidebar, Header)" as Layout
         }
     }
@@ -32,6 +32,12 @@ package "Presentation Layer" <<Presentation>> {
             component "Components" as PortalComponents
             component "Emotion + theme" as PortalTheme
         }
+    }
+
+    component "@fintech/analytics" as AnalyticsPkg {
+        component "AnalyticsProvider + useAnalytics" as AnalyticsProvider
+        component "track / identify" as TrackIdentify
+        component "Console / HTTP transport" as AnalyticsTransport
     }
 
     component "@fintech/ui" as UIComponent {
@@ -200,6 +206,10 @@ package "External Services" <<External>> {
             component "POST /forecast/model (MLflow)" as ForecastModel
             component "risk-metrics, valuations" as AnalyticsRiskVal
         }
+        component "Behavior events (in-memory)" as BehaviorEvents {
+            component "POST /analytics/events" as PostEvents
+            component "GET /analytics/events" as GetEvents
+        }
         component "SQLAlchemy 2.0 + asyncpg + Alembic" as SQLAlchemyStack
         component "TimescaleDB (portfolio + history)" as TimescaleDB
         component "Redis (server-side cache)" as RedisDB
@@ -303,6 +313,7 @@ FastAPIApp --> PortfolioEndpoints
 FastAPIApp --> QuotesGet
 FastAPIApp --> AIMLAPI
 FastAPIApp --> AnalyticsAPI
+FastAPIApp --> BehaviorEvents
 AnalyticsAPI --> ClickHouseDB
 FastAPIApp --> SQLAlchemyStack
 SQLAlchemyStack --> TimescaleDB
@@ -317,9 +328,16 @@ AdminVite --> AppRouter
 AdminVite --> Components
 AdminVite --> Services
 AppRouter --> Layout
+AdminApp --> AnalyticsPkg
 AdminApp --> UIComponent
 AdminApp --> ChartLibrariesWeb
+PortalApp --> AnalyticsPkg
 PortalApp --> UIComponent
+MobilePortfolio --> AnalyticsPkg
+AnalyticsPkg --> AnalyticsProvider
+AnalyticsProvider --> TrackIdentify
+TrackIdentify --> AnalyticsTransport
+AnalyticsTransport --> GoAPIGateway
 PortalVite --> PortalRouter
 PortalVite --> PortalComponents
 PortalVite --> PortalTheme

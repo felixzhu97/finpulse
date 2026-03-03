@@ -207,6 +207,13 @@
 | GET | `/api/v1/analytics/portfolio-risk` | 从 ClickHouse 读取组合风险序列。查询参数：`portfolio_id`（可选）、`limit`（默认 100）。返回 `{ "data": [...] }`。 |
 | GET | `/api/v1/analytics/delta-info` | Delta 表统计（行数、样本）从 ClickHouse 读取。查询参数：`path`（可选；否则用 `DELTA_SAMPLE_PATH`）。需先运行 `python -m jobs.batch.delta_sync_info` 写入。 |
 
+## 行为事件
+
+| 方法 | 路径 | 说明 |
+|--------|------|-------------|
+| POST | `/api/v1/analytics/events` | 上报单条行为事件。请求体：`{ "name", "properties?", "timestamp?" }`。返回 `201` 及 `{ "id": "..." }`。内存存储，上限 1000 条。 |
+| GET | `/api/v1/analytics/events` | 查询事件列表（新在前）。查询参数：`limit`（1–500，默认 100）、`source`（可选：portal \| admin \| mobile）。返回 `{ "data": [ { "id", "name", "properties", "timestamp" }, ... ] }`。 |
+
 ## 预测（MLflow）
 
 | 方法 | 路径 | 说明 |
@@ -232,7 +239,7 @@ AI、ML、DL 已融入业务操作：
 - **交易**（`POST /trades`）：响应包含 `surveillance_alert`、`surveillance_score`
 - **客户**（`POST /customers`）：响应包含 `ai_identity_score`
 - **风险**（`POST /risk-metrics/compute`）：单组合 VaR；**批量**（`POST /risk-metrics/compute-batch`）：多组合 VaR，写入 ClickHouse
-- **分析**：`GET /analytics/portfolio-risk`（ClickHouse）、`GET /analytics/delta-info`（Delta 统计）
+- **分析**：`GET /analytics/portfolio-risk`（ClickHouse）、`GET /analytics/delta-info`（Delta 统计）。**行为**：`POST /analytics/events`（上报）、`GET /analytics/events`（列表；Admin Behavior 页使用）。
 - **预测**：`POST /forecast/model` 加载 MLflow 模型并返回预测结果
 
 请求/响应结构见 OpenAPI：`/docs`。

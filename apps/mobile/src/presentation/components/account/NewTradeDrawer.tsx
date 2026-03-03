@@ -18,6 +18,8 @@ import {
 import type { Instrument } from "@/src/domain/entities/instrument";
 import type { Order } from "@/src/domain/entities/order";
 import type { Trade } from "@/src/domain/entities/trade";
+import { ORDER_CREATE, TRADE_EXECUTE } from "@fintech/analytics";
+import { useAnalytics } from "@fintech/analytics/react";
 import { useDraggableDrawer } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import {
@@ -55,6 +57,7 @@ interface NewTradeDrawerProps {
 export function NewTradeDrawer({ visible, onClose, onSuccess, prefillDefaults }: NewTradeDrawerProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const analytics = useAnalytics();
   const [step, setStep] = useState<"order" | "trade">("order");
   const [accounts, setAccounts] = useState<{ account_id: string; account_type: string; currency: string }[]>([]);
   const [instruments, setInstruments] = useState<Instrument[]>([]);
@@ -110,6 +113,7 @@ export function NewTradeDrawer({ visible, onClose, onSuccess, prefillDefaults }:
         side,
         quantity: qty,
       });
+      analytics.track(ORDER_CREATE, { success: !!order, side });
       if (order) {
         setCreatedOrder(order);
         setStep("trade");
@@ -118,6 +122,7 @@ export function NewTradeDrawer({ visible, onClose, onSuccess, prefillDefaults }:
         setError(t("account.orderFailed"));
       }
     } catch {
+      analytics.track(ORDER_CREATE, { success: false, side });
       setError(t("account.orderFailed"));
     } finally {
       setSubmitting(false);
@@ -140,6 +145,7 @@ export function NewTradeDrawer({ visible, onClose, onSuccess, prefillDefaults }:
         quantity: qty,
         price: prc,
       });
+      analytics.track(TRADE_EXECUTE, { success: !!trade });
       if (trade) {
         setResult(trade);
         onSuccess?.(trade);
@@ -147,6 +153,7 @@ export function NewTradeDrawer({ visible, onClose, onSuccess, prefillDefaults }:
         setError(t("account.tradeFailed"));
       }
     } catch {
+      analytics.track(TRADE_EXECUTE, { success: false });
       setError(t("account.tradeFailed"));
     } finally {
       setSubmitting(false);

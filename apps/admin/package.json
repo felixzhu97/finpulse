@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fintech/analytics": "workspace:*",
     "@fintech/utils": "workspace:*",
     "ag-grid-community": "^35.0.0",
     "ag-grid-react": "^35.0.0",

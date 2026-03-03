@@ -219,6 +219,13 @@ All auth responses use JSON. Protected endpoints require header: `Authorization:
 | GET | `/api/v1/analytics/portfolio-risk` | Portfolio risk series from ClickHouse. Query: `portfolio_id` (optional), `limit` (default 100). Returns `{ "data": [...] }`. |
 | GET | `/api/v1/analytics/delta-info` | Delta table stats (row count, sample) from ClickHouse. Query: `path` (optional; else `DELTA_SAMPLE_PATH`). Run `python -m jobs.batch.delta_sync_info` to populate. |
 
+## Behavior events
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/analytics/events` | Ingest one event. Body: `{ "name", "properties?", "timestamp?" }`. Returns `201` with `{ "id": "..." }`. Stored in-memory (cap 1000). |
+| GET | `/api/v1/analytics/events` | List events (newest first). Query: `limit` (1–500, default 100), `source` (optional: portal \| admin \| mobile). Returns `{ "data": [ { "id", "name", "properties", "timestamp" }, ... ] }`. |
+
 ## Forecast (MLflow)
 
 | Method | Path | Description |
@@ -244,7 +251,7 @@ AI, ML and DL are integrated into business operations:
 - **Trades** (`POST /trades`): response includes `surveillance_alert`, `surveillance_score`.
 - **Customers** (`POST /customers`): response includes `ai_identity_score`.
 - **Risk** (`POST /risk-metrics/compute`): single-portfolio VaR from history. **Batch** (`POST /risk-metrics/compute-batch`): VaR for multiple portfolios; writes to ClickHouse.
-- **Analytics**: `GET /analytics/portfolio-risk` (ClickHouse), `GET /analytics/delta-info` (Delta stats from ClickHouse).
+- **Analytics**: `GET /analytics/portfolio-risk` (ClickHouse), `GET /analytics/delta-info` (Delta stats from ClickHouse). **Behavior**: `POST /analytics/events` (ingest), `GET /analytics/events` (list; used by Admin Behavior page).
 - **Forecast**: `POST /forecast/model` loads an MLflow-registered model and returns predictions.
 
 Schemas: see OpenAPI at `/docs`.

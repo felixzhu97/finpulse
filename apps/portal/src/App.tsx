@@ -1,4 +1,7 @@
-import styled from '@emotion/styled'
+import styled from "@emotion/styled";
+import { CTA_CLICK, PAGE_VIEW } from "@fintech/analytics";
+import { useAnalytics, useFeatureIsOn, useFeatureValue } from "@fintech/analytics/react";
+import { useEffect } from "react";
 
 const Root = styled.div`
   min-height: 100vh;
@@ -8,19 +11,19 @@ const Root = styled.div`
   justify-content: center;
   gap: 1.5rem;
   padding: 1.5rem;
-`
+`;
 
 const Title = styled.h1`
   font-size: 1.875rem;
   font-weight: 600;
   color: var(--foreground);
-`
+`;
 
 const Subtitle = styled.p`
   color: var(--muted-foreground);
   text-align: center;
   max-width: 28rem;
-`
+`;
 
 const PrimaryButton = styled.button`
   display: inline-flex;
@@ -46,18 +49,32 @@ const PrimaryButton = styled.button`
     pointer-events: none;
     opacity: 0.5;
   }
-`
+`;
 
 function App() {
+  const analytics = useAnalytics();
+  const useNewCta = useFeatureIsOn("portal-new-cta");
+  const ctaLabel = useFeatureValue("portal-cta-label", "Get started");
+
+  useEffect(() => {
+    analytics.track(PAGE_VIEW, { path: "/" });
+  }, [analytics]);
+
+  const handleCtaClick = () => {
+    analytics.track(CTA_CLICK, { cta: "get_started", variant: useNewCta ? "new" : "legacy" });
+  };
+
   return (
     <Root>
       <Title>FinPulse Portal</Title>
       <Subtitle>
         Portal app — Robinhood-style fintech experience.
       </Subtitle>
-      <PrimaryButton type="button">Get started</PrimaryButton>
+      <PrimaryButton type="button" onClick={handleCtaClick}>
+        {ctaLabel}
+      </PrimaryButton>
     </Root>
-  )
+  );
 }
 
-export default App
+export default App;

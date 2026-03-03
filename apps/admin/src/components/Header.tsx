@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import styled from '@emotion/styled'
+import { SEARCH } from '@fintech/analytics'
+import { useAnalytics } from '@fintech/analytics/react'
 import { StyledButton, StyledInput, StyledBadge, StyledAvatar } from '@/styled'
 
 const StyledHeader = styled.header`
@@ -151,6 +153,14 @@ const AvatarButton = styled(StyledButton)`
 export function Header() {
   const [darkMode, setDarkMode] = useState(true)
   const [avatarError, setAvatarError] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const analytics = useAnalytics()
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      analytics.track(SEARCH, { query: searchQuery.slice(0, 100) })
+    }
+  }
 
   const toggleDarkMode = () => {
     const next = !darkMode
@@ -165,7 +175,13 @@ export function Header() {
           <SearchIcon fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </SearchIcon>
-          <SearchInput placeholder="Search stocks, funds, assets..." type="search" />
+          <SearchInput
+            placeholder="Search stocks, funds, assets..."
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
+          />
           <Kbd>⌘K</Kbd>
         </SearchWrap>
 

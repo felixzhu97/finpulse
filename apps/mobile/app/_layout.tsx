@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo } from "react";
@@ -14,13 +14,21 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ActivityIndicator, useColorScheme } from "react-native";
 import styled from "@emotion/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { createConsoleTransport, createHttpTransport } from "@fintech/analytics";
+import { AnalyticsProvider, useAnalytics } from "@fintech/analytics/react";
+import { SCREEN_VIEW } from "@fintech/analytics";
 import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubscriber";
 import { store } from "@/src/presentation/store";
-import { usePreferences, useAuthTokenSync, useAuthRestore, useAuthFetchCustomer } from "@/src/presentation/hooks";
+import { getBaseUrl } from "@/src/infrastructure/network/config";
+import { useAuth, usePreferences, useAuthTokenSync, useAuthRestore, useAuthFetchCustomer } from "@/src/presentation/hooks";
 import { DarkColors, LightColors } from "@/src/presentation/theme/colors";
 import { StyledThemeProvider } from "@/src/presentation/theme/StyledThemeProvider";
 import "@/src/presentation/i18n/config";
 import { i18n } from "@/src/presentation/i18n";
+
+const base = getBaseUrl().replace(/\/$/, "");
+const apiBase = base ? `${base}${base.indexOf("/api/v1") !== -1 ? "" : "/api/v1"}` : "";
+const analyticsTransport = apiBase ? createHttpTransport(apiBase, "mobile") : createConsoleTransport();
 
 const LoadingRoot = styled.View<{ bg: string }>`
   flex: 1;
@@ -31,12 +39,32 @@ const LoadingRoot = styled.View<{ bg: string }>`
 
 SplashScreen.preventAutoHideAsync();
 
+function ScreenViewTracker() {
+  const pathname = usePathname();
+  const analytics = useAnalytics();
+  useEffect(() => {
+    analytics.track(SCREEN_VIEW, { screen: pathname });
+  }, [pathname, analytics]);
+  return null;
+}
+
 function AppContent() {
   const { loading, theme: themePreference, language } = usePreferences();
   const systemColorScheme = useColorScheme();
+  const { customer } = useAuth();
+  const analytics = useAnalytics();
   useAuthTokenSync();
   useAuthRestore();
   useAuthFetchCustomer();
+
+  useEffect(() => {
+    if (customer) {
+      analytics.identify(customer.customer_id, {
+        email: customer.email ?? undefined,
+        name: customer.name,
+      });
+    }
+  }, [customer, analytics]);
 
   useEffect(() => {
     if (language) {
@@ -85,6 +113,7 @@ function AppContent() {
           <SafeAreaView
             style={{ flex: 1, backgroundColor: theme.colors.background }}
           >
+            <ScreenViewTracker />
             <QuoteSocketSubscriber />
             <Stack initialRouteName="index">
               <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -117,7 +146,9 @@ export default function RootLayout() {
 
   return (
     <Provider store={store}>
-      <AppContent />
+      <AnalyticsProvider transport={analyticsTransport}>
+        <AppContent />
+      </AnalyticsProvider>
     </Provider>
   );
 }

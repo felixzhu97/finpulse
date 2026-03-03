@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from '@emotion/styled'
+import { SIDEBAR_TOGGLE } from '@fintech/analytics'
+import { useAnalytics } from '@fintech/analytics/react'
 
 interface MenuItem {
   icon: string
@@ -28,7 +30,7 @@ const menuItems: MenuItem[] = [
   { icon: 'wallet', label: 'Portfolio', route: '/portfolio' },
   { icon: 'trending', label: 'Market Trends', route: '#' },
   { icon: 'pie', label: 'Asset Allocation', route: '#' },
-  { icon: 'line-chart', label: 'Analytics', route: '#' },
+  { icon: 'line-chart', label: 'Behavior', route: '/behavior' },
   { icon: 'shield', label: 'Risk Management', route: '#' },
   { icon: 'credit-card', label: 'Transactions', route: '/transactions' },
   { icon: 'users', label: 'Clients', route: '/clients' },
@@ -208,6 +210,14 @@ function Icon({ name }: { name: string }) {
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
+  const analytics = useAnalytics()
+
+  const handleToggle = () => {
+    const next = !collapsed
+    setCollapsed(next)
+    analytics.track(SIDEBAR_TOGGLE, { collapsed: next })
+  }
+
   return (
     <Aside collapsed={collapsed}>
       <SidebarHeader>
@@ -247,7 +257,7 @@ export function Sidebar() {
           ))}
         </NavList>
       </Bottom>
-      <ToggleBtn type="button" collapsed={collapsed} onClick={() => setCollapsed(!collapsed)} aria-label={collapsed ? 'Expand' : 'Collapse'}>
+      <ToggleBtn type="button" collapsed={collapsed} onClick={handleToggle} aria-label={collapsed ? 'Expand' : 'Collapse'}>
         {collapsed ? (
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

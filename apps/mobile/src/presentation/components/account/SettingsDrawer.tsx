@@ -12,6 +12,8 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { LOGOUT, PASSWORD_CHANGE } from "@fintech/analytics";
+import { useAnalytics } from "@fintech/analytics/react";
 import { useDraggableDrawer, usePreferences, useAuth } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import {
@@ -41,6 +43,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
   const router = useRouter();
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const analytics = useAnalytics();
   const { isAuthenticated, changePassword, logout } = useAuth();
   const {
     theme,
@@ -134,6 +137,7 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
       new_password: newPassword,
     });
     setSaving(false);
+    analytics.track(PASSWORD_CHANGE, { success: result.ok });
     if (result.ok) {
       setChangePasswordSuccess(true);
       setCurrentPassword("");
@@ -143,13 +147,14 @@ export function SettingsDrawer({ visible, onClose }: SettingsDrawerProps) {
     } else {
       setChangePasswordError(result.error ?? t("auth.changePasswordFailed"));
     }
-  }, [changePassword, currentPassword, newPassword, confirmPassword, t]);
+  }, [analytics, changePassword, currentPassword, newPassword, confirmPassword, t]);
 
   const handleLogout = useCallback(async () => {
+    analytics.track(LOGOUT);
     onClose();
     await logout();
     router.replace("/(auth)/login");
-  }, [logout, onClose, router]);
+  }, [analytics, logout, onClose, router]);
 
   const translateY = Animated.add(slideAnim, dragOffset);
 

@@ -1,8 +1,8 @@
 from datetime import date
-from typing import Annotated, Optional
-from uuid import UUID, uuid4
+from typing import Annotated, Any, Optional
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from src.api.v1.endpoints.crud_helpers import register_crud
 from src.api.v1.schemas import (
@@ -65,7 +65,35 @@ def _as_of(b):
     return b.as_of_date or date.today()
 
 
+_BEHAVIOR_EVENTS: list[dict[str, Any]] = []
+_BEHAVIOR_EVENTS_MAX = 1000
+
+
 def register(router: APIRouter) -> None:
+    @router.post("/analytics/events", status_code=201)
+    def post_behavior_events(body: dict[str, Any]) -> dict[str, str]:
+        event = {
+            "id": str(uuid4()),
+            "name": body.get("name", ""),
+            "properties": body.get("properties") or {},
+            "timestamp": body.get("timestamp"),
+        }
+        _BEHAVIOR_EVENTS.append(event)
+        if len(_BEHAVIOR_EVENTS) > _BEHAVIOR_EVENTS_MAX:
+            _BEHAVIOR_EVENTS.pop(0)
+        return {"id": event["id"]}
+
+    @router.get("/analytics/events")
+    def get_behavior_events(
+        limit: Annotated[int, Query(ge=1, le=500)] = 100,
+        source: Annotated[Optional[str], Query()] = None,
+    ) -> dict[str, Any]:
+        items = list(reversed(_BEHAVIOR_EVENTS))
+        if source:
+            items = [e for e in items if (e.get("properties") or {}).get("source") == source]
+        return {"data": items[:limit]}
+
+
     register_crud(
         router, "risk-metrics", "metric_id",
         RiskMetricsCreate, RiskMetricsResponse, get_risk_metrics_repo,

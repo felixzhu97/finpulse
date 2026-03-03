@@ -20,7 +20,7 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
     component "apps/admin" as AdminApp {
         component "React 19 + Vite 管理台" as NextApp {
             component "React Router" as AppRouter
-            component "Pages (Dashboard, Portfolio 等)" as ServerComponents
+            component "Pages (Dashboard, Portfolio, Behavior 等)" as ServerComponents
             component "Layout (Sidebar, Header)" as Layout
             component "主题 (Emotion)" as ThemeProvider
         }
@@ -32,6 +32,12 @@ package "展示层 (Presentation Layer)" <<Presentation>> {
             component "组件" as PortalComponents
             component "Emotion + 主题" as PortalTheme
         }
+    }
+
+    component "@fintech/analytics" as AnalyticsPkg {
+        component "AnalyticsProvider + useAnalytics" as AnalyticsProvider
+        component "track / identify" as TrackIdentify
+        component "Console / HTTP 传输" as AnalyticsTransport
     }
 
     component "@fintech/ui" as UIComponent {
@@ -321,6 +327,10 @@ package "外部服务层 (External Services)" <<External>> {
             component "POST /forecast/model (MLflow)" as ForecastModel
             component "risk-metrics, valuations" as AnalyticsRiskVal
         }
+        component "行为事件 (内存)" as BehaviorEvents {
+            component "POST /analytics/events" as PostEvents
+            component "GET /analytics/events" as GetEvents
+        }
         component "SQLAlchemy 2.0 + asyncpg + Alembic" as SQLAlchemyStack
         component "TimescaleDB (portfolio + history)" as TimescaleDB
         component "Redis (服务端缓存)" as RedisDB
@@ -440,6 +450,7 @@ FastAPIApp --> PortfolioEndpoints
 FastAPIApp --> QuotesGet
 FastAPIApp --> AIMLAPI
 FastAPIApp --> AnalyticsAPI
+FastAPIApp --> BehaviorEvents
 AnalyticsAPI --> ClickHouseDB
 FastAPIApp --> SQLAlchemyStack
 SQLAlchemyStack --> TimescaleDB
@@ -461,6 +472,13 @@ PortalVite --> PortalComponents
 PortalVite --> PortalTheme
 PortalApp --> UtilsPkg
 PortalApp --> GoAPIGateway
+AdminApp --> AnalyticsPkg
+PortalApp --> AnalyticsPkg
+MobilePortfolio --> AnalyticsPkg
+AnalyticsPkg --> AnalyticsProvider
+AnalyticsProvider --> TrackIdentify
+TrackIdentify --> AnalyticsTransport
+AnalyticsTransport --> GoAPIGateway
 BaseUI --> RadixPrimitives
 FormLibrary --> Validator
 

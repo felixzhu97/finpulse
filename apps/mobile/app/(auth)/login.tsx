@@ -11,6 +11,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import styled from "@emotion/native";
+import { LOGIN } from "@fintech/analytics";
+import { useAnalytics } from "@fintech/analytics/react";
 import { useTheme } from "@/src/presentation/theme";
 import { useAuth } from "@/src/presentation/hooks/auth";
 import { useTranslation } from "@/src/presentation/i18n";
@@ -97,6 +99,7 @@ export default function LoginScreen() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
+  const analytics = useAnalytics();
   const { login } = useAuth();
   const defaultEmail = typeof process !== "undefined" ? process.env?.EXPO_PUBLIC_DEMO_EMAIL ?? "" : "";
   const defaultPassword = typeof process !== "undefined" ? process.env?.EXPO_PUBLIC_DEMO_PASSWORD ?? "" : "";
@@ -115,6 +118,7 @@ export default function LoginScreen() {
     setLoading(true);
     const result = await login({ email: trimmedEmail, password });
     setLoading(false);
+    analytics.track(LOGIN, { success: result.ok });
     if (result.ok) {
       router.replace("/(tabs)");
     } else {

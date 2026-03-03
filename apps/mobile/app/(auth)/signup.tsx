@@ -9,6 +9,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import styled from "@emotion/native";
+import { REGISTER } from "@fintech/analytics";
+import { useAnalytics } from "@fintech/analytics/react";
 import { useTheme } from "@/src/presentation/theme";
 import { useAuth } from "@/src/presentation/hooks/auth";
 import { useTranslation } from "@/src/presentation/i18n";
@@ -95,6 +97,7 @@ export default function SignupScreen() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
+  const analytics = useAnalytics();
   const { register } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -121,6 +124,7 @@ export default function SignupScreen() {
       password,
     });
     setLoading(false);
+    analytics.track(REGISTER, { success: result.ok });
     if (result.ok) {
       router.replace("/(tabs)");
     } else {

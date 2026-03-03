@@ -32,6 +32,8 @@ import {
   DrawerSubmitButtonText,
   DrawerErrorText,
 } from "@/src/presentation/theme/primitives";
+import { TRANSFER_SUBMIT } from "@fintech/analytics";
+import { useAnalytics } from "@fintech/analytics/react";
 import { useWeb3, SEPOLIA_CHAIN_ID } from "@/src/presentation/hooks";
 import { useTheme } from "@/src/presentation/theme";
 import { useTranslation } from "@/src/presentation/i18n";
@@ -54,6 +56,7 @@ interface EthTransferDrawerProps {
 export function EthTransferDrawer({ visible, onClose, onSuccess }: EthTransferDrawerProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const analytics = useAnalytics();
   const { walletInfo, loading: web3Loading, error: web3Error, refreshBalance } = useWeb3();
   const { slideAnim, dragOffset, panHandlers, backdropOpacity, closeWithAnimation } =
     useDraggableDrawer({ visible, drawerHeight: DRAWER_HEIGHT, onClose });
@@ -122,6 +125,7 @@ export function EthTransferDrawer({ visible, onClose, onSuccess }: EthTransferDr
             setError(null);
             try {
               const tx = await web3Service.sendTransaction(normalizedTo, amountEth);
+              analytics.track(TRANSFER_SUBMIT, { success: !!tx });
               if (tx) {
                 onSuccess?.();
                 refreshBalance();
@@ -131,6 +135,7 @@ export function EthTransferDrawer({ visible, onClose, onSuccess }: EthTransferDr
                 setError(t("blockchain.sendEthFailed"));
               }
             } catch {
+              analytics.track(TRANSFER_SUBMIT, { success: false });
               setError(t("blockchain.sendEthFailed"));
             } finally {
               setSubmitting(false);

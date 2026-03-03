@@ -11,6 +11,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PAYMENT_CREATE } from "@fintech/analytics";
+import { useAnalytics } from "@fintech/analytics/react";
 import { getPaymentFormData, createPayment } from "@/src/infrastructure/api";
 import type { AccountResource } from "@/src/domain/entities/accountResource";
 import type { Payment } from "@/src/domain/entities/payment";
@@ -50,6 +52,7 @@ interface NewPaymentDrawerProps {
 export function NewPaymentDrawer({ visible, onClose, onSuccess }: NewPaymentDrawerProps) {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const analytics = useAnalytics();
   const [accounts, setAccounts] = useState<AccountResource[]>([]);
   const [accountId, setAccountId] = useState("");
   const [amount, setAmount] = useState("");
@@ -92,6 +95,7 @@ export function NewPaymentDrawer({ visible, onClose, onSuccess }: NewPaymentDraw
         currency: "USD",
         counterparty: counterparty.trim() || undefined,
       });
+      analytics.track(PAYMENT_CREATE, { success: !!created });
       if (created) {
         setResult(created);
         onSuccess?.(created);
@@ -99,6 +103,7 @@ export function NewPaymentDrawer({ visible, onClose, onSuccess }: NewPaymentDraw
         setError(t("account.paymentFailed"));
       }
     } catch {
+      analytics.track(PAYMENT_CREATE, { success: false });
       setError(t("account.paymentFailed"));
     } finally {
       setSubmitting(false);

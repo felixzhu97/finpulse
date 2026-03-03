@@ -16,6 +16,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.11.0
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.8)(react@19.2.0))(@types/react@19.2.8)(react@19.2.0)
+      '@fintech/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@fintech/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -83,6 +86,9 @@ importers:
       '@expo/vector-icons':
         specifier: ^15.0.3
         version: 15.0.3(expo-font@14.0.11)(react-native@0.83.1(@babel/core@7.28.6)(@react-native-community/cli@18.0.1(typescript@5.9.3))(@types/react@19.2.8)(react@19.2.0))(react@19.2.0)
+      '@fintech/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@fintech/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -231,6 +237,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.11.0
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.8)(react@19.2.0))(@types/react@19.2.8)(react@19.2.0)
+      '@fintech/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@fintech/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -274,6 +283,31 @@ importers:
       vite:
         specifier: ^6.0.3
         version: 6.4.1(@types/node@22.19.7)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.30.2)(sass@1.97.1)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
+
+  packages/analytics:
+    dependencies:
+      '@growthbook/growthbook':
+        specifier: ^1.6.5
+        version: 1.6.5
+      '@growthbook/growthbook-react':
+        specifier: ^1.4.1
+        version: 1.6.5(react@19.2.0)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      react:
+        specifier: '>=18.0.0'
+        version: 19.2.0
+    devDependencies:
+      '@types/lodash':
+        specifier: ^4.17.0
+        version: 4.17.23
+      '@types/react':
+        specifier: ^19
+        version: 19.2.8
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
   packages/ui:
     dependencies:
@@ -1514,6 +1548,16 @@ packages:
     peerDependencies:
       react: '*'
       react-native: '*'
+
+  '@growthbook/growthbook-react@1.6.5':
+    resolution: {integrity: sha512-afi/RUbwazVNKv2acn6wDQz4BJNRAEpwIuHfggQup2/aE5PLAxy3+95gjjRMgCcPR0Pf3sFmhYGvOmxLD0ZRbQ==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: ^16.8.0-0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+
+  '@growthbook/growthbook@1.6.5':
+    resolution: {integrity: sha512-mUaMsgeUTpRIUOTn33EUXHRK6j7pxBjwqH4WpQyq+pukjd1AIzWlEa6w7i6bInJUcweGgP2beXZmaP6b6UPn7A==}
+    engines: {node: '>=10'}
 
   '@hapi/hoek@9.3.0':
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
@@ -3719,6 +3763,10 @@ packages:
 
   dom-helpers@5.2.1:
     resolution: {integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==}
+
+  dom-mutator@0.6.0:
+    resolution: {integrity: sha512-iCt9o0aYfXMUkz/43ZOAUFQYotjGB+GNbYJiJdz4TgXkyToXbbRy5S6FbTp72lRBtfpUMwEc1KmpFEU4CZeoNg==}
+    engines: {node: '>=10'}
 
   dom-serializer@2.0.0:
     resolution: {integrity: sha512-wIkAryiqt/nV5EQKqQpo3SToSOV9J0DnbJqwK7Wv/Trc92zIAYZ4FlMu+JPFW1DfGFt81ZTCGgDEabffXeLyJg==}
@@ -8184,6 +8232,15 @@ snapshots:
       react: 19.2.0
       react-native: 0.83.1(@babel/core@7.28.6)(@react-native-community/cli@18.0.1(typescript@5.9.3))(@types/react@19.2.8)(react@19.2.0)
 
+  '@growthbook/growthbook-react@1.6.5(react@19.2.0)':
+    dependencies:
+      '@growthbook/growthbook': 1.6.5
+      react: 19.2.0
+
+  '@growthbook/growthbook@1.6.5':
+    dependencies:
+      dom-mutator: 0.6.0
+
   '@hapi/hoek@9.3.0': {}
 
   '@hapi/topo@5.1.0':
@@ -10669,6 +10726,8 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.6
       csstype: 3.2.3
+
+  dom-mutator@0.6.0: {}
 
   dom-serializer@2.0.0:
     dependencies:
