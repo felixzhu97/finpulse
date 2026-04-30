@@ -1,102 +1,102 @@
-# FinPulse | Fintech Analytics Platform
+# FinPulse | 金融分析平台
 
-Professional-grade financial data analysis and portfolio management platform.
+专业级金融数据分析与投资组合管理平台，帮助您轻松追踪市场动态、管理投资组合、掌控风险。
 
-Chinese docs: [docs/zh/README.md](docs/zh/README.md)
+中文文档：[docs/zh/README.md](docs/zh/README.md)
 
-## Overview
+## 概述
 
-FinPulse provides portfolio management, market analysis, and risk management. Built with React (admin, portal), React Native (mobile), and FastAPI/Go backends.
+FinPulse 提供投资组合管理、市场分析和风险管理功能。基于 React（管理后台、门户）、React Native（移动端）和 FastAPI/Go 后端构建。
 
-## Screenshots
+## 截图
 
-### Mobile
+### 移动端
 <p align="center">
-  <img src="./screenshots/finpulse-mobile-dashboard.png" width="200" alt="Mobile Dashboard">
-  <img src="./screenshots/finpulse-mobile-watchlist.png" width="200" alt="Mobile Watchlist">
-  <img src="./screenshots/finpulse-mobile-stock-detail.png" width="200" alt="Mobile Stock Detail">
+  <img src="./screenshots/finpulse-mobile-dashboard.png" width="200" alt="移动端仪表盘">
+  <img src="./screenshots/finpulse-mobile-watchlist.png" width="200" alt="移动端自选股">
+  <img src="./screenshots/finpulse-mobile-stock-detail.png" width="200" alt="移动端股票详情">
 </p>
 <p align="center">
-  <img src="./screenshots/finpulse-mobile-insights.png" width="200" alt="Mobile Insights">
-  <img src="./screenshots/finpulse-mobile-account.png" width="200" alt="Mobile Account">
-  <img src="./screenshots/finpulse-mobile-new-payment.png" width="200" alt="Mobile New Payment">
+  <img src="./screenshots/finpulse-mobile-insights.png" width="200" alt="移动端洞察">
+  <img src="./screenshots/finpulse-mobile-account.png" width="200" alt="移动端账户">
+  <img src="./screenshots/finpulse-mobile-new-payment.png" width="200" alt="移动端新支付">
 </p>
 
-### Admin
+### 管理后台
 <p align="center">
-  <img src="./screenshots/finpulse-admin-dashboard.png" width="280" alt="Admin Dashboard">
-  <img src="./screenshots/finpulse-admin-portfolio.png" width="280" alt="Admin Portfolio">
-  <img src="./screenshots/finpulse-admin-transactions.png" width="280" alt="Admin Transactions">
-  <img src="./screenshots/finpulse-admin-clients.png" width="280" alt="Admin Clients">
+  <img src="./screenshots/finpulse-admin-dashboard.png" width="280" alt="管理后台仪表盘">
+  <img src="./screenshots/finpulse-admin-portfolio.png" width="280" alt="管理后台投资组合">
+  <img src="./screenshots/finpulse-admin-transactions.png" width="280" alt="管理后台交易记录">
+  <img src="./screenshots/finpulse-admin-clients.png" width="280" alt="管理后台客户管理">
 </p>
 
-## Tech Stack
+## 技术栈
 
-- **Frontend**: React 19 + Vite, React Native + Expo, Emotion, Radix UI
-- **Packages**: `@fintech/analytics` (behavior tracking, A/B via GrowthBook), `@fintech/ui`, `@fintech/utils`
-- **Backend**: Python FastAPI (analytics, portfolio aggregate, quotes, behavior events, AI/ML), Go (gateway + CRUD: auth, blockchain, customers, accounts, portfolios, instruments, bonds, options, watchlists, orders, trades, payments, settlements, market-data, user-preferences), TimescaleDB, Redis, Kafka
-- **Tools**: pnpm workspaces, TypeScript 5
+- **前端**: React 19 + Vite, React Native + Expo, Emotion, Radix UI
+- **组件库**: `@fintech/analytics`（行为追踪、A/B 测试）、`@fintech/ui`、`@fintech/utils`
+- **后端**: Python FastAPI（分析、组合聚合、行情、行为事件、AI/ML）、Go（网关 + CRUD）、TimescaleDB、Redis、Kafka
+- **工具**: pnpm workspaces, TypeScript 5
 
-## Quick Start
+## 快速开始
 
-**Requirements**: Node 18+, pnpm 10.6+, Python 3.10+, Docker
+**环境要求**: Node 18+, pnpm 10.6+, Python 3.10+, Docker
 
 ```bash
 pnpm install
-pnpm dev              # Admin @ localhost:4200
-pnpm dev:portal       # Portal @ localhost:3001
-pnpm dev:finpulse-mobile   # Mobile (Expo)
-pnpm run start:server # Backend (Docker + Python :8800 + Go :8801 + seed)
+pnpm dev              # 管理后台 @ localhost:4200
+pnpm dev:portal       # 门户 @ localhost:3001
+pnpm dev:finpulse-mobile   # 移动端 (Expo)
+pnpm run start:server # 后端 (Docker + Python :8800 + Go :8801 + 种子数据)
 ```
 
-Use `http://127.0.0.1:8801` as API entry when backend is running. For Admin behavior view, set `VITE_API_BASE_URL` (e.g. `http://127.0.0.1:8801/api/v1` or leave default for dev proxy). For Mobile analytics, set `EXPO_PUBLIC_API_BASE_URL` (e.g. `http://localhost:8801`; `/api/v1` is appended automatically).
+后端运行后，使用 `http://127.0.0.1:8801` 作为 API 入口。管理后台行为分析页面需设置 `VITE_API_BASE_URL`（如 `http://127.0.0.1:8801/api/v1` 或使用默认开发代理）。移动端分析需设置 `EXPO_PUBLIC_API_BASE_URL`（如 `http://localhost:8801`；`/api/v1` 会自动追加）。
 
-## Behavior Analytics
+## 行为分析
 
-Portal, Admin, and Mobile use `@fintech/analytics`: `AnalyticsProvider` + `useAnalytics().track()` / `identify()`. Events are sent to `POST /api/v1/analytics/events` (Console transport in dev if no API base). Admin **Behavior** page (`/behavior`) lists events and shows user detail (userId, email, name) in a drawer on row click.
+门户、管理后台和移动端均使用 `@fintech/analytics`：通过 `AnalyticsProvider` + `useAnalytics().track()` / `identify()` 追踪事件。事件发送至 `POST /api/v1/analytics/events`（开发模式下无 API 时使用 Console 传输）。管理后台 **Behavior** 页面（`/behavior`）展示事件列表，点击行可在抽屉中查看用户详情（userId、email、name）。
 
-## Project Structure
+## 项目结构
 
 ```
 finpulse/
 ├── apps/
-│   ├── admin/         # React admin console
-│   ├── portal/        # React portal app
-│   ├── mobile/        # React Native (Expo) app
-│   ├── server-python/ # FastAPI backend
-│   └── server-go/     # Go API gateway
+│   ├── admin/         # React 管理后台
+│   ├── portal/        # React 门户应用
+│   ├── mobile/        # React Native (Expo) 移动端
+│   ├── server-python/ # FastAPI 后端
+│   └── server-go/     # Go API 网关
 ├── packages/
-│   ├── analytics/     # @fintech/analytics (track, identify, GrowthBook A/B, console/HTTP transport)
-│   ├── ui/            # @fintech/ui
-│   └── utils/         # @fintech/utils
-├── scripts/           # Backend start, seed, db
-└── docs/              # Architecture, C4, ER diagrams
+│   ├── analytics/     # @fintech/analytics（追踪、识别、GrowthBook A/B 测试、Console/HTTP 传输）
+│   ├── ui/            # @fintech/ui 组件库
+│   └── utils/         # @fintech/utils 工具库
+├── scripts/           # 后端启动、种子数据、数据库
+└── docs/              # 架构、C4、ER 图等文档
 ```
 
-## Scripts
+## 常用脚本
 
-| Script | Description |
+| 脚本 | 说明 |
 |--------|-------------|
-| `pnpm dev` | Admin dev server |
-| `pnpm dev:portal` | Portal dev server |
-| `pnpm dev:finpulse-mobile` | Mobile Metro |
-| `pnpm run start:server` | Backend (Docker + API + seed) |
-| `pnpm build` | Build admin |
-| `pnpm test:api` | Python API tests |
-| `pnpm lint` | ESLint |
+| `pnpm dev` | 管理后台开发服务器 |
+| `pnpm dev:portal` | 门户开发服务器 |
+| `pnpm dev:finpulse-mobile` | 移动端 Metro |
+| `pnpm run start:server` | 后端（Doker + API + 种子数据） |
+| `pnpm build` | 构建管理后台 |
+| `pnpm test:api` | Python API 测试 |
+| `pnpm lint` | ESLint 检查 |
 
-## Docs
+## 文档
 
-- **Architecture**: `docs/en/rd/togaf/`, `docs/en/rd/c4/`
-- **ER Diagram**: `docs/en/data/er-diagram/`
+- **架构设计**: `docs/en/rd/togaf/`、`docs/en/rd/c4/`
+- **ER 图**: `docs/en/data/er-diagram/`
 - **TODO**: `docs/en/TODO.md`
 
-## Deploy (Vercel)
+## 部署（Vercel）
 
-- Root: `/`
-- Build: `pnpm install && pnpm --filter finpulse-admin build`
-- Output: `apps/admin/dist`
+- 根目录: `/`
+- 构建: `pnpm install && pnpm --filter finpulse-admin build`
+- 输出目录: `apps/admin/dist`
 
-## License
+## 开源许可
 
-Private. Issues and PRs welcome.
+私有项目。欢迎提交 Issue 和 PR。
