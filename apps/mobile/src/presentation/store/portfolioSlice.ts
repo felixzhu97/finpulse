@@ -19,4 +19,5 @@ const portfolioSlice = createSlice({
 });
 
 export const { setSelectedAccountId } = portfolioSlice.actions;
+export { portfolioSlice };
 export default portfolioSlice.reducer;
