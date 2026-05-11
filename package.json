@@ -22,6 +22,12 @@
     "pre-commit": "pnpm lint-staged",
     "stop:backend": "bash scripts/backend/stop-backend.sh"
   },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "vitest related --run"
+    ]
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.59.2",
     "@typescript-eslint/parser": "^8.59.2",
