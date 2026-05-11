@@ -60,5 +60,5 @@ export const {
   setPreferences,
   setLoading,
 } = preferencesSlice.actions;
-
+export { preferencesSlice };
 export default preferencesSlice.reducer;

@@ -13,9 +13,26 @@
     "build": "pnpm --filter finpulse-admin build",
     "start": "pnpm --filter finpulse-admin start",
     "test": "pnpm run test:api",
+    "test:all": "pnpm -r --parallel run test",
+    "test:all:coverage": "pnpm -r --parallel run test:coverage",
+    "test:type": "pnpm -r --parallel run type-check",
     "test:api": "cd apps/server-python && .venv/bin/python -m pytest tests -v",
     "test:api:go": "cd apps/server-go && go test ./cmd/server -v -count=1",
     "lint": "pnpm --filter finpulse-admin lint",
-    "stop:backend": "bash scripts/backend/stop-backend.sh"
+    "pre-commit": "pnpm lint-staged",
+    "stop:backend": "bash scripts/backend/stop-backend.sh",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "vitest related --run"
+    ]
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.59.2",
+    "@typescript-eslint/parser": "^8.59.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.4"
   }
 }

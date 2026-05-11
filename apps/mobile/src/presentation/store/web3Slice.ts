@@ -105,5 +105,6 @@ const web3Slice = createSlice({
 });
 
 export const { clearError, syncFromService } = web3Slice.actions;
+export { web3Slice };
 export default web3Slice.reducer;
 export type { Web3State };

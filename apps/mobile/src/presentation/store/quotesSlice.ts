@@ -63,4 +63,5 @@ const quotesSlice = createSlice({
 });
 
 export const { setSubscribedSymbols, setSnapshot, setStatus, setHistory, setExtraSubscribedSymbols } = quotesSlice.actions;
+export { quotesSlice };
 export default quotesSlice.reducer;
