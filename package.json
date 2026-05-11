@@ -10,7 +10,9 @@
     "dev:mobile:ios": "pnpm --filter finpulse-mobile ios",
     "dev:mobile:android": "pnpm --filter finpulse-mobile android",
     "dev:server": "bash scripts/backend/start-backend.sh",
-    "build": "pnpm --filter finpulse-admin build",
+    "build": "turbo run build",
+    "check-types": "pnpm -r run --if-present check-types",
+    "tsc": "pnpm -r run --if-present check-types",
     "start": "pnpm --filter finpulse-admin start",
     "test": "pnpm run test:api",
     "test:all": "pnpm -r --parallel run test",
@@ -33,6 +35,9 @@
     "@typescript-eslint/eslint-plugin": "^8.59.2",
     "@typescript-eslint/parser": "^8.59.2",
     "husky": "^9.1.7",
-    "lint-staged": "^17.0.4"
+    "lint-staged": "^17.0.4",
+    "prettier": "^3.6.0",
+    "turbo": "^2.5.4",
+    "typescript": "^5"
   }
 }
