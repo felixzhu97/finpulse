@@ -20,7 +20,8 @@
     "test:api:go": "cd apps/server-go && go test ./cmd/server -v -count=1",
     "lint": "pnpm --filter finpulse-admin lint",
     "pre-commit": "pnpm lint-staged",
-    "stop:backend": "bash scripts/backend/stop-backend.sh"
+    "stop:backend": "bash scripts/backend/stop-backend.sh",
+    "prepare": "husky"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
