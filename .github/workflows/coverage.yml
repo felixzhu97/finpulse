@@ -119,17 +119,14 @@ jobs:
           if [ -f "apps/mobile/coverage/lcov.info" ]; then
             echo "### 📱 apps/mobile (Jest)" >> $GITHUB_STEP_SUMMARY
             
-            # Parse Jest lcov.info format for line coverage
             LINE_COVERAGE=$(awk '/^SF:/{f=1} f{print} /^end_of_record/{f=0}' apps/mobile/coverage/lcov.info | \
               awk -F':' '/^LH:/{h+=$2} /^LF:/{l+=$2} END{if(l>0) printf "%.1f", (h/l)*100; else print "N/A"}')
             
-            # Parse function coverage
             FN_COVERAGE=$(awk '/^SF:/{f=1} f{print} /^end_of_record/{f=0}' apps/mobile/coverage/lcov.info | \
-              awk -F':' '/^LH:/{h+=$2} /^LF:/{l+=$2} /^FN:/{fn++} /^FNF:/{fnf=$2} END{if(fnf>0) printf "%.1f", (fn/fnf)*100; else print "N/A"}')
+              awk -F':' '/^FN:/{fn++} /^FNF:/{fnf=$2} END{if(fnf>0) printf "%.1f", (fn/fnf)*100; else print "N/A"}')
             
-            # Parse branch coverage
             BR_COVERAGE=$(awk '/^SF:/{f=1} f{print} /^end_of_record/{f=0}' apps/mobile/coverage/lcov.info | \
-              awk -F':' '/^LH:/{h+=$2} /^LF:/{l+=$2} /^BRH:/{bh+=$2} /^BRF:/{bf+=$2} END{if(bf>0) printf "%.1f", (bh/bf)*100; else print "N/A"}')
+              awk -F':' '/^BRH:/{bh+=$2} /^BRF:/{bf+=$2} END{if(bf>0) printf "%.1f", (bh/bf)*100; else print "N/A"}')
             
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "Lines     : ${LINE_COVERAGE:-N/A}%" >> $GITHUB_STEP_SUMMARY

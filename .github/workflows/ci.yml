@@ -29,26 +29,13 @@ jobs:
         run: pnpm --filter './packages/**' build
 
       - name: Type check
-        run: |
-          pnpm --filter '@fintech/utils' type-check
-          pnpm --filter '@fintech/analytics' type-check
-          pnpm --filter '@fintech/ui' type-check
-          pnpm --filter finpulse-admin type-check
-          pnpm --filter finpulse-portal type-check
+        run: pnpm test:type
 
       - name: Lint
-        run: pnpm --filter finpulse-admin lint
+        run: pnpm lint
 
-      - name: Unit Tests (Vitest)
-        run: |
-          pnpm --filter '@fintech/utils' test
-          pnpm --filter '@fintech/analytics' test
-          pnpm --filter '@fintech/ui' test
-          pnpm --filter finpulse-admin test
-          pnpm --filter finpulse-portal test
-
-      - name: Unit Tests (Jest - mobile)
-        run: pnpm --filter finpulse-mobile test
+      - name: Unit Tests
+        run: pnpm test:all
 
       - name: API Tests
         run: pnpm test
