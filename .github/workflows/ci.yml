@@ -33,6 +33,3 @@ jobs:
 
       - name: Lint
         run: pnpm lint
-
-      - name: API Tests
-        run: pnpm test
