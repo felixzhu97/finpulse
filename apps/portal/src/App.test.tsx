@@ -15,8 +15,8 @@ const mockAnalyticsClient: AnalyticsClient = {
 
 // Create mock functions using vi.hoisted to ensure they're available before vi.mock
 const { mockUseFeatureIsOn, mockUseFeatureValue } = vi.hoisted(() => {
-  const isOn = vi.fn(() => false);
-  const value = vi.fn((_key: string, fallback: string) => fallback);
+  const isOn = vi.fn((_key?: string) => false);
+  const value = vi.fn((_key?: string, fallback?: string) => fallback ?? "");
   return { mockUseFeatureIsOn: isOn, mockUseFeatureValue: value };
 });
 
@@ -35,8 +35,8 @@ vi.mock("@fintech/analytics", () => ({
 vi.mock("@fintech/analytics/react", () => {
   return {
     useAnalytics: () => mockAnalyticsClient,
-    useFeatureIsOn: (key: string) => mockUseFeatureIsOn(key),
-    useFeatureValue: (key: string, fallback: string) => mockUseFeatureValue(key, fallback),
+    useFeatureIsOn: (key?: string) => mockUseFeatureIsOn(key),
+    useFeatureValue: (key?: string, fallback?: string) => mockUseFeatureValue(key, fallback),
     AnalyticsProvider: ({ children }: { children: React.ReactNode }) => children,
     GrowthBookProvider: ({ children }: { children: React.ReactNode }) => children,
   };
@@ -49,8 +49,8 @@ describe("App Component", () => {
   beforeEach(() => {
     trackCalls.length = 0;
     vi.clearAllMocks();
-    mockUseFeatureIsOn.mockImplementation(() => false);
-    mockUseFeatureValue.mockImplementation((_key: string, fallback: string) => fallback);
+    mockUseFeatureIsOn.mockImplementation((_key?: string) => false);
+    mockUseFeatureValue.mockImplementation((_key?: string, fallback?: string) => fallback ?? "");
   });
 
   describe("Rendering", () => {
@@ -77,9 +77,9 @@ describe("App Component", () => {
     });
 
     it("renders CTA button with custom label from feature flag", () => {
-      mockUseFeatureValue.mockImplementation((key: string, fallback: string) => {
-        if (key === "portal-cta-label") return "Get Started Now";
-        return fallback;
+      mockUseFeatureValue.mockImplementation((_key?: string, fallback?: string) => {
+        if (_key === "portal-cta-label") return "Get Started Now";
+        return fallback ?? "";
       });
 
       render(<App />);
@@ -115,8 +115,8 @@ describe("App Component", () => {
     });
 
     it("tracks CTA click with new variant when feature flag is enabled", () => {
-      mockUseFeatureIsOn.mockImplementation((key: string) => {
-        if (key === "portal-new-cta") return true;
+      mockUseFeatureIsOn.mockImplementation((_key?: string) => {
+        if (_key === "portal-new-cta") return true;
         return false;
       });
 
@@ -174,9 +174,9 @@ describe("App Component", () => {
 
   describe("Feature Flags", () => {
     it("uses empty string from feature flag correctly", () => {
-      mockUseFeatureValue.mockImplementation((key: string, fallback: string) => {
-        if (key === "portal-cta-label") return "";
-        return fallback;
+      mockUseFeatureValue.mockImplementation((_key?: string, fallback?: string) => {
+        if (_key === "portal-cta-label") return "";
+        return fallback ?? "";
       });
 
       render(<App />);
@@ -185,8 +185,8 @@ describe("App Component", () => {
     });
 
     it("handles new CTA flag correctly", () => {
-      mockUseFeatureIsOn.mockImplementation((key: string) => {
-        if (key === "portal-new-cta") return true;
+      mockUseFeatureIsOn.mockImplementation((_key?: string) => {
+        if (_key === "portal-new-cta") return true;
         return false;
       });
 
