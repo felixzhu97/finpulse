@@ -148,7 +148,7 @@ describe("react", () => {
     });
 
     it("should render children", () => {
-      const { getByText } = renderHook(() => null, {
+      renderHook(() => null, {
         wrapper: ({ children }) => (
           <GrowthBookProvider config={{ apiHost: "https://test.com", clientKey: "key" }}>
             <span>Test Child</span>

@@ -1,5 +1,9 @@
-# husky
+echo "husky - DEPRECATED
 
-# This file is intentionally empty.
-# The husky v9 loader lives in `h` (the single-letter script).
-# Individual hooks are managed via `git config core.hooksPath .husky`.
+Please remove the following two lines from $0:
+
+#!/usr/bin/env sh
+. \"\$(dirname -- \"\$0\")/_/husky.sh\"
+
+They WILL FAIL in v10.0.0
+"

@@ -366,6 +366,9 @@ importers:
       '@types/lodash':
         specifier: ^4.17.0
         version: 4.17.23
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.7
       '@types/react':
         specifier: ^19
         version: 19.2.8

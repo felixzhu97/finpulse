@@ -126,7 +126,8 @@ describe("types", () => {
   describe("AnalyticsClient", () => {
     it("should have required track method", () => {
       const client: AnalyticsClient = {
-        track: (name) => expect(name).toBe("test"),
+        track: (name) => { expect(name).toBe("test"); },
+        identify: () => {},
       };
       client.track("test");
     });
@@ -168,7 +169,7 @@ describe("types", () => {
     it("should allow sync track implementation", () => {
       const events: AnalyticsEvent[] = [];
       const transport: AnalyticsTransport = {
-        track: (event) => events.push(event),
+        track: (event) => { events.push(event); },
       };
       transport.track({ name: "event1" });
       transport.track({ name: "event2" });
@@ -179,7 +180,6 @@ describe("types", () => {
       const transport: AnalyticsTransport = {
         track: async (event) => {
           await Promise.resolve();
-          return event;
         },
       };
       expect(transport.track({ name: "test" })).toBeInstanceOf(Promise);

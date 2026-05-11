@@ -1,13 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { createAnalyticsClient, createNoopClient } from "./client";
-import type { AnalyticsEvent } from "./types";
+import type { AnalyticsEvent, AnalyticsTransport } from "./types";
 
 describe("client", () => {
   describe("createAnalyticsClient", () => {
-    let mockTransport: { track: ReturnType<typeof vi.fn> };
+    let mockTransport: AnalyticsTransport;
+    let mockTrack: Mock<(event: AnalyticsEvent) => void | Promise<void>>;
 
     beforeEach(() => {
-      mockTransport = { track: vi.fn() };
+      mockTrack = vi.fn();
+      mockTransport = { track: mockTrack };
     });
 
     describe("track", () => {
@@ -22,8 +24,8 @@ describe("client", () => {
         const client = createAnalyticsClient(mockTransport);
         client.track("page_view", { page: "home" });
 
-        expect(mockTransport.track).toHaveBeenCalledTimes(1);
-        const event = mockTransport.track.mock.calls[0][0] as AnalyticsEvent;
+        expect(mockTrack).toHaveBeenCalledTimes(1);
+        const event = (mockTrack as Mock<(event: AnalyticsEvent) => void>).mock.calls[0][0] as AnalyticsEvent;
         expect(event.name).toBe("page_view");
         expect(event.properties).toEqual({ page: "home" });
         expect(typeof event.timestamp).toBe("number");
@@ -34,7 +36,7 @@ describe("client", () => {
         client.identify("user-123", { email: "test@example.com" });
         client.track("page_view", { page: "dashboard" });
 
-        const event = mockTransport.track.mock.calls[0][0] as AnalyticsEvent;
+        const event = (mockTrack as Mock<(event: AnalyticsEvent) => void>).mock.calls[0][0] as AnalyticsEvent;
         expect(event.properties?.userId).toBe("user-123");
         expect(event.properties?.email).toBe("test@example.com");
         expect(event.properties?.page).toBe("dashboard");
@@ -44,7 +46,7 @@ describe("client", () => {
         const client = createAnalyticsClient(mockTransport);
         client.track("page_view", { page: "home" });
 
-        const event = mockTransport.track.mock.calls[0][0] as AnalyticsEvent;
+        const event = (mockTrack as Mock<(event: AnalyticsEvent) => void>).mock.calls[0][0] as AnalyticsEvent;
         expect(event.properties?.userId).toBeUndefined();
         expect(event.properties?.page).toBe("home");
       });
@@ -55,7 +57,7 @@ describe("client", () => {
         client.identify("user-123", { tier: "premium" });
         client.track("page_view");
 
-        const event = mockTransport.track.mock.calls[0][0] as AnalyticsEvent;
+        const event = (mockTrack as Mock<(event: AnalyticsEvent) => void>).mock.calls[0][0] as AnalyticsEvent;
         expect(event.properties?.userId).toBe("user-123");
         expect(event.properties?.plan).toBe("pro");
         expect(event.properties?.tier).toBe("premium");
@@ -65,7 +67,7 @@ describe("client", () => {
         const client = createAnalyticsClient(mockTransport);
         client.track("login");
 
-        const event = mockTransport.track.mock.calls[0][0] as AnalyticsEvent;
+        const event = (mockTrack as Mock<(event: AnalyticsEvent) => void>).mock.calls[0][0] as AnalyticsEvent;
         expect(event.name).toBe("login");
         expect(event.properties).toEqual({});
       });
@@ -76,7 +78,7 @@ describe("client", () => {
         client.track("test");
         const after = Date.now();
 
-        const event = mockTransport.track.mock.calls[0][0] as AnalyticsEvent;
+        const event = (mockTrack as Mock<(event: AnalyticsEvent) => void>).mock.calls[0][0] as AnalyticsEvent;
         expect(event.timestamp).toBeGreaterThanOrEqual(before);
         expect(event.timestamp).toBeLessThanOrEqual(after);
       });
@@ -88,7 +90,7 @@ describe("client", () => {
         client.identify("user-456");
         client.track("page_view");
 
-        const event = mockTransport.track.mock.calls[0][0] as AnalyticsEvent;
+        const event = (mockTrack as Mock<(event: AnalyticsEvent) => void>).mock.calls[0][0] as AnalyticsEvent;
         expect(event.properties?.userId).toBe("user-456");
       });
 
@@ -96,7 +98,7 @@ describe("client", () => {
         const client = createAnalyticsClient(mockTransport);
         client.identify("user-789", { name: "John" });
 
-        expect(mockTransport.track).not.toHaveBeenCalled();
+        expect(mockTrack).not.toHaveBeenCalled();
       });
 
       it("should override previous userId", () => {
@@ -105,7 +107,7 @@ describe("client", () => {
         client.identify("user-2");
         client.track("page_view");
 
-        const event = mockTransport.track.mock.calls[0][0] as AnalyticsEvent;
+        const event = (mockTrack as Mock<(event: AnalyticsEvent) => void>).mock.calls[0][0] as AnalyticsEvent;
         expect(event.properties?.userId).toBe("user-2");
       });
 
@@ -115,7 +117,7 @@ describe("client", () => {
         client.identify("user-1", { plan: "pro" });
         client.track("page_view");
 
-        const event = mockTransport.track.mock.calls[0][0] as AnalyticsEvent;
+        const event = (mockTrack as Mock<(event: AnalyticsEvent) => void>).mock.calls[0][0] as AnalyticsEvent;
         expect(event.properties?.name).toBe("John");
         expect(event.properties?.plan).toBe("pro");
       });
@@ -144,7 +146,6 @@ describe("client", () => {
       const client = createNoopClient();
       client.track("page_view", { page: "home" });
       client.identify("user-123", { name: "Test" });
-      // No assertion needed - if this runs without errors, test passes
     });
   });
 });
