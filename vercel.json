@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm install && pnpm --filter finpulse-admin build",
+  "buildCommand": "pnpm turbo build --filter=finpulse-admin",
   "outputDirectory": "apps/admin/dist",
   "installCommand": "pnpm install",
   "framework": null,
