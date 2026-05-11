@@ -6,60 +6,98 @@ import { Badge } from './badge';
 
 const { badgeVariants } = BadgeModule;
 
+// =============================================================================
+// Domain Test Values - Badge Component
+// =============================================================================
+
+const BADGE_DOMAIN = {
+  TEXT: {
+    TEST: 'Test Badge',
+    DEFAULT: 'Default Badge',
+    SLOT: 'Slot Badge',
+    SECONDARY: 'Secondary',
+    DESTRUCTIVE: 'Destructive',
+    OUTLINE: 'Outline',
+    CUSTOM: 'Custom',
+    WITH_ID: 'With ID',
+    HOVER: 'Hover Me',
+    LINK: 'Link Badge',
+  },
+
+  VARIANTS: {
+    DEFAULT: 'default',
+    SECONDARY: 'secondary',
+    DESTRUCTIVE: 'destructive',
+    OUTLINE: 'outline',
+  },
+
+  CLASSES: {
+    inlineFlex: 'inline-flex',
+    bgPrimary: 'bg-primary',
+    bgSecondary: 'bg-secondary',
+    bgDestructive: 'bg-destructive',
+    textForeground: 'text-foreground',
+  },
+} as const;
+
+// =============================================================================
+// Test Suite
+// =============================================================================
+
 describe('Badge', () => {
   describe('when rendered with default props', () => {
     it('should render with correct text content', () => {
-      render(<Badge>Test Badge</Badge>);
-      expect(screen.getByText('Test Badge')).toBeInTheDocument();
+      render(<Badge>{BADGE_DOMAIN.TEXT.TEST}</Badge>);
+      expect(screen.getByText(BADGE_DOMAIN.TEXT.TEST)).toBeInTheDocument();
     });
 
     it('should render as a span element', () => {
-      render(<Badge>Default Badge</Badge>);
-      expect(screen.getByText('Default Badge').tagName).toBe('SPAN');
+      render(<Badge>{BADGE_DOMAIN.TEXT.DEFAULT}</Badge>);
+      expect(screen.getByText(BADGE_DOMAIN.TEXT.DEFAULT).tagName).toBe('SPAN');
     });
 
     it('should have data-slot attribute', () => {
-      render(<Badge>Slot Badge</Badge>);
-      expect(screen.getByText('Slot Badge')).toHaveAttribute('data-slot', 'badge');
+      render(<Badge>{BADGE_DOMAIN.TEXT.SLOT}</Badge>);
+      expect(screen.getByText(BADGE_DOMAIN.TEXT.SLOT)).toHaveAttribute('data-slot', 'badge');
+    });
+
+    it('should have default variant class', () => {
+      render(<Badge>{BADGE_DOMAIN.TEXT.DEFAULT}</Badge>);
+      expect(screen.getByText(BADGE_DOMAIN.TEXT.DEFAULT)).toHaveClass(BADGE_DOMAIN.CLASSES.inlineFlex);
     });
   });
 
   describe('when variant is specified', () => {
-    it('should apply default variant class when no variant prop is provided', () => {
-      render(<Badge>Default Variant</Badge>);
-      expect(screen.getByText('Default Variant')).toHaveClass('inline-flex');
-    });
-
-    it('should apply secondary variant class when variant="secondary"', () => {
-      render(<Badge variant="secondary">Secondary</Badge>);
-      expect(screen.getByText('Secondary')).toHaveClass('bg-secondary');
-    });
-
-    it('should apply destructive variant class when variant="destructive"', () => {
-      render(<Badge variant="destructive">Destructive</Badge>);
-      expect(screen.getByText('Destructive')).toHaveClass('bg-destructive');
-    });
-
-    it('should apply outline variant class when variant="outline"', () => {
-      render(<Badge variant="outline">Outline</Badge>);
-      expect(screen.getByText('Outline')).toHaveClass('text-foreground');
-    });
+    it.each([
+      { variant: BADGE_DOMAIN.VARIANTS.DEFAULT, expectedClass: BADGE_DOMAIN.CLASSES.bgPrimary },
+      { variant: BADGE_DOMAIN.VARIANTS.SECONDARY, expectedClass: BADGE_DOMAIN.CLASSES.bgSecondary },
+      { variant: BADGE_DOMAIN.VARIANTS.DESTRUCTIVE, expectedClass: BADGE_DOMAIN.CLASSES.bgDestructive },
+      { variant: BADGE_DOMAIN.VARIANTS.OUTLINE, expectedClass: BADGE_DOMAIN.CLASSES.textForeground },
+    ])(
+      'should apply $variant variant class',
+      ({ variant, expectedClass }) => {
+        render(
+          <Badge variant={variant as any}>{BADGE_DOMAIN.TEXT.TEST}</Badge>
+        );
+        expect(screen.getByText(BADGE_DOMAIN.TEXT.TEST)).toHaveClass(expectedClass);
+      }
+    );
   });
 
   describe('when additional props are provided', () => {
     it('should apply custom className', () => {
-      render(<Badge className="custom-class">Custom</Badge>);
-      expect(screen.getByText('Custom')).toHaveClass('custom-class');
+      render(<Badge className="custom-class">{BADGE_DOMAIN.TEXT.CUSTOM}</Badge>);
+      expect(screen.getByText(BADGE_DOMAIN.TEXT.CUSTOM)).toHaveClass('custom-class');
     });
 
     it('should pass through standard HTML attributes', () => {
-      render(<Badge id="test-id">With ID</Badge>);
-      expect(screen.getByText('With ID')).toHaveAttribute('id', 'test-id');
+      render(<Badge id="test-id">{BADGE_DOMAIN.TEXT.WITH_ID}</Badge>);
+      expect(screen.getByText(BADGE_DOMAIN.TEXT.WITH_ID)).toHaveAttribute('id', 'test-id');
     });
 
     it('should apply title attribute for accessibility', () => {
-      render(<Badge title="Tooltip text">Hover Me</Badge>);
-      expect(screen.getByText('Hover Me')).toHaveAttribute('title', 'Tooltip text');
+      render(<Badge title="Tooltip text">{BADGE_DOMAIN.TEXT.HOVER}</Badge>);
+      expect(screen.getByText(BADGE_DOMAIN.TEXT.HOVER)).toHaveAttribute('title', 'Tooltip text');
     });
   });
 
@@ -67,10 +105,10 @@ describe('Badge', () => {
     it('should render child element', () => {
       render(
         <Badge asChild>
-          <a href="/test">Link Badge</a>
+          <a href="/test">{BADGE_DOMAIN.TEXT.LINK}</a>
         </Badge>
       );
-      const link = screen.getByRole('link', { name: 'Link Badge' });
+      const link = screen.getByRole('link', { name: BADGE_DOMAIN.TEXT.LINK });
       expect(link).toBeInTheDocument();
       expect(link).toHaveAttribute('href', '/test');
     });
@@ -83,25 +121,18 @@ describe('badgeVariants', () => {
     expect(typeof badgeVariants).toBe('function');
   });
 
-  it('should return correct classes for default variant', () => {
-    const classes = badgeVariants({ variant: 'default' });
-    expect(classes).toContain('bg-primary');
-  });
-
-  it('should return correct classes for secondary variant', () => {
-    const classes = badgeVariants({ variant: 'secondary' });
-    expect(classes).toContain('bg-secondary');
-  });
-
-  it('should return correct classes for destructive variant', () => {
-    const classes = badgeVariants({ variant: 'destructive' });
-    expect(classes).toContain('bg-destructive');
-  });
-
-  it('should return correct classes for outline variant', () => {
-    const classes = badgeVariants({ variant: 'outline' });
-    expect(classes).toContain('text-foreground');
-  });
+  it.each([
+    { variant: 'default', expectedClass: BADGE_DOMAIN.CLASSES.bgPrimary },
+    { variant: 'secondary', expectedClass: BADGE_DOMAIN.CLASSES.bgSecondary },
+    { variant: 'destructive', expectedClass: BADGE_DOMAIN.CLASSES.bgDestructive },
+    { variant: 'outline', expectedClass: BADGE_DOMAIN.CLASSES.textForeground },
+  ])(
+    'should return correct classes for $variant variant',
+    ({ variant, expectedClass }) => {
+      const classes = badgeVariants({ variant: variant as any });
+      expect(classes).toContain(expectedClass);
+    }
+  );
 
   it('should handle custom className', () => {
     const classes = badgeVariants({ className: 'custom-class' });

@@ -5,132 +5,206 @@ import {
   WatchlistItemCreate,
 } from "../../../domain/entities/watchlist";
 
+// ============================================================
+// Domain Test Values - 领域测试值
+// ============================================================
+const WATCHLIST_DOMAIN = {
+  IDS: {
+    PREFIX: "WL",
+    ITEM_PREFIX: "WI",
+    CUSTOMER_PREFIX: "C",
+    TEST: "WL001",
+    TEST_ITEM: "WI001",
+    CUSTOMER: "C001",
+    INSTRUMENT: "INST001",
+  } as const,
+  TIMESTAMPS: {
+    NOW: "2024-01-15T10:00:00Z",
+    LATER: "2024-01-15T11:00:00Z",
+    LATER_30: "2024-01-15T11:30:00Z",
+  } as const,
+  NAMES: {
+    TECH: "Tech Stocks",
+    HEALTHCARE: "Healthcare",
+    FAVORITES: "My Favorites",
+    EMPTY: "",
+  } as const,
+} as const;
+
+const SCENARIOS = {
+  WATCHLISTS: [
+    { id: "WL_TECH", name: "Tech Stocks", desc: "sector watchlist" },
+    { id: "WL_HEALTH", name: "Healthcare", desc: "healthcare watchlist" },
+    { id: "WL_FAV", name: "My Favorites", desc: "custom watchlist" },
+  ] as const,
+} as const;
+
+// ============================================================
+// Factory Functions - 工厂函数
+// ============================================================
+const createWatchlist = (overrides: Partial<Watchlist> = {}): Watchlist => ({
+  watchlist_id: WATCHLIST_DOMAIN.IDS.TEST,
+  customer_id: WATCHLIST_DOMAIN.IDS.CUSTOMER,
+  name: WATCHLIST_DOMAIN.NAMES.TECH,
+  created_at: WATCHLIST_DOMAIN.TIMESTAMPS.NOW,
+  ...overrides,
+});
+
+const createWatchlistItem = (
+  overrides: Partial<WatchlistItem> = {}
+): WatchlistItem => ({
+  watchlist_item_id: WATCHLIST_DOMAIN.IDS.TEST_ITEM,
+  watchlist_id: WATCHLIST_DOMAIN.IDS.TEST,
+  instrument_id: WATCHLIST_DOMAIN.IDS.INSTRUMENT,
+  added_at: WATCHLIST_DOMAIN.TIMESTAMPS.NOW,
+  ...overrides,
+});
+
+const createWatchlistCreate = (
+  overrides: Partial<WatchlistCreate> = {}
+): WatchlistCreate => ({
+  customer_id: WATCHLIST_DOMAIN.IDS.CUSTOMER,
+  name: WATCHLIST_DOMAIN.NAMES.TECH,
+  ...overrides,
+});
+
+const createWatchlistItemCreate = (
+  overrides: Partial<WatchlistItemCreate> = {}
+): WatchlistItemCreate => ({
+  watchlist_id: WATCHLIST_DOMAIN.IDS.TEST,
+  instrument_id: WATCHLIST_DOMAIN.IDS.INSTRUMENT,
+  ...overrides,
+});
+
+// ============================================================
+// Test Suites
+// ============================================================
 describe("Watchlist Entity", () => {
   describe("Watchlist interface", () => {
-    it("should accept valid watchlist data", () => {
-      const watchlist: Watchlist = {
-        watchlist_id: "WL001",
-        customer_id: "C001",
-        name: "Tech Stocks",
-        created_at: "2024-01-15T10:00:00Z",
-      };
+    describe("when providing valid data", () => {
+      it("should accept complete watchlist data", () => {
+        // Arrange
+        const watchlist = createWatchlist();
 
-      expect(watchlist.watchlist_id).toBe("WL001");
-      expect(watchlist.customer_id).toBe("C001");
-      expect(watchlist.name).toBe("Tech Stocks");
-      expect(watchlist.created_at).toBe("2024-01-15T10:00:00Z");
+        // Assert
+        expect(watchlist.watchlist_id).toBe(WATCHLIST_DOMAIN.IDS.TEST);
+        expect(watchlist.customer_id).toBe(WATCHLIST_DOMAIN.IDS.CUSTOMER);
+        expect(watchlist.name).toBe(WATCHLIST_DOMAIN.NAMES.TECH);
+        expect(watchlist.created_at).toBe(WATCHLIST_DOMAIN.TIMESTAMPS.NOW);
+      });
     });
 
-    it("should represent a sector-based watchlist", () => {
-      const sectorWatchlist: Watchlist = {
-        watchlist_id: "WL_SECTOR",
-        customer_id: "C002",
-        name: "Healthcare",
-        created_at: "2024-01-16T09:00:00Z",
-      };
+    describe("when modeling real-world watchlists", () => {
+      it.each(SCENARIOS.WATCHLISTS)(
+        "should model $desc",
+        ({ id, name }) => {
+          const watchlist = createWatchlist({
+            watchlist_id: id,
+            name,
+          });
+          expect(watchlist.watchlist_id).toBe(id);
+          expect(watchlist.name).toBe(name);
+        }
+      );
 
-      expect(sectorWatchlist.name).toBe("Healthcare");
-    });
-
-    it("should represent a custom watchlist", () => {
-      const customWatchlist: Watchlist = {
-        watchlist_id: "WL_CUSTOM",
-        customer_id: "C003",
-        name: "My Favorites",
-        created_at: "2024-01-17T08:00:00Z",
-      };
-
-      expect(customWatchlist.name).toBe("My Favorites");
+      it("should allow empty name for default naming", () => {
+        const watchlist = createWatchlist({ name: WATCHLIST_DOMAIN.NAMES.EMPTY });
+        expect(watchlist.name).toBe("");
+      });
     });
   });
 
   describe("WatchlistItem interface", () => {
-    it("should accept valid watchlist item data", () => {
-      const item: WatchlistItem = {
-        watchlist_item_id: "WI001",
-        watchlist_id: "WL001",
-        instrument_id: "INST001",
-        added_at: "2024-01-15T10:30:00Z",
-      };
+    describe("when providing valid data", () => {
+      it("should accept complete watchlist item data", () => {
+        // Arrange
+        const item = createWatchlistItem();
 
-      expect(item.watchlist_item_id).toBe("WI001");
-      expect(item.watchlist_id).toBe("WL001");
-      expect(item.instrument_id).toBe("INST001");
-      expect(item.added_at).toBe("2024-01-15T10:30:00Z");
+        // Assert
+        expect(item.watchlist_item_id).toBe(WATCHLIST_DOMAIN.IDS.TEST_ITEM);
+        expect(item.watchlist_id).toBe(WATCHLIST_DOMAIN.IDS.TEST);
+        expect(item.instrument_id).toBe(WATCHLIST_DOMAIN.IDS.INSTRUMENT);
+        expect(item.added_at).toBe(WATCHLIST_DOMAIN.TIMESTAMPS.NOW);
+      });
     });
 
-    it("should link to parent watchlist", () => {
-      const watchlist: Watchlist = {
-        watchlist_id: "WL001",
-        customer_id: "C001",
-        name: "Tech Stocks",
-        created_at: "2024-01-15T10:00:00Z",
-      };
+    describe("when linking to parent watchlist", () => {
+      it("should link multiple items to same watchlist", () => {
+        // Arrange
+        const watchlist = createWatchlist();
 
-      const items: WatchlistItem[] = [
-        {
-          watchlist_item_id: "WI001",
-          watchlist_id: watchlist.watchlist_id,
-          instrument_id: "INST_AAPL",
-          added_at: "2024-01-15T11:00:00Z",
-        },
-        {
-          watchlist_item_id: "WI002",
-          watchlist_id: watchlist.watchlist_id,
-          instrument_id: "INST_GOOGL",
-          added_at: "2024-01-15T11:30:00Z",
-        },
-      ];
+        // Act
+        const items: WatchlistItem[] = [
+          createWatchlistItem({
+            watchlist_id: watchlist.watchlist_id,
+            instrument_id: "INST_AAPL",
+            added_at: WATCHLIST_DOMAIN.TIMESTAMPS.LATER,
+          }),
+          createWatchlistItem({
+            watchlist_id: watchlist.watchlist_id,
+            instrument_id: "INST_GOOGL",
+            added_at: WATCHLIST_DOMAIN.TIMESTAMPS.LATER_30,
+          }),
+        ];
 
-      items.forEach((item) => {
-        expect(item.watchlist_id).toBe(watchlist.watchlist_id);
+        // Assert
+        expect(items).toHaveLength(2);
+        items.forEach((item) => {
+          expect(item.watchlist_id).toBe(watchlist.watchlist_id);
+        });
       });
     });
   });
 
   describe("WatchlistCreate interface", () => {
-    it("should accept valid watchlist creation data", () => {
-      const watchlistCreate: WatchlistCreate = {
-        customer_id: "C001",
-        name: "New Watchlist",
-      };
+    describe("when providing valid data", () => {
+      it("should accept complete watchlist creation data", () => {
+        // Arrange
+        const watchlistCreate = createWatchlistCreate();
 
-      expect(watchlistCreate.customer_id).toBe("C001");
-      expect(watchlistCreate.name).toBe("New Watchlist");
+        // Assert
+        expect(watchlistCreate.customer_id).toBe(WATCHLIST_DOMAIN.IDS.CUSTOMER);
+        expect(watchlistCreate.name).toBe(WATCHLIST_DOMAIN.NAMES.TECH);
+      });
     });
 
-    it("should allow empty name for default naming", () => {
-      const watchlistCreate: WatchlistCreate = {
-        customer_id: "C002",
-        name: "",
-      };
-
-      expect(watchlistCreate.name).toBe("");
+    describe("when validating name field", () => {
+      it.each([
+        { name: "Tech Stocks", desc: "specific name" },
+        { name: "", desc: "empty name" },
+        { name: "My Custom List", desc: "custom name" },
+      ])("should accept $desc", ({ name }) => {
+        const create = createWatchlistCreate({ name });
+        expect(create.name).toBe(name);
+      });
     });
   });
 
   describe("WatchlistItemCreate interface", () => {
-    it("should accept valid watchlist item creation data", () => {
-      const itemCreate: WatchlistItemCreate = {
-        watchlist_id: "WL001",
-        instrument_id: "INST001",
-      };
+    describe("when providing valid data", () => {
+      it("should accept complete item creation data", () => {
+        // Arrange
+        const itemCreate = createWatchlistItemCreate();
 
-      expect(itemCreate.watchlist_id).toBe("WL001");
-      expect(itemCreate.instrument_id).toBe("INST001");
+        // Assert
+        expect(itemCreate.watchlist_id).toBe(WATCHLIST_DOMAIN.IDS.TEST);
+        expect(itemCreate.instrument_id).toBe(WATCHLIST_DOMAIN.IDS.INSTRUMENT);
+      });
     });
 
-    it("should link instrument to watchlist", () => {
-      const watchlistId = "WL001";
-      const instrumentId = "INST_AAPL";
+    describe("when linking instruments", () => {
+      it("should link instrument to watchlist", () => {
+        const watchlistId = "WL001";
+        const instrumentId = "INST_AAPL";
 
-      const itemCreate: WatchlistItemCreate = {
-        watchlist_id: watchlistId,
-        instrument_id: instrumentId,
-      };
+        const itemCreate = createWatchlistItemCreate({
+          watchlist_id: watchlistId,
+          instrument_id: instrumentId,
+        });
 
-      expect(itemCreate.watchlist_id).toBe(watchlistId);
-      expect(itemCreate.instrument_id).toBe(instrumentId);
+        expect(itemCreate.watchlist_id).toBe(watchlistId);
+        expect(itemCreate.instrument_id).toBe(instrumentId);
+      });
     });
   });
 });

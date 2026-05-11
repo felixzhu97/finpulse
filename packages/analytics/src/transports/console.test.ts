@@ -1,6 +1,34 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { createConsoleTransport } from "./console";
 
+// =============================================================================
+// Domain Test Values - Console Transport
+// =============================================================================
+
+const CONSOLE_DOMAIN = {
+  EVENTS: {
+    WITH_PROPS: { name: "page_view", properties: { page: "home" } },
+    WITHOUT_PROPS: { name: "login" },
+    WITH_UNDEFINED_PROPS: { name: "test", properties: undefined },
+    WITH_TIMESTAMP: {
+      name: "order_create",
+      properties: { orderId: "123" },
+      timestamp: 1699999999999,
+    },
+  },
+
+  LOG_PREFIX: "[analytics]",
+
+  ERROR_CASES: {
+    CONSOLE_UNDEFINED: "console is undefined",
+    INFO_UNDEFINED: "console.info is undefined",
+  },
+} as const;
+
+// =============================================================================
+// Test Suite
+// =============================================================================
+
 describe("transports/console", () => {
   let consoleInfoSpy: ReturnType<typeof vi.spyOn>;
 
@@ -22,45 +50,42 @@ describe("transports/console", () => {
     describe("track", () => {
       it("should log event to console.info with event name and properties", () => {
         const transport = createConsoleTransport();
-        transport.track({
-          name: "page_view",
-          properties: { page: "home" },
-        });
+        transport.track(CONSOLE_DOMAIN.EVENTS.WITH_PROPS);
 
         expect(consoleInfoSpy).toHaveBeenCalledTimes(1);
         expect(consoleInfoSpy).toHaveBeenCalledWith(
-          "[analytics]",
-          "page_view",
-          { page: "home" }
+          CONSOLE_DOMAIN.LOG_PREFIX,
+          CONSOLE_DOMAIN.EVENTS.WITH_PROPS.name,
+          CONSOLE_DOMAIN.EVENTS.WITH_PROPS.properties
         );
       });
 
-      it("should handle event without properties", () => {
-        const transport = createConsoleTransport();
-        transport.track({ name: "login" });
+      it.each([
+        { event: CONSOLE_DOMAIN.EVENTS.WITHOUT_PROPS, expectedProps: {} },
+        { event: CONSOLE_DOMAIN.EVENTS.WITH_UNDEFINED_PROPS, expectedProps: {} },
+      ])(
+        "should handle event $event.name and log $expectedProps",
+        ({ event, expectedProps }) => {
+          const transport = createConsoleTransport();
+          transport.track(event);
 
-        expect(consoleInfoSpy).toHaveBeenCalledWith("[analytics]", "login", {});
-      });
-
-      it("should handle event with undefined properties", () => {
-        const transport = createConsoleTransport();
-        transport.track({ name: "test", properties: undefined });
-
-        expect(consoleInfoSpy).toHaveBeenCalledWith("[analytics]", "test", {});
-      });
+          expect(consoleInfoSpy).toHaveBeenCalledWith(
+            CONSOLE_DOMAIN.LOG_PREFIX,
+            event.name,
+            expectedProps
+          );
+        }
+      );
 
       it("should handle event with timestamp", () => {
-        const timestamp = 1699999999999;
         const transport = createConsoleTransport();
-        transport.track({
-          name: "order_create",
-          properties: { orderId: "123" },
-          timestamp,
-        });
+        transport.track(CONSOLE_DOMAIN.EVENTS.WITH_TIMESTAMP);
 
-        expect(consoleInfoSpy).toHaveBeenCalledWith("[analytics]", "order_create", {
-          orderId: "123",
-        });
+        expect(consoleInfoSpy).toHaveBeenCalledWith(
+          CONSOLE_DOMAIN.LOG_PREFIX,
+          CONSOLE_DOMAIN.EVENTS.WITH_TIMESTAMP.name,
+          CONSOLE_DOMAIN.EVENTS.WITH_TIMESTAMP.properties
+        );
       });
 
       it("should not throw when console.info is undefined", () => {

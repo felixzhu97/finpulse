@@ -1,5 +1,9 @@
+/**
+ * Quotes Slice Tests - TDD Optimized
+ * Following TDD Best Practices: AAA Pattern, Domain Values, Factory Functions, Boundary Testing
+ */
 import * as quotesSliceModule from "../../../presentation/store/quotesSlice";
-import type { QuoteSnapshot } from "@/src/domain/entities/quotes";
+import type { QuoteSnapshot, QuoteConnectionStatus } from "@/src/domain/entities/quotes";
 
 const {
   quotesSlice,
@@ -10,8 +14,104 @@ const {
   setExtraSubscribedSymbols,
 } = quotesSliceModule;
 
+/**
+ * Domain Test Values - Standardized test data for quotes slice
+ */
+const DOMAIN_VALUES = {
+  // Stock symbols
+  SYMBOLS: {
+    VALID: ["AAPL", "GOOGL", "TSLA", "MSFT", "AMZN", "META", "NVDA", "BTC", "ETH"],
+    EDGE_CASES: {
+      LOWERCASE: ["aapl", "googl", "tsla"],
+      MIXED_CASE: ["AaPl", "gOoGl", "TsLa"],
+      SINGLE_CHAR: ["A", "B", "C"],
+      WITH_NUMBERS: ["AAPL1", "BTC2"],
+    },
+  },
+  // Quote data
+  QUOTE: {
+    VALID: {
+      price: 175.5,
+      change: 2.5,
+      changeRate: 0.0145,
+      volume: 1000000,
+      timestamp: 1704067200000,
+    },
+    EDGE_CASES: {
+      ZERO_PRICE: { price: 0, change: 0, changeRate: 0, volume: 0, timestamp: 0 },
+      NEGATIVE_PRICE: { price: -10, change: -1, changeRate: -0.05, volume: 100, timestamp: 0 },
+      LARGE_VOLUME: { price: 100, change: 10, changeRate: 0.1, volume: 9999999999, timestamp: 0 },
+      SMALL_PRICE: { price: 0.01, change: 0.001, changeRate: 0.1, volume: 100, timestamp: 0 },
+    },
+  },
+  // Connection status
+  STATUS: {
+    ALL: ["idle", "connecting", "open", "closed", "error"] as QuoteConnectionStatus[],
+  },
+  // History constants
+  MAX_HISTORY_POINTS: 45,
+  HISTORY: {
+    SHORT: [170, 172, 174],
+    MEDIUM: [170, 172, 174, 175, 175.5],
+    LONG: Array.from({ length: 100 }, (_, i) => 100 + i),
+    EDGE_44: Array.from({ length: 44 }, (_, i) => 100 + i),
+    EDGE_45: Array.from({ length: 45 }, (_, i) => 100 + i),
+    EDGE_46: Array.from({ length: 46 }, (_, i) => 100 + i),
+  },
+} as const;
+
+/**
+ * Factory function for creating test QuoteSnapshot
+ */
+const createQuoteSnapshot = (
+  overrides: Partial<Record<string, { price: number; change: number; changeRate: number; volume?: number; timestamp: number }>> = {}
+): QuoteSnapshot => {
+  const defaultQuote = { ...DOMAIN_VALUES.QUOTE.VALID };
+  if (overrides.default) {
+    Object.assign(defaultQuote, overrides.default);
+    delete overrides.default;
+  }
+  const snapshot: QuoteSnapshot = {};
+  for (const [symbol, data] of Object.entries(overrides)) {
+    snapshot[symbol] = { ...defaultQuote, ...data };
+  }
+  return snapshot;
+};
+
+/**
+ * Factory function for creating test history
+ */
+const createHistory = (overrides: Record<string, number[]> = {}): Record<string, number[]> => ({
+  ...overrides,
+});
+
+/**
+ * Factory function for creating test quotes state
+ */
+const createQuotesState = (overrides: {
+  quotes?: QuoteSnapshot;
+  history?: Record<string, number[]>;
+  historyLoaded?: boolean;
+  status?: QuoteConnectionStatus;
+  subscribedSymbols?: string[];
+  extraSubscribedSymbols?: string[];
+} = {}) => ({
+  quotes: {},
+  history: {},
+  historyLoaded: false,
+  status: "idle" as QuoteConnectionStatus,
+  subscribedSymbols: [] as string[],
+  extraSubscribedSymbols: [] as string[],
+  ...overrides,
+});
+
 describe("quotesSlice", () => {
-  const initialState = quotesSlice.getInitialState();
+  // Shared fixture - initial state
+  let initialState: ReturnType<typeof quotesSlice.getInitialState>;
+
+  beforeEach(() => {
+    initialState = quotesSlice.getInitialState();
+  });
 
   describe("initial state", () => {
     it("should have empty quotes object", () => {
@@ -40,249 +140,412 @@ describe("quotesSlice", () => {
   });
 
   describe("setSubscribedSymbols action", () => {
-    it("should set subscribed symbols", () => {
-      const action = setSubscribedSymbols(["AAPL", "GOOGL"]);
-      const state = quotesSlice.reducer(initialState, action);
+    describe("when setting symbols", () => {
+      it("should set subscribed symbols", () => {
+        // Arrange
+        const symbols = ["AAPL", "GOOGL"];
 
-      expect(state.subscribedSymbols).toContain("AAPL");
-      expect(state.subscribedSymbols).toContain("GOOGL");
+        // Act
+        const action = setSubscribedSymbols(symbols);
+        const state = quotesSlice.reducer(initialState, action);
+
+        // Assert
+        expect(state.subscribedSymbols).toContain("AAPL");
+        expect(state.subscribedSymbols).toContain("GOOGL");
+      });
     });
 
-    it("should convert symbols to uppercase", () => {
-      const action = setSubscribedSymbols(["aapl", "googl"]);
-      const state = quotesSlice.reducer(initialState, action);
+    describe("when normalizing symbols", () => {
+      it("should convert symbols to uppercase", () => {
+        // Arrange
+        const symbols = ["aapl", "googl"];
 
-      expect(state.subscribedSymbols).toContain("AAPL");
-      expect(state.subscribedSymbols).toContain("GOOGL");
+        // Act
+        const action = setSubscribedSymbols(symbols);
+        const state = quotesSlice.reducer(initialState, action);
+
+        // Assert
+        expect(state.subscribedSymbols).toContain("AAPL");
+        expect(state.subscribedSymbols).toContain("GOOGL");
+      });
+
+      it("should handle mixed case symbols", () => {
+        // Arrange
+        const symbols = ["AaPl", "gOoGl", "TsLa"];
+
+        // Act
+        const action = setSubscribedSymbols(symbols);
+        const state = quotesSlice.reducer(initialState, action);
+
+        // Assert
+        expect(state.subscribedSymbols).toEqual(["AAPL", "GOOGL", "TSLA"]);
+      });
     });
 
-    it("should deduplicate symbols", () => {
-      const action = setSubscribedSymbols(["AAPL", "aapl", "AAPL"]);
-      const state = quotesSlice.reducer(initialState, action);
+    describe("when deduplicating symbols", () => {
+      it("should deduplicate symbols", () => {
+        // Arrange
+        const symbols = ["AAPL", "aapl", "AAPL"];
 
-      expect(state.subscribedSymbols).toHaveLength(1);
-      expect(state.subscribedSymbols[0]).toBe("AAPL");
+        // Act
+        const action = setSubscribedSymbols(symbols);
+        const state = quotesSlice.reducer(initialState, action);
+
+        // Assert
+        expect(state.subscribedSymbols).toHaveLength(1);
+        expect(state.subscribedSymbols[0]).toBe("AAPL");
+      });
     });
 
-    it("should handle mixed case symbols", () => {
-      const action = setSubscribedSymbols(["AaPl", "gOoGl", "TsLa"]);
-      const state = quotesSlice.reducer(initialState, action);
+    describe("boundary value testing", () => {
+      it.each(DOMAIN_VALUES.SYMBOLS.VALID)(
+        "should handle valid symbol: %s",
+        (symbol) => {
+          // Act
+          const action = setSubscribedSymbols([symbol]);
+          const state = quotesSlice.reducer(initialState, action);
 
-      expect(state.subscribedSymbols).toEqual(["AAPL", "GOOGL", "TSLA"]);
+          // Assert
+          expect(state.subscribedSymbols).toContain(symbol);
+        }
+      );
+
+      it.each(DOMAIN_VALUES.SYMBOLS.EDGE_CASES.MIXED_CASE)(
+        "should normalize mixed case: %s -> uppercase",
+        (symbol) => {
+          // Act
+          const action = setSubscribedSymbols([symbol]);
+          const state = quotesSlice.reducer(initialState, action);
+
+          // Assert
+          expect(state.subscribedSymbols).toContain(symbol.toUpperCase());
+        }
+      );
+
+      it.each(DOMAIN_VALUES.SYMBOLS.EDGE_CASES.SINGLE_CHAR)(
+        "should handle single character symbol: %s",
+        (symbol) => {
+          // Act
+          const action = setSubscribedSymbols([symbol]);
+          const state = quotesSlice.reducer(initialState, action);
+
+          // Assert
+          expect(state.subscribedSymbols).toContain(symbol.toUpperCase());
+        }
+      );
     });
   });
 
   describe("setSnapshot action", () => {
-    it("should set quotes snapshot", () => {
-      const snapshot: QuoteSnapshot = {
-        AAPL: { price: 175.5, change: 2.5, changeRate: 0.0145, volume: 1000000, timestamp: Date.now() },
-      };
+    describe("when setting quotes snapshot", () => {
+      it("should set quotes snapshot", () => {
+        // Arrange
+        const snapshot = createQuoteSnapshot({
+          AAPL: DOMAIN_VALUES.QUOTE.VALID,
+        });
 
-      const action = setSnapshot(snapshot);
-      const state = quotesSlice.reducer(initialState, action);
+        // Act
+        const action = setSnapshot(snapshot);
+        const state = quotesSlice.reducer(initialState, action);
 
-      expect(state.quotes.AAPL.price).toBe(175.5);
-      expect(state.quotes.AAPL.change).toBe(2.5);
+        // Assert
+        expect(state.quotes.AAPL.price).toBe(DOMAIN_VALUES.QUOTE.VALID.price);
+        expect(state.quotes.AAPL.change).toBe(DOMAIN_VALUES.QUOTE.VALID.change);
+      });
     });
 
-    it("should convert symbol keys to uppercase", () => {
-      const snapshot: QuoteSnapshot = {
-        aapl: { price: 175.5, change: 2.5, changeRate: 0.0145, volume: 1000000, timestamp: Date.now() },
-      };
+    describe("when normalizing symbol keys", () => {
+      it("should convert symbol keys to uppercase", () => {
+        // Arrange
+        const snapshot = createQuoteSnapshot({
+          aapl: DOMAIN_VALUES.QUOTE.VALID,
+        });
 
-      const action = setSnapshot(snapshot);
-      const state = quotesSlice.reducer(initialState, action);
+        // Act
+        const action = setSnapshot(snapshot);
+        const state = quotesSlice.reducer(initialState, action);
 
-      expect(state.quotes.AAPL).toBeDefined();
-      expect(state.quotes.aapl).toBeUndefined();
+        // Assert
+        expect(state.quotes.AAPL).toBeDefined();
+        expect(state.quotes.aapl).toBeUndefined();
+      });
     });
 
-    it("should initialize history for new symbols", () => {
-      const snapshot: QuoteSnapshot = {
-        AAPL: { price: 175.5, change: 2.5, changeRate: 0.0145, volume: 1000000, timestamp: Date.now() },
-      };
+    describe("when managing history", () => {
+      it("should initialize history for new symbols", () => {
+        // Arrange
+        const snapshot = createQuoteSnapshot({
+          AAPL: DOMAIN_VALUES.QUOTE.VALID,
+        });
 
-      const action = setSnapshot(snapshot);
-      const state = quotesSlice.reducer(initialState, action);
+        // Act
+        const action = setSnapshot(snapshot);
+        const state = quotesSlice.reducer(initialState, action);
 
-      expect(state.history.AAPL).toBeDefined();
-      expect(state.history.AAPL).toContain(175.5);
+        // Assert
+        expect(state.history.AAPL).toBeDefined();
+        expect(state.history.AAPL).toContain(DOMAIN_VALUES.QUOTE.VALID.price);
+      });
+
+      it("should append to existing history", () => {
+        // Arrange
+        const stateWithHistory = createQuotesState({
+          history: { AAPL: [170, 172, 174] },
+        });
+        const newPrice = 175.5;
+        const snapshot = createQuoteSnapshot({
+          AAPL: { ...DOMAIN_VALUES.QUOTE.VALID, price: newPrice },
+        });
+
+        // Act
+        const action = setSnapshot(snapshot);
+        const state = quotesSlice.reducer(stateWithHistory, action);
+
+        // Assert
+        expect(state.history.AAPL).toContain(newPrice);
+        expect(state.history.AAPL).toHaveLength(4);
+      });
+
+      it("should not duplicate consecutive same prices", () => {
+        // Arrange
+        const samePrice = 175.5;
+        const stateWithHistory = createQuotesState({
+          history: { AAPL: [samePrice] },
+        });
+        const snapshot = createQuoteSnapshot({
+          AAPL: { ...DOMAIN_VALUES.QUOTE.VALID, price: samePrice },
+        });
+
+        // Act
+        const action = setSnapshot(snapshot);
+        const state = quotesSlice.reducer(stateWithHistory, action);
+
+        // Assert
+        expect(state.history.AAPL).toHaveLength(1);
+      });
     });
 
-    it("should append to existing history", () => {
-      const stateWithHistory = {
-        ...initialState,
-        history: { AAPL: [170, 172, 174] },
-      };
+    describe("boundary value testing", () => {
+      it.each([
+        { desc: "zero price", quote: DOMAIN_VALUES.QUOTE.EDGE_CASES.ZERO_PRICE },
+        { desc: "negative price", quote: DOMAIN_VALUES.QUOTE.EDGE_CASES.NEGATIVE_PRICE },
+        { desc: "small price", quote: DOMAIN_VALUES.QUOTE.EDGE_CASES.SMALL_PRICE },
+      ])("should handle $desc", ({ quote }) => {
+        // Arrange
+        const snapshot = createQuoteSnapshot({ AAPL: quote });
 
-      const snapshot: QuoteSnapshot = {
-        AAPL: { price: 175.5, change: 2.5, changeRate: 0.0145, volume: 1000000, timestamp: Date.now() },
-      };
+        // Act
+        const action = setSnapshot(snapshot);
+        const state = quotesSlice.reducer(initialState, action);
 
-      const action = setSnapshot(snapshot);
-      const state = quotesSlice.reducer(stateWithHistory, action);
-
-      expect(state.history.AAPL).toContain(175.5);
-      expect(state.history.AAPL).toHaveLength(4);
-    });
-
-    it("should not duplicate consecutive same prices", () => {
-      const stateWithHistory = {
-        ...initialState,
-        history: { AAPL: [175.5] },
-      };
-
-      const snapshot: QuoteSnapshot = {
-        AAPL: { price: 175.5, change: 0, changeRate: 0, volume: 1000000, timestamp: Date.now() },
-      };
-
-      const action = setSnapshot(snapshot);
-      const state = quotesSlice.reducer(stateWithHistory, action);
-
-      expect(state.history.AAPL).toHaveLength(1);
+        // Assert
+        expect(state.quotes.AAPL.price).toBe(quote.price);
+      });
     });
   });
 
   describe("setStatus action", () => {
-    it("should set status to connecting", () => {
-      const action = setStatus("connecting");
-      const state = quotesSlice.reducer(initialState, action);
+    describe("when setting status", () => {
+      it.each(DOMAIN_VALUES.STATUS.ALL)(
+        "should set status to %s",
+        (status) => {
+          // Act
+          const action = setStatus(status);
+          const state = quotesSlice.reducer(initialState, action);
 
-      expect(state.status).toBe("connecting");
+          // Assert
+          expect(state.status).toBe(status);
+        }
+      );
     });
 
-    it("should set status to open", () => {
-      const action = setStatus("open");
-      const state = quotesSlice.reducer(initialState, action);
+    describe("when transitioning through status lifecycle", () => {
+      it("should transition through status lifecycle", () => {
+        // Arrange & Act & Assert
+        let state = quotesSlice.reducer(initialState, setStatus("connecting"));
+        expect(state.status).toBe("connecting");
 
-      expect(state.status).toBe("open");
-    });
+        state = quotesSlice.reducer(state, setStatus("open"));
+        expect(state.status).toBe("open");
 
-    it("should set status to closed", () => {
-      const action = setStatus("closed");
-      const state = quotesSlice.reducer(initialState, action);
-
-      expect(state.status).toBe("closed");
-    });
-
-    it("should set status to error", () => {
-      const action = setStatus("error");
-      const state = quotesSlice.reducer(initialState, action);
-
-      expect(state.status).toBe("error");
-    });
-
-    it("should transition through status lifecycle", () => {
-      let state = quotesSlice.reducer(initialState, setStatus("connecting"));
-      expect(state.status).toBe("connecting");
-
-      state = quotesSlice.reducer(state, setStatus("open"));
-      expect(state.status).toBe("open");
-
-      state = quotesSlice.reducer(state, setStatus("closed"));
-      expect(state.status).toBe("closed");
+        state = quotesSlice.reducer(state, setStatus("closed"));
+        expect(state.status).toBe("closed");
+      });
     });
   });
 
   describe("setHistory action", () => {
-    it("should set history and mark as loaded", () => {
-      const history = {
-        AAPL: [170, 172, 174, 175, 175.5],
-        GOOGL: [140, 141, 142, 142.5],
-      };
+    describe("when setting history", () => {
+      it("should set history and mark as loaded", () => {
+        // Arrange
+        const history = createHistory({
+          AAPL: DOMAIN_VALUES.HISTORY.MEDIUM,
+          GOOGL: [140, 141, 142, 142.5],
+        });
 
-      const action = setHistory(history);
-      const state = quotesSlice.reducer(initialState, action);
+        // Act
+        const action = setHistory(history);
+        const state = quotesSlice.reducer(initialState, action);
 
-      expect(state.historyLoaded).toBe(true);
-      expect(state.history.AAPL).toEqual([170, 172, 174, 175, 175.5]);
+        // Assert
+        expect(state.historyLoaded).toBe(true);
+        expect(state.history.AAPL).toEqual(DOMAIN_VALUES.HISTORY.MEDIUM);
+      });
+
+      it("should convert symbol keys to uppercase", () => {
+        // Arrange
+        const history = createHistory({
+          aapl: DOMAIN_VALUES.HISTORY.SHORT,
+          googl: [140, 141, 142],
+        });
+
+        // Act
+        const action = setHistory(history);
+        const state = quotesSlice.reducer(initialState, action);
+
+        // Assert
+        expect(state.history.AAPL).toBeDefined();
+        expect(state.history.GOOGL).toBeDefined();
+      });
     });
 
-    it("should convert symbol keys to uppercase", () => {
-      const history = {
-        aapl: [170, 172, 174],
-        googl: [140, 141, 142],
-      };
+    describe("when limiting history points", () => {
+      it("should limit history to max 45 points", () => {
+        // Arrange
+        const history = createHistory({
+          AAPL: DOMAIN_VALUES.HISTORY.LONG,
+        });
 
-      const action = setHistory(history);
-      const state = quotesSlice.reducer(initialState, action);
+        // Act
+        const action = setHistory(history);
+        const state = quotesSlice.reducer(initialState, action);
 
-      expect(state.history.AAPL).toBeDefined();
-      expect(state.history.GOOGL).toBeDefined();
+        // Assert
+        expect(state.history.AAPL).toHaveLength(DOMAIN_VALUES.MAX_HISTORY_POINTS);
+        expect(state.history.AAPL[0]).toBe(155);
+      });
+
+      it("should keep last 45 points from long history (46 items)", () => {
+        // Arrange
+        const history = createHistory({
+          AAPL: DOMAIN_VALUES.HISTORY.EDGE_46,
+        });
+
+        // Act
+        const action = setHistory(history);
+        const state = quotesSlice.reducer(initialState, action);
+
+        // Assert
+        expect(state.history.AAPL).toHaveLength(DOMAIN_VALUES.MAX_HISTORY_POINTS);
+        expect(state.history.AAPL[0]).toBe(101);
+      });
+
+      it("should keep all points when exactly 45", () => {
+        // Arrange
+        const history = createHistory({
+          AAPL: DOMAIN_VALUES.HISTORY.EDGE_45,
+        });
+
+        // Act
+        const action = setHistory(history);
+        const state = quotesSlice.reducer(initialState, action);
+
+        // Assert
+        expect(state.history.AAPL).toHaveLength(DOMAIN_VALUES.MAX_HISTORY_POINTS);
+      });
+
+      it("should keep all points when under 45", () => {
+        // Arrange
+        const history = createHistory({
+          AAPL: DOMAIN_VALUES.HISTORY.EDGE_44,
+        });
+
+        // Act
+        const action = setHistory(history);
+        const state = quotesSlice.reducer(initialState, action);
+
+        // Assert
+        expect(state.history.AAPL).toHaveLength(44);
+      });
     });
 
-    it("should limit history to max 45 points", () => {
-      const longHistory = Array.from({ length: 100 }, (_, i) => 100 + i);
-      const history = { AAPL: longHistory };
+    describe("when filtering empty arrays", () => {
+      it("should ignore empty arrays", () => {
+        // Arrange
+        const history = createHistory({
+          AAPL: DOMAIN_VALUES.HISTORY.MEDIUM,
+          GOOGL: [],
+        });
 
-      const action = setHistory(history);
-      const state = quotesSlice.reducer(initialState, action);
+        // Act
+        const action = setHistory(history);
+        const state = quotesSlice.reducer(initialState, action);
 
-      expect(state.history.AAPL).toHaveLength(45);
-      expect(state.history.AAPL[0]).toBe(155);
-    });
+        // Assert
+        expect(state.history.AAPL).toHaveLength(5);
+        expect(state.history.GOOGL).toBeUndefined();
+      });
 
-    it("should keep last 45 points from long history", () => {
-      const longHistory = Array.from({ length: 50 }, (_, i) => 100 + i);
-      const history = { AAPL: longHistory };
+      it("should ignore undefined arrays", () => {
+        // Arrange
+        const history = createHistory({
+          AAPL: DOMAIN_VALUES.HISTORY.MEDIUM,
+          GOOGL: undefined,
+        } as Record<string, number[] | undefined>);
 
-      const action = setHistory(history);
-      const state = quotesSlice.reducer(initialState, action);
+        // Act
+        const action = setHistory(history as Record<string, number[]>);
+        const state = quotesSlice.reducer(initialState, action);
 
-      expect(state.history.AAPL).toHaveLength(45);
-      expect(state.history.AAPL[0]).toBe(105);
-    });
-
-    it("should ignore empty arrays", () => {
-      const history = {
-        AAPL: [170, 172, 174],
-        GOOGL: [],
-      };
-
-      const action = setHistory(history);
-      const state = quotesSlice.reducer(initialState, action);
-
-      expect(state.history.AAPL).toHaveLength(3);
-      expect(state.history.GOOGL).toBeUndefined();
-    });
-
-    it("should ignore undefined arrays", () => {
-      const history = {
-        AAPL: [170, 172, 174],
-        GOOGL: undefined,
-      };
-
-      const action = setHistory(history);
-      const state = quotesSlice.reducer(initialState, action);
-
-      expect(state.history.AAPL).toHaveLength(3);
-      expect(state.history.GOOGL).toBeUndefined();
+        // Assert
+        expect(state.history.AAPL).toHaveLength(5);
+        expect(state.history.GOOGL).toBeUndefined();
+      });
     });
   });
 
   describe("setExtraSubscribedSymbols action", () => {
-    it("should set extra subscribed symbols", () => {
-      const action = setExtraSubscribedSymbols(["BTC", "ETH"]);
-      const state = quotesSlice.reducer(initialState, action);
+    describe("when setting extra symbols", () => {
+      it("should set extra subscribed symbols", () => {
+        // Arrange
+        const symbols = ["BTC", "ETH"];
 
-      expect(state.extraSubscribedSymbols).toContain("BTC");
-      expect(state.extraSubscribedSymbols).toContain("ETH");
+        // Act
+        const action = setExtraSubscribedSymbols(symbols);
+        const state = quotesSlice.reducer(initialState, action);
+
+        // Assert
+        expect(state.extraSubscribedSymbols).toContain("BTC");
+        expect(state.extraSubscribedSymbols).toContain("ETH");
+      });
+
+      it("should convert symbols to uppercase", () => {
+        // Arrange
+        const symbols = ["btc", "eth"];
+
+        // Act
+        const action = setExtraSubscribedSymbols(symbols);
+        const state = quotesSlice.reducer(initialState, action);
+
+        // Assert
+        expect(state.extraSubscribedSymbols).toContain("BTC");
+        expect(state.extraSubscribedSymbols).toContain("ETH");
+      });
     });
 
-    it("should convert symbols to uppercase", () => {
-      const action = setExtraSubscribedSymbols(["btc", "eth"]);
-      const state = quotesSlice.reducer(initialState, action);
+    describe("when filtering symbols", () => {
+      it("should filter out empty strings", () => {
+        // Arrange
+        const symbols = ["BTC", "", "ETH", ""];
 
-      expect(state.extraSubscribedSymbols).toContain("BTC");
-      expect(state.extraSubscribedSymbols).toContain("ETH");
-    });
+        // Act
+        const action = setExtraSubscribedSymbols(symbols);
+        const state = quotesSlice.reducer(initialState, action);
 
-    it("should filter out empty strings", () => {
-      const action = setExtraSubscribedSymbols(["BTC", "", "ETH", ""]);
-      const state = quotesSlice.reducer(initialState, action);
-
-      expect(state.extraSubscribedSymbols).toHaveLength(2);
-      expect(state.extraSubscribedSymbols).not.toContain("");
+        // Assert
+        expect(state.extraSubscribedSymbols).toHaveLength(2);
+        expect(state.extraSubscribedSymbols).not.toContain("");
+      });
     });
   });
 });

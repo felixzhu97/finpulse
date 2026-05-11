@@ -3,45 +3,103 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter } from './card';
 
+// =============================================================================
+// Domain Test Values - Card Component
+// =============================================================================
+
+const CARD_DOMAIN = {
+  TEST_IDS: {
+    CARD: 'card',
+    HEADER: 'card-header',
+    TITLE: 'card-title',
+    DESCRIPTION: 'card-description',
+    ACTION: 'card-action',
+    CONTENT: 'card-content',
+    FOOTER: 'card-footer',
+  },
+
+  TEXT: {
+    CARD: 'Card Content',
+    HEADER: 'Header',
+    TITLE: 'Card Title',
+    DESCRIPTION: 'Card Description',
+    ACTION: 'Action',
+    CONTENT: 'Card content goes here',
+    BUTTON: 'Action',
+    EDIT: 'Edit',
+  },
+
+  CLASSES: {
+    roundedXl: 'rounded-xl',
+    border: 'border',
+    grid: 'grid',
+    fontSemibold: 'font-semibold',
+    leadingNone: 'leading-none',
+    textSm: 'text-sm',
+    textMutedForeground: 'text-muted-foreground',
+    px6: 'px-6',
+    flex: 'flex',
+    itemsCenter: 'items-center',
+  },
+} as const;
+
+// =============================================================================
+// Test Factories
+// =============================================================================
+
+const renderCard = (ui: React.ReactElement, testId?: string) =>
+  render(ui);
+
+// =============================================================================
+// Test Suite
+// =============================================================================
+
 describe('Card', () => {
   describe('when rendered with default props', () => {
     it('should render without crashing', () => {
-      render(<Card data-testid="card">Card Content</Card>);
-      expect(screen.getByTestId('card')).toBeInTheDocument();
+      renderCard(<Card data-testid={CARD_DOMAIN.TEST_IDS.CARD}>{CARD_DOMAIN.TEXT.CARD}</Card>);
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.CARD)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<Card data-testid="card">Content</Card>);
-      expect(screen.getByTestId('card')).toHaveAttribute('data-slot', 'card');
+      renderCard(<Card data-testid={CARD_DOMAIN.TEST_IDS.CARD}>{CARD_DOMAIN.TEXT.CARD}</Card>);
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.CARD)).toHaveAttribute('data-slot', 'card');
     });
 
     it('should render children', () => {
-      render(<Card data-testid="card"><p>Card Content</p></Card>);
-      expect(screen.getByText('Card Content')).toBeInTheDocument();
+      renderCard(
+        <Card data-testid={CARD_DOMAIN.TEST_IDS.CARD}><p>{CARD_DOMAIN.TEXT.CARD}</p></Card>
+      );
+      expect(screen.getByText(CARD_DOMAIN.TEXT.CARD)).toBeInTheDocument();
     });
 
-    it('should have rounded-xl class', () => {
-      render(<Card data-testid="card">Content</Card>);
-      expect(screen.getByTestId('card')).toHaveClass('rounded-xl');
-    });
-
-    it('should have border class', () => {
-      render(<Card data-testid="card">Content</Card>);
-      expect(screen.getByTestId('card')).toHaveClass('border');
+    it('should have rounded-xl and border classes', () => {
+      renderCard(<Card data-testid={CARD_DOMAIN.TEST_IDS.CARD}>{CARD_DOMAIN.TEXT.CARD}</Card>);
+      const card = screen.getByTestId(CARD_DOMAIN.TEST_IDS.CARD);
+      expect(card).toHaveClass(CARD_DOMAIN.CLASSES.roundedXl);
+      expect(card).toHaveClass(CARD_DOMAIN.CLASSES.border);
     });
   });
 
   describe('when custom className is provided', () => {
     it('should apply custom className', () => {
-      render(<Card className="custom-card" data-testid="card">Custom</Card>);
-      expect(screen.getByTestId('card')).toHaveClass('custom-card');
+      renderCard(
+        <Card className="custom-card" data-testid={CARD_DOMAIN.TEST_IDS.CARD}>
+          {CARD_DOMAIN.TEXT.CARD}
+        </Card>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.CARD)).toHaveClass('custom-card');
     });
 
     it('should merge with default classes', () => {
-      render(<Card className="custom-class" data-testid="card">Content</Card>);
-      const card = screen.getByTestId('card');
+      renderCard(
+        <Card className="custom-class" data-testid={CARD_DOMAIN.TEST_IDS.CARD}>
+          {CARD_DOMAIN.TEXT.CARD}
+        </Card>
+      );
+      const card = screen.getByTestId(CARD_DOMAIN.TEST_IDS.CARD);
       expect(card).toHaveClass('custom-class');
-      expect(card).toHaveClass('rounded-xl');
+      expect(card).toHaveClass(CARD_DOMAIN.CLASSES.roundedXl);
     });
   });
 });
@@ -49,31 +107,42 @@ describe('Card', () => {
 describe('CardHeader', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      render(<CardHeader data-testid="card-header">Header</CardHeader>);
-      expect(screen.getByTestId('card-header')).toBeInTheDocument();
+      renderCard(
+        <CardHeader data-testid={CARD_DOMAIN.TEST_IDS.HEADER}>
+          {CARD_DOMAIN.TEXT.HEADER}
+        </CardHeader>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.HEADER)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<CardHeader data-testid="card-header">Header</CardHeader>);
-      expect(screen.getByTestId('card-header')).toHaveAttribute('data-slot', 'card-header');
+      renderCard(
+        <CardHeader data-testid={CARD_DOMAIN.TEST_IDS.HEADER}>
+          {CARD_DOMAIN.TEXT.HEADER}
+        </CardHeader>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.HEADER)).toHaveAttribute(
+        'data-slot',
+        CARD_DOMAIN.TEST_IDS.HEADER
+      );
     });
 
     it('should render children', () => {
-      render(<CardHeader data-testid="card-header"><CardTitle>Title</CardTitle></CardHeader>);
-      expect(screen.getByText('Title')).toBeInTheDocument();
+      renderCard(
+        <CardHeader data-testid={CARD_DOMAIN.TEST_IDS.HEADER}>
+          <CardTitle>{CARD_DOMAIN.TEXT.TITLE}</CardTitle>
+        </CardHeader>
+      );
+      expect(screen.getByText(CARD_DOMAIN.TEXT.TITLE)).toBeInTheDocument();
     });
 
-    it('should have flex-col class', () => {
-      render(<CardHeader data-testid="card-header">Header</CardHeader>);
-      const header = screen.getByTestId('card-header');
-      expect(header).toHaveClass('grid');
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      render(<CardHeader className="custom-header" data-testid="card-header">Header</CardHeader>);
-      expect(screen.getByTestId('card-header')).toHaveClass('custom-header');
+    it('should have grid class', () => {
+      renderCard(
+        <CardHeader data-testid={CARD_DOMAIN.TEST_IDS.HEADER}>
+          {CARD_DOMAIN.TEXT.HEADER}
+        </CardHeader>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.HEADER)).toHaveClass(CARD_DOMAIN.CLASSES.grid);
     });
   });
 });
@@ -81,35 +150,44 @@ describe('CardHeader', () => {
 describe('CardTitle', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      render(<CardTitle data-testid="card-title">Title</CardTitle>);
-      expect(screen.getByTestId('card-title')).toBeInTheDocument();
+      renderCard(
+        <CardTitle data-testid={CARD_DOMAIN.TEST_IDS.TITLE}>
+          {CARD_DOMAIN.TEXT.TITLE}
+        </CardTitle>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.TITLE)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<CardTitle data-testid="card-title">Title</CardTitle>);
-      expect(screen.getByTestId('card-title')).toHaveAttribute('data-slot', 'card-title');
+      renderCard(
+        <CardTitle data-testid={CARD_DOMAIN.TEST_IDS.TITLE}>
+          {CARD_DOMAIN.TEXT.TITLE}
+        </CardTitle>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.TITLE)).toHaveAttribute(
+        'data-slot',
+        CARD_DOMAIN.TEST_IDS.TITLE
+      );
     });
 
     it('should render with text content', () => {
-      render(<CardTitle data-testid="card-title">Card Title</CardTitle>);
-      expect(screen.getByText('Card Title')).toBeInTheDocument();
+      renderCard(
+        <CardTitle data-testid={CARD_DOMAIN.TEST_IDS.TITLE}>
+          {CARD_DOMAIN.TEXT.TITLE}
+        </CardTitle>
+      );
+      expect(screen.getByText(CARD_DOMAIN.TEXT.TITLE)).toBeInTheDocument();
     });
 
-    it('should have font-semibold class', () => {
-      render(<CardTitle data-testid="card-title">Title</CardTitle>);
-      expect(screen.getByTestId('card-title')).toHaveClass('font-semibold');
-    });
-
-    it('should have leading-none class', () => {
-      render(<CardTitle data-testid="card-title">Title</CardTitle>);
-      expect(screen.getByTestId('card-title')).toHaveClass('leading-none');
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      render(<CardTitle className="custom-title" data-testid="card-title">Title</CardTitle>);
-      expect(screen.getByTestId('card-title')).toHaveClass('custom-title');
+    it('should have font-semibold and leading-none classes', () => {
+      renderCard(
+        <CardTitle data-testid={CARD_DOMAIN.TEST_IDS.TITLE}>
+          {CARD_DOMAIN.TEXT.TITLE}
+        </CardTitle>
+      );
+      const title = screen.getByTestId(CARD_DOMAIN.TEST_IDS.TITLE);
+      expect(title).toHaveClass(CARD_DOMAIN.CLASSES.fontSemibold);
+      expect(title).toHaveClass(CARD_DOMAIN.CLASSES.leadingNone);
     });
   });
 });
@@ -117,35 +195,44 @@ describe('CardTitle', () => {
 describe('CardDescription', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      render(<CardDescription data-testid="card-description">Description</CardDescription>);
-      expect(screen.getByTestId('card-description')).toBeInTheDocument();
+      renderCard(
+        <CardDescription data-testid={CARD_DOMAIN.TEST_IDS.DESCRIPTION}>
+          {CARD_DOMAIN.TEXT.DESCRIPTION}
+        </CardDescription>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.DESCRIPTION)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<CardDescription data-testid="card-description">Description</CardDescription>);
-      expect(screen.getByTestId('card-description')).toHaveAttribute('data-slot', 'card-description');
+      renderCard(
+        <CardDescription data-testid={CARD_DOMAIN.TEST_IDS.DESCRIPTION}>
+          {CARD_DOMAIN.TEXT.DESCRIPTION}
+        </CardDescription>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.DESCRIPTION)).toHaveAttribute(
+        'data-slot',
+        CARD_DOMAIN.TEST_IDS.DESCRIPTION
+      );
     });
 
     it('should render with text content', () => {
-      render(<CardDescription data-testid="card-description">Card Description</CardDescription>);
-      expect(screen.getByText('Card Description')).toBeInTheDocument();
+      renderCard(
+        <CardDescription data-testid={CARD_DOMAIN.TEST_IDS.DESCRIPTION}>
+          {CARD_DOMAIN.TEXT.DESCRIPTION}
+        </CardDescription>
+      );
+      expect(screen.getByText(CARD_DOMAIN.TEXT.DESCRIPTION)).toBeInTheDocument();
     });
 
-    it('should have text-sm class', () => {
-      render(<CardDescription data-testid="card-description">Description</CardDescription>);
-      expect(screen.getByTestId('card-description')).toHaveClass('text-sm');
-    });
-
-    it('should have text-muted-foreground class', () => {
-      render(<CardDescription data-testid="card-description">Description</CardDescription>);
-      expect(screen.getByTestId('card-description')).toHaveClass('text-muted-foreground');
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      render(<CardDescription className="custom-description" data-testid="card-description">Desc</CardDescription>);
-      expect(screen.getByTestId('card-description')).toHaveClass('custom-description');
+    it('should have text-sm and text-muted-foreground classes', () => {
+      renderCard(
+        <CardDescription data-testid={CARD_DOMAIN.TEST_IDS.DESCRIPTION}>
+          {CARD_DOMAIN.TEXT.DESCRIPTION}
+        </CardDescription>
+      );
+      const desc = screen.getByTestId(CARD_DOMAIN.TEST_IDS.DESCRIPTION);
+      expect(desc).toHaveClass(CARD_DOMAIN.CLASSES.textSm);
+      expect(desc).toHaveClass(CARD_DOMAIN.CLASSES.textMutedForeground);
     });
   });
 });
@@ -153,25 +240,33 @@ describe('CardDescription', () => {
 describe('CardAction', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      render(<CardAction data-testid="card-action">Action</CardAction>);
-      expect(screen.getByTestId('card-action')).toBeInTheDocument();
+      renderCard(
+        <CardAction data-testid={CARD_DOMAIN.TEST_IDS.ACTION}>
+          {CARD_DOMAIN.TEXT.ACTION}
+        </CardAction>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.ACTION)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<CardAction data-testid="card-action">Action</CardAction>);
-      expect(screen.getByTestId('card-action')).toHaveAttribute('data-slot', 'card-action');
+      renderCard(
+        <CardAction data-testid={CARD_DOMAIN.TEST_IDS.ACTION}>
+          {CARD_DOMAIN.TEXT.ACTION}
+        </CardAction>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.ACTION)).toHaveAttribute(
+        'data-slot',
+        CARD_DOMAIN.TEST_IDS.ACTION
+      );
     });
 
     it('should render children', () => {
-      render(<CardAction data-testid="card-action"><button>Edit</button></CardAction>);
-      expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      render(<CardAction className="custom-action" data-testid="card-action">Action</CardAction>);
-      expect(screen.getByTestId('card-action')).toHaveClass('custom-action');
+      renderCard(
+        <CardAction data-testid={CARD_DOMAIN.TEST_IDS.ACTION}>
+          <button>{CARD_DOMAIN.TEXT.EDIT}</button>
+        </CardAction>
+      );
+      expect(screen.getByRole('button', { name: CARD_DOMAIN.TEXT.EDIT })).toBeInTheDocument();
     });
   });
 });
@@ -179,30 +274,42 @@ describe('CardAction', () => {
 describe('CardContent', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      render(<CardContent data-testid="card-content">Content</CardContent>);
-      expect(screen.getByTestId('card-content')).toBeInTheDocument();
+      renderCard(
+        <CardContent data-testid={CARD_DOMAIN.TEST_IDS.CONTENT}>
+          {CARD_DOMAIN.TEXT.CARD}
+        </CardContent>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.CONTENT)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<CardContent data-testid="card-content">Content</CardContent>);
-      expect(screen.getByTestId('card-content')).toHaveAttribute('data-slot', 'card-content');
+      renderCard(
+        <CardContent data-testid={CARD_DOMAIN.TEST_IDS.CONTENT}>
+          {CARD_DOMAIN.TEXT.CARD}
+        </CardContent>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.CONTENT)).toHaveAttribute(
+        'data-slot',
+        CARD_DOMAIN.TEST_IDS.CONTENT
+      );
     });
 
     it('should render children', () => {
-      render(<CardContent data-testid="card-content"><p>Card Content</p></CardContent>);
-      expect(screen.getByText('Card Content')).toBeInTheDocument();
+      renderCard(
+        <CardContent data-testid={CARD_DOMAIN.TEST_IDS.CONTENT}>
+          <p>{CARD_DOMAIN.TEXT.CARD}</p>
+        </CardContent>
+      );
+      expect(screen.getByText(CARD_DOMAIN.TEXT.CARD)).toBeInTheDocument();
     });
 
     it('should have px-6 class', () => {
-      render(<CardContent data-testid="card-content">Content</CardContent>);
-      expect(screen.getByTestId('card-content')).toHaveClass('px-6');
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      render(<CardContent className="custom-content" data-testid="card-content">Content</CardContent>);
-      expect(screen.getByTestId('card-content')).toHaveClass('custom-content');
+      renderCard(
+        <CardContent data-testid={CARD_DOMAIN.TEST_IDS.CONTENT}>
+          {CARD_DOMAIN.TEXT.CARD}
+        </CardContent>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.CONTENT)).toHaveClass(CARD_DOMAIN.CLASSES.px6);
     });
   });
 });
@@ -210,40 +317,45 @@ describe('CardContent', () => {
 describe('CardFooter', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      render(<CardFooter data-testid="card-footer">Footer</CardFooter>);
-      expect(screen.getByTestId('card-footer')).toBeInTheDocument();
+      renderCard(
+        <CardFooter data-testid={CARD_DOMAIN.TEST_IDS.FOOTER}>
+          {CARD_DOMAIN.TEXT.CARD}
+        </CardFooter>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.FOOTER)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<CardFooter data-testid="card-footer">Footer</CardFooter>);
-      expect(screen.getByTestId('card-footer')).toHaveAttribute('data-slot', 'card-footer');
+      renderCard(
+        <CardFooter data-testid={CARD_DOMAIN.TEST_IDS.FOOTER}>
+          {CARD_DOMAIN.TEXT.CARD}
+        </CardFooter>
+      );
+      expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.FOOTER)).toHaveAttribute(
+        'data-slot',
+        CARD_DOMAIN.TEST_IDS.FOOTER
+      );
     });
 
     it('should render children', () => {
-      render(<CardFooter data-testid="card-footer"><button>Action</button></CardFooter>);
-      expect(screen.getByRole('button', { name: 'Action' })).toBeInTheDocument();
+      renderCard(
+        <CardFooter data-testid={CARD_DOMAIN.TEST_IDS.FOOTER}>
+          <button>{CARD_DOMAIN.TEXT.BUTTON}</button>
+        </CardFooter>
+      );
+      expect(screen.getByRole('button', { name: CARD_DOMAIN.TEXT.BUTTON })).toBeInTheDocument();
     });
 
-    it('should have flex class', () => {
-      render(<CardFooter data-testid="card-footer">Footer</CardFooter>);
-      expect(screen.getByTestId('card-footer')).toHaveClass('flex');
-    });
-
-    it('should have items-center class', () => {
-      render(<CardFooter data-testid="card-footer">Footer</CardFooter>);
-      expect(screen.getByTestId('card-footer')).toHaveClass('items-center');
-    });
-
-    it('should have px-6 class', () => {
-      render(<CardFooter data-testid="card-footer">Footer</CardFooter>);
-      expect(screen.getByTestId('card-footer')).toHaveClass('px-6');
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      render(<CardFooter className="custom-footer" data-testid="card-footer">Footer</CardFooter>);
-      expect(screen.getByTestId('card-footer')).toHaveClass('custom-footer');
+    it('should have flex, items-center, and px-6 classes', () => {
+      renderCard(
+        <CardFooter data-testid={CARD_DOMAIN.TEST_IDS.FOOTER}>
+          {CARD_DOMAIN.TEXT.CARD}
+        </CardFooter>
+      );
+      const footer = screen.getByTestId(CARD_DOMAIN.TEST_IDS.FOOTER);
+      expect(footer).toHaveClass(CARD_DOMAIN.CLASSES.flex);
+      expect(footer).toHaveClass(CARD_DOMAIN.CLASSES.itemsCenter);
+      expect(footer).toHaveClass(CARD_DOMAIN.CLASSES.px6);
     });
   });
 });
@@ -251,25 +363,29 @@ describe('CardFooter', () => {
 describe('Card integration', () => {
   it('should render complete Card structure', () => {
     render(
-      <Card data-testid="card">
-        <CardHeader data-testid="card-header">
-          <CardTitle data-testid="card-title">Card Title</CardTitle>
-          <CardDescription data-testid="card-description">Description</CardDescription>
+      <Card data-testid={CARD_DOMAIN.TEST_IDS.CARD}>
+        <CardHeader data-testid={CARD_DOMAIN.TEST_IDS.HEADER}>
+          <CardTitle data-testid={CARD_DOMAIN.TEST_IDS.TITLE}>
+            {CARD_DOMAIN.TEXT.TITLE}
+          </CardTitle>
+          <CardDescription data-testid={CARD_DOMAIN.TEST_IDS.DESCRIPTION}>
+            {CARD_DOMAIN.TEXT.DESCRIPTION}
+          </CardDescription>
         </CardHeader>
-        <CardContent data-testid="card-content">
-          <p>Card content goes here</p>
+        <CardContent data-testid={CARD_DOMAIN.TEST_IDS.CONTENT}>
+          <p>{CARD_DOMAIN.TEXT.CONTENT}</p>
         </CardContent>
-        <CardFooter data-testid="card-footer">
-          <button>Action</button>
+        <CardFooter data-testid={CARD_DOMAIN.TEST_IDS.FOOTER}>
+          <button>{CARD_DOMAIN.TEXT.BUTTON}</button>
         </CardFooter>
       </Card>
     );
 
-    expect(screen.getByTestId('card')).toBeInTheDocument();
-    expect(screen.getByTestId('card-header')).toBeInTheDocument();
-    expect(screen.getByTestId('card-title')).toBeInTheDocument();
-    expect(screen.getByTestId('card-description')).toBeInTheDocument();
-    expect(screen.getByTestId('card-content')).toBeInTheDocument();
-    expect(screen.getByTestId('card-footer')).toBeInTheDocument();
+    expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.CARD)).toBeInTheDocument();
+    expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.HEADER)).toBeInTheDocument();
+    expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.TITLE)).toBeInTheDocument();
+    expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.DESCRIPTION)).toBeInTheDocument();
+    expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.CONTENT)).toBeInTheDocument();
+    expect(screen.getByTestId(CARD_DOMAIN.TEST_IDS.FOOTER)).toBeInTheDocument();
   });
 });

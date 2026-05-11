@@ -1,325 +1,274 @@
 import type { Payment, PaymentCreate } from "../../../domain/entities/payment";
 
+// ============================================================
+// Domain Test Values - 领域测试值
+// ============================================================
+const PAYMENT_DOMAIN = {
+  STATUSES: ["pending", "processing", "completed", "failed", "cancelled", "refunded"] as const,
+  CURRENCIES: ["USD", "EUR", "GBP", "JPY", "CNY"] as const,
+  FRAUD_RECOMMENDATIONS: ["allow", "review", "block"] as const,
+  IDS: {
+    PREFIX: "PAY",
+    ACCOUNT_PREFIX: "ACC",
+    TEST: "PAY001",
+    ACCOUNT: "ACC001",
+  } as const,
+  TIMESTAMPS: {
+    NOW: "2024-01-15T10:00:00Z",
+  } as const,
+  AMOUNTS: {
+    TYPICAL: 150.5,
+    SMALL: 0.01,
+    LARGE: 999999.99,
+    REFUND: -50.0,
+    FREE: 0,
+  } as const,
+  FRAUD_SCORES: {
+    LOW: 0.2,
+    MEDIUM: 0.5,
+    HIGH: 0.85,
+    BLOCK: 0.95,
+  } as const,
+} as const;
+
+const BOUNDARY_VALUES = {
+  AMOUNT: [
+    { value: 0.01, desc: "smallest positive" },
+    { value: 100.0, desc: "typical" },
+    { value: 999999.99, desc: "maximum" },
+    { value: 0, desc: "zero (free transfer)" },
+    { value: -50.0, desc: "negative (refund)" },
+  ],
+  FRAUD_SCORE: [
+    { value: 0.0, desc: "no risk" },
+    { value: 0.5, desc: "medium risk" },
+    { value: 0.85, desc: "high risk" },
+    { value: null, desc: "null score" },
+  ],
+} as const;
+
+const SCENARIOS = {
+  FRAUD: {
+    BLOCKED: {
+      counterparty: "Suspicious Store",
+      amount: 50000.0,
+      status: "failed" as const,
+      recommendation: "block" as const,
+      score: PAYMENT_DOMAIN.FRAUD_SCORES.BLOCK,
+      desc: "blocked fraudulent payment",
+    },
+    REVIEW: {
+      counterparty: "Unknown Merchant",
+      amount: 5000.0,
+      status: "pending" as const,
+      recommendation: "review" as const,
+      score: PAYMENT_DOMAIN.FRAUD_SCORES.HIGH,
+      desc: "payment pending review",
+    },
+  },
+  LIFECYCLE: {
+    PENDING: { status: "pending" as const, desc: "pending payment" },
+    PROCESSING: { status: "processing" as const, desc: "processing payment" },
+    COMPLETED: { status: "completed" as const, desc: "completed payment" },
+  },
+} as const;
+
+// ============================================================
+// Factory Functions - 工厂函数
+// ============================================================
+const createPayment = (overrides: Partial<Payment> = {}): Payment => ({
+  payment_id: PAYMENT_DOMAIN.IDS.TEST,
+  account_id: PAYMENT_DOMAIN.IDS.ACCOUNT,
+  counterparty: "Coffee Shop",
+  amount: PAYMENT_DOMAIN.AMOUNTS.TYPICAL,
+  currency: "USD",
+  status: "completed",
+  created_at: PAYMENT_DOMAIN.TIMESTAMPS.NOW,
+  ...overrides,
+});
+
+const createPaymentCreate = (overrides: Partial<PaymentCreate> = {}): PaymentCreate => ({
+  account_id: PAYMENT_DOMAIN.IDS.ACCOUNT,
+  counterparty: "Coffee Shop",
+  amount: 25.0,
+  currency: "USD",
+  ...overrides,
+});
+
+// ============================================================
+// Test Suites
+// ============================================================
 describe("Payment Entity", () => {
   describe("Payment interface", () => {
-    it("should accept valid payment data", () => {
-      const payment: Payment = {
-        payment_id: "PAY001",
-        account_id: "ACC001",
-        counterparty: "Coffee Shop",
-        amount: 150.50,
-        currency: "USD",
-        status: "completed",
-        created_at: "2024-01-15T10:00:00Z",
-      };
+    describe("when providing valid data", () => {
+      it("should accept complete payment data", () => {
+        // Arrange
+        const payment = createPayment();
 
-      expect(payment.payment_id).toBe("PAY001");
-      expect(payment.account_id).toBe("ACC001");
-      expect(payment.counterparty).toBe("Coffee Shop");
-      expect(payment.amount).toBe(150.50);
-      expect(payment.currency).toBe("USD");
-      expect(payment.status).toBe("completed");
-      expect(payment.created_at).toBe("2024-01-15T10:00:00Z");
+        // Assert
+        expect(payment.payment_id).toBe(PAYMENT_DOMAIN.IDS.TEST);
+        expect(payment.account_id).toBe(PAYMENT_DOMAIN.IDS.ACCOUNT);
+        expect(payment.counterparty).toBe("Coffee Shop");
+        expect(payment.amount).toBe(PAYMENT_DOMAIN.AMOUNTS.TYPICAL);
+        expect(payment.currency).toBe("USD");
+        expect(payment.status).toBe("completed");
+      });
     });
 
-    it("should accept null counterparty", () => {
-      const payment: Payment = {
-        payment_id: "PAY002",
-        account_id: "ACC001",
-        counterparty: null,
-        amount: 100.00,
-        currency: "USD",
-        status: "pending",
-        created_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(payment.counterparty).toBeNull();
-    });
-
-    it("should accept positive amounts", () => {
-      const payment: Payment = {
-        payment_id: "PAY003",
-        account_id: "ACC001",
-        counterparty: "Store",
-        amount: 999999.99,
-        currency: "USD",
-        status: "completed",
-        created_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(payment.amount).toBeGreaterThan(0);
-    });
-
-    it("should accept small amounts", () => {
-      const payment: Payment = {
-        payment_id: "PAY004",
-        account_id: "ACC001",
-        counterparty: "Store",
-        amount: 0.01,
-        currency: "USD",
-        status: "completed",
-        created_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(payment.amount).toBe(0.01);
-    });
-
-    it("should accept negative amounts", () => {
-      const payment: Payment = {
-        payment_id: "PAY005",
-        account_id: "ACC001",
-        counterparty: "Refund",
-        amount: -50.00,
-        currency: "USD",
-        status: "completed",
-        created_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(payment.amount).toBeLessThan(0);
-    });
-
-    it("should accept zero amount", () => {
-      const payment: Payment = {
-        payment_id: "PAY006",
-        account_id: "ACC001",
-        counterparty: "Free Transfer",
-        amount: 0,
-        currency: "USD",
-        status: "completed",
-        created_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(payment.amount).toBe(0);
-    });
-
-    it("should accept optional fraud_recommendation", () => {
-      const payment: Payment = {
-        payment_id: "PAY007",
-        account_id: "ACC001",
-        counterparty: "Unknown",
-        amount: 10000.00,
-        currency: "USD",
-        status: "pending",
-        created_at: "2024-01-15T10:00:00Z",
-        fraud_recommendation: "review",
-      };
-
-      expect(payment.fraud_recommendation).toBe("review");
-    });
-
-    it("should accept null fraud_recommendation", () => {
-      const payment: Payment = {
-        payment_id: "PAY008",
-        account_id: "ACC001",
-        counterparty: "Trusted",
-        amount: 100.00,
-        currency: "USD",
-        status: "completed",
-        created_at: "2024-01-15T10:00:00Z",
-        fraud_recommendation: null,
-      };
-
-      expect(payment.fraud_recommendation).toBeNull();
-    });
-
-    it("should accept optional fraud_score", () => {
-      const payment: Payment = {
-        payment_id: "PAY009",
-        account_id: "ACC001",
-        counterparty: "Risky",
-        amount: 5000.00,
-        currency: "USD",
-        status: "pending",
-        created_at: "2024-01-15T10:00:00Z",
-        fraud_score: 0.85,
-      };
-
-      expect(payment.fraud_score).toBe(0.85);
-    });
-
-    it("should accept null fraud_score", () => {
-      const payment: Payment = {
-        payment_id: "PAY010",
-        account_id: "ACC001",
-        counterparty: "Normal",
-        amount: 50.00,
-        currency: "USD",
-        status: "completed",
-        created_at: "2024-01-15T10:00:00Z",
-        fraud_score: null,
-      };
-
-      expect(payment.fraud_score).toBeNull();
-    });
-
-    it("should accept various payment statuses", () => {
-      const statuses = ["pending", "processing", "completed", "failed", "cancelled", "refunded"];
-
-      statuses.forEach((status) => {
-        const payment: Payment = {
-          payment_id: `PAY_${status}`,
-          account_id: "ACC001",
-          counterparty: "Store",
-          amount: 100.00,
-          currency: "USD",
-          status,
-          created_at: "2024-01-15T10:00:00Z",
-        };
-
+    describe("when validating statuses", () => {
+      it.each(PAYMENT_DOMAIN.STATUSES)("should accept status: %s", (status) => {
+        const payment = createPayment({ status });
         expect(payment.status).toBe(status);
       });
     });
 
-    it("should accept various currencies", () => {
-      const currencies = ["USD", "EUR", "GBP", "JPY", "CNY"];
-
-      currencies.forEach((currency) => {
-        const payment: Payment = {
-          payment_id: `PAY_${currency}`,
-          account_id: "ACC001",
-          counterparty: "Store",
-          amount: 100.00,
-          currency,
-          status: "completed",
-          created_at: "2024-01-15T10:00:00Z",
-        };
-
+    describe("when validating currencies", () => {
+      it.each(PAYMENT_DOMAIN.CURRENCIES)("should accept currency: %s", (currency) => {
+        const payment = createPayment({ currency });
         expect(payment.currency).toBe(currency);
+      });
+    });
+
+    describe("when handling amounts", () => {
+      it.each(BOUNDARY_VALUES.AMOUNT)("should accept $desc", ({ value, desc }) => {
+        const payment = createPayment({ amount: value });
+        expect(payment.amount).toBe(value);
+      });
+    });
+
+    describe("when handling counterparty field", () => {
+      it.each([
+        { value: "Coffee Shop", desc: "valid counterparty" },
+        { value: null, desc: "null counterparty" },
+      ])("should accept $desc", ({ value }) => {
+        const payment = createPayment({ counterparty: value });
+        expect(payment.counterparty).toBe(value);
+      });
+    });
+
+    describe("when handling fraud fields", () => {
+      it.each(BOUNDARY_VALUES.FRAUD_SCORE)(
+        "should accept fraud_score: $desc",
+        ({ value }) => {
+          const payment = createPayment({ fraud_score: value });
+          expect(payment.fraud_score).toBe(value);
+        }
+      );
+
+      it.each(PAYMENT_DOMAIN.FRAUD_RECOMMENDATIONS)(
+        "should accept fraud_recommendation: %s",
+        (recommendation) => {
+          const payment = createPayment({ fraud_recommendation: recommendation });
+          expect(payment.fraud_recommendation).toBe(recommendation);
+        }
+      );
+
+      it("should allow undefined fraud fields", () => {
+        const payment = createPayment();
+        expect(payment.fraud_recommendation).toBeUndefined();
+        expect(payment.fraud_score).toBeUndefined();
+      });
+    });
+
+    describe("when modeling payment scenarios", () => {
+      it.each([
+        {
+          counterparty: "Suspicious Store",
+          amount: 50000.0,
+          status: "failed" as const,
+          recommendation: "block" as const,
+          score: 0.95,
+          scoreMin: 0.9,
+          desc: "blocked fraudulent payment",
+        },
+        {
+          counterparty: "Unknown Merchant",
+          amount: 5000.0,
+          status: "pending" as const,
+          recommendation: "review" as const,
+          score: 0.85,
+          scoreMin: 0.8,
+          desc: "payment pending review",
+        },
+      ])("should model $desc", ({ counterparty, amount, status, recommendation, score, scoreMin }) => {
+        const payment = createPayment({
+          counterparty,
+          amount,
+          status,
+          fraud_recommendation: recommendation,
+          fraud_score: score,
+        });
+
+        expect(payment.status).toBe(status);
+        expect(payment.fraud_recommendation).toBe(recommendation);
+        expect(payment.fraud_score).toBeGreaterThanOrEqual(scoreMin);
+      });
+    });
+
+    describe("when modeling payment lifecycle", () => {
+      it("should represent complete payment lifecycle", () => {
+        const lifecycle: Payment[] = [
+          createPayment({
+            payment_id: "PAY001",
+            status: SCENARIOS.LIFECYCLE.PENDING.status,
+          }),
+          createPayment({
+            payment_id: "PAY001",
+            status: SCENARIOS.LIFECYCLE.PROCESSING.status,
+          }),
+          createPayment({
+            payment_id: "PAY001",
+            status: SCENARIOS.LIFECYCLE.COMPLETED.status,
+          }),
+        ];
+
+        expect(lifecycle[0].status).toBe("pending");
+        expect(lifecycle[1].status).toBe("processing");
+        expect(lifecycle[2].status).toBe("completed");
       });
     });
   });
 
   describe("PaymentCreate interface", () => {
-    it("should accept valid payment creation data", () => {
-      const paymentCreate: PaymentCreate = {
-        account_id: "ACC001",
-        counterparty: "Coffee Shop",
-        amount: 25.00,
-        currency: "USD",
-      };
+    describe("when providing valid data", () => {
+      it("should accept complete payment creation data", () => {
+        // Arrange
+        const paymentCreate = createPaymentCreate();
 
-      expect(paymentCreate.account_id).toBe("ACC001");
-      expect(paymentCreate.counterparty).toBe("Coffee Shop");
-      expect(paymentCreate.amount).toBe(25.00);
-      expect(paymentCreate.currency).toBe("USD");
+        // Assert
+        expect(paymentCreate.account_id).toBe(PAYMENT_DOMAIN.IDS.ACCOUNT);
+        expect(paymentCreate.counterparty).toBe("Coffee Shop");
+        expect(paymentCreate.amount).toBe(25.0);
+        expect(paymentCreate.currency).toBe("USD");
+      });
     });
 
-    it("should allow optional counterparty", () => {
-      const paymentCreate: PaymentCreate = {
-        account_id: "ACC001",
-        amount: 100.00,
-        currency: "USD",
-      };
-
-      expect(paymentCreate.counterparty).toBeUndefined();
+    describe("when validating required fields", () => {
+      it.each([
+        { field: "account_id", value: PAYMENT_DOMAIN.IDS.ACCOUNT, desc: "with account_id" },
+        { field: "amount", value: 100.0, desc: "with amount" },
+        { field: "currency", value: "USD", desc: "with currency" },
+      ])("should require $desc", ({ field, value }) => {
+        const paymentCreate = createPaymentCreate({ [field]: value });
+        expect(paymentCreate[field]).toBeDefined();
+      });
     });
 
-    it("should allow null counterparty", () => {
-      const paymentCreate: PaymentCreate = {
-        account_id: "ACC001",
-        counterparty: null,
-        amount: 50.00,
-        currency: "USD",
-      };
-
-      expect(paymentCreate.counterparty).toBeNull();
-    });
-
-    it("should allow optional status", () => {
-      const paymentCreate: PaymentCreate = {
-        account_id: "ACC001",
-        amount: 100.00,
-        currency: "USD",
-        status: "pending",
-      };
-
-      expect(paymentCreate.status).toBe("pending");
-    });
-
-    it("should require account_id", () => {
-      const paymentCreate: PaymentCreate = {
-        account_id: "ACC001",
-        amount: 100.00,
-        currency: "USD",
-      };
-
-      expect(paymentCreate.account_id).toBeDefined();
-    });
-
-    it("should require amount", () => {
-      const paymentCreate: PaymentCreate = {
-        account_id: "ACC001",
-        amount: 100.00,
-        currency: "USD",
-      };
-
-      expect(typeof paymentCreate.amount).toBe("number");
-    });
-
-    it("should require currency", () => {
-      const paymentCreate: PaymentCreate = {
-        account_id: "ACC001",
-        amount: 100.00,
-        currency: "USD",
-      };
-
-      expect(paymentCreate.currency).toBeDefined();
-    });
-  });
-
-  describe("Payment workflow", () => {
-    it("should model a complete payment lifecycle", () => {
-      const payments: Payment[] = [
-        {
-          payment_id: "PAY001",
-          account_id: "ACC001",
-          counterparty: "Store",
-          amount: 100.00,
-          currency: "USD",
-          status: "pending",
-          created_at: "2024-01-15T10:00:00Z",
-        },
-        {
-          payment_id: "PAY001",
-          account_id: "ACC001",
-          counterparty: "Store",
-          amount: 100.00,
-          currency: "USD",
-          status: "processing",
-          created_at: "2024-01-15T10:00:00Z",
-        },
-        {
-          payment_id: "PAY001",
-          account_id: "ACC001",
-          counterparty: "Store",
-          amount: 100.00,
-          currency: "USD",
-          status: "completed",
-          created_at: "2024-01-15T10:00:00Z",
-        },
-      ];
-
-      expect(payments[0].status).toBe("pending");
-      expect(payments[1].status).toBe("processing");
-      expect(payments[2].status).toBe("completed");
-    });
-
-    it("should model a failed payment with fraud detection", () => {
-      const payment: Payment = {
-        payment_id: "PAY001",
-        account_id: "ACC001",
-        counterparty: "Suspicious Store",
-        amount: 50000.00,
-        currency: "USD",
-        status: "failed",
-        created_at: "2024-01-15T10:00:00Z",
-        fraud_recommendation: "block",
-        fraud_score: 0.95,
-      };
-
-      expect(payment.status).toBe("failed");
-      expect(payment.fraud_recommendation).toBe("block");
-      expect(payment.fraud_score).toBeGreaterThan(0.9);
+    describe("when handling optional fields", () => {
+      it.each([
+        { field: "counterparty", value: "Store", desc: "with counterparty" },
+        { field: "counterparty", value: null, desc: "with null counterparty" },
+        { field: "counterparty", value: undefined, desc: "without counterparty" },
+        { field: "status", value: "pending", desc: "with status" },
+        { field: "status", value: undefined, desc: "without status" },
+      ])("should accept $desc", ({ field, value }) => {
+        const paymentCreate = createPaymentCreate({ [field]: value } as Partial<PaymentCreate>);
+        if (value === undefined) {
+          expect(paymentCreate[field]).toBeUndefined();
+        } else {
+          expect(paymentCreate[field]).toBe(value);
+        }
+      });
     });
   });
 });

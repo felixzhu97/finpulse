@@ -4,11 +4,62 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { Input } from './input';
 
+// =============================================================================
+// Domain Test Values - Input Component
+// =============================================================================
+
+const INPUT_DOMAIN = {
+  TEST_ID: 'input',
+
+  PLACEHOLDER: 'Enter text...',
+
+  TYPE: {
+    EMAIL: 'email',
+    PASSWORD: 'password',
+    NUMBER: 'number',
+    SEARCH: 'search',
+    TEL: 'tel',
+    URL: 'url',
+  },
+
+  VALUE: {
+    INITIAL: 'Initial',
+    UPDATED: 'Updated',
+    TEST: 'Test Value',
+    READ_ONLY: 'Read Only',
+    TYPED: 'Hello World',
+  },
+
+  ATTRIBUTES: {
+    USERNAME: 'username',
+    USERNAME_INPUT: 'username-input',
+  },
+
+  ARIA: {
+    LABEL: 'Search input',
+    DESCRIPTION: 'description',
+  },
+
+  CLASSES: {
+    roundedMd: 'rounded-md',
+    border: 'border',
+    disabledCursor: 'disabled:cursor-not-allowed',
+    disabledOpacity: 'disabled:opacity-50',
+    h9: 'h-9',
+    wFull: 'w-full',
+    ariaInvalidBorder: 'aria-invalid:border-destructive',
+  },
+} as const;
+
+// =============================================================================
+// Test Suite
+// =============================================================================
+
 describe('Input', () => {
   describe('when rendered with default props', () => {
     it('should render without crashing', () => {
-      render(<Input data-testid="input" />);
-      expect(screen.getByTestId('input')).toBeInTheDocument();
+      render(<Input data-testid={INPUT_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toBeInTheDocument();
     });
 
     it('should render as an input element', () => {
@@ -17,89 +68,77 @@ describe('Input', () => {
     });
 
     it('should have data-slot attribute', () => {
-      render(<Input data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('data-slot', 'input');
+      render(<Input data-testid={INPUT_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveAttribute('data-slot', 'input');
     });
 
-    it('should have rounded-md class', () => {
-      render(<Input data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveClass('rounded-md');
-    });
-
-    it('should have border class', () => {
-      render(<Input data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveClass('border');
+    it('should have rounded-md and border classes', () => {
+      render(<Input data-testid={INPUT_DOMAIN.TEST_ID} />);
+      const input = screen.getByTestId(INPUT_DOMAIN.TEST_ID);
+      expect(input).toHaveClass(INPUT_DOMAIN.CLASSES.roundedMd);
+      expect(input).toHaveClass(INPUT_DOMAIN.CLASSES.border);
     });
   });
 
   describe('when type prop is specified', () => {
-    it('should render as email input', () => {
-      render(<Input type="email" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('type', 'email');
-    });
-
-    it('should render as password input', () => {
-      render(<Input type="password" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('type', 'password');
-    });
-
-    it('should render as number input', () => {
-      render(<Input type="number" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('type', 'number');
-    });
-
-    it('should render as search input', () => {
-      render(<Input type="search" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('type', 'search');
-    });
-
-    it('should render as tel input', () => {
-      render(<Input type="tel" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('type', 'tel');
-    });
-
-    it('should render as url input', () => {
-      render(<Input type="url" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('type', 'url');
-    });
+    it.each([
+      { type: INPUT_DOMAIN.TYPE.EMAIL, expected: 'email' },
+      { type: INPUT_DOMAIN.TYPE.PASSWORD, expected: 'password' },
+      { type: INPUT_DOMAIN.TYPE.NUMBER, expected: 'number' },
+      { type: INPUT_DOMAIN.TYPE.SEARCH, expected: 'search' },
+      { type: INPUT_DOMAIN.TYPE.TEL, expected: 'tel' },
+      { type: INPUT_DOMAIN.TYPE.URL, expected: 'url' },
+    ])(
+      'should render as $expected input',
+      ({ type, expected }) => {
+        render(<Input type={type} data-testid={INPUT_DOMAIN.TEST_ID} />);
+        expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveAttribute('type', expected);
+      }
+    );
   });
 
   describe('when placeholder is provided', () => {
     it('should render with placeholder text', () => {
-      render(<Input placeholder="Enter text..." data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('placeholder', 'Enter text...');
+      render(
+        <Input placeholder={INPUT_DOMAIN.PLACEHOLDER} data-testid={INPUT_DOMAIN.TEST_ID} />
+      );
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveAttribute(
+        'placeholder',
+        INPUT_DOMAIN.PLACEHOLDER
+      );
     });
   });
 
   describe('when value is provided', () => {
     it('should render with value', () => {
-      render(<Input value="Test Value" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveValue('Test Value');
+      render(<Input value={INPUT_DOMAIN.VALUE.TEST} data-testid={INPUT_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveValue(INPUT_DOMAIN.VALUE.TEST);
     });
 
-    it('should display value correctly', () => {
-      const { rerender } = render(<Input value="Initial" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveValue('Initial');
+    it('should update value when changed', () => {
+      const { rerender } = render(
+        <Input value={INPUT_DOMAIN.VALUE.INITIAL} data-testid={INPUT_DOMAIN.TEST_ID} />
+      );
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveValue(INPUT_DOMAIN.VALUE.INITIAL);
 
-      rerender(<Input value="Updated" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveValue('Updated');
+      rerender(
+        <Input value={INPUT_DOMAIN.VALUE.UPDATED} data-testid={INPUT_DOMAIN.TEST_ID} />
+      );
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveValue(INPUT_DOMAIN.VALUE.UPDATED);
     });
   });
 
   describe('when disabled', () => {
     it('should render disabled input', () => {
-      render(<Input disabled data-testid="input" />);
-      expect(screen.getByTestId('input')).toBeDisabled();
+      render(<Input disabled data-testid={INPUT_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toBeDisabled();
     });
 
-    it('should have disabled cursor', () => {
-      render(<Input disabled data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveClass('disabled:cursor-not-allowed');
-    });
-
-    it('should have disabled opacity', () => {
-      render(<Input disabled data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveClass('disabled:opacity-50');
+    it('should have disabled cursor and opacity classes', () => {
+      render(<Input disabled data-testid={INPUT_DOMAIN.TEST_ID} />);
+      const input = screen.getByTestId(INPUT_DOMAIN.TEST_ID);
+      expect(input).toHaveClass(INPUT_DOMAIN.CLASSES.disabledCursor);
+      expect(input).toHaveClass(INPUT_DOMAIN.CLASSES.disabledOpacity);
     });
   });
 
@@ -108,8 +147,8 @@ describe('Input', () => {
       const handleChange = vi.fn();
       const user = userEvent.setup();
 
-      render(<Input onChange={handleChange} data-testid="input" />);
-      await user.type(screen.getByTestId('input'), 'Hello');
+      render(<Input onChange={handleChange} data-testid={INPUT_DOMAIN.TEST_ID} />);
+      await user.type(screen.getByTestId(INPUT_DOMAIN.TEST_ID), INPUT_DOMAIN.VALUE.TYPED);
 
       expect(handleChange).toHaveBeenCalled();
     });
@@ -117,104 +156,101 @@ describe('Input', () => {
     it('should update value when typing', async () => {
       const user = userEvent.setup();
 
-      render(<Input data-testid="input" />);
-      await user.type(screen.getByTestId('input'), 'Hello World');
+      render(<Input data-testid={INPUT_DOMAIN.TEST_ID} />);
+      await user.type(screen.getByTestId(INPUT_DOMAIN.TEST_ID), INPUT_DOMAIN.VALUE.TYPED);
 
-      expect(screen.getByTestId('input')).toHaveValue('Hello World');
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveValue(INPUT_DOMAIN.VALUE.TYPED);
     });
   });
 
   describe('when readOnly', () => {
     it('should render readonly input', () => {
-      render(<Input readOnly value="Read Only" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('readonly');
+      render(
+        <Input readOnly value={INPUT_DOMAIN.VALUE.READ_ONLY} data-testid={INPUT_DOMAIN.TEST_ID} />
+      );
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveAttribute('readonly');
     });
 
     it('should not allow typing when readonly', async () => {
       const user = userEvent.setup();
 
-      render(<Input readOnly value="Read Only" data-testid="input" />);
-      await user.click(screen.getByTestId('input'));
+      render(
+        <Input readOnly value={INPUT_DOMAIN.VALUE.READ_ONLY} data-testid={INPUT_DOMAIN.TEST_ID} />
+      );
+      await user.click(screen.getByTestId(INPUT_DOMAIN.TEST_ID));
 
-      expect(screen.getByTestId('input')).toHaveValue('Read Only');
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveValue(INPUT_DOMAIN.VALUE.READ_ONLY);
     });
   });
 
   describe('when required', () => {
     it('should render required input', () => {
-      render(<Input required data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('required');
+      render(<Input required data-testid={INPUT_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveAttribute('required');
     });
   });
 
   describe('when name prop is provided', () => {
     it('should have correct name attribute', () => {
-      render(<Input name="username" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('name', 'username');
+      render(<Input name={INPUT_DOMAIN.ATTRIBUTES.USERNAME} data-testid={INPUT_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveAttribute(
+        'name',
+        INPUT_DOMAIN.ATTRIBUTES.USERNAME
+      );
     });
   });
 
   describe('when id prop is provided', () => {
     it('should have correct id attribute', () => {
-      render(<Input id="username-input" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('id', 'username-input');
+      render(
+        <Input id={INPUT_DOMAIN.ATTRIBUTES.USERNAME_INPUT} data-testid={INPUT_DOMAIN.TEST_ID} />
+      );
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveAttribute(
+        'id',
+        INPUT_DOMAIN.ATTRIBUTES.USERNAME_INPUT
+      );
     });
   });
 
   describe('when autoFocus is provided', () => {
     it('should render auto-focused input', () => {
-      render(<Input autoFocus data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveFocus();
+      render(<Input autoFocus data-testid={INPUT_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveFocus();
     });
   });
 
   describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      render(<Input className="custom-input" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveClass('custom-input');
-    });
-
-    it('should merge with default classes', () => {
-      render(<Input className="custom-class" data-testid="input" />);
-      const input = screen.getByTestId('input');
-      expect(input).toHaveClass('custom-class');
-      expect(input).toHaveClass('rounded-md');
+    it('should apply custom className and merge with defaults', () => {
+      render(<Input className="custom-input" data-testid={INPUT_DOMAIN.TEST_ID} />);
+      const input = screen.getByTestId(INPUT_DOMAIN.TEST_ID);
+      expect(input).toHaveClass('custom-input');
+      expect(input).toHaveClass(INPUT_DOMAIN.CLASSES.roundedMd);
     });
   });
 
   describe('when aria attributes are provided', () => {
-    it('should have aria-label', () => {
-      render(<Input aria-label="Search input" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('aria-label', 'Search input');
+    it.each([
+      { attr: 'aria-label', value: INPUT_DOMAIN.ARIA.LABEL },
+      { attr: 'aria-describedby', value: INPUT_DOMAIN.ARIA.DESCRIPTION },
+    ])('should have $attr attribute', ({ attr, value }) => {
+      render(<Input {...{ [attr]: value }} data-testid={INPUT_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveAttribute(attr, value);
     });
 
-    it('should have aria-invalid when invalid', () => {
-      render(<Input aria-invalid="true" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('aria-invalid', 'true');
-    });
-
-    it('should have aria-describedby for accessibility', () => {
-      render(<Input aria-describedby="description" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveAttribute('aria-describedby', 'description');
-    });
-  });
-
-  describe('when aria-invalid is true', () => {
-    it('should have destructive border class', () => {
-      render(<Input aria-invalid="true" data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveClass('aria-invalid:border-destructive');
+    it('should have aria-invalid border class when invalid', () => {
+      render(<Input aria-invalid="true" data-testid={INPUT_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(INPUT_DOMAIN.TEST_ID)).toHaveClass(
+        INPUT_DOMAIN.CLASSES.ariaInvalidBorder
+      );
     });
   });
 
   describe('Input field dimensions', () => {
-    it('should have h-9 class for height', () => {
-      render(<Input data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveClass('h-9');
-    });
-
-    it('should have w-full class for width', () => {
-      render(<Input data-testid="input" />);
-      expect(screen.getByTestId('input')).toHaveClass('w-full');
+    it('should have h-9 and w-full classes', () => {
+      render(<Input data-testid={INPUT_DOMAIN.TEST_ID} />);
+      const input = screen.getByTestId(INPUT_DOMAIN.TEST_ID);
+      expect(input).toHaveClass(INPUT_DOMAIN.CLASSES.h9);
+      expect(input).toHaveClass(INPUT_DOMAIN.CLASSES.wFull);
     });
   });
 });

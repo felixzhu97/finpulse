@@ -1,300 +1,280 @@
 import type { UserPreference, UserPreferenceCreate } from "../../../domain/entities/userPreference";
 
+// ============================================================
+// Domain Test Values - 领域测试值
+// ============================================================
+const PREFERENCE_DOMAIN = {
+  THEMES: ["light", "dark", "auto"] as const,
+  LANGUAGES: ["en", "zh-CN", "zh-TW", "ja", "ko", "fr", "de", "es", "pt", "ru"] as const,
+  BOOLEAN_STATES: [true, false] as const,
+  IDS: {
+    PREFIX: "PREF",
+    CUSTOMER_PREFIX: "CUST",
+    TEST: "PREF001",
+    CUSTOMER: "CUST001",
+  } as const,
+  TIMESTAMPS: {
+    NOW: "2024-01-15T10:00:00Z",
+    LATER: "2024-01-16T10:00:00Z",
+    ISO_MILLIS: "2024-01-15T10:30:00.000Z",
+  } as const,
+} as const;
+
+const BOUNDARY_VALUES = {
+  THEME: [
+    { value: "light", desc: "light theme" },
+    { value: "dark", desc: "dark theme" },
+    { value: "auto", desc: "auto theme" },
+    { value: null, desc: "null theme" },
+  ],
+  LANGUAGE: [
+    { value: "en", desc: "English" },
+    { value: "zh-CN", desc: "Simplified Chinese" },
+    { value: "zh-TW", desc: "Traditional Chinese" },
+    { value: "ja", desc: "Japanese" },
+    { value: null, desc: "null language" },
+  ],
+  NOTIFICATIONS: [
+    { value: true, desc: "enabled" },
+    { value: false, desc: "disabled" },
+  ],
+} as const;
+
+// ============================================================
+// Factory Functions - 工厂函数
+// ============================================================
+const createUserPreference = (
+  overrides: Partial<UserPreference> = {}
+): UserPreference => ({
+  preference_id: PREFERENCE_DOMAIN.IDS.TEST,
+  customer_id: PREFERENCE_DOMAIN.IDS.CUSTOMER,
+  theme: "dark",
+  language: "en",
+  notifications_enabled: true,
+  updated_at: PREFERENCE_DOMAIN.TIMESTAMPS.NOW,
+  ...overrides,
+});
+
+const createUserPreferenceCreate = (
+  overrides: Partial<UserPreferenceCreate> = {}
+): UserPreferenceCreate => ({
+  customer_id: PREFERENCE_DOMAIN.IDS.CUSTOMER,
+  theme: "dark",
+  language: "en",
+  notifications_enabled: true,
+  ...overrides,
+});
+
+// ============================================================
+// Test Suites
+// ============================================================
 describe("UserPreference Entity", () => {
   describe("UserPreference interface", () => {
-    it("should accept valid user preference data", () => {
-      const preference: UserPreference = {
-        preference_id: "PREF001",
-        customer_id: "CUST001",
-        theme: "dark",
-        language: "en",
-        notifications_enabled: true,
-        updated_at: "2024-01-15T10:00:00Z",
-      };
+    describe("when providing valid data", () => {
+      it("should accept complete preference data", () => {
+        // Arrange
+        const preference = createUserPreference();
 
-      expect(preference.preference_id).toBe("PREF001");
-      expect(preference.customer_id).toBe("CUST001");
-      expect(preference.theme).toBe("dark");
-      expect(preference.language).toBe("en");
-      expect(preference.notifications_enabled).toBe(true);
-      expect(preference.updated_at).toBe("2024-01-15T10:00:00Z");
-    });
-
-    it("should accept null theme", () => {
-      const preference: UserPreference = {
-        preference_id: "PREF002",
-        customer_id: "CUST001",
-        theme: null,
-        language: "en",
-        notifications_enabled: true,
-        updated_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(preference.theme).toBeNull();
-    });
-
-    it("should accept null language", () => {
-      const preference: UserPreference = {
-        preference_id: "PREF003",
-        customer_id: "CUST001",
-        theme: "dark",
-        language: null,
-        notifications_enabled: true,
-        updated_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(preference.language).toBeNull();
-    });
-
-    it("should accept disabled notifications", () => {
-      const preference: UserPreference = {
-        preference_id: "PREF004",
-        customer_id: "CUST001",
-        theme: "light",
-        language: "en",
-        notifications_enabled: false,
-        updated_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(preference.notifications_enabled).toBe(false);
-    });
-
-    it("should accept various theme values", () => {
-      const themes = ["light", "dark", "auto"];
-
-      themes.forEach((theme) => {
-        const preference: UserPreference = {
-          preference_id: `PREF_${theme}`,
-          customer_id: "CUST001",
-          theme,
-          language: "en",
-          notifications_enabled: true,
-          updated_at: "2024-01-15T10:00:00Z",
-        };
-
-        expect(preference.theme).toBe(theme);
+        // Assert
+        expect(preference.preference_id).toBe(PREFERENCE_DOMAIN.IDS.TEST);
+        expect(preference.customer_id).toBe(PREFERENCE_DOMAIN.IDS.CUSTOMER);
+        expect(preference.theme).toBe("dark");
+        expect(preference.language).toBe("en");
+        expect(preference.notifications_enabled).toBe(true);
+        expect(preference.updated_at).toBe(PREFERENCE_DOMAIN.TIMESTAMPS.NOW);
       });
     });
 
-    it("should accept various language codes", () => {
-      const languages = ["en", "zh-CN", "zh-TW", "ja", "ko", "fr", "de", "es", "pt", "ru"];
-
-      languages.forEach((language) => {
-        const preference: UserPreference = {
-          preference_id: `PREF_${language}`,
-          customer_id: "CUST001",
-          theme: "dark",
-          language,
-          notifications_enabled: true,
-          updated_at: "2024-01-15T10:00:00Z",
-        };
-
-        expect(preference.language).toBe(language);
+    describe("when validating theme options", () => {
+      it.each(BOUNDARY_VALUES.THEME)("should accept $desc", ({ value }) => {
+        const preference = createUserPreference({ theme: value });
+        expect(preference.theme).toBe(value);
       });
     });
 
-    it("should handle ISO timestamp for updated_at", () => {
-      const preference: UserPreference = {
-        preference_id: "PREF005",
-        customer_id: "CUST001",
-        theme: "dark",
-        language: "en",
-        notifications_enabled: true,
-        updated_at: "2024-01-15T10:30:00.000Z",
-      };
-
-      expect(new Date(preference.updated_at).toISOString()).toBe("2024-01-15T10:30:00.000Z");
+    describe("when validating language options", () => {
+      it.each(BOUNDARY_VALUES.LANGUAGE)("should accept $desc", ({ value }) => {
+        const preference = createUserPreference({ language: value });
+        expect(preference.language).toBe(value);
+      });
     });
 
-    it("should support multiple preferences per customer", () => {
-      const customerId = "CUST001";
-      const preferences: UserPreference[] = [
+    describe("when validating notification states", () => {
+      it.each(BOUNDARY_VALUES.NOTIFICATIONS)(
+        "should accept notifications $desc",
+        ({ value }) => {
+          const preference = createUserPreference({
+            notifications_enabled: value,
+          });
+          expect(preference.notifications_enabled).toBe(value);
+        }
+      );
+    });
+
+    describe("when handling timestamps", () => {
+      it("should accept ISO timestamp format", () => {
+        const preference = createUserPreference({
+          updated_at: PREFERENCE_DOMAIN.TIMESTAMPS.ISO_MILLIS,
+        });
+        expect(new Date(preference.updated_at).toISOString()).toBe(
+          PREFERENCE_DOMAIN.TIMESTAMPS.ISO_MILLIS
+        );
+      });
+    });
+
+    describe("when modeling user scenarios", () => {
+      it.each([
         {
-          preference_id: "PREF001",
-          customer_id: customerId,
           theme: "dark",
           language: "en",
-          notifications_enabled: true,
-          updated_at: "2024-01-15T10:00:00Z",
+          notifications: false,
+          desc: "privacy-conscious user",
         },
         {
-          preference_id: "PREF002",
-          customer_id: customerId,
           theme: "light",
           language: "zh-CN",
-          notifications_enabled: false,
-          updated_at: "2024-01-16T10:00:00Z",
+          notifications: true,
+          desc: "international user",
         },
-      ];
+        {
+          theme: "auto",
+          language: "en",
+          notifications: true,
+          desc: "auto theme user",
+        },
+        {
+          theme: null,
+          language: null,
+          notifications: true,
+          desc: "user with no preferences",
+        },
+      ])("should model $desc", ({ theme, language, notifications }) => {
+        const preference = createUserPreference({
+          preference_id: `PREF_${theme ?? "null"}_${language ?? "null"}`,
+          theme,
+          language,
+          notifications_enabled: notifications,
+        });
 
-      expect(preferences).toHaveLength(2);
-      expect(preferences.every((p) => p.customer_id === customerId)).toBe(true);
+        expect(preference.theme).toBe(theme);
+        expect(preference.language).toBe(language);
+        expect(preference.notifications_enabled).toBe(notifications);
+      });
+    });
+
+    describe("when handling multiple preferences", () => {
+      it("should support multiple preferences per customer", () => {
+        const customerId = PREFERENCE_DOMAIN.IDS.CUSTOMER;
+        const preferences: UserPreference[] = [
+          createUserPreference({
+            preference_id: "PREF001",
+            customer_id: customerId,
+            theme: "dark",
+            language: "en",
+          }),
+          createUserPreference({
+            preference_id: "PREF002",
+            customer_id: customerId,
+            theme: "light",
+            language: "zh-CN",
+            notifications_enabled: false,
+          }),
+        ];
+
+        expect(preferences).toHaveLength(2);
+        expect(preferences.every((p) => p.customer_id === customerId)).toBe(
+          true
+        );
+      });
     });
   });
 
   describe("UserPreferenceCreate interface", () => {
-    it("should accept valid preference creation data", () => {
-      const create: UserPreferenceCreate = {
-        customer_id: "CUST001",
-        theme: "dark",
-        language: "en",
-        notifications_enabled: true,
-      };
+    describe("when providing valid data", () => {
+      it("should accept complete preference creation data", () => {
+        // Arrange
+        const create = createUserPreferenceCreate();
 
-      expect(create.customer_id).toBe("CUST001");
-      expect(create.theme).toBe("dark");
-      expect(create.language).toBe("en");
-      expect(create.notifications_enabled).toBe(true);
+        // Assert
+        expect(create.customer_id).toBe(PREFERENCE_DOMAIN.IDS.CUSTOMER);
+        expect(create.theme).toBe("dark");
+        expect(create.language).toBe("en");
+        expect(create.notifications_enabled).toBe(true);
+      });
     });
 
-    it("should require customer_id", () => {
-      const create: UserPreferenceCreate = {
-        customer_id: "CUST001",
-      };
-
-      expect(create.customer_id).toBeDefined();
+    describe("when validating required fields", () => {
+      it("should require customer_id", () => {
+        const create = createUserPreferenceCreate({
+          customer_id: PREFERENCE_DOMAIN.IDS.CUSTOMER,
+        });
+        expect(create.customer_id).toBeDefined();
+      });
     });
 
-    it("should allow optional theme", () => {
-      const create: UserPreferenceCreate = {
-        customer_id: "CUST001",
-        language: "en",
-        notifications_enabled: true,
-      };
+    describe("when handling optional fields", () => {
+      it.each([
+        { field: "theme", value: "light", desc: "with theme" },
+        { field: "theme", value: null, desc: "with null theme" },
+        { field: "theme", value: undefined, desc: "without theme" },
+        { field: "language", value: "ja", desc: "with language" },
+        { field: "language", value: null, desc: "with null language" },
+        { field: "language", value: undefined, desc: "without language" },
+        { field: "notifications_enabled", value: false, desc: "with disabled notifications" },
+        { field: "notifications_enabled", value: undefined, desc: "without notifications" },
+      ])("should accept $desc", ({ field, value }) => {
+        const create = createUserPreferenceCreate({
+          [field]: value,
+        } as Partial<UserPreferenceCreate>);
 
-      expect(create.theme).toBeUndefined();
+        if (value === undefined) {
+          expect(create[field]).toBeUndefined();
+        } else {
+          expect(create[field]).toBe(value);
+        }
+      });
     });
 
-    it("should allow null theme", () => {
-      const create: UserPreferenceCreate = {
-        customer_id: "CUST001",
-        theme: null,
-        language: "en",
-        notifications_enabled: true,
-      };
+    describe("when validating minimal creation", () => {
+      it("should accept minimal data with only customer_id", () => {
+        const create = createUserPreferenceCreate({
+          customer_id: PREFERENCE_DOMAIN.IDS.CUSTOMER,
+          theme: undefined,
+          language: undefined,
+          notifications_enabled: undefined,
+        });
 
-      expect(create.theme).toBeNull();
+        expect(create.customer_id).toBe(PREFERENCE_DOMAIN.IDS.CUSTOMER);
+        expect(create.theme).toBeUndefined();
+        expect(create.language).toBeUndefined();
+        expect(create.notifications_enabled).toBeUndefined();
+      });
     });
 
-    it("should allow optional language", () => {
-      const create: UserPreferenceCreate = {
-        customer_id: "CUST001",
-        theme: "dark",
-        notifications_enabled: true,
-      };
+    describe("when converting to UserPreference", () => {
+      it("should properly map create to preference fields", () => {
+        // Arrange
+        const create = createUserPreferenceCreate({
+          theme: "dark",
+          language: "ja",
+          notifications_enabled: false,
+        });
 
-      expect(create.language).toBeUndefined();
-    });
+        // Act
+        const preference: UserPreference = {
+          preference_id: "PREF_NEW",
+          customer_id: create.customer_id,
+          theme: create.theme ?? null,
+          language: create.language ?? null,
+          notifications_enabled: create.notifications_enabled ?? true,
+          updated_at: new Date().toISOString(),
+        };
 
-    it("should allow null language", () => {
-      const create: UserPreferenceCreate = {
-        customer_id: "CUST001",
-        theme: "dark",
-        language: null,
-        notifications_enabled: true,
-      };
-
-      expect(create.language).toBeNull();
-    });
-
-    it("should allow optional notifications_enabled", () => {
-      const create: UserPreferenceCreate = {
-        customer_id: "CUST001",
-        theme: "dark",
-        language: "en",
-      };
-
-      expect(create.notifications_enabled).toBeUndefined();
-    });
-
-    it("should accept minimal creation data", () => {
-      const create: UserPreferenceCreate = {
-        customer_id: "CUST001",
-      };
-
-      expect(create.customer_id).toBeDefined();
-      expect(create.theme).toBeUndefined();
-      expect(create.language).toBeUndefined();
-      expect(create.notifications_enabled).toBeUndefined();
-    });
-  });
-
-  describe("User preference scenarios", () => {
-    it("should model a privacy-conscious user", () => {
-      const preference: UserPreference = {
-        preference_id: "PREF_PRIVACY",
-        customer_id: "CUST_PRIVACY",
-        theme: "dark",
-        language: "en",
-        notifications_enabled: false,
-        updated_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(preference.notifications_enabled).toBe(false);
-    });
-
-    it("should model an international user", () => {
-      const preference: UserPreference = {
-        preference_id: "PREF_INTL",
-        customer_id: "CUST_INTL",
-        theme: "light",
-        language: "zh-CN",
-        notifications_enabled: true,
-        updated_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(preference.language).toBe("zh-CN");
-      expect(preference.theme).toBe("light");
-    });
-
-    it("should model a user who prefers auto theme", () => {
-      const preference: UserPreference = {
-        preference_id: "PREF_AUTO",
-        customer_id: "CUST_AUTO",
-        theme: "auto",
-        language: "en",
-        notifications_enabled: true,
-        updated_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(preference.theme).toBe("auto");
-    });
-
-    it("should model a user with no preferences set", () => {
-      const preference: UserPreference = {
-        preference_id: "PREF_NONE",
-        customer_id: "CUST_NEW",
-        theme: null,
-        language: null,
-        notifications_enabled: true,
-        updated_at: "2024-01-15T10:00:00Z",
-      };
-
-      expect(preference.theme).toBeNull();
-      expect(preference.language).toBeNull();
-    });
-
-    it("should convert create to preference", () => {
-      const create: UserPreferenceCreate = {
-        customer_id: "CUST001",
-        theme: "dark",
-        language: "ja",
-        notifications_enabled: false,
-      };
-
-      const preference: UserPreference = {
-        preference_id: "PREF_NEW",
-        customer_id: create.customer_id,
-        theme: create.theme ?? null,
-        language: create.language ?? null,
-        notifications_enabled: create.notifications_enabled ?? true,
-        updated_at: new Date().toISOString(),
-      };
-
-      expect(preference.customer_id).toBe("CUST001");
-      expect(preference.theme).toBe("dark");
-      expect(preference.language).toBe("ja");
-      expect(preference.notifications_enabled).toBe(false);
+        // Assert
+        expect(preference.theme).toBe("dark");
+        expect(preference.language).toBe("ja");
+        expect(preference.notifications_enabled).toBe(false);
+      });
     });
   });
 });

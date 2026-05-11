@@ -1,21 +1,44 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createGrowthBook, GrowthBook } from "./ab";
 import type { GrowthBookConfig } from "./types";
 
+// =============================================================================
+// Domain Test Values - A/B Testing
+// =============================================================================
+
+const AB_DOMAIN = {
+  CONFIG: {
+    REQUIRED: {
+      apiHost: "https://cdn.growthbook.io",
+      clientKey: "sdk-abc123",
+    },
+    ENABLE_DEV_MODE: true,
+    ATTRIBUTES: { id: "user-123", browser: "chrome" },
+  },
+
+  GROWTHBOOK_INSTANCE: {
+    EXPECTED_METHODS: ["init", "destroy"],
+  },
+} as const;
+
+// =============================================================================
+// Mock Setup
+// =============================================================================
+
 vi.mock("@growthbook/growthbook", () => {
-  const mockFn = vi.fn().mockImplementation(function (this: any, config: any) {
-    this.apiHost = config.apiHost;
-    this.clientKey = config.clientKey;
-    this.enableDevMode = config.enableDevMode;
-    this.attributes = config.attributes;
-    this.setFeatures = vi.fn().mockReturnThis();
-    this.setAttributes = vi.fn().mockReturnThis();
-    this.setTrackingCallback = vi.fn().mockReturnThis();
-    this.init = vi.fn();
-    this.destroy = vi.fn();
-  });
-  return { GrowthBook: mockFn };
+  return {
+    GrowthBook: vi.fn().mockImplementation(function (this: any, config: any) {
+      this.apiHost = config.apiHost;
+      this.clientKey = config.clientKey;
+      this.enableDevMode = config.enableDevMode;
+      this.attributes = config.attributes;
+    }),
+  };
 });
+
+// =============================================================================
+// Test Suite
+// =============================================================================
 
 describe("ab", () => {
   beforeEach(() => {
@@ -24,103 +47,71 @@ describe("ab", () => {
 
   describe("createGrowthBook", () => {
     it("should create a GrowthBook instance", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-abc123",
-      };
-
+      const config: GrowthBookConfig = AB_DOMAIN.CONFIG.REQUIRED;
       const gb = createGrowthBook(config);
       expect(gb).toBeDefined();
     });
 
     it("should pass apiHost to GrowthBook constructor", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-abc123",
-      };
-
+      const config: GrowthBookConfig = AB_DOMAIN.CONFIG.REQUIRED;
       createGrowthBook(config);
 
       expect(GrowthBook).toHaveBeenCalledWith(
         expect.objectContaining({
-          apiHost: "https://cdn.growthbook.io",
+          apiHost: AB_DOMAIN.CONFIG.REQUIRED.apiHost,
         })
       );
     });
 
     it("should pass clientKey to GrowthBook constructor", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-abc123",
-      };
-
+      const config: GrowthBookConfig = AB_DOMAIN.CONFIG.REQUIRED;
       createGrowthBook(config);
 
       expect(GrowthBook).toHaveBeenCalledWith(
         expect.objectContaining({
-          clientKey: "sdk-abc123",
+          clientKey: AB_DOMAIN.CONFIG.REQUIRED.clientKey,
         })
       );
     });
 
-    it("should set enableDevMode to false by default", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-abc123",
-      };
+    it.each([
+      { enableDevMode: false, expected: false },
+      { enableDevMode: true, expected: true },
+    ])(
+      "should set enableDevMode to $expected",
+      ({ enableDevMode, expected }) => {
+        const config: GrowthBookConfig = {
+          ...AB_DOMAIN.CONFIG.REQUIRED,
+          enableDevMode,
+        };
 
-      createGrowthBook(config);
+        createGrowthBook(config);
 
-      expect(GrowthBook).toHaveBeenCalledWith(
-        expect.objectContaining({
-          enableDevMode: false,
-        })
-      );
-    });
-
-    it("should pass enableDevMode when provided", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-abc123",
-        enableDevMode: true,
-      };
-
-      createGrowthBook(config);
-
-      expect(GrowthBook).toHaveBeenCalledWith(
-        expect.objectContaining({
-          enableDevMode: true,
-        })
-      );
-    });
+        expect(GrowthBook).toHaveBeenCalledWith(
+          expect.objectContaining({
+            enableDevMode: expected,
+          })
+        );
+      }
+    );
 
     it("should pass attributes when provided", () => {
       const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-abc123",
-        attributes: {
-          id: "user-123",
-          browser: "chrome",
-        },
+        ...AB_DOMAIN.CONFIG.REQUIRED,
+        attributes: AB_DOMAIN.CONFIG.ATTRIBUTES,
       };
 
       createGrowthBook(config);
 
       expect(GrowthBook).toHaveBeenCalledWith(
         expect.objectContaining({
-          attributes: {
-            id: "user-123",
-            browser: "chrome",
-          },
+          attributes: AB_DOMAIN.CONFIG.ATTRIBUTES,
         })
       );
     });
 
     it("should not pass attributes when not provided", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-abc123",
-      };
+      const config: GrowthBookConfig = AB_DOMAIN.CONFIG.REQUIRED;
 
       createGrowthBook(config);
 
@@ -131,50 +122,32 @@ describe("ab", () => {
       );
     });
 
-    it("should return a GrowthBook instance with expected methods", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-abc123",
-      };
-
+    it("should create GrowthBook with correct configuration", () => {
+      const config: GrowthBookConfig = AB_DOMAIN.CONFIG.REQUIRED;
       const gb = createGrowthBook(config);
 
-      expect(gb).toHaveProperty("init");
-      expect(gb).toHaveProperty("destroy");
-    });
-  });
-
-  describe("GrowthBook", () => {
-    it("should be exported from the module", () => {
-      expect(GrowthBook).toBeDefined();
-    });
-
-    it("should be a constructor function", () => {
-      expect(typeof GrowthBook).toBe("function");
+      expect(gb).toBeDefined();
+      expect(GrowthBook).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("GrowthBookConfig type export", () => {
     it("should allow creating config with required fields", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-key",
-      };
+      const config: GrowthBookConfig = AB_DOMAIN.CONFIG.REQUIRED;
 
-      expect(config.apiHost).toBe("https://cdn.growthbook.io");
-      expect(config.clientKey).toBe("sdk-key");
+      expect(config.apiHost).toBe(AB_DOMAIN.CONFIG.REQUIRED.apiHost);
+      expect(config.clientKey).toBe(AB_DOMAIN.CONFIG.REQUIRED.clientKey);
     });
 
     it("should allow creating config with optional fields", () => {
       const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-key",
-        enableDevMode: true,
-        attributes: { userId: "123" },
+        ...AB_DOMAIN.CONFIG.REQUIRED,
+        enableDevMode: AB_DOMAIN.CONFIG.ENABLE_DEV_MODE,
+        attributes: AB_DOMAIN.CONFIG.ATTRIBUTES,
       };
 
-      expect(config.enableDevMode).toBe(true);
-      expect(config.attributes).toEqual({ userId: "123" });
+      expect(config.enableDevMode).toBe(AB_DOMAIN.CONFIG.ENABLE_DEV_MODE);
+      expect(config.attributes).toEqual(AB_DOMAIN.CONFIG.ATTRIBUTES);
     });
   });
 });

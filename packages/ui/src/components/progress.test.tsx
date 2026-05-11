@@ -3,119 +3,147 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Progress } from './progress';
 
+// =============================================================================
+// Domain Test Values - Progress Component
+// =============================================================================
+
+const PROGRESS_DOMAIN = {
+  TEST_ID: 'progress',
+
+  INDICATOR_SLOT: 'progress-indicator',
+
+  VALUE: {
+    ZERO: 0,
+    MIN: 1,
+    MID: 50,
+    HIGH: 75,
+    MAX: 100,
+  },
+
+  INDICATOR_STYLE: {
+    EXPECTED_PATTERNS: {
+      ZERO: '100%',
+      MID: '50%',
+      HIGH: '25%',
+      MAX: '0%',
+    },
+  },
+
+  CLASSES: {
+    roundedFull: 'rounded-full',
+    h2: 'h-2',
+    indicator: {
+      bgPrimary: 'bg-primary',
+      hFull: 'h-full',
+      flex1: 'flex-1',
+      transitionAll: 'transition-all',
+    },
+  },
+
+  UNDEFINED_CASES: {
+    UNDEFINED: undefined,
+    NULL: null as unknown as undefined,
+  },
+} as const;
+
+// =============================================================================
+// Test Suite
+// =============================================================================
+
 describe('Progress', () => {
   describe('when rendered with default props', () => {
     it('should render without crashing', () => {
-      render(<Progress data-testid="progress" />);
-      expect(screen.getByTestId('progress')).toBeInTheDocument();
+      render(<Progress data-testid={PROGRESS_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(PROGRESS_DOMAIN.TEST_ID)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<Progress data-testid="progress" />);
-      expect(screen.getByTestId('progress')).toHaveAttribute('data-slot', 'progress');
+      render(<Progress data-testid={PROGRESS_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(PROGRESS_DOMAIN.TEST_ID)).toHaveAttribute(
+        'data-slot',
+        PROGRESS_DOMAIN.TEST_ID
+      );
     });
 
     it('should have default progress indicator', () => {
-      const { container } = render(<Progress data-testid="progress" />);
-      const indicator = container.querySelector('[data-slot="progress-indicator"]');
+      const { container } = render(<Progress data-testid={PROGRESS_DOMAIN.TEST_ID} />);
+      const indicator = container.querySelector(
+        `[data-slot="${PROGRESS_DOMAIN.INDICATOR_SLOT}"]`
+      );
       expect(indicator).toBeInTheDocument();
     });
 
-    it('should have rounded-full class', () => {
-      render(<Progress data-testid="progress" />);
-      expect(screen.getByTestId('progress')).toHaveClass('rounded-full');
-    });
-
-    it('should have h-2 class for height', () => {
-      render(<Progress data-testid="progress" />);
-      expect(screen.getByTestId('progress')).toHaveClass('h-2');
+    it('should have rounded-full and h-2 classes', () => {
+      render(<Progress data-testid={PROGRESS_DOMAIN.TEST_ID} />);
+      const progress = screen.getByTestId(PROGRESS_DOMAIN.TEST_ID);
+      expect(progress).toHaveClass(PROGRESS_DOMAIN.CLASSES.roundedFull);
+      expect(progress).toHaveClass(PROGRESS_DOMAIN.CLASSES.h2);
     });
   });
 
   describe('when value prop is provided', () => {
-    it('should render with value of 0', () => {
-      render(<Progress value={0} data-testid="progress" />);
-      const indicator = screen.getByTestId('progress').querySelector('[data-slot="progress-indicator"]');
-      expect(indicator).toHaveAttribute('style', expect.stringContaining('100%'));
-    });
-
-    it('should render with value of 50', () => {
-      render(<Progress value={50} data-testid="progress" />);
-      const indicator = screen.getByTestId('progress').querySelector('[data-slot="progress-indicator"]');
-      expect(indicator).toHaveAttribute('style', expect.stringContaining('50%'));
-    });
-
-    it('should render with value of 100', () => {
-      render(<Progress value={100} data-testid="progress" />);
-      const indicator = screen.getByTestId('progress').querySelector('[data-slot="progress-indicator"]');
-      expect(indicator).toHaveAttribute('style', expect.stringContaining('0%'));
-    });
-
-    it('should render with value of 75', () => {
-      render(<Progress value={75} data-testid="progress" />);
-      const indicator = screen.getByTestId('progress').querySelector('[data-slot="progress-indicator"]');
-      expect(indicator).toHaveAttribute('style', expect.stringContaining('25%'));
-    });
+    it.each([
+      { value: PROGRESS_DOMAIN.VALUE.ZERO, expectedPattern: PROGRESS_DOMAIN.INDICATOR_STYLE.EXPECTED_PATTERNS.ZERO },
+      { value: PROGRESS_DOMAIN.VALUE.MID, expectedPattern: PROGRESS_DOMAIN.INDICATOR_STYLE.EXPECTED_PATTERNS.MID },
+      { value: PROGRESS_DOMAIN.VALUE.HIGH, expectedPattern: PROGRESS_DOMAIN.INDICATOR_STYLE.EXPECTED_PATTERNS.HIGH },
+      { value: PROGRESS_DOMAIN.VALUE.MAX, expectedPattern: PROGRESS_DOMAIN.INDICATOR_STYLE.EXPECTED_PATTERNS.MAX },
+    ])(
+      'should render with value $value and indicator at $expectedPattern',
+      ({ value, expectedPattern }) => {
+        render(<Progress value={value} data-testid={PROGRESS_DOMAIN.TEST_ID} />);
+        const indicator = screen
+          .getByTestId(PROGRESS_DOMAIN.TEST_ID)
+          .querySelector(`[data-slot="${PROGRESS_DOMAIN.INDICATOR_SLOT}"]`);
+        expect(indicator).toHaveAttribute('style', expect.stringContaining(expectedPattern));
+      }
+    );
   });
 
   describe('when value is undefined', () => {
-    it('should render indicator at 100% when value is undefined', () => {
-      render(<Progress value={undefined} data-testid="progress" />);
-      const indicator = screen.getByTestId('progress').querySelector('[data-slot="progress-indicator"]');
-      expect(indicator).toHaveAttribute('style', expect.stringContaining('100%'));
-    });
-
-    it('should render indicator at 100% when value is null', () => {
-      render(<Progress value={null as unknown as undefined} data-testid="progress" />);
-      const indicator = screen.getByTestId('progress').querySelector('[data-slot="progress-indicator"]');
-      expect(indicator).toHaveAttribute('style', expect.stringContaining('100%'));
-    });
+    it.each([
+      { value: PROGRESS_DOMAIN.UNDEFINED_CASES.UNDEFINED },
+      { value: PROGRESS_DOMAIN.UNDEFINED_CASES.NULL },
+    ])(
+      'should render indicator at 100% when value is $value',
+      ({ value }) => {
+        render(<Progress value={value} data-testid={PROGRESS_DOMAIN.TEST_ID} />);
+        const indicator = screen
+          .getByTestId(PROGRESS_DOMAIN.TEST_ID)
+          .querySelector(`[data-slot="${PROGRESS_DOMAIN.INDICATOR_SLOT}"]`);
+        expect(indicator).toHaveAttribute(
+          'style',
+          expect.stringContaining(PROGRESS_DOMAIN.INDICATOR_STYLE.EXPECTED_PATTERNS.ZERO)
+        );
+      }
+    );
   });
 
   describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      render(<Progress className="custom-progress" data-testid="progress" />);
-      expect(screen.getByTestId('progress')).toHaveClass('custom-progress');
-    });
-
-    it('should merge with default classes', () => {
-      render(<Progress className="custom-class" data-testid="progress" />);
-      const progress = screen.getByTestId('progress');
-      expect(progress).toHaveClass('custom-class');
-      expect(progress).toHaveClass('rounded-full');
+    it('should apply custom className and merge with defaults', () => {
+      render(<Progress className="custom-progress" data-testid={PROGRESS_DOMAIN.TEST_ID} />);
+      const progress = screen.getByTestId(PROGRESS_DOMAIN.TEST_ID);
+      expect(progress).toHaveClass('custom-progress');
+      expect(progress).toHaveClass(PROGRESS_DOMAIN.CLASSES.roundedFull);
     });
   });
 
   describe('when additional props are passed', () => {
     it('should pass through id attribute', () => {
-      render(<Progress id="progress-1" data-testid="progress" />);
-      expect(screen.getByTestId('progress')).toHaveAttribute('id', 'progress-1');
+      render(<Progress id="progress-1" data-testid={PROGRESS_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(PROGRESS_DOMAIN.TEST_ID)).toHaveAttribute('id', 'progress-1');
     });
   });
 
   describe('indicator behavior', () => {
-    it('indicator should have bg-primary class', () => {
-      const { container } = render(<Progress data-testid="progress" />);
-      const indicator = container.querySelector('[data-slot="progress-indicator"]');
-      expect(indicator).toHaveClass('bg-primary');
-    });
-
-    it('indicator should have h-full class', () => {
-      const { container } = render(<Progress data-testid="progress" />);
-      const indicator = container.querySelector('[data-slot="progress-indicator"]');
-      expect(indicator).toHaveClass('h-full');
-    });
-
-    it('indicator should have flex-1 class', () => {
-      const { container } = render(<Progress data-testid="progress" />);
-      const indicator = container.querySelector('[data-slot="progress-indicator"]');
-      expect(indicator).toHaveClass('flex-1');
-    });
-
-    it('indicator should have transition-all class', () => {
-      const { container } = render(<Progress data-testid="progress" />);
-      const indicator = container.querySelector('[data-slot="progress-indicator"]');
-      expect(indicator).toHaveClass('transition-all');
+    it('indicator should have bg-primary, h-full, flex-1, and transition-all classes', () => {
+      const { container } = render(<Progress data-testid={PROGRESS_DOMAIN.TEST_ID} />);
+      const indicator = container.querySelector(
+        `[data-slot="${PROGRESS_DOMAIN.INDICATOR_SLOT}"]`
+      );
+      expect(indicator).toHaveClass(PROGRESS_DOMAIN.CLASSES.indicator.bgPrimary);
+      expect(indicator).toHaveClass(PROGRESS_DOMAIN.CLASSES.indicator.hFull);
+      expect(indicator).toHaveClass(PROGRESS_DOMAIN.CLASSES.indicator.flex1);
+      expect(indicator).toHaveClass(PROGRESS_DOMAIN.CLASSES.indicator.transitionAll);
     });
   });
 });

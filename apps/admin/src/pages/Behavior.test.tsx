@@ -1,159 +1,224 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+/**
+ * Behavior Page Tests
+ * Following TDD best practices with proper fetch mocking and domain test values
+ */
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { Behavior, getUserSummary } from './Behavior';
+import { BEHAVIOR_DOMAIN } from '@/__fixtures__/domain';
+
+const mockFetch = vi.fn();
 
 describe('Behavior', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (global.fetch as ReturnType<typeof vi.fn>).mockReset();
+    global.fetch = mockFetch;
   });
 
-  it('should render the Behavior Events title', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
-    });
-    render(<Behavior />);
-    await waitFor(() => {
-      expect(screen.getByText('Behavior Events')).toBeInTheDocument();
-    });
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
-  it('should render the Refresh button', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
+  describe('successful data loading', () => {
+    it('should render the Behavior Events title', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByText('Behavior Events')).toBeInTheDocument();
+      });
     });
-    render(<Behavior />);
-    await waitFor(() => {
-      expect(screen.getByText('Refresh')).toBeInTheDocument();
-    });
-  });
 
-  it('should render the description', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
+    it('should render the Refresh button', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /refresh/i })).toBeInTheDocument();
+      });
     });
-    render(<Behavior />);
-    await waitFor(() => {
-      expect(screen.getByText(/Recent events from portal/)).toBeInTheDocument();
-    });
-  });
 
-  it('should show loading state initially', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
-      () => new Promise(() => {})
-    );
-    render(<Behavior />);
-    await waitFor(() => {
-      expect(screen.getByText('Loading…')).toBeInTheDocument();
+    it('should render the description', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByText(/recent events from portal/i)).toBeInTheDocument();
+      });
     });
-  });
 
-  it('should display error message on fetch failure', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: false,
-      statusText: 'Network Error',
-    });
-    render(<Behavior />);
-    await waitFor(() => {
-      expect(screen.getByText('Network Error')).toBeInTheDocument();
+    it('should render AG Grid when data is loaded', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        const agGrid = document.querySelector('.ag-theme-quartz-dark');
+        expect(agGrid).toBeInTheDocument();
+      });
     });
   });
 
-  it('should render the Card component', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
+  describe('loading states', () => {
+    it('should show loading state initially', async () => {
+      mockFetch.mockImplementation(() => new Promise(() => {}));
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByText('Loading…')).toBeInTheDocument();
+      });
     });
-    render(<Behavior />);
-    await waitFor(() => {
-      const card = screen.getByText('Behavior Events').closest('.glass');
-      expect(card).toBeInTheDocument();
+
+    it('should show loading indicator while fetching', async () => {
+      mockFetch.mockImplementation(() => new Promise(() => {}));
+      render(<Behavior />);
+      
+      await waitFor(() => {
+        const loadingText = screen.getByText('Loading…');
+        expect(loadingText).toBeInTheDocument();
+      });
     });
   });
 
-  it('should render AG Grid when data is loaded', async () => {
-    const mockData = [
-      { id: '1', name: 'page_view', properties: { source: 'portal' }, timestamp: 1704067200000 },
-    ];
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ data: mockData }),
+  describe('error handling', () => {
+    it('should display error message on fetch failure', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        statusText: 'Network Error',
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByText('Network Error')).toBeInTheDocument();
+      });
     });
-    render(<Behavior />);
-    await waitFor(() => {
-      const agGrid = document.querySelector('.ag-theme-quartz-dark');
-      expect(agGrid).toBeInTheDocument();
+
+    it('should display error message for server errors', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        statusText: 'Internal Server Error',
+        status: 500,
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByText('Internal Server Error')).toBeInTheDocument();
+      });
+    });
+
+    it('should display error message for 404 Not Found', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        statusText: 'Not Found',
+        status: 404,
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByText('Not Found')).toBeInTheDocument();
+      });
     });
   });
 
-  it('should disable Refresh button while loading', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
-      () => new Promise(() => {})
-    );
-    render(<Behavior />);
-    await waitFor(() => {
-      const button = screen.getByText('Loading…');
-      expect(button).toBeInTheDocument();
+  describe('data handling', () => {
+    it('should show empty state when no data', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /refresh/i })).toBeInTheDocument();
+      });
+    });
+
+    it('should handle null data in response', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: null }),
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /refresh/i })).toBeInTheDocument();
+      });
+    });
+
+    it('should handle undefined data in response', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({}),
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /refresh/i })).toBeInTheDocument();
+      });
+    });
+
+    it('should display behavior event data when available', async () => {
+      const mockData = [
+        BEHAVIOR_DOMAIN.VALID.pageView,
+        BEHAVIOR_DOMAIN.VALID.trade,
+      ];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: mockData }),
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        const agGrid = document.querySelector('.ag-theme-quartz-dark');
+        expect(agGrid).toBeInTheDocument();
+      });
     });
   });
 
-  it('should show empty state when no data', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
-    });
-    render(<Behavior />);
-    await waitFor(() => {
-      expect(screen.getByText('Refresh')).toBeInTheDocument();
-      expect(document.querySelector('.ag-theme-quartz-dark')).toBeInTheDocument();
+  describe('refresh functionality', () => {
+    it('should have a working refresh button', async () => {
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ data: [] }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ data: [] }),
+        });
+
+      render(<Behavior />);
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /refresh/i })).toBeInTheDocument();
+      });
+
+      const refreshButton = screen.getByRole('button', { name: /refresh/i });
+      fireEvent.click(refreshButton);
     });
   });
 
-  it('should handle empty data array response', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
+  describe('component structure', () => {
+    it('should render Card component', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        const card = screen.getByText('Behavior Events').closest('.glass');
+        expect(card).toBeInTheDocument();
+      });
     });
-    render(<Behavior />);
-    await waitFor(() => {
-      expect(screen.getByText('Refresh')).toBeInTheDocument();
-    });
-  });
 
-  it('should handle null data in response', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ data: null }),
-    });
-    render(<Behavior />);
-    await waitFor(() => {
-      expect(screen.getByText('Refresh')).toBeInTheDocument();
-    });
-  });
-
-  it('should handle undefined data in response', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({}),
-    });
-    render(<Behavior />);
-    await waitFor(() => {
-      expect(screen.getByText('Refresh')).toBeInTheDocument();
-    });
-  });
-
-  it('should enable grid animation', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ data: [] }),
-    });
-    render(<Behavior />);
-    await waitFor(() => {
-      const agGrid = document.querySelector('.ag-theme-quartz-dark.ag-robinhood');
-      expect(agGrid).toBeInTheDocument();
+    it('should enable grid animation', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [] }),
+      });
+      render(<Behavior />);
+      await waitFor(() => {
+        const agGrid = document.querySelector('.ag-theme-quartz-dark.ag-robinhood');
+        expect(agGrid).toBeInTheDocument();
+      });
     });
   });
 });
@@ -187,5 +252,11 @@ describe('getUserSummary', () => {
   it('should prioritize email over userId', () => {
     const props = { email: 'test@example.com', userId: '12345' };
     expect(getUserSummary(props)).toBe('test@example.com');
+  });
+
+  it('should handle partial data with name only', () => {
+    // Empty string name returns email only, not the name
+    expect(getUserSummary({ name: '' })).toBe('—');
+    expect(getUserSummary({ email: 'alice@example.com' })).toBe('alice@example.com');
   });
 });

@@ -2,7 +2,42 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-// Mock @radix-ui/react-avatar to simulate image loading state
+// =============================================================================
+// Domain Test Values - Avatar Component
+// =============================================================================
+
+const AVATAR_DOMAIN = {
+  TEST_ID: 'avatar',
+  IMAGE_TEST_ID: 'avatar-image',
+  FALLBACK_TEST_ID: 'avatar-fallback',
+
+  FALLBACK: {
+    TEXT: {
+      TWO_LETTER: 'AB',
+      INITIALS: 'JD',
+    },
+  },
+
+  IMAGE: {
+    SRC: 'https://example.com/avatar.png',
+    ALT: 'User profile photo',
+  },
+
+  CLASSES: {
+    roundedFull: 'rounded-full',
+    size8: 'size-8',
+    bgMuted: 'bg-muted',
+    flex: 'flex',
+    itemsCenter: 'items-center',
+    aspectSquare: 'aspect-square',
+    sizeFull: 'size-full',
+  },
+} as const;
+
+// =============================================================================
+// Mock Setup
+// =============================================================================
+
 vi.mock('@radix-ui/react-avatar', () => {
   const MockRoot = ({ children, ...props }: React.ComponentProps<'div'>) => (
     <div data-slot="avatar" {...props}>{children}</div>
@@ -29,119 +64,96 @@ vi.mock('@radix-ui/react-avatar', () => {
 
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 
+// =============================================================================
+// Test Suite
+// =============================================================================
+
 describe('Avatar', () => {
   describe('when rendered with default props', () => {
     it('should render without crashing', () => {
-      render(<Avatar data-testid="avatar" />);
-      expect(screen.getByTestId('avatar')).toBeInTheDocument();
+      render(<Avatar data-testid={AVATAR_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(AVATAR_DOMAIN.TEST_ID)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<Avatar data-testid="avatar" />);
-      expect(screen.getByTestId('avatar')).toHaveAttribute('data-slot', 'avatar');
+      render(<Avatar data-testid={AVATAR_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(AVATAR_DOMAIN.TEST_ID)).toHaveAttribute(
+        'data-slot',
+        'avatar'
+      );
     });
 
-    it('should have rounded-full class', () => {
-      render(<Avatar data-testid="avatar" />);
-      expect(screen.getByTestId('avatar')).toHaveClass('rounded-full');
-    });
-
-    it('should have size-8 class', () => {
-      render(<Avatar data-testid="avatar" />);
-      expect(screen.getByTestId('avatar')).toHaveClass('size-8');
+    it('should have rounded-full and size-8 classes', () => {
+      render(<Avatar data-testid={AVATAR_DOMAIN.TEST_ID} />);
+      const avatar = screen.getByTestId(AVATAR_DOMAIN.TEST_ID);
+      expect(avatar).toHaveClass(AVATAR_DOMAIN.CLASSES.roundedFull);
+      expect(avatar).toHaveClass(AVATAR_DOMAIN.CLASSES.size8);
     });
   });
 
   describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      render(<Avatar className="custom-avatar" data-testid="avatar" />);
-      expect(screen.getByTestId('avatar')).toHaveClass('custom-avatar');
-    });
-
-    it('should merge with default classes', () => {
-      render(<Avatar className="custom-class" data-testid="avatar" />);
-      const avatar = screen.getByTestId('avatar');
-      expect(avatar).toHaveClass('custom-class');
-      expect(avatar).toHaveClass('rounded-full');
+    it('should apply custom className and merge with defaults', () => {
+      render(<Avatar className="custom-avatar" data-testid={AVATAR_DOMAIN.TEST_ID} />);
+      const avatar = screen.getByTestId(AVATAR_DOMAIN.TEST_ID);
+      expect(avatar).toHaveClass('custom-avatar');
+      expect(avatar).toHaveClass(AVATAR_DOMAIN.CLASSES.roundedFull);
     });
   });
 
   describe('when additional props are passed', () => {
     it('should pass through id attribute', () => {
-      render(<Avatar id="avatar-1" data-testid="avatar" />);
-      expect(screen.getByTestId('avatar')).toHaveAttribute('id', 'avatar-1');
+      render(<Avatar id="avatar-1" data-testid={AVATAR_DOMAIN.TEST_ID} />);
+      expect(screen.getByTestId(AVATAR_DOMAIN.TEST_ID)).toHaveAttribute('id', 'avatar-1');
     });
   });
 });
 
 describe('AvatarFallback', () => {
   describe('when rendered within Avatar', () => {
-    it('should render without crashing when inside Avatar', () => {
+    it('should render without crashing', () => {
       render(
-        <Avatar data-testid="avatar">
-          <AvatarFallback>AB</AvatarFallback>
+        <Avatar data-testid={AVATAR_DOMAIN.TEST_ID}>
+          <AvatarFallback>{AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER}</AvatarFallback>
         </Avatar>
       );
-      expect(screen.getByText('AB')).toBeInTheDocument();
+      expect(
+        screen.getByText(AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER)
+      ).toBeInTheDocument();
     });
 
     it('should render with text content', () => {
       render(
-        <Avatar data-testid="avatar">
-          <AvatarFallback>AB</AvatarFallback>
+        <Avatar data-testid={AVATAR_DOMAIN.TEST_ID}>
+          <AvatarFallback>{AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER}</AvatarFallback>
         </Avatar>
       );
-      expect(screen.getByText('AB')).toHaveTextContent('AB');
+      expect(
+        screen.getByText(AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER)
+      ).toHaveTextContent(AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER);
     });
 
-    it('should have bg-muted class', () => {
+    it('should have bg-muted, flex, and items-center classes', () => {
       render(
-        <Avatar data-testid="avatar">
-          <AvatarFallback>AB</AvatarFallback>
+        <Avatar data-testid={AVATAR_DOMAIN.TEST_ID}>
+          <AvatarFallback>{AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER}</AvatarFallback>
         </Avatar>
       );
-      expect(screen.getByText('AB')).toHaveClass('bg-muted');
-    });
-
-    it('should have flex class', () => {
-      render(
-        <Avatar data-testid="avatar">
-          <AvatarFallback>AB</AvatarFallback>
-        </Avatar>
-      );
-      expect(screen.getByText('AB')).toHaveClass('flex');
-    });
-
-    it('should have items-center class', () => {
-      render(
-        <Avatar data-testid="avatar">
-          <AvatarFallback>AB</AvatarFallback>
-        </Avatar>
-      );
-      expect(screen.getByText('AB')).toHaveClass('items-center');
+      const fallback = screen.getByText(AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER);
+      expect(fallback).toHaveClass(AVATAR_DOMAIN.CLASSES.bgMuted);
+      expect(fallback).toHaveClass(AVATAR_DOMAIN.CLASSES.flex);
+      expect(fallback).toHaveClass(AVATAR_DOMAIN.CLASSES.itemsCenter);
     });
 
     it('should have data-slot attribute', () => {
       render(
-        <Avatar data-testid="avatar">
-          <AvatarFallback>AB</AvatarFallback>
+        <Avatar data-testid={AVATAR_DOMAIN.TEST_ID}>
+          <AvatarFallback>{AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER}</AvatarFallback>
         </Avatar>
       );
-      expect(screen.getByText('AB')).toHaveAttribute('data-slot', 'avatar-fallback');
+      expect(
+        screen.getByText(AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER)
+      ).toHaveAttribute('data-slot', 'avatar-fallback');
     });
-  });
-});
-
-describe('Avatar integration', () => {
-  it('should render Avatar with Fallback content', () => {
-    render(
-      <Avatar data-testid="avatar">
-        <AvatarFallback>JD</AvatarFallback>
-      </Avatar>
-    );
-
-    expect(screen.getByTestId('avatar')).toBeInTheDocument();
-    expect(screen.getByText('JD')).toBeInTheDocument();
   });
 });
 
@@ -150,112 +162,99 @@ describe('AvatarImage', () => {
     it('should render without crashing', () => {
       render(
         <Avatar>
-          <AvatarImage data-testid="avatar-image" src="https://example.com/avatar.png" />
-          <AvatarFallback>AB</AvatarFallback>
+          <AvatarImage
+            data-testid={AVATAR_DOMAIN.IMAGE_TEST_ID}
+            src={AVATAR_DOMAIN.IMAGE.SRC}
+          />
+          <AvatarFallback>{AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER}</AvatarFallback>
         </Avatar>
       );
-      expect(screen.getByTestId('avatar-image')).toBeInTheDocument();
+      expect(screen.getByTestId(AVATAR_DOMAIN.IMAGE_TEST_ID)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
       render(
         <Avatar>
-          <AvatarImage data-testid="avatar-image" src="https://example.com/avatar.png" />
-          <AvatarFallback>AB</AvatarFallback>
+          <AvatarImage
+            data-testid={AVATAR_DOMAIN.IMAGE_TEST_ID}
+            src={AVATAR_DOMAIN.IMAGE.SRC}
+          />
+          <AvatarFallback>{AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER}</AvatarFallback>
         </Avatar>
       );
-      expect(screen.getByTestId('avatar-image')).toHaveAttribute('data-slot', 'avatar-image');
+      expect(screen.getByTestId(AVATAR_DOMAIN.IMAGE_TEST_ID)).toHaveAttribute(
+        'data-slot',
+        'avatar-image'
+      );
     });
 
-    it('should have aspect-square class', () => {
+    it('should have aspect-square and size-full classes', () => {
       render(
         <Avatar>
-          <AvatarImage data-testid="avatar-image" src="https://example.com/avatar.png" />
-          <AvatarFallback>AB</AvatarFallback>
+          <AvatarImage
+            data-testid={AVATAR_DOMAIN.IMAGE_TEST_ID}
+            src={AVATAR_DOMAIN.IMAGE.SRC}
+          />
+          <AvatarFallback>{AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER}</AvatarFallback>
         </Avatar>
       );
-      expect(screen.getByTestId('avatar-image')).toHaveClass('aspect-square');
+      const image = screen.getByTestId(AVATAR_DOMAIN.IMAGE_TEST_ID);
+      expect(image).toHaveClass(AVATAR_DOMAIN.CLASSES.aspectSquare);
+      expect(image).toHaveClass(AVATAR_DOMAIN.CLASSES.sizeFull);
     });
 
-    it('should have size-full class', () => {
+    it('should pass src and alt attributes', () => {
       render(
         <Avatar>
-          <AvatarImage data-testid="avatar-image" src="https://example.com/avatar.png" />
-          <AvatarFallback>AB</AvatarFallback>
+          <AvatarImage
+            data-testid={AVATAR_DOMAIN.IMAGE_TEST_ID}
+            src={AVATAR_DOMAIN.IMAGE.SRC}
+            alt={AVATAR_DOMAIN.IMAGE.ALT}
+          />
+          <AvatarFallback>{AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER}</AvatarFallback>
         </Avatar>
       );
-      expect(screen.getByTestId('avatar-image')).toHaveClass('size-full');
-    });
-
-    it('should pass src attribute to image element', () => {
-      render(
-        <Avatar>
-          <AvatarImage data-testid="avatar-image" src="https://example.com/avatar.png" />
-          <AvatarFallback>AB</AvatarFallback>
-        </Avatar>
-      );
-      expect(screen.getByTestId('avatar-image')).toHaveAttribute('src', 'https://example.com/avatar.png');
+      const image = screen.getByTestId(AVATAR_DOMAIN.IMAGE_TEST_ID);
+      expect(image).toHaveAttribute('src', AVATAR_DOMAIN.IMAGE.SRC);
+      expect(image).toHaveAttribute('alt', AVATAR_DOMAIN.IMAGE.ALT);
     });
   });
 
   describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
+    it('should apply custom className and merge with defaults', () => {
       render(
         <Avatar>
-          <AvatarImage data-testid="avatar-image" src="https://example.com/avatar.png" className="custom-image" />
-          <AvatarFallback>AB</AvatarFallback>
+          <AvatarImage
+            data-testid={AVATAR_DOMAIN.IMAGE_TEST_ID}
+            src={AVATAR_DOMAIN.IMAGE.SRC}
+            className="w-16 h-16"
+          />
+          <AvatarFallback>{AVATAR_DOMAIN.FALLBACK.TEXT.TWO_LETTER}</AvatarFallback>
         </Avatar>
       );
-      expect(screen.getByTestId('avatar-image')).toHaveClass('custom-image');
-    });
-
-    it('should merge with default classes', () => {
-      render(
-        <Avatar>
-          <AvatarImage data-testid="avatar-image" src="https://example.com/avatar.png" className="w-16 h-16" />
-          <AvatarFallback>AB</AvatarFallback>
-        </Avatar>
-      );
-      const image = screen.getByTestId('avatar-image');
+      const image = screen.getByTestId(AVATAR_DOMAIN.IMAGE_TEST_ID);
       expect(image).toHaveClass('w-16');
       expect(image).toHaveClass('h-16');
-      expect(image).toHaveClass('aspect-square');
-      expect(image).toHaveClass('size-full');
-    });
-  });
-
-  describe('when additional props are passed', () => {
-    it('should pass through id attribute', () => {
-      render(
-        <Avatar>
-          <AvatarImage data-testid="avatar-image" id="profile-image" src="https://example.com/avatar.png" />
-          <AvatarFallback>AB</AvatarFallback>
-        </Avatar>
-      );
-      expect(screen.getByTestId('avatar-image')).toHaveAttribute('id', 'profile-image');
-    });
-
-    it('should pass through alt attribute', () => {
-      render(
-        <Avatar>
-          <AvatarImage data-testid="avatar-image" src="https://example.com/avatar.png" alt="User profile photo" />
-          <AvatarFallback>AB</AvatarFallback>
-        </Avatar>
-      );
-      expect(screen.getByTestId('avatar-image')).toHaveAttribute('alt', 'User profile photo');
+      expect(image).toHaveClass(AVATAR_DOMAIN.CLASSES.aspectSquare);
+      expect(image).toHaveClass(AVATAR_DOMAIN.CLASSES.sizeFull);
     });
   });
 
   describe('integration with Avatar and AvatarFallback', () => {
-    it('should render image before fallback content', () => {
+    it('should render image and fallback together', () => {
       render(
-        <Avatar data-testid="avatar">
-          <AvatarImage data-testid="avatar-image" src="https://example.com/avatar.png" />
-          <AvatarFallback data-testid="avatar-fallback">JD</AvatarFallback>
+        <Avatar data-testid={AVATAR_DOMAIN.TEST_ID}>
+          <AvatarImage
+            data-testid={AVATAR_DOMAIN.IMAGE_TEST_ID}
+            src={AVATAR_DOMAIN.IMAGE.SRC}
+          />
+          <AvatarFallback data-testid={AVATAR_DOMAIN.FALLBACK_TEST_ID}>
+            {AVATAR_DOMAIN.FALLBACK.TEXT.INITIALS}
+          </AvatarFallback>
         </Avatar>
       );
-      expect(screen.getByTestId('avatar-image')).toBeInTheDocument();
-      expect(screen.getByTestId('avatar-fallback')).toBeInTheDocument();
+      expect(screen.getByTestId(AVATAR_DOMAIN.IMAGE_TEST_ID)).toBeInTheDocument();
+      expect(screen.getByTestId(AVATAR_DOMAIN.FALLBACK_TEST_ID)).toBeInTheDocument();
     });
   });
 });

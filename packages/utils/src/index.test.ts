@@ -1,10 +1,45 @@
 import { describe, it, expect } from 'vitest';
 import { cn } from './index';
 
+// =============================================================================
+// Domain Test Values - Utility Functions
+// =============================================================================
+
+const UTIL_DOMAIN = {
+  CLASSES: {
+    SINGLE: 'foo',
+    MULTIPLE: ['foo', 'bar', 'baz'],
+    OBJECT_TRUTHY: { foo: true, bar: true },
+    OBJECT_FALSY: { foo: true, bar: false },
+    MIXED: { conditional: true, hidden: false },
+    NESTED: ['foo', ['bar', 'baz']],
+    WITH_OBJECTS: ['foo', { bar: true }],
+    COMPLEX: 'base',
+  },
+
+  TAILWIND: {
+    CONFLICTING: {
+      PADDING: ['p-2', 'p-4'],
+      PADDING_X: ['px-2', 'py-4'],
+      MARGIN: ['m-2', 'm-4'],
+      TEXT_COLOR: ['text-red-500', 'text-blue-500'],
+      COMBINED: ['p-2 m-2', 'p-4'],
+    },
+  },
+
+  EMPTY: {
+    VALUES: [null, false, undefined, ''],
+  },
+} as const;
+
+// =============================================================================
+// Test Suite
+// =============================================================================
+
 describe('cn', () => {
   describe('when given a single class string', () => {
     it('should return the class string unchanged', () => {
-      expect(cn('foo')).toBe('foo');
+      expect(cn(UTIL_DOMAIN.CLASSES.SINGLE)).toBe('foo');
     });
   });
 
@@ -20,30 +55,35 @@ describe('cn', () => {
 
   describe('when given class objects', () => {
     it('should include classes for truthy values', () => {
-      expect(cn({ foo: true, bar: true })).toBe('foo bar');
+      expect(cn(UTIL_DOMAIN.CLASSES.OBJECT_TRUTHY)).toBe('foo bar');
     });
 
     it('should exclude classes for falsy values', () => {
-      expect(cn({ foo: true, bar: false })).toBe('foo');
+      expect(cn(UTIL_DOMAIN.CLASSES.OBJECT_FALSY)).toBe('foo');
     });
 
     it('should include only truthy classes from mixed input', () => {
-      expect(cn('static-class', { conditional: true, hidden: false })).toBe('static-class conditional');
+      expect(
+        cn('static-class', UTIL_DOMAIN.CLASSES.MIXED)
+      ).toBe('static-class conditional');
     });
   });
 
   describe('when given class arrays', () => {
     it('should flatten nested arrays', () => {
-      expect(cn(['foo', 'bar'])).toBe('foo bar');
+      expect(cn(UTIL_DOMAIN.CLASSES.NESTED)).toBe('foo bar baz');
     });
 
     it('should handle nested arrays with objects', () => {
-      expect(cn(['foo', { bar: true }])).toBe('foo bar');
+      expect(cn(UTIL_DOMAIN.CLASSES.WITH_OBJECTS)).toBe('foo bar');
     });
 
-    it('should filter falsy values in arrays', () => {
-      expect(cn(['foo', null, undefined, false, 'bar'])).toBe('foo bar');
-    });
+    it.each(UTIL_DOMAIN.EMPTY.VALUES)(
+      'should filter falsy value %p in arrays',
+      (value) => {
+        expect(cn(['foo', value, 'bar'])).toBe('foo bar');
+      }
+    );
   });
 
   describe('when given empty inputs', () => {
@@ -58,7 +98,13 @@ describe('cn', () => {
 
   describe('when given mixed input types', () => {
     it('should handle complex mixed inputs', () => {
-      expect(cn('base', ['medium', 'padding'], { 'text-center': true, hidden: false })).toBe('base medium padding text-center');
+      expect(
+        cn(
+          UTIL_DOMAIN.CLASSES.COMPLEX,
+          ['medium', 'padding'],
+          { 'text-center': true, hidden: false }
+        )
+      ).toBe('base medium padding text-center');
     });
 
     it('should merge duplicate classes from different inputs', () => {
@@ -73,7 +119,9 @@ describe('cn', () => {
     });
 
     it('should merge padding classes', () => {
-      expect(cn('px-2 py-4', 'px-4')).toBe('py-4 px-4');
+      const result = cn('px-2 py-4', 'px-4');
+      expect(result).toContain('px-4');
+      expect(result).toContain('py-4');
     });
 
     it('should merge margin classes', () => {

@@ -9,47 +9,84 @@ import type {
   GrowthBookConfig,
 } from "./types";
 
+// =============================================================================
+// Domain Test Values - Analytics Types
+// =============================================================================
+
+const TYPE_DOMAIN = {
+  ANALYTICS_EVENT_NAME: {
+    VALID: ["page_view", "custom_event", "cta_click", "login", "logout"],
+    PATTERN: /^[a-z_]+$/,
+  } as const,
+
+  EVENT_PROPERTIES: {
+    STRING: { key: "value", name: "test", email: "user@example.com" },
+    NUMBER: { count: 42, amount: 99.99, quantity: 5 },
+    BOOLEAN: { active: true, enabled: false, premium: true },
+    UNDEFINED: { optional: undefined },
+    MIXED: { name: "test", count: 10, enabled: false, optional: undefined },
+  } as const,
+
+  USER_TRAITS: {
+    STRING: { email: "test@example.com", name: "John" },
+    NUMBER: { age: 25, accountAge: 365 },
+    BOOLEAN: { premium: true, verified: false },
+    MIXED: { name: "John", age: 30, isAdmin: false },
+  } as const,
+
+  ANALYTICS_EVENT: {
+    MINIMAL: { name: "page_view" },
+    WITH_PROPERTIES: { name: "page_view", properties: { page: "home" } },
+    WITH_TIMESTAMP: { name: "page_view", timestamp: 1699999999999 },
+    COMPLETE: {
+      name: "purchase",
+      properties: { amount: 100, currency: "USD" },
+      timestamp: 1699999999999,
+    },
+  } as const,
+
+  BOUNDARY: {
+    EMPTY_STRING: "",
+    MAX_SAFE_INTEGER: Number.MAX_SAFE_INTEGER,
+    MIN_SAFE_INTEGER: Number.MIN_SAFE_INTEGER,
+  } as const,
+} as const;
+
+// =============================================================================
+// Test Suite
+// =============================================================================
+
 describe("types", () => {
   describe("AnalyticsEventName", () => {
-    it("should be a string type", () => {
-      const name: AnalyticsEventName = "page_view";
-      expect(typeof name).toBe("string");
-    });
+    it.each(TYPE_DOMAIN.ANALYTICS_EVENT_NAME.VALID)(
+      "should accept valid event name: %s",
+      (name) => {
+        const eventName: AnalyticsEventName = name;
+        expect(typeof eventName).toBe("string");
+        expect(eventName).toMatch(TYPE_DOMAIN.ANALYTICS_EVENT_NAME.PATTERN);
+      }
+    );
 
-    it("should accept any string value", () => {
+    it("should accept any string value conforming to pattern", () => {
       const name: AnalyticsEventName = "custom_event";
       expect(name).toBe("custom_event");
     });
   });
 
   describe("EventProperties", () => {
-    it("should accept string values", () => {
-      const props: EventProperties = { key: "value" };
-      expect(props.key).toBe("value");
-    });
-
-    it("should accept number values", () => {
-      const props: EventProperties = { count: 42 };
-      expect(props.count).toBe(42);
-    });
-
-    it("should accept boolean values", () => {
-      const props: EventProperties = { active: true };
-      expect(props.active).toBe(true);
-    });
-
-    it("should accept undefined values", () => {
-      const props: EventProperties = { optional: undefined };
-      expect(props.optional).toBeUndefined();
+    it.each([
+      { input: TYPE_DOMAIN.EVENT_PROPERTIES.STRING, expected: "value" },
+      { input: TYPE_DOMAIN.EVENT_PROPERTIES.NUMBER, expected: 42 },
+      { input: TYPE_DOMAIN.EVENT_PROPERTIES.BOOLEAN, expected: true },
+      { input: TYPE_DOMAIN.EVENT_PROPERTIES.UNDEFINED, expected: undefined },
+    ])("should accept $expected type values", ({ input, expected }) => {
+      const props: EventProperties = input;
+      const firstKey = Object.keys(input)[0];
+      expect((props as any)[firstKey]).toBe(expected);
     });
 
     it("should accept mixed value types", () => {
-      const props: EventProperties = {
-        name: "test",
-        count: 10,
-        enabled: false,
-        optional: undefined,
-      };
+      const props: EventProperties = TYPE_DOMAIN.EVENT_PROPERTIES.MIXED;
       expect(props.name).toBe("test");
       expect(props.count).toBe(10);
       expect(props.enabled).toBe(false);
@@ -58,27 +95,17 @@ describe("types", () => {
   });
 
   describe("UserTraits", () => {
-    it("should accept string values", () => {
-      const traits: UserTraits = { email: "test@example.com" };
-      expect(traits.email).toBe("test@example.com");
-    });
-
-    it("should accept number values", () => {
-      const traits: UserTraits = { age: 25 };
-      expect(traits.age).toBe(25);
-    });
-
-    it("should accept boolean values", () => {
-      const traits: UserTraits = { premium: true };
-      expect(traits.premium).toBe(true);
+    it.each([
+      { input: TYPE_DOMAIN.USER_TRAITS.STRING, field: "email" },
+      { input: TYPE_DOMAIN.USER_TRAITS.NUMBER, field: "age" },
+      { input: TYPE_DOMAIN.USER_TRAITS.BOOLEAN, field: "premium" },
+    ])("should accept $field type values", ({ input, field }) => {
+      const traits: UserTraits = input;
+      expect((traits as any)[field]).toBeDefined();
     });
 
     it("should accept mixed value types", () => {
-      const traits: UserTraits = {
-        name: "John",
-        age: 30,
-        isAdmin: false,
-      };
+      const traits: UserTraits = TYPE_DOMAIN.USER_TRAITS.MIXED;
       expect(traits.name).toBe("John");
       expect(traits.age).toBe(30);
       expect(traits.isAdmin).toBe(false);
@@ -87,35 +114,24 @@ describe("types", () => {
 
   describe("AnalyticsEvent", () => {
     it("should accept event with name only", () => {
-      const event: AnalyticsEvent = { name: "page_view" };
+      const event: AnalyticsEvent = TYPE_DOMAIN.ANALYTICS_EVENT.MINIMAL;
       expect(event.name).toBe("page_view");
     });
 
     it("should accept event with name and properties", () => {
-      const event: AnalyticsEvent = {
-        name: "page_view",
-        properties: { page: "home" },
-      };
+      const event: AnalyticsEvent = TYPE_DOMAIN.ANALYTICS_EVENT.WITH_PROPERTIES;
       expect(event.name).toBe("page_view");
       expect(event.properties?.page).toBe("home");
     });
 
     it("should accept event with name and timestamp", () => {
-      const timestamp = 1699999999999;
-      const event: AnalyticsEvent = {
-        name: "page_view",
-        timestamp,
-      };
+      const event: AnalyticsEvent = TYPE_DOMAIN.ANALYTICS_EVENT.WITH_TIMESTAMP;
       expect(event.name).toBe("page_view");
-      expect(event.timestamp).toBe(timestamp);
+      expect(event.timestamp).toBe(1699999999999);
     });
 
     it("should accept complete event structure", () => {
-      const event: AnalyticsEvent = {
-        name: "purchase",
-        properties: { amount: 100, currency: "USD" },
-        timestamp: 1699999999999,
-      };
+      const event: AnalyticsEvent = TYPE_DOMAIN.ANALYTICS_EVENT.COMPLETE;
       expect(event.name).toBe("purchase");
       expect(event.properties?.amount).toBe(100);
       expect(event.properties?.currency).toBe("USD");
@@ -126,7 +142,9 @@ describe("types", () => {
   describe("AnalyticsClient", () => {
     it("should have required track method", () => {
       const client: AnalyticsClient = {
-        track: (name) => { expect(name).toBe("test"); },
+        track: (name) => {
+          expect(name).toBe("test");
+        },
         identify: () => {},
       };
       client.track("test");
@@ -140,21 +158,20 @@ describe("types", () => {
       client.identify("user-123");
     });
 
-    it("should have optional flush method", () => {
+    it.each([
+      { hasFlush: true },
+      { hasFlush: false },
+    ])("should $hasFlush ? 'have' : 'not have' flush method", ({ hasFlush }) => {
       const client: AnalyticsClient = {
         track: () => {},
         identify: () => {},
-        flush: async () => {},
+        ...(hasFlush ? { flush: async () => {} } : {}),
       };
-      expect(typeof client.flush).toBe("function");
-    });
-
-    it("should work without flush method", () => {
-      const client: AnalyticsClient = {
-        track: () => {},
-        identify: () => {},
-      };
-      expect(client.flush).toBeUndefined();
+      if (hasFlush) {
+        expect(typeof client.flush).toBe("function");
+      } else {
+        expect(client.flush).toBeUndefined();
+      }
     });
   });
 
@@ -169,7 +186,9 @@ describe("types", () => {
     it("should allow sync track implementation", () => {
       const events: AnalyticsEvent[] = [];
       const transport: AnalyticsTransport = {
-        track: (event) => { events.push(event); },
+        track: (event) => {
+          events.push(event);
+        },
       };
       transport.track({ name: "event1" });
       transport.track({ name: "event2" });
@@ -187,38 +206,30 @@ describe("types", () => {
   });
 
   describe("GrowthBookConfig", () => {
+    const REQUIRED_CONFIG = {
+      apiHost: "https://cdn.growthbook.io",
+      clientKey: "sdk-key",
+    };
+
     it("should require apiHost", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-key",
-      };
+      const config: GrowthBookConfig = { ...REQUIRED_CONFIG };
       expect(config.apiHost).toBe("https://cdn.growthbook.io");
     });
 
     it("should require clientKey", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-key",
-      };
+      const config: GrowthBookConfig = { ...REQUIRED_CONFIG };
       expect(config.clientKey).toBe("sdk-key");
     });
 
-    it("should have optional enableDevMode", () => {
+    it.each([
+      { field: "enableDevMode", value: true },
+      { field: "attributes", value: { browser: "chrome" } },
+    ])("should have optional $field", ({ field, value }) => {
       const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-key",
-        enableDevMode: true,
+        ...REQUIRED_CONFIG,
+        [field]: value,
       };
-      expect(config.enableDevMode).toBe(true);
-    });
-
-    it("should have optional attributes", () => {
-      const config: GrowthBookConfig = {
-        apiHost: "https://cdn.growthbook.io",
-        clientKey: "sdk-key",
-        attributes: { browser: "chrome" },
-      };
-      expect(config.attributes).toEqual({ browser: "chrome" });
+      expect((config as any)[field]).toEqual(value);
     });
   });
 });

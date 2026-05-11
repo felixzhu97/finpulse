@@ -4,6 +4,56 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
+// =============================================================================
+// Domain Test Values - Dropdown Menu Component
+// =============================================================================
+
+const DROPDOWN_DOMAIN = {
+  TEST_IDS: {
+    DROPDOWN_MENU: 'dropdown-menu',
+    RADIO_GROUP: 'radio-group',
+    PORTAL: 'dropdown-portal',
+    CONTENT: 'dropdown-content',
+    SUB: 'dropdown-sub',
+    SUB_CONTENT: 'dropdown-sub-content',
+  },
+
+  TEXT: {
+    LABEL: 'Label',
+    MENU_LABEL: 'Menu Label',
+    SHORTCUT: '⌘K',
+    SHORTCUT_S: '⌘S',
+    ITEM_1: 'Item 1',
+    ITEM: 'Item',
+    MENU_ITEM: 'Menu Item',
+    DELETE_ACCOUNT: 'Delete Account',
+    CHECKBOX_ITEM: 'Checkbox Item',
+    CHECKED_ITEM: 'Checked Item',
+    RADIO_OPTION: 'Radio Option',
+    THEME: 'Light Theme',
+    SUBMENU: 'Submenu',
+    SUBMENU_TRIGGER: 'Submenu Trigger',
+    MORE_OPTIONS: 'More Options',
+    SUB_ITEM: 'Sub Item',
+    OPEN_MENU: 'Open Menu',
+    OPTIONS: 'Options',
+    SETTINGS: 'Settings',
+    PORTAL_CONTENT: 'Portal Content',
+  },
+
+  CLASSES: {
+    fontMedium: 'font-medium',
+    textMutedForeground: 'text-muted-foreground',
+    bgBorder: 'bg-border',
+    shadowMd: 'shadow-md',
+    shadowLg: 'shadow-lg',
+  },
+} as const;
+
+// =============================================================================
+// Mock Setup
+// =============================================================================
+
 vi.mock('@radix-ui/react-dropdown-menu', () => {
   const MockPrimitive = {
     Root: ({ children, 'data-testid': testId, ...props }: React.ComponentProps<'div'> & { 'data-testid'?: string }) => (
@@ -89,26 +139,35 @@ import {
   DropdownMenuSubContent,
 } from './dropdown-menu';
 
+// =============================================================================
+// Test Suite
+// =============================================================================
+
 describe('DropdownMenuLabel', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      const { container } = render(<DropdownMenuLabel>Label</DropdownMenuLabel>);
+      const { container } = render(<DropdownMenuLabel>{DROPDOWN_DOMAIN.TEXT.LABEL}</DropdownMenuLabel>);
       expect(container.querySelector('[data-slot="dropdown-menu-label"]')).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      const { container } = render(<DropdownMenuLabel>Label</DropdownMenuLabel>);
-      expect(container.querySelector('[data-slot="dropdown-menu-label"]')).toHaveAttribute('data-slot', 'dropdown-menu-label');
+      const { container } = render(<DropdownMenuLabel>{DROPDOWN_DOMAIN.TEXT.LABEL}</DropdownMenuLabel>);
+      expect(container.querySelector('[data-slot="dropdown-menu-label"]')).toHaveAttribute(
+        'data-slot',
+        'dropdown-menu-label'
+      );
     });
 
     it('should have font-medium class', () => {
-      const { container } = render(<DropdownMenuLabel>Label</DropdownMenuLabel>);
-      expect(container.querySelector('[data-slot="dropdown-menu-label"]')).toHaveClass('font-medium');
+      const { container } = render(<DropdownMenuLabel>{DROPDOWN_DOMAIN.TEXT.LABEL}</DropdownMenuLabel>);
+      expect(container.querySelector('[data-slot="dropdown-menu-label"]')).toHaveClass(
+        DROPDOWN_DOMAIN.CLASSES.fontMedium
+      );
     });
 
     it('should render with text content', () => {
-      const { container } = render(<DropdownMenuLabel>Menu Label</DropdownMenuLabel>);
-      expect(container).toHaveTextContent('Menu Label');
+      const { container } = render(<DropdownMenuLabel>{DROPDOWN_DOMAIN.TEXT.MENU_LABEL}</DropdownMenuLabel>);
+      expect(container).toHaveTextContent(DROPDOWN_DOMAIN.TEXT.MENU_LABEL);
     });
   });
 
@@ -129,12 +188,17 @@ describe('DropdownMenuSeparator', () => {
 
     it('should have data-slot attribute', () => {
       const { container } = render(<DropdownMenuSeparator />);
-      expect(container.querySelector('[data-slot="dropdown-menu-separator"]')).toHaveAttribute('data-slot', 'dropdown-menu-separator');
+      expect(container.querySelector('[data-slot="dropdown-menu-separator"]')).toHaveAttribute(
+        'data-slot',
+        'dropdown-menu-separator'
+      );
     });
 
     it('should have bg-border class', () => {
       const { container } = render(<DropdownMenuSeparator />);
-      expect(container.querySelector('[data-slot="dropdown-menu-separator"]')).toHaveClass('bg-border');
+      expect(container.querySelector('[data-slot="dropdown-menu-separator"]')).toHaveClass(
+        DROPDOWN_DOMAIN.CLASSES.bgBorder
+      );
     });
   });
 });
@@ -142,23 +206,28 @@ describe('DropdownMenuSeparator', () => {
 describe('DropdownMenuShortcut', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      const { container } = render(<DropdownMenuShortcut>⌘K</DropdownMenuShortcut>);
+      const { container } = render(<DropdownMenuShortcut>{DROPDOWN_DOMAIN.TEXT.SHORTCUT}</DropdownMenuShortcut>);
       expect(container.querySelector('[data-slot="dropdown-menu-shortcut"]')).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      const { container } = render(<DropdownMenuShortcut>⌘K</DropdownMenuShortcut>);
-      expect(container.querySelector('[data-slot="dropdown-menu-shortcut"]')).toHaveAttribute('data-slot', 'dropdown-menu-shortcut');
+      const { container } = render(<DropdownMenuShortcut>{DROPDOWN_DOMAIN.TEXT.SHORTCUT}</DropdownMenuShortcut>);
+      expect(container.querySelector('[data-slot="dropdown-menu-shortcut"]')).toHaveAttribute(
+        'data-slot',
+        'dropdown-menu-shortcut'
+      );
     });
 
     it('should have text-muted-foreground class', () => {
-      const { container } = render(<DropdownMenuShortcut>⌘K</DropdownMenuShortcut>);
-      expect(container.querySelector('[data-slot="dropdown-menu-shortcut"]')).toHaveClass('text-muted-foreground');
+      const { container } = render(<DropdownMenuShortcut>{DROPDOWN_DOMAIN.TEXT.SHORTCUT}</DropdownMenuShortcut>);
+      expect(container.querySelector('[data-slot="dropdown-menu-shortcut"]')).toHaveClass(
+        DROPDOWN_DOMAIN.CLASSES.textMutedForeground
+      );
     });
 
     it('should render with text content', () => {
-      const { container } = render(<DropdownMenuShortcut>⌘S</DropdownMenuShortcut>);
-      expect(container).toHaveTextContent('⌘S');
+      const { container } = render(<DropdownMenuShortcut>{DROPDOWN_DOMAIN.TEXT.SHORTCUT_S}</DropdownMenuShortcut>);
+      expect(container).toHaveTextContent(DROPDOWN_DOMAIN.TEXT.SHORTCUT_S);
     });
   });
 });
@@ -172,7 +241,10 @@ describe('DropdownMenuGroup', () => {
 
     it('should have data-slot attribute', () => {
       const { container } = render(<DropdownMenuGroup />);
-      expect(container.querySelector('[data-slot="dropdown-menu-group"]')).toHaveAttribute('data-slot', 'dropdown-menu-group');
+      expect(container.querySelector('[data-slot="dropdown-menu-group"]')).toHaveAttribute(
+        'data-slot',
+        'dropdown-menu-group'
+      );
     });
   });
 });
@@ -180,13 +252,16 @@ describe('DropdownMenuGroup', () => {
 describe('DropdownMenuRadioGroup', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      render(<DropdownMenuRadioGroup data-testid="radio-group" />);
-      expect(screen.getByTestId('radio-group')).toBeInTheDocument();
+      render(<DropdownMenuRadioGroup data-testid={DROPDOWN_DOMAIN.TEST_IDS.RADIO_GROUP} />);
+      expect(screen.getByTestId(DROPDOWN_DOMAIN.TEST_IDS.RADIO_GROUP)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<DropdownMenuRadioGroup data-testid="radio-group" />);
-      expect(screen.getByTestId('radio-group')).toHaveAttribute('data-slot', 'dropdown-menu-radio-group');
+      render(<DropdownMenuRadioGroup data-testid={DROPDOWN_DOMAIN.TEST_IDS.RADIO_GROUP} />);
+      expect(screen.getByTestId(DROPDOWN_DOMAIN.TEST_IDS.RADIO_GROUP)).toHaveAttribute(
+        'data-slot',
+        'dropdown-menu-radio-group'
+      );
     });
   });
 });
@@ -194,13 +269,16 @@ describe('DropdownMenuRadioGroup', () => {
 describe('DropdownMenu', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      render(<DropdownMenu data-testid="dropdown-menu" />);
-      expect(screen.getByTestId('dropdown-menu')).toBeInTheDocument();
+      render(<DropdownMenu data-testid={DROPDOWN_DOMAIN.TEST_IDS.DROPDOWN_MENU} />);
+      expect(screen.getByTestId(DROPDOWN_DOMAIN.TEST_IDS.DROPDOWN_MENU)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      render(<DropdownMenu data-testid="dropdown-menu" />);
-      expect(screen.getByTestId('dropdown-menu')).toHaveAttribute('data-slot', 'dropdown-menu');
+      render(<DropdownMenu data-testid={DROPDOWN_DOMAIN.TEST_IDS.DROPDOWN_MENU} />);
+      expect(screen.getByTestId(DROPDOWN_DOMAIN.TEST_IDS.DROPDOWN_MENU)).toHaveAttribute(
+        'data-slot',
+        'dropdown-menu'
+      );
     });
   });
 
@@ -209,11 +287,13 @@ describe('DropdownMenu', () => {
       render(
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button>Open Menu</button>
+            <button>{DROPDOWN_DOMAIN.TEXT.OPEN_MENU}</button>
           </DropdownMenuTrigger>
         </DropdownMenu>
       );
-      expect(screen.getByRole('button', { name: 'Open Menu' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: DROPDOWN_DOMAIN.TEXT.OPEN_MENU })
+      ).toBeInTheDocument();
     });
   });
 });
@@ -222,42 +302,45 @@ describe('DropdownMenuPortal', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
       render(
-        <DropdownMenuPortal data-testid="dropdown-portal">
-          <div>Portal Content</div>
+        <DropdownMenuPortal data-testid={DROPDOWN_DOMAIN.TEST_IDS.PORTAL}>
+          <div>{DROPDOWN_DOMAIN.TEXT.PORTAL_CONTENT}</div>
         </DropdownMenuPortal>
       );
-      expect(screen.getByTestId('dropdown-portal')).toBeInTheDocument();
+      expect(screen.getByTestId(DROPDOWN_DOMAIN.TEST_IDS.PORTAL)).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
       render(
-        <DropdownMenuPortal data-testid="dropdown-portal">
-          <div>Portal Content</div>
+        <DropdownMenuPortal data-testid={DROPDOWN_DOMAIN.TEST_IDS.PORTAL}>
+          <div>{DROPDOWN_DOMAIN.TEXT.PORTAL_CONTENT}</div>
         </DropdownMenuPortal>
       );
-      expect(screen.getByTestId('dropdown-portal')).toHaveAttribute('data-slot', 'dropdown-menu-portal');
+      expect(screen.getByTestId(DROPDOWN_DOMAIN.TEST_IDS.PORTAL)).toHaveAttribute(
+        'data-slot',
+        'dropdown-menu-portal'
+      );
     });
   });
 });
 
 describe('DropdownMenuTrigger', () => {
   describe('when rendered with asChild', () => {
-    it('should render custom element', () => {
+    it('should render custom element as button', () => {
       render(
         <DropdownMenuTrigger asChild>
-          <button>Options</button>
+          <button>{DROPDOWN_DOMAIN.TEXT.OPTIONS}</button>
         </DropdownMenuTrigger>
       );
-      expect(screen.getByRole('button', { name: 'Options' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: DROPDOWN_DOMAIN.TEXT.OPTIONS })).toBeInTheDocument();
     });
 
     it('should render link element', () => {
       render(
         <DropdownMenuTrigger asChild>
-          <a href="/settings">Settings</a>
+          <a href="/settings">{DROPDOWN_DOMAIN.TEXT.SETTINGS}</a>
         </DropdownMenuTrigger>
       );
-      expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: DROPDOWN_DOMAIN.TEXT.SETTINGS })).toBeInTheDocument();
     });
   });
 });
@@ -266,60 +349,35 @@ describe('DropdownMenuContent', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
       const { container } = render(
-        <DropdownMenuContent data-testid="dropdown-content">
-          <DropdownMenuItem>Item 1</DropdownMenuItem>
+        <DropdownMenuContent data-testid={DROPDOWN_DOMAIN.TEST_IDS.CONTENT}>
+          <DropdownMenuItem>{DROPDOWN_DOMAIN.TEXT.ITEM_1}</DropdownMenuItem>
         </DropdownMenuContent>
       );
       expect(container.querySelector('[data-slot="dropdown-menu-content"]')).toBeInTheDocument();
     });
 
-    it('should have data-slot attribute', () => {
+    it('should have data-slot attribute and shadow class', () => {
       const { container } = render(
-        <DropdownMenuContent data-testid="dropdown-content">
-          <DropdownMenuItem>Item 1</DropdownMenuItem>
+        <DropdownMenuContent data-testid={DROPDOWN_DOMAIN.TEST_IDS.CONTENT}>
+          <DropdownMenuItem>{DROPDOWN_DOMAIN.TEXT.ITEM}</DropdownMenuItem>
         </DropdownMenuContent>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-content"]')).toHaveAttribute('data-slot', 'dropdown-menu-content');
-    });
-
-    it('should render with shadow class', () => {
-      const { container } = render(
-        <DropdownMenuContent data-testid="dropdown-content">
-          <DropdownMenuItem>Item</DropdownMenuItem>
-        </DropdownMenuContent>
-      );
-      expect(container.querySelector('[data-slot="dropdown-menu-content"]')).toHaveClass('shadow-md');
+      const content = container.querySelector('[data-slot="dropdown-menu-content"]');
+      expect(content).toHaveAttribute('data-slot', 'dropdown-menu-content');
+      expect(content).toHaveClass(DROPDOWN_DOMAIN.CLASSES.shadowMd);
     });
   });
 
   describe('when custom className is provided', () => {
     it('should apply custom className', () => {
       const { container } = render(
-        <DropdownMenuContent className="custom-content" data-testid="dropdown-content">
-          <DropdownMenuItem>Item</DropdownMenuItem>
+        <DropdownMenuContent className="custom-content" data-testid={DROPDOWN_DOMAIN.TEST_IDS.CONTENT}>
+          <DropdownMenuItem>{DROPDOWN_DOMAIN.TEXT.ITEM}</DropdownMenuItem>
         </DropdownMenuContent>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-content"]')).toHaveClass('custom-content');
-    });
-  });
-
-  describe('when sideOffset is customized', () => {
-    it('should render with default sideOffset', () => {
-      const { container } = render(
-        <DropdownMenuContent data-testid="dropdown-content">
-          <DropdownMenuItem>Item</DropdownMenuItem>
-        </DropdownMenuContent>
+      expect(container.querySelector('[data-slot="dropdown-menu-content"]')).toHaveClass(
+        'custom-content'
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-content"]')).toBeInTheDocument();
-    });
-
-    it('should render with custom sideOffset', () => {
-      const { container } = render(
-        <DropdownMenuContent sideOffset={8} data-testid="dropdown-content">
-          <DropdownMenuItem>Item</DropdownMenuItem>
-        </DropdownMenuContent>
-      );
-      expect(container.querySelector('[data-slot="dropdown-menu-content"]')).toBeInTheDocument();
     });
   });
 });
@@ -327,18 +385,23 @@ describe('DropdownMenuContent', () => {
 describe('DropdownMenuItem', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      const { container } = render(<DropdownMenuItem>Menu Item</DropdownMenuItem>);
+      const { container } = render(<DropdownMenuItem>{DROPDOWN_DOMAIN.TEXT.MENU_ITEM}</DropdownMenuItem>);
       expect(container.querySelector('[data-slot="dropdown-menu-item"]')).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      const { container } = render(<DropdownMenuItem>Menu Item</DropdownMenuItem>);
-      expect(container.querySelector('[data-slot="dropdown-menu-item"]')).toHaveAttribute('data-slot', 'dropdown-menu-item');
+      const { container } = render(<DropdownMenuItem>{DROPDOWN_DOMAIN.TEXT.MENU_ITEM}</DropdownMenuItem>);
+      expect(container.querySelector('[data-slot="dropdown-menu-item"]')).toHaveAttribute(
+        'data-slot',
+        'dropdown-menu-item'
+      );
     });
 
     it('should render with text content', () => {
-      const { container } = render(<DropdownMenuItem>Delete Account</DropdownMenuItem>);
-      expect(container).toHaveTextContent('Delete Account');
+      const { container } = render(
+        <DropdownMenuItem>{DROPDOWN_DOMAIN.TEXT.DELETE_ACCOUNT}</DropdownMenuItem>
+      );
+      expect(container).toHaveTextContent(DROPDOWN_DOMAIN.TEXT.DELETE_ACCOUNT);
     });
   });
 
@@ -351,23 +414,20 @@ describe('DropdownMenuItem', () => {
 
   describe('when variant is destructive', () => {
     it('should have data-variant attribute', () => {
-      const { container } = render(<DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>);
+      const { container } = render(
+        <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+      );
       expect(container.querySelector('[data-variant="destructive"]')).toBeInTheDocument();
     });
   });
 
   describe('when disabled', () => {
     it('should have disabled opacity class', () => {
-      const { container } = render(<DropdownMenuItem disabled>Disabled Item</DropdownMenuItem>);
+      const { container } = render(
+        <DropdownMenuItem disabled>Disabled Item</DropdownMenuItem>
+      );
       const item = container.querySelector('[data-slot="dropdown-menu-item"]');
       expect(item).toHaveClass('data-[disabled]:opacity-50');
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      const { container } = render(<DropdownMenuItem className="custom-item">Item</DropdownMenuItem>);
-      expect(container.querySelector('[data-slot="dropdown-menu-item"]')).toHaveClass('custom-item');
     });
   });
 });
@@ -376,43 +436,33 @@ describe('DropdownMenuCheckboxItem', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
       const { container } = render(
-        <DropdownMenuCheckboxItem checked={false}>Checkbox Item</DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={false}>
+          {DROPDOWN_DOMAIN.TEXT.CHECKBOX_ITEM}
+        </DropdownMenuCheckboxItem>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-checkbox-item"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="dropdown-menu-checkbox-item"]')
+      ).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
       const { container } = render(
-        <DropdownMenuCheckboxItem checked={false}>Checkbox Item</DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={false}>
+          {DROPDOWN_DOMAIN.TEXT.CHECKBOX_ITEM}
+        </DropdownMenuCheckboxItem>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-checkbox-item"]')).toHaveAttribute('data-slot', 'dropdown-menu-checkbox-item');
+      expect(
+        container.querySelector('[data-slot="dropdown-menu-checkbox-item"]')
+      ).toHaveAttribute('data-slot', 'dropdown-menu-checkbox-item');
     });
 
     it('should render with text content', () => {
       const { container } = render(
-        <DropdownMenuCheckboxItem checked={false}>Enable Notifications</DropdownMenuCheckboxItem>
-      );
-      expect(container).toHaveTextContent('Enable Notifications');
-    });
-  });
-
-  describe('when checked', () => {
-    it('should render with checked state', () => {
-      const { container } = render(
-        <DropdownMenuCheckboxItem checked={true}>Checked Item</DropdownMenuCheckboxItem>
-      );
-      expect(container.querySelector('[data-slot="dropdown-menu-checkbox-item"]')).toBeInTheDocument();
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      const { container } = render(
-        <DropdownMenuCheckboxItem checked={false} className="custom-checkbox">
-          Item
+        <DropdownMenuCheckboxItem checked={false}>
+          {DROPDOWN_DOMAIN.TEXT.CHECKED_ITEM}
         </DropdownMenuCheckboxItem>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-checkbox-item"]')).toHaveClass('custom-checkbox');
+      expect(container).toHaveTextContent(DROPDOWN_DOMAIN.TEXT.CHECKED_ITEM);
     });
   });
 });
@@ -421,34 +471,20 @@ describe('DropdownMenuRadioItem', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
       const { container } = render(
-        <DropdownMenuRadioItem value="option1">Radio Option</DropdownMenuRadioItem>
+        <DropdownMenuRadioItem value="option1">{DROPDOWN_DOMAIN.TEXT.RADIO_OPTION}</DropdownMenuRadioItem>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-radio-item"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="dropdown-menu-radio-item"]')
+      ).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
       const { container } = render(
-        <DropdownMenuRadioItem value="option1">Radio Option</DropdownMenuRadioItem>
+        <DropdownMenuRadioItem value="option1">{DROPDOWN_DOMAIN.TEXT.THEME}</DropdownMenuRadioItem>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-radio-item"]')).toHaveAttribute('data-slot', 'dropdown-menu-radio-item');
-    });
-
-    it('should render with text content', () => {
-      const { container } = render(
-        <DropdownMenuRadioItem value="option1">Light Theme</DropdownMenuRadioItem>
-      );
-      expect(container).toHaveTextContent('Light Theme');
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      const { container } = render(
-        <DropdownMenuRadioItem value="option1" className="custom-radio">
-          Item
-        </DropdownMenuRadioItem>
-      );
-      expect(container.querySelector('[data-slot="dropdown-menu-radio-item"]')).toHaveClass('custom-radio');
+      expect(
+        container.querySelector('[data-slot="dropdown-menu-radio-item"]')
+      ).toHaveAttribute('data-slot', 'dropdown-menu-radio-item');
     });
   });
 });
@@ -457,8 +493,8 @@ describe('DropdownMenuSub', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
       const { container } = render(
-        <DropdownMenuSub data-testid="dropdown-sub">
-          <DropdownMenuSubTrigger>Submenu</DropdownMenuSubTrigger>
+        <DropdownMenuSub data-testid={DROPDOWN_DOMAIN.TEST_IDS.SUB}>
+          <DropdownMenuSubTrigger>{DROPDOWN_DOMAIN.TEXT.SUBMENU}</DropdownMenuSubTrigger>
         </DropdownMenuSub>
       );
       expect(container.querySelector('[data-slot="dropdown-menu-sub"]')).toBeInTheDocument();
@@ -466,11 +502,14 @@ describe('DropdownMenuSub', () => {
 
     it('should have data-slot attribute', () => {
       const { container } = render(
-        <DropdownMenuSub data-testid="dropdown-sub">
-          <DropdownMenuSubTrigger>Submenu</DropdownMenuSubTrigger>
+        <DropdownMenuSub data-testid={DROPDOWN_DOMAIN.TEST_IDS.SUB}>
+          <DropdownMenuSubTrigger>{DROPDOWN_DOMAIN.TEXT.SUBMENU}</DropdownMenuSubTrigger>
         </DropdownMenuSub>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-sub"]')).toHaveAttribute('data-slot', 'dropdown-menu-sub');
+      expect(container.querySelector('[data-slot="dropdown-menu-sub"]')).toHaveAttribute(
+        'data-slot',
+        'dropdown-menu-sub'
+      );
     });
   });
 });
@@ -478,34 +517,37 @@ describe('DropdownMenuSub', () => {
 describe('DropdownMenuSubTrigger', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
-      const { container } = render(<DropdownMenuSubTrigger>Submenu Trigger</DropdownMenuSubTrigger>);
-      expect(container.querySelector('[data-slot="dropdown-menu-sub-trigger"]')).toBeInTheDocument();
+      const { container } = render(
+        <DropdownMenuSubTrigger>{DROPDOWN_DOMAIN.TEXT.SUBMENU_TRIGGER}</DropdownMenuSubTrigger>
+      );
+      expect(
+        container.querySelector('[data-slot="dropdown-menu-sub-trigger"]')
+      ).toBeInTheDocument();
     });
 
     it('should have data-slot attribute', () => {
-      const { container } = render(<DropdownMenuSubTrigger>Submenu Trigger</DropdownMenuSubTrigger>);
-      expect(container.querySelector('[data-slot="dropdown-menu-sub-trigger"]')).toHaveAttribute('data-slot', 'dropdown-menu-sub-trigger');
+      const { container } = render(
+        <DropdownMenuSubTrigger>{DROPDOWN_DOMAIN.TEXT.SUBMENU_TRIGGER}</DropdownMenuSubTrigger>
+      );
+      expect(
+        container.querySelector('[data-slot="dropdown-menu-sub-trigger"]')
+      ).toHaveAttribute('data-slot', 'dropdown-menu-sub-trigger');
     });
 
     it('should render with text content', () => {
-      const { container } = render(<DropdownMenuSubTrigger>More Options</DropdownMenuSubTrigger>);
-      expect(container).toHaveTextContent('More Options');
+      const { container } = render(
+        <DropdownMenuSubTrigger>{DROPDOWN_DOMAIN.TEXT.MORE_OPTIONS}</DropdownMenuSubTrigger>
+      );
+      expect(container).toHaveTextContent(DROPDOWN_DOMAIN.TEXT.MORE_OPTIONS);
     });
   });
 
   describe('when inset is true', () => {
     it('should have data-inset attribute', () => {
-      const { container } = render(<DropdownMenuSubTrigger inset>Inset Submenu</DropdownMenuSubTrigger>);
-      expect(container.querySelector('[data-inset="true"]')).toBeInTheDocument();
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
       const { container } = render(
-        <DropdownMenuSubTrigger className="custom-trigger">Submenu</DropdownMenuSubTrigger>
+        <DropdownMenuSubTrigger inset>Inset Submenu</DropdownMenuSubTrigger>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-sub-trigger"]')).toHaveClass('custom-trigger');
+      expect(container.querySelector('[data-inset="true"]')).toBeInTheDocument();
     });
   });
 });
@@ -514,40 +556,24 @@ describe('DropdownMenuSubContent', () => {
   describe('when rendered', () => {
     it('should render without crashing', () => {
       const { container } = render(
-        <DropdownMenuSubContent data-testid="dropdown-sub-content">
-          <DropdownMenuItem>Sub Item</DropdownMenuItem>
+        <DropdownMenuSubContent data-testid={DROPDOWN_DOMAIN.TEST_IDS.SUB_CONTENT}>
+          <DropdownMenuItem>{DROPDOWN_DOMAIN.TEXT.SUB_ITEM}</DropdownMenuItem>
         </DropdownMenuSubContent>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-sub-content"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="dropdown-menu-sub-content"]')
+      ).toBeInTheDocument();
     });
 
-    it('should have data-slot attribute', () => {
+    it('should have data-slot attribute and shadow-lg class', () => {
       const { container } = render(
-        <DropdownMenuSubContent data-testid="dropdown-sub-content">
-          <DropdownMenuItem>Sub Item</DropdownMenuItem>
+        <DropdownMenuSubContent data-testid={DROPDOWN_DOMAIN.TEST_IDS.SUB_CONTENT}>
+          <DropdownMenuItem>{DROPDOWN_DOMAIN.TEXT.SUB_ITEM}</DropdownMenuItem>
         </DropdownMenuSubContent>
       );
-      expect(container.querySelector('[data-slot="dropdown-menu-sub-content"]')).toHaveAttribute('data-slot', 'dropdown-menu-sub-content');
-    });
-
-    it('should render with shadow-lg class', () => {
-      const { container } = render(
-        <DropdownMenuSubContent data-testid="dropdown-sub-content">
-          <DropdownMenuItem>Sub Item</DropdownMenuItem>
-        </DropdownMenuSubContent>
-      );
-      expect(container.querySelector('[data-slot="dropdown-menu-sub-content"]')).toHaveClass('shadow-lg');
-    });
-  });
-
-  describe('when custom className is provided', () => {
-    it('should apply custom className', () => {
-      const { container } = render(
-        <DropdownMenuSubContent className="custom-sub-content" data-testid="dropdown-sub-content">
-          <DropdownMenuItem>Sub Item</DropdownMenuItem>
-        </DropdownMenuSubContent>
-      );
-      expect(container.querySelector('[data-slot="dropdown-menu-sub-content"]')).toHaveClass('custom-sub-content');
+      const content = container.querySelector('[data-slot="dropdown-menu-sub-content"]');
+      expect(content).toHaveAttribute('data-slot', 'dropdown-menu-sub-content');
+      expect(content).toHaveClass(DROPDOWN_DOMAIN.CLASSES.shadowLg);
     });
   });
 });

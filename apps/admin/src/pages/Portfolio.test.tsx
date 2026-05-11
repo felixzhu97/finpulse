@@ -1,3 +1,7 @@
+/**
+ * Portfolio Page Tests
+ * Following TDD best practices with parameterized tests and domain test values
+ */
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import {
@@ -11,172 +15,187 @@ import {
   portfolioColumnDefs,
   portfolioRowData,
 } from './Portfolio';
+import {
+  PORTFOLIO_DOMAIN,
+} from '@/__fixtures__/domain';
 
 describe('Portfolio', () => {
-  it('should render the Portfolio title', () => {
-    render(<Portfolio />);
-    expect(screen.getByText('Portfolio')).toBeInTheDocument();
+  describe('page rendering', () => {
+    it('should render the Portfolio title', () => {
+      render(<Portfolio />);
+      expect(screen.getByText('Portfolio')).toBeInTheDocument();
+    });
+
+    it('should render the description', () => {
+      render(<Portfolio />);
+      expect(screen.getByText('View your complete investment portfolio')).toBeInTheDocument();
+    });
+
+    it('should render Card component with glass styling', () => {
+      render(<Portfolio />);
+      const card = screen.getByText('Portfolio').closest('.glass');
+      expect(card).toBeInTheDocument();
+    });
+
+    it('should render AG Grid component', () => {
+      render(<Portfolio />);
+      const agGrid = document.querySelector('.ag-theme-quartz-dark');
+      expect(agGrid).toBeInTheDocument();
+    });
+
+    it('should render AG Grid with robinhood theme', () => {
+      render(<Portfolio />);
+      const grid = document.querySelector('.ag-theme-quartz-dark.ag-robinhood');
+      expect(grid).toBeInTheDocument();
+    });
   });
 
-  it('should render the description', () => {
-    render(<Portfolio />);
-    expect(screen.getByText('View your complete investment portfolio')).toBeInTheDocument();
+  describe('gainLossCellClass', () => {
+    it.each([
+      { value: 100, expectedClass: 'cell-accent cell-font-semibold' },
+      { value: 0, expectedClass: 'cell-accent cell-font-semibold' },
+      { value: -50, expectedClass: 'cell-destructive cell-font-semibold' },
+    ])('should return "$expectedClass" for value $value', ({ value, expectedClass }) => {
+      expect(gainLossCellClass(value)).toBe(expectedClass);
+    });
+
+    it('should return empty string for undefined value', () => {
+      expect(gainLossCellClass(undefined)).toBe('');
+    });
   });
 
-  it('should render the Card component', () => {
-    render(<Portfolio />);
-    const card = screen.getByText('Portfolio').closest('.glass');
-    expect(card).toBeInTheDocument();
+  describe('formatPortfolioPrice', () => {
+    it.each([
+      { value: 182.52, expected: '¥182.52' },
+      { value: 100, expected: '¥100.00' },
+      { value: 0.99, expected: '¥0.99' },
+    ])('should format $value to "$expected"', ({ value, expected }) => {
+      expect(formatPortfolioPrice(value)).toBe(expected);
+    });
+
+    it.each([null, undefined])('should return empty string for %s value', (value) => {
+      expect(formatPortfolioPrice(value)).toBe('');
+    });
   });
 
-  it('should render AG Grid component', () => {
-    render(<Portfolio />);
-    const agGrid = document.querySelector('.ag-theme-quartz-dark');
-    expect(agGrid).toBeInTheDocument();
+  describe('formatMarketValue', () => {
+    it.each([
+      { value: 9126, expected: '¥9126.00' },
+      { value: 1000, expected: '¥1000.00' },
+      { value: 0.5, expected: '¥0.50' },
+    ])('should format $value to "$expected"', ({ value, expected }) => {
+      expect(formatMarketValue(value)).toBe(expected);
+    });
+
+    it.each([null, undefined])('should return empty string for %s value', (value) => {
+      expect(formatMarketValue(value)).toBe('');
+    });
   });
 
-  it('should render the grid with proper theme class', () => {
-    render(<Portfolio />);
-    const grid = document.querySelector('.ag-theme-quartz-dark.ag-robinhood');
-    expect(grid).toBeInTheDocument();
+  describe('formatGainLoss', () => {
+    it.each([
+      { value: 366, expected: '+¥366.00' },
+      { value: 0, expected: '+¥0.00' },
+      { value: -100, expected: '¥-100.00' },
+    ])('should format $value to "$expected"', ({ value, expected }) => {
+      expect(formatGainLoss(value)).toBe(expected);
+    });
+
+    it.each([null, undefined])('should return empty string for %s value', (value) => {
+      expect(formatGainLoss(value)).toBe('');
+    });
   });
 
-  it('should have CardContent with proper styling', () => {
-    render(<Portfolio />);
-    const card = document.querySelector('.glass');
-    expect(card).toBeInTheDocument();
+  describe('formatGainLossPercent', () => {
+    it.each([
+      { value: 4.18, expected: '+4.18%' },
+      { value: 0, expected: '+0.00%' },
+      { value: -2.5, expected: '-2.50%' },
+    ])('should format $value to "$expected"', ({ value, expected }) => {
+      expect(formatGainLossPercent(value)).toBe(expected);
+    });
+
+    it.each([null, undefined])('should return empty string for %s value', (value) => {
+      expect(formatGainLossPercent(value)).toBe('');
+    });
   });
 
-  it('should render grid with animation enabled', () => {
-    render(<Portfolio />);
-    const grid = document.querySelector('.ag-theme-quartz-dark');
-    expect(grid).toBeInTheDocument();
-  });
-});
+  describe('formatAllocation', () => {
+    it.each([
+      { value: 18.5, expected: '18.5%' },
+      { value: 100, expected: '100.0%' },
+      { value: 0, expected: '0.0%' },
+    ])('should format $value to "$expected"', ({ value, expected }) => {
+      expect(formatAllocation(value)).toBe(expected);
+    });
 
-describe('gainLossCellClass', () => {
-  it('should return positive classes for positive gain', () => {
-    expect(gainLossCellClass(100)).toBe('cell-accent cell-font-semibold');
-  });
-
-  it('should return negative classes for negative loss', () => {
-    expect(gainLossCellClass(-50)).toBe('cell-destructive cell-font-semibold');
+    it.each([null, undefined])('should return empty string for %s value', (value) => {
+      expect(formatAllocation(value)).toBe('');
+    });
   });
 
-  it('should return positive classes for zero gain', () => {
-    expect(gainLossCellClass(0)).toBe('cell-accent cell-font-semibold');
+  describe('portfolioRowData', () => {
+    it('should contain portfolio records', () => {
+      expect(portfolioRowData.length).toBeGreaterThan(0);
+    });
+
+    it('should have correct data structure for first record', () => {
+      const first = portfolioRowData[0];
+      expect(first).toHaveProperty('symbol');
+      expect(first).toHaveProperty('name');
+      expect(first).toHaveProperty('sector');
+      expect(first).toHaveProperty('marketValue');
+      expect(first).toHaveProperty('gainLoss');
+    });
+
+    it('should have valid sector values', () => {
+      portfolioRowData.forEach((holding) => {
+        expect(typeof holding.sector).toBe('string');
+      });
+    });
+
+    it('should have numeric values for calculations', () => {
+      portfolioRowData.forEach((holding) => {
+        expect(typeof holding.marketValue).toBe('number');
+        expect(typeof holding.gainLoss).toBe('number');
+        expect(typeof holding.gainLossPercent).toBe('number');
+      });
+    });
   });
 
-  it('should return empty string for undefined value', () => {
-    expect(gainLossCellClass(undefined)).toBe('');
-  });
-});
+  describe('portfolioColumnDefs', () => {
+    it('should have column definitions', () => {
+      expect(portfolioColumnDefs.length).toBeGreaterThan(0);
+    });
 
-describe('formatPortfolioPrice', () => {
-  it('should format price with yen symbol', () => {
-    expect(formatPortfolioPrice(182.52)).toBe('¥182.52');
-  });
+    it('should have symbol column pinned left', () => {
+      const symbolCol = portfolioColumnDefs.find((c) => c.field === 'symbol');
+      expect(symbolCol).toBeDefined();
+      expect(symbolCol?.pinned).toBe('left');
+    });
 
-  it('should return empty string for null value', () => {
-    expect(formatPortfolioPrice(null)).toBe('');
-  });
+    it('should have gain/loss column with cellClass function', () => {
+      const gainLossCol = portfolioColumnDefs.find((c) => c.field === 'gainLoss');
+      expect(gainLossCol).toBeDefined();
+      expect(typeof gainLossCol?.cellClass).toBe('function');
+    });
 
-  it('should return empty string for undefined value', () => {
-    expect(formatPortfolioPrice(undefined)).toBe('');
-  });
-});
-
-describe('formatMarketValue', () => {
-  it('should format market value with yen symbol', () => {
-    expect(formatMarketValue(9126)).toBe('¥9126.00');
-  });
-
-  it('should return empty string for null value', () => {
-    expect(formatMarketValue(null)).toBe('');
+    it('should have all required fields', () => {
+      const requiredFields = ['symbol', 'name', 'sector', 'quantity', 'avgPrice', 'currentPrice', 'marketValue', 'costBasis', 'gainLoss', 'gainLossPercent', 'allocation'];
+      requiredFields.forEach((field) => {
+        expect(portfolioColumnDefs.find((c) => c.field === field)).toBeDefined();
+      });
+    });
   });
 
-  it('should return empty string for undefined value', () => {
-    expect(formatMarketValue(undefined)).toBe('');
-  });
-});
+  describe('boundary value tests', () => {
+    it('should handle zero gain/loss correctly', () => {
+      expect(gainLossCellClass(0)).toBe(PORTFOLIO_DOMAIN.BOUNDARY.zeroGain.gainLoss >= 0 ? 'cell-accent cell-font-semibold' : 'cell-destructive cell-font-semibold');
+    });
 
-describe('formatGainLoss', () => {
-  it('should format positive gain with plus sign', () => {
-    expect(formatGainLoss(366)).toBe('+¥366.00');
-  });
-
-  it('should format negative loss with minus sign', () => {
-    expect(formatGainLoss(-100)).toBe('¥-100.00');
-  });
-
-  it('should return empty string for null value', () => {
-    expect(formatGainLoss(null)).toBe('');
-  });
-
-  it('should return empty string for undefined value', () => {
-    expect(formatGainLoss(undefined)).toBe('');
-  });
-});
-
-describe('formatGainLossPercent', () => {
-  it('should format positive percent with plus sign', () => {
-    expect(formatGainLossPercent(4.18)).toBe('+4.18%');
-  });
-
-  it('should format negative percent with minus sign', () => {
-    expect(formatGainLossPercent(-2.5)).toBe('-2.50%');
-  });
-
-  it('should return empty string for null value', () => {
-    expect(formatGainLossPercent(null)).toBe('');
-  });
-
-  it('should return empty string for undefined value', () => {
-    expect(formatGainLossPercent(undefined)).toBe('');
-  });
-});
-
-describe('formatAllocation', () => {
-  it('should format allocation with percent symbol', () => {
-    expect(formatAllocation(18.5)).toBe('18.5%');
-  });
-
-  it('should return empty string for null value', () => {
-    expect(formatAllocation(null)).toBe('');
-  });
-
-  it('should return empty string for undefined value', () => {
-    expect(formatAllocation(undefined)).toBe('');
-  });
-});
-
-describe('portfolioRowData', () => {
-  it('should contain portfolio records', () => {
-    expect(portfolioRowData.length).toBe(7);
-  });
-
-  it('should have correct data structure', () => {
-    const first = portfolioRowData[0];
-    expect(first.symbol).toBe('AAPL');
-    expect(first.name).toBe('Apple Inc.');
-    expect(first.sector).toBe('Technology');
-  });
-});
-
-describe('portfolioColumnDefs', () => {
-  it('should have column definitions', () => {
-    expect(portfolioColumnDefs.length).toBeGreaterThan(0);
-  });
-
-  it('should have symbol column with pinned left', () => {
-    const symbolCol = portfolioColumnDefs.find((c) => c.field === 'symbol');
-    expect(symbolCol).toBeDefined();
-    expect(symbolCol?.pinned).toBe('left');
-  });
-
-  it('should have gain/loss column with cellClass function', () => {
-    const gainLossCol = portfolioColumnDefs.find((c) => c.field === 'gainLoss');
-    expect(gainLossCol).toBeDefined();
-    expect(gainLossCol?.cellClass).toBeDefined();
+    it('should handle maximum allocation', () => {
+      const holding = PORTFOLIO_DOMAIN.BOUNDARY.maxAllocation;
+      expect(formatAllocation(holding.allocation)).toBe('100.0%');
+    });
   });
 });

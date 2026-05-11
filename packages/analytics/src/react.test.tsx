@@ -1,11 +1,28 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import {
   AnalyticsProvider,
   useAnalytics,
   GrowthBookProvider,
 } from "./react";
+
+// =============================================================================
+// Domain Test Values - React Hooks
+// =============================================================================
+
+const REACT_DOMAIN = {
+  CONFIG: {
+    apiHost: "https://test.com",
+    clientKey: "test-key",
+  },
+
+  USER_ID: "user-123",
+} as const;
+
+// =============================================================================
+// Mock Setup
+// =============================================================================
 
 const mockGrowthBookInstance = {
   setFeatures: vi.fn().mockReturnThis(),
@@ -30,14 +47,17 @@ vi.mock("./ab", () => ({
   createGrowthBook: vi.fn(() => mockGrowthBookInstance),
 }));
 
+// =============================================================================
+// Test Factories
+// =============================================================================
+
 const createMockTransport = () => ({
   track: vi.fn(),
 });
 
-const createMockClient = () => ({
-  track: vi.fn(),
-  identify: vi.fn(),
-});
+// =============================================================================
+// Test Suite
+// =============================================================================
 
 describe("react", () => {
   describe("AnalyticsProvider", () => {
@@ -56,9 +76,8 @@ describe("react", () => {
       expect(typeof result.current.identify).toBe("function");
     });
 
-    it("should create new client when transport changes", () => {
+    it("should return defined client on re-render", () => {
       const transport1 = createMockTransport();
-      const transport2 = createMockTransport();
 
       const { result, rerender } = renderHook(() => useAnalytics(), {
         wrapper: ({ children }) => (
@@ -66,30 +85,21 @@ describe("react", () => {
         ),
       });
 
-      const firstClient = result.current;
+      rerender();
 
-      rerender({
-        children: null as any,
-      });
-
-      // Changing transport would require full re-render with new wrapper
-      // This is a simplified test showing the provider exists
       expect(result.current).toBeDefined();
     });
 
-    it("should throw when useAnalytics is called outside provider", () => {
-      // When outside provider, useContext returns null and createNoopClient is used
-      // This is expected behavior, not an error
+    it("should not throw when useAnalytics is called outside provider", () => {
       const { result } = renderHook(() => useAnalytics());
 
-      // The noop client should be returned, not throw
       expect(result.current).toBeDefined();
       expect(typeof result.current.track).toBe("function");
     });
   });
 
   describe("useAnalytics", () => {
-    it("should return a client with track method", () => {
+    it("should return a client with track and identify methods", () => {
       const mockTransport = createMockTransport();
       const { result } = renderHook(() => useAnalytics(), {
         wrapper: ({ children }) => (
@@ -100,27 +110,14 @@ describe("react", () => {
       });
 
       expect(typeof result.current.track).toBe("function");
-    });
-
-    it("should return a client with identify method", () => {
-      const mockTransport = createMockTransport();
-      const { result } = renderHook(() => useAnalytics(), {
-        wrapper: ({ children }) => (
-          <AnalyticsProvider transport={mockTransport}>
-            {children}
-          </AnalyticsProvider>
-        ),
-      });
-
       expect(typeof result.current.identify).toBe("function");
     });
 
     it("should use noop client when outside provider", () => {
       const { result } = renderHook(() => useAnalytics());
 
-      // Noop client should not throw when methods are called
       expect(() => result.current.track("test")).not.toThrow();
-      expect(() => result.current.identify("user-1")).not.toThrow();
+      expect(() => result.current.identify(REACT_DOMAIN.USER_ID)).not.toThrow();
     });
 
     it("should return same client instance on re-renders (memoization)", () => {
@@ -137,7 +134,6 @@ describe("react", () => {
 
       rerender();
 
-      // Client should be memoized
       expect(result.current).toBe(firstClient);
     });
   });
@@ -150,7 +146,7 @@ describe("react", () => {
     it("should render children", () => {
       renderHook(() => null, {
         wrapper: ({ children }) => (
-          <GrowthBookProvider config={{ apiHost: "https://test.com", clientKey: "key" }}>
+          <GrowthBookProvider config={REACT_DOMAIN.CONFIG}>
             <span>Test Child</span>
           </GrowthBookProvider>
         ),
@@ -160,24 +156,20 @@ describe("react", () => {
     });
 
     it("should create GrowthBook instance with config", async () => {
-      const config = { apiHost: "https://test.com", clientKey: "test-key" };
-
       renderHook(() => null, {
         wrapper: ({ children }) => (
-          <GrowthBookProvider config={config}>{children}</GrowthBookProvider>
+          <GrowthBookProvider config={REACT_DOMAIN.CONFIG}>{children}</GrowthBookProvider>
         ),
       });
 
       const { createGrowthBook } = await import("./ab");
-      expect(createGrowthBook).toHaveBeenCalledWith(config);
+      expect(createGrowthBook).toHaveBeenCalledWith(REACT_DOMAIN.CONFIG);
     });
 
     it("should call init on mount", async () => {
       renderHook(() => null, {
         wrapper: ({ children }) => (
-          <GrowthBookProvider
-            config={{ apiHost: "https://test.com", clientKey: "key" }}
-          >
+          <GrowthBookProvider config={REACT_DOMAIN.CONFIG}>
             {children}
           </GrowthBookProvider>
         ),
@@ -193,9 +185,7 @@ describe("react", () => {
     it("should call destroy on unmount", async () => {
       const { unmount } = renderHook(() => null, {
         wrapper: ({ children }) => (
-          <GrowthBookProvider
-            config={{ apiHost: "https://test.com", clientKey: "key" }}
-          >
+          <GrowthBookProvider config={REACT_DOMAIN.CONFIG}>
             {children}
           </GrowthBookProvider>
         ),
@@ -206,39 +196,31 @@ describe("react", () => {
       expect(mockGrowthBookInstance.destroy).toHaveBeenCalled();
     });
 
-    it("should use stable GrowthBook instance", async () => {
-      const { result, rerender } = renderHook(() => null, {
+    it("should create GrowthBook only once on re-renders", async () => {
+      const { rerender } = renderHook(() => null, {
         wrapper: ({ children }) => (
-          <GrowthBookProvider
-            config={{ apiHost: "https://test.com", clientKey: "key" }}
-          >
+          <GrowthBookProvider config={REACT_DOMAIN.CONFIG}>
             {children}
           </GrowthBookProvider>
         ),
       });
 
       rerender();
+      rerender();
 
-      // GrowthBook instance should be created only once
       const { createGrowthBook } = await import("./ab");
       expect(createGrowthBook).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("re-exported hooks", () => {
-    it("should export useFeatureIsOn", async () => {
-      const { useFeatureIsOn } = await import("./react");
-      expect(useFeatureIsOn).toBeDefined();
-    });
-
-    it("should export useFeatureValue", async () => {
-      const { useFeatureValue } = await import("./react");
-      expect(useFeatureValue).toBeDefined();
-    });
-
-    it("should export useGrowthBook", async () => {
-      const { useGrowthBook } = await import("./react");
-      expect(useGrowthBook).toBeDefined();
+    it.each([
+      { name: "useFeatureIsOn" },
+      { name: "useFeatureValue" },
+      { name: "useGrowthBook" },
+    ])("should export $name", async ({ name }) => {
+      const module = await import("./react");
+      expect((module as any)[name]).toBeDefined();
     });
   });
 });
