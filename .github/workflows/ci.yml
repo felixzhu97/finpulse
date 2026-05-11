@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm --filter './packages/**' build
+
+      - name: Type check
+        run: |
+          pnpm --filter '@fintech/utils' type-check
+          pnpm --filter '@fintech/analytics' type-check
+          pnpm --filter '@fintech/ui' type-check
+          pnpm --filter finpulse-admin type-check
+          pnpm --filter finpulse-portal type-check
+
+      - name: Lint
+        run: pnpm --filter finpulse-admin lint
+
+      - name: Unit Tests (Vitest)
+        run: |
+          pnpm --filter '@fintech/utils' test
+          pnpm --filter '@fintech/analytics' test
+          pnpm --filter '@fintech/ui' test
+          pnpm --filter finpulse-admin test
+          pnpm --filter finpulse-portal test
+
+      - name: Unit Tests (Jest - mobile)
+        run: pnpm --filter finpulse-mobile test
+
+      - name: API Tests
+        run: pnpm test
