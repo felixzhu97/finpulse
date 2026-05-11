@@ -23,8 +23,8 @@ export const BOUNDARY_VALUES = {
 // TEST DATA GENERATORS
 // ============================================================================
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createDataGenerator =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   <T extends Record<string, any>>(defaults: T) =>
   (overrides: Partial<T> = {}): T => ({
     ...defaults,

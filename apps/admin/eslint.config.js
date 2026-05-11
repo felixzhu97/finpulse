@@ -7,7 +7,7 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['dist', 'node_modules', 'coverage', '*.config.*', '**/*.test.{ts,tsx}', '**/test-setup.ts'],
+    ignores: ['dist', 'node_modules', 'coverage', '*.config.*', '**/*.test.{ts,tsx}', '**/test-setup.ts', '.angular'],
   },
   {
     files: ['**/*.{ts,tsx}'],

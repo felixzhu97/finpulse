@@ -19,6 +19,7 @@ interface PortfolioItem {
   sector: string
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const portfolioRowData: PortfolioItem[] = [
   { symbol: 'AAPL', name: 'Apple Inc.', quantity: 50, avgPrice: 175.2, currentPrice: 182.52, marketValue: 9126, costBasis: 8760, gainLoss: 366, gainLossPercent: 4.18, allocation: 18.5, sector: 'Technology' },
   { symbol: 'MSFT', name: 'Microsoft', quantity: 30, avgPrice: 365.8, currentPrice: 378.91, marketValue: 11367.3, costBasis: 10974, gainLoss: 393.3, gainLossPercent: 3.59, allocation: 23, sector: 'Technology' },
@@ -29,14 +30,20 @@ export const portfolioRowData: PortfolioItem[] = [
   { symbol: 'JPM', name: 'JPMorgan Chase', quantity: 40, avgPrice: 145.2, currentPrice: 148.75, marketValue: 5950, costBasis: 5808, gainLoss: 142, gainLossPercent: 2.45, allocation: 12.1, sector: 'Finance' },
 ]
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const gainLossCellClass = (value: number | undefined) => value !== undefined ? (value >= 0 ? 'cell-accent cell-font-semibold' : 'cell-destructive cell-font-semibold') : ''
-
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatPortfolioPrice = (value: number | null | undefined) => value != null ? `¥${Number(value).toFixed(2)}` : ''
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatMarketValue = (value: number | null | undefined) => value != null ? `¥${Number(value).toFixed(2)}` : ''
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatGainLoss = (value: number | null | undefined) => value != null ? `${value >= 0 ? '+' : ''}¥${Number(value).toFixed(2)}` : ''
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatGainLossPercent = (value: number | null | undefined) => value != null ? `${value >= 0 ? '+' : ''}${Number(value).toFixed(2)}%` : ''
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatAllocation = (value: number | null | undefined) => value != null ? `${Number(value).toFixed(1)}%` : ''
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const portfolioColumnDefs: ColDef<PortfolioItem>[] = [
   { field: 'symbol', headerName: 'Symbol', sortable: true, filter: true, width: 100, pinned: 'left' },
   { field: 'name', headerName: 'Name', sortable: true, filter: true, flex: 1 },

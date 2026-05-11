@@ -16,6 +16,7 @@ interface Report {
   format: 'PDF' | 'Excel' | 'CSV'
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const reportRowData: Report[] = [
   { id: '1', title: 'Q4 2025 Performance Report', type: 'Performance', generatedDate: '2026-01-15', period: 'Q4 2025', status: 'Ready', fileSize: '2.4 MB', format: 'PDF' },
   { id: '2', title: 'Annual Risk Assessment', type: 'Risk', generatedDate: '2026-01-10', period: '2025', status: 'Ready', fileSize: '1.8 MB', format: 'PDF' },
@@ -27,9 +28,12 @@ export const reportRowData: Report[] = [
   { id: '8', title: 'Client Portfolio Summary', type: 'Performance', generatedDate: '2026-01-25', period: 'January 2026', status: 'Failed', fileSize: '-', format: 'PDF' },
 ]
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const reportTypeClass = (v: string) => ({ Performance: 'bg-primary-10', Risk: 'bg-destructive-10', Tax: 'bg-chart-3-10', Compliance: 'bg-accent-10', Custom: 'bg-muted-10' }[v] ?? '')
+// eslint-disable-next-line react-refresh/only-export-components
 export const reportStatusClass = (v: string) => ({ Ready: 'bg-accent-10', Generating: 'bg-chart-3-10', Failed: 'bg-destructive-10' }[v] ?? '')
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const reportColumnDefs: ColDef<Report>[] = [
   { field: 'title', headerName: 'Report Title', sortable: true, filter: true, flex: 2, pinned: 'left' },
   { field: 'type', headerName: 'Type', sortable: true, filter: true, width: 130, cellClass: (p) => reportTypeClass(p.value ?? '') },

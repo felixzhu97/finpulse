@@ -18,6 +18,7 @@ interface Transaction {
   fee: number
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const transactionRowData: Transaction[] = [
   { id: '1', date: '2026-01-27', type: 'Buy', symbol: 'AAPL', name: 'Apple Inc.', quantity: 10, price: 182.52, amount: 1825.2, status: 'Completed', fee: 1 },
   { id: '2', date: '2026-01-26', type: 'Sell', symbol: 'TSLA', name: 'Tesla', quantity: 5, price: 248.34, amount: 1241.7, status: 'Completed', fee: 1 },
@@ -29,14 +30,20 @@ export const transactionRowData: Transaction[] = [
   { id: '8', date: '2026-01-20', type: 'Buy', symbol: 'GOOGL', name: 'Alphabet', quantity: 1, price: 142.5, amount: 142.5, status: 'Failed', fee: 0 },
 ]
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const typeClass = (v: string) => ({ Buy: 'cell-accent', Sell: 'cell-destructive', Deposit: 'cell-chart-3', Withdrawal: 'cell-chart-4' }[v] ?? '')
+// eslint-disable-next-line react-refresh/only-export-components
 export const statusClass = (v: string) => ({ Completed: 'bg-accent-10', Pending: 'bg-chart-3-10', Failed: 'bg-destructive-10' }[v] ?? '')
-
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatQuantity = (value: number | null | undefined) => value != null && value !== 0 ? String(value) : '-'
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatPrice = (value: number | null | undefined) => value ? `¥${Number(value).toFixed(2)}` : '-'
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatAmount = (value: number | null | undefined) => value != null ? `¥${Number(value).toFixed(2)}` : ''
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatFee = (value: number | null | undefined) => value ? `¥${Number(value).toFixed(2)}` : '-'
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const transactionColumnDefs: ColDef<Transaction>[] = [
   { field: 'date', headerName: 'Date', sortable: true, filter: 'agDateColumnFilter', width: 120 },
   { field: 'type', headerName: 'Type', sortable: true, filter: true, width: 100, cellClass: (p) => typeClass(p.value ?? '') },

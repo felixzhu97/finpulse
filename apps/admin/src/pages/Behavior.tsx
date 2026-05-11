@@ -16,6 +16,7 @@ interface EventRow {
   timestamp?: number
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function getUserSummary(p: Record<string, unknown>): string {
   const email = p?.email as string | undefined
   const name = p?.name as string | undefined

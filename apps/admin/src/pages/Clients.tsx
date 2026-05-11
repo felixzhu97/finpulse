@@ -18,6 +18,7 @@ interface Client {
   riskProfile: 'Conservative' | 'Moderate' | 'Aggressive'
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const clientRowData: Client[] = [
   { id: '1', name: 'John Smith', email: 'john.smith@email.com', phone: '+1 234-567-8900', portfolioValue: 1250000, totalAssets: 8, activeInvestments: 5, joinDate: '2024-01-15', status: 'Active', riskProfile: 'Moderate' },
   { id: '2', name: 'Sarah Johnson', email: 'sarah.j@email.com', phone: '+1 234-567-8901', portfolioValue: 850000, totalAssets: 6, activeInvestments: 4, joinDate: '2024-03-20', status: 'Active', riskProfile: 'Conservative' },
@@ -29,11 +30,14 @@ export const clientRowData: Client[] = [
   { id: '8', name: 'Jennifer Taylor', email: 'j.taylor@email.com', phone: '+1 234-567-8907', portfolioValue: 1750000, totalAssets: 10, activeInvestments: 7, joinDate: '2023-12-05', status: 'Active', riskProfile: 'Aggressive' },
 ]
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const statusClass = (v: string) => ({ Active: 'bg-accent-10', Inactive: 'bg-muted-10', Pending: 'bg-chart-3-10' }[v] ?? '')
+// eslint-disable-next-line react-refresh/only-export-components
 export const riskClass = (v: string) => ({ Conservative: 'bg-chart-3-10', Moderate: 'bg-chart-2-10', Aggressive: 'bg-destructive-10' }[v] ?? '')
-
+// eslint-disable-next-line react-refresh/only-export-components
 export const formatPortfolioValue = (value: number | null | undefined) => value != null ? `¥${(value / 1e6).toFixed(2)}M` : ''
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const clientColumnDefs: ColDef<Client>[] = [
   { field: 'name', headerName: 'Name', sortable: true, filter: true, flex: 1, pinned: 'left' },
   { field: 'email', headerName: 'Email', sortable: true, filter: true, flex: 1 },
