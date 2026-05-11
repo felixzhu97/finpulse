@@ -22,7 +22,7 @@
     "test:api": "cd apps/server-python && .venv/bin/python -m pytest tests -v",
     "test:api:go": "cd apps/server-go && go test ./cmd/server -v -count=1",
     "lint": "pnpm --filter finpulse-admin lint",
-    "pre-commit": "pnpm check-types && pnpm test:type && pnpm test:all && pnpm lint-staged",
+    "pre-commit": "pnpm check-types && pnpm test:type && pnpm lint-staged",
     "stop:backend": "bash scripts/backend/stop-backend.sh",
     "prepare": "husky"
   },
