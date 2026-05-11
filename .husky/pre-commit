@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpm pre-commit
+pnpm check-types && pnpm test:type && pnpm test:all && pnpm lint
