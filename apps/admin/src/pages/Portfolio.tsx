@@ -19,7 +19,7 @@ interface PortfolioItem {
   sector: string
 }
 
-const rowData: PortfolioItem[] = [
+export const portfolioRowData: PortfolioItem[] = [
   { symbol: 'AAPL', name: 'Apple Inc.', quantity: 50, avgPrice: 175.2, currentPrice: 182.52, marketValue: 9126, costBasis: 8760, gainLoss: 366, gainLossPercent: 4.18, allocation: 18.5, sector: 'Technology' },
   { symbol: 'MSFT', name: 'Microsoft', quantity: 30, avgPrice: 365.8, currentPrice: 378.91, marketValue: 11367.3, costBasis: 10974, gainLoss: 393.3, gainLossPercent: 3.59, allocation: 23, sector: 'Technology' },
   { symbol: 'NVDA', name: 'NVIDIA', quantity: 20, avgPrice: 850, currentPrice: 875.28, marketValue: 17505.6, costBasis: 17000, gainLoss: 505.6, gainLossPercent: 2.98, allocation: 35.5, sector: 'Technology' },
@@ -29,18 +29,26 @@ const rowData: PortfolioItem[] = [
   { symbol: 'JPM', name: 'JPMorgan Chase', quantity: 40, avgPrice: 145.2, currentPrice: 148.75, marketValue: 5950, costBasis: 5808, gainLoss: 142, gainLossPercent: 2.45, allocation: 12.1, sector: 'Finance' },
 ]
 
-const columnDefs: ColDef<PortfolioItem>[] = [
+export const gainLossCellClass = (value: number | undefined) => value !== undefined ? (value >= 0 ? 'cell-accent cell-font-semibold' : 'cell-destructive cell-font-semibold') : ''
+
+export const formatPortfolioPrice = (value: number | null | undefined) => value != null ? `¥${Number(value).toFixed(2)}` : ''
+export const formatMarketValue = (value: number | null | undefined) => value != null ? `¥${Number(value).toFixed(2)}` : ''
+export const formatGainLoss = (value: number | null | undefined) => value != null ? `${value >= 0 ? '+' : ''}¥${Number(value).toFixed(2)}` : ''
+export const formatGainLossPercent = (value: number | null | undefined) => value != null ? `${value >= 0 ? '+' : ''}${Number(value).toFixed(2)}%` : ''
+export const formatAllocation = (value: number | null | undefined) => value != null ? `${Number(value).toFixed(1)}%` : ''
+
+export const portfolioColumnDefs: ColDef<PortfolioItem>[] = [
   { field: 'symbol', headerName: 'Symbol', sortable: true, filter: true, width: 100, pinned: 'left' },
   { field: 'name', headerName: 'Name', sortable: true, filter: true, flex: 1 },
   { field: 'sector', headerName: 'Sector', sortable: true, filter: true, width: 120 },
   { field: 'quantity', headerName: 'Quantity', sortable: true, filter: 'agNumberColumnFilter', width: 100 },
-  { field: 'avgPrice', headerName: 'Avg Price', sortable: true, filter: 'agNumberColumnFilter', width: 110, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : '') },
-  { field: 'currentPrice', headerName: 'Current Price', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : '') },
-  { field: 'marketValue', headerName: 'Market Value', sortable: true, filter: 'agNumberColumnFilter', width: 130, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : ''), cellClass: 'cell-font-semibold' },
-  { field: 'costBasis', headerName: 'Cost Basis', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : '') },
-  { field: 'gainLoss', headerName: 'Gain/Loss', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `${p.value >= 0 ? '+' : ''}¥${Number(p.value).toFixed(2)}` : ''), cellClass: (p) => (p.value >= 0 ? 'cell-accent cell-font-semibold' : 'cell-destructive cell-font-semibold') },
-  { field: 'gainLossPercent', headerName: 'Gain/Loss %', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `${p.value >= 0 ? '+' : ''}${Number(p.value).toFixed(2)}%` : ''), cellClass: (p) => (p.value >= 0 ? 'cell-accent cell-font-semibold' : 'cell-destructive cell-font-semibold') },
-  { field: 'allocation', headerName: 'Allocation %', sortable: true, filter: 'agNumberColumnFilter', width: 130, valueFormatter: (p) => (p.value != null ? `${Number(p.value).toFixed(1)}%` : '') },
+  { field: 'avgPrice', headerName: 'Avg Price', sortable: true, filter: 'agNumberColumnFilter', width: 110, valueFormatter: (p) => formatPortfolioPrice(p.value) },
+  { field: 'currentPrice', headerName: 'Current Price', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => formatPortfolioPrice(p.value) },
+  { field: 'marketValue', headerName: 'Market Value', sortable: true, filter: 'agNumberColumnFilter', width: 130, valueFormatter: (p) => formatMarketValue(p.value), cellClass: 'cell-font-semibold' },
+  { field: 'costBasis', headerName: 'Cost Basis', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => formatPortfolioPrice(p.value) },
+  { field: 'gainLoss', headerName: 'Gain/Loss', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => formatGainLoss(p.value), cellClass: (p) => gainLossCellClass(p.value) },
+  { field: 'gainLossPercent', headerName: 'Gain/Loss %', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => formatGainLossPercent(p.value), cellClass: (p) => gainLossCellClass(p.value) },
+  { field: 'allocation', headerName: 'Allocation %', sortable: true, filter: 'agNumberColumnFilter', width: 130, valueFormatter: (p) => formatAllocation(p.value) },
 ]
 
 export function Portfolio() {
@@ -60,8 +68,8 @@ export function Portfolio() {
         <AgGridWrap className="ag-theme-quartz-dark ag-robinhood">
           <AgGridReact<PortfolioItem>
             ref={gridRef}
-            rowData={rowData}
-            columnDefs={columnDefs}
+            rowData={portfolioRowData}
+            columnDefs={portfolioColumnDefs}
             defaultColDef={{ resizable: true, sortable: true, filter: true }}
             pagination
             paginationPageSize={20}

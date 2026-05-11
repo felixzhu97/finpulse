@@ -16,7 +16,7 @@ interface EventRow {
   timestamp?: number
 }
 
-function getUserSummary(p: Record<string, unknown>): string {
+export function getUserSummary(p: Record<string, unknown>): string {
   const email = p?.email as string | undefined
   const name = p?.name as string | undefined
   const userId = p?.userId as string | undefined

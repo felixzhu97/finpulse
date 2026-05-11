@@ -16,7 +16,7 @@ interface Report {
   format: 'PDF' | 'Excel' | 'CSV'
 }
 
-const rowData: Report[] = [
+export const reportRowData: Report[] = [
   { id: '1', title: 'Q4 2025 Performance Report', type: 'Performance', generatedDate: '2026-01-15', period: 'Q4 2025', status: 'Ready', fileSize: '2.4 MB', format: 'PDF' },
   { id: '2', title: 'Annual Risk Assessment', type: 'Risk', generatedDate: '2026-01-10', period: '2025', status: 'Ready', fileSize: '1.8 MB', format: 'PDF' },
   { id: '3', title: 'Tax Report 2025', type: 'Tax', generatedDate: '2026-01-05', period: '2025', status: 'Ready', fileSize: '3.2 MB', format: 'Excel' },
@@ -27,17 +27,17 @@ const rowData: Report[] = [
   { id: '8', title: 'Client Portfolio Summary', type: 'Performance', generatedDate: '2026-01-25', period: 'January 2026', status: 'Failed', fileSize: '-', format: 'PDF' },
 ]
 
-const typeClass = (v: string) => ({ Performance: 'bg-primary-10', Risk: 'bg-destructive-10', Tax: 'bg-chart-3-10', Compliance: 'bg-accent-10', Custom: 'bg-muted-10' }[v] ?? '')
-const statusClass = (v: string) => ({ Ready: 'bg-accent-10', Generating: 'bg-chart-3-10', Failed: 'bg-destructive-10' }[v] ?? '')
+export const reportTypeClass = (v: string) => ({ Performance: 'bg-primary-10', Risk: 'bg-destructive-10', Tax: 'bg-chart-3-10', Compliance: 'bg-accent-10', Custom: 'bg-muted-10' }[v] ?? '')
+export const reportStatusClass = (v: string) => ({ Ready: 'bg-accent-10', Generating: 'bg-chart-3-10', Failed: 'bg-destructive-10' }[v] ?? '')
 
-const columnDefs: ColDef<Report>[] = [
+export const reportColumnDefs: ColDef<Report>[] = [
   { field: 'title', headerName: 'Report Title', sortable: true, filter: true, flex: 2, pinned: 'left' },
-  { field: 'type', headerName: 'Type', sortable: true, filter: true, width: 130, cellClass: (p) => typeClass(p.value ?? '') },
+  { field: 'type', headerName: 'Type', sortable: true, filter: true, width: 130, cellClass: (p) => reportTypeClass(p.value ?? '') },
   { field: 'period', headerName: 'Period', sortable: true, filter: true, width: 150 },
   { field: 'generatedDate', headerName: 'Generated Date', sortable: true, filter: 'agDateColumnFilter', width: 150 },
   { field: 'format', headerName: 'Format', sortable: true, filter: true, width: 100 },
   { field: 'fileSize', headerName: 'File Size', sortable: true, filter: true, width: 100 },
-  { field: 'status', headerName: 'Status', sortable: true, filter: true, width: 130, cellClass: (p) => statusClass(p.value ?? '') },
+  { field: 'status', headerName: 'Status', sortable: true, filter: true, width: 130, cellClass: (p) => reportStatusClass(p.value ?? '') },
 ]
 
 export function Reports() {
@@ -57,8 +57,8 @@ export function Reports() {
         <AgGridWrap className="ag-theme-quartz-dark ag-robinhood">
           <AgGridReact<Report>
             ref={gridRef}
-            rowData={rowData}
-            columnDefs={columnDefs}
+            rowData={reportRowData}
+            columnDefs={reportColumnDefs}
             defaultColDef={{ resizable: true, sortable: true, filter: true }}
             pagination
             paginationPageSize={20}

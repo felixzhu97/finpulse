@@ -18,7 +18,7 @@ interface Client {
   riskProfile: 'Conservative' | 'Moderate' | 'Aggressive'
 }
 
-const rowData: Client[] = [
+export const clientRowData: Client[] = [
   { id: '1', name: 'John Smith', email: 'john.smith@email.com', phone: '+1 234-567-8900', portfolioValue: 1250000, totalAssets: 8, activeInvestments: 5, joinDate: '2024-01-15', status: 'Active', riskProfile: 'Moderate' },
   { id: '2', name: 'Sarah Johnson', email: 'sarah.j@email.com', phone: '+1 234-567-8901', portfolioValue: 850000, totalAssets: 6, activeInvestments: 4, joinDate: '2024-03-20', status: 'Active', riskProfile: 'Conservative' },
   { id: '3', name: 'Michael Chen', email: 'm.chen@email.com', phone: '+1 234-567-8902', portfolioValue: 2100000, totalAssets: 12, activeInvestments: 8, joinDate: '2023-11-10', status: 'Active', riskProfile: 'Aggressive' },
@@ -29,14 +29,16 @@ const rowData: Client[] = [
   { id: '8', name: 'Jennifer Taylor', email: 'j.taylor@email.com', phone: '+1 234-567-8907', portfolioValue: 1750000, totalAssets: 10, activeInvestments: 7, joinDate: '2023-12-05', status: 'Active', riskProfile: 'Aggressive' },
 ]
 
-const statusClass = (v: string) => ({ Active: 'bg-accent-10', Inactive: 'bg-muted-10', Pending: 'bg-chart-3-10' }[v] ?? '')
-const riskClass = (v: string) => ({ Conservative: 'bg-chart-3-10', Moderate: 'bg-chart-2-10', Aggressive: 'bg-destructive-10' }[v] ?? '')
+export const statusClass = (v: string) => ({ Active: 'bg-accent-10', Inactive: 'bg-muted-10', Pending: 'bg-chart-3-10' }[v] ?? '')
+export const riskClass = (v: string) => ({ Conservative: 'bg-chart-3-10', Moderate: 'bg-chart-2-10', Aggressive: 'bg-destructive-10' }[v] ?? '')
 
-const columnDefs: ColDef<Client>[] = [
+export const formatPortfolioValue = (value: number | null | undefined) => value != null ? `¥${(value / 1e6).toFixed(2)}M` : ''
+
+export const clientColumnDefs: ColDef<Client>[] = [
   { field: 'name', headerName: 'Name', sortable: true, filter: true, flex: 1, pinned: 'left' },
   { field: 'email', headerName: 'Email', sortable: true, filter: true, flex: 1 },
   { field: 'phone', headerName: 'Phone', sortable: true, filter: true, width: 150 },
-  { field: 'portfolioValue', headerName: 'Portfolio Value', sortable: true, filter: 'agNumberColumnFilter', width: 150, valueFormatter: (p) => (p.value != null ? `¥${(p.value / 1e6).toFixed(2)}M` : ''), cellClass: 'cell-font-semibold' },
+  { field: 'portfolioValue', headerName: 'Portfolio Value', sortable: true, filter: 'agNumberColumnFilter', width: 150, valueFormatter: (p) => formatPortfolioValue(p.value), cellClass: 'cell-font-semibold' },
   { field: 'totalAssets', headerName: 'Total Assets', sortable: true, filter: 'agNumberColumnFilter', width: 120 },
   { field: 'activeInvestments', headerName: 'Active Investments', sortable: true, filter: 'agNumberColumnFilter', width: 150 },
   { field: 'joinDate', headerName: 'Join Date', sortable: true, filter: 'agDateColumnFilter', width: 120 },
@@ -61,8 +63,8 @@ export function Clients() {
         <AgGridWrap className="ag-theme-quartz-dark ag-robinhood">
           <AgGridReact<Client>
             ref={gridRef}
-            rowData={rowData}
-            columnDefs={columnDefs}
+            rowData={clientRowData}
+            columnDefs={clientColumnDefs}
             defaultColDef={{ resizable: true, sortable: true, filter: true }}
             pagination
             paginationPageSize={20}

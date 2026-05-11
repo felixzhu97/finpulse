@@ -18,4 +18,30 @@ describe('AssetAllocation', () => {
     expect(screen.getByText('Stocks')).toBeInTheDocument();
     expect(screen.getByText('Bonds')).toBeInTheDocument();
   });
+
+  it('should render all asset categories', () => {
+    render(<AssetAllocation />);
+    expect(screen.getByText('Stocks')).toBeInTheDocument();
+    expect(screen.getByText('Bonds')).toBeInTheDocument();
+    expect(screen.getByText('Funds')).toBeInTheDocument();
+    expect(screen.getByText('Cash')).toBeInTheDocument();
+    expect(screen.getByText('Other')).toBeInTheDocument();
+  });
+
+  it('should render percentage values', () => {
+    render(<AssetAllocation />);
+    expect(screen.getByText('45%')).toBeInTheDocument();
+    expect(screen.getByText('25%')).toBeInTheDocument();
+  });
+
+  it('should render Total Assets label', () => {
+    render(<AssetAllocation />);
+    expect(screen.getByText('Total Assets')).toBeInTheDocument();
+  });
+
+  it('should render Card component', () => {
+    render(<AssetAllocation />);
+    const card = screen.getByText('Asset Allocation').closest('.glass');
+    expect(card).toBeInTheDocument();
+  });
 });

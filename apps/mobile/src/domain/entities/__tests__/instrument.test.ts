@@ -1,4 +1,4 @@
-import { Instrument } from "../../../domain/entities/instrument";
+import type { Instrument } from "@/src/domain/entities/instrument";
 
 describe("Instrument Entity", () => {
   describe("Instrument interface", () => {
@@ -23,7 +23,7 @@ describe("Instrument Entity", () => {
     it("should allow null name", () => {
       const instrument: Instrument = {
         instrument_id: "INST002",
-        symbol: "UNKNOWN",
+        symbol: "SPY",
         name: null,
         asset_class: "equity",
         currency: "USD",
@@ -36,11 +36,11 @@ describe("Instrument Entity", () => {
     it("should allow null asset_class", () => {
       const instrument: Instrument = {
         instrument_id: "INST003",
-        symbol: "XYZ",
-        name: "XYZ Corp",
+        symbol: "BND",
+        name: "Vanguard Total Bond Market ETF",
         asset_class: null,
         currency: "USD",
-        exchange: "NASDAQ",
+        exchange: "NYSE",
       };
 
       expect(instrument.asset_class).toBeNull();
@@ -49,11 +49,11 @@ describe("Instrument Entity", () => {
     it("should allow null currency", () => {
       const instrument: Instrument = {
         instrument_id: "INST004",
-        symbol: "DEF",
-        name: "DEF Industries",
-        asset_class: "bond",
+        symbol: "FX",
+        name: "Foreign Exchange",
+        asset_class: "currency",
         currency: null,
-        exchange: "NYSE",
+        exchange: "FX",
       };
 
       expect(instrument.currency).toBeNull();
@@ -62,10 +62,10 @@ describe("Instrument Entity", () => {
     it("should allow null exchange", () => {
       const instrument: Instrument = {
         instrument_id: "INST005",
-        symbol: "GHI",
-        name: "GHI Holdings",
-        asset_class: "fund",
-        currency: "EUR",
+        symbol: "CRYPTO",
+        name: "Bitcoin",
+        asset_class: "crypto",
+        currency: "BTC",
         exchange: null,
       };
 
@@ -73,52 +73,51 @@ describe("Instrument Entity", () => {
     });
 
     it("should accept various asset classes", () => {
-      const assetClasses = ["equity", "bond", "fund", "etf", "option", "futures", "commodity", "forex", "crypto"];
-
-      assetClasses.forEach((assetClass) => {
+      const assetClasses = ["equity", "fixed_income", "cash", "crypto", "commodity", "real_estate"];
+      
+      assetClasses.forEach((asset_class) => {
         const instrument: Instrument = {
-          instrument_id: `INST_${assetClass}`,
-          symbol: assetClass.toUpperCase(),
-          name: `${assetClass} Asset`,
-          asset_class: assetClass,
+          instrument_id: `INST-${asset_class}`,
+          symbol: asset_class.toUpperCase().slice(0, 4),
+          name: asset_class,
+          asset_class,
           currency: "USD",
           exchange: "EXCHANGE",
         };
-
-        expect(instrument.asset_class).toBe(assetClass);
+        expect(instrument.asset_class).toBe(asset_class);
       });
     });
 
     it("should accept various currencies", () => {
-      const currencies = ["USD", "EUR", "GBP", "JPY", "HKD", "CNY", "CHF", "AUD"];
-
+      const currencies = ["USD", "EUR", "GBP", "JPY", "CNY", "BTC", "ETH"];
+      
       currencies.forEach((currency) => {
         const instrument: Instrument = {
-          instrument_id: `INST_${currency}`,
+          instrument_id: `INST-${currency}`,
           symbol: currency,
-          name: `${currency} Asset`,
-          asset_class: "equity",
+          name: currency,
+          asset_class: "currency",
           currency,
-          exchange: "EXCHANGE",
+          exchange: "FX",
         };
-
         expect(instrument.currency).toBe(currency);
       });
     });
 
-    it("should handle cryptocurrency instruments", () => {
-      const crypto: Instrument = {
-        instrument_id: "CRYPTO_BTC",
-        symbol: "BTC",
-        name: "Bitcoin",
-        asset_class: "crypto",
-        currency: "USD",
-        exchange: "CRYPTO",
+    it("should handle all null optional fields", () => {
+      const instrument: Instrument = {
+        instrument_id: "INST_NULL",
+        symbol: "UNKNOWN",
+        name: null,
+        asset_class: null,
+        currency: null,
+        exchange: null,
       };
 
-      expect(crypto.symbol).toBe("BTC");
-      expect(crypto.asset_class).toBe("crypto");
-      expect(crypto.exchange).toBe("CRYPTO");
+      expect(instrument.name).toBeNull();
+      expect(instrument.asset_class).toBeNull();
+      expect(instrument.currency).toBeNull();
+      expect(instrument.exchange).toBeNull();
     });
   });
 });

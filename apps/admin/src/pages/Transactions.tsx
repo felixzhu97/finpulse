@@ -18,7 +18,7 @@ interface Transaction {
   fee: number
 }
 
-const rowData: Transaction[] = [
+export const transactionRowData: Transaction[] = [
   { id: '1', date: '2026-01-27', type: 'Buy', symbol: 'AAPL', name: 'Apple Inc.', quantity: 10, price: 182.52, amount: 1825.2, status: 'Completed', fee: 1 },
   { id: '2', date: '2026-01-26', type: 'Sell', symbol: 'TSLA', name: 'Tesla', quantity: 5, price: 248.34, amount: 1241.7, status: 'Completed', fee: 1 },
   { id: '3', date: '2026-01-25', type: 'Buy', symbol: 'NVDA', name: 'NVIDIA', quantity: 2, price: 875.28, amount: 1750.56, status: 'Completed', fee: 1 },
@@ -29,18 +29,23 @@ const rowData: Transaction[] = [
   { id: '8', date: '2026-01-20', type: 'Buy', symbol: 'GOOGL', name: 'Alphabet', quantity: 1, price: 142.5, amount: 142.5, status: 'Failed', fee: 0 },
 ]
 
-const typeClass = (v: string) => ({ Buy: 'cell-accent', Sell: 'cell-destructive', Deposit: 'cell-chart-3', Withdrawal: 'cell-chart-4' }[v] ?? '')
-const statusClass = (v: string) => ({ Completed: 'bg-accent-10', Pending: 'bg-chart-3-10', Failed: 'bg-destructive-10' }[v] ?? '')
+export const typeClass = (v: string) => ({ Buy: 'cell-accent', Sell: 'cell-destructive', Deposit: 'cell-chart-3', Withdrawal: 'cell-chart-4' }[v] ?? '')
+export const statusClass = (v: string) => ({ Completed: 'bg-accent-10', Pending: 'bg-chart-3-10', Failed: 'bg-destructive-10' }[v] ?? '')
 
-const columnDefs: ColDef<Transaction>[] = [
+export const formatQuantity = (value: number | null | undefined) => value != null && value !== 0 ? String(value) : '-'
+export const formatPrice = (value: number | null | undefined) => value ? `¥${Number(value).toFixed(2)}` : '-'
+export const formatAmount = (value: number | null | undefined) => value != null ? `¥${Number(value).toFixed(2)}` : ''
+export const formatFee = (value: number | null | undefined) => value ? `¥${Number(value).toFixed(2)}` : '-'
+
+export const transactionColumnDefs: ColDef<Transaction>[] = [
   { field: 'date', headerName: 'Date', sortable: true, filter: 'agDateColumnFilter', width: 120 },
   { field: 'type', headerName: 'Type', sortable: true, filter: true, width: 100, cellClass: (p) => typeClass(p.value ?? '') },
   { field: 'symbol', headerName: 'Symbol', sortable: true, filter: true, width: 100 },
   { field: 'name', headerName: 'Name', sortable: true, filter: true, flex: 1 },
-  { field: 'quantity', headerName: 'Quantity', sortable: true, filter: 'agNumberColumnFilter', width: 100, valueFormatter: (p) => (p.value != null && p.value !== 0 ? String(p.value) : '-') },
-  { field: 'price', headerName: 'Price', sortable: true, filter: 'agNumberColumnFilter', width: 100, valueFormatter: (p) => (p.value ? `¥${Number(p.value).toFixed(2)}` : '-') },
-  { field: 'amount', headerName: 'Amount', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => (p.value != null ? `¥${Number(p.value).toFixed(2)}` : ''), cellClass: 'cell-font-semibold' },
-  { field: 'fee', headerName: 'Fee', sortable: true, filter: 'agNumberColumnFilter', width: 80, valueFormatter: (p) => (p.value ? `¥${Number(p.value).toFixed(2)}` : '-') },
+  { field: 'quantity', headerName: 'Quantity', sortable: true, filter: 'agNumberColumnFilter', width: 100, valueFormatter: (p) => formatQuantity(p.value) },
+  { field: 'price', headerName: 'Price', sortable: true, filter: 'agNumberColumnFilter', width: 100, valueFormatter: (p) => formatPrice(p.value) },
+  { field: 'amount', headerName: 'Amount', sortable: true, filter: 'agNumberColumnFilter', width: 120, valueFormatter: (p) => formatAmount(p.value), cellClass: 'cell-font-semibold' },
+  { field: 'fee', headerName: 'Fee', sortable: true, filter: 'agNumberColumnFilter', width: 80, valueFormatter: (p) => formatFee(p.value) },
   { field: 'status', headerName: 'Status', sortable: true, filter: true, width: 120, cellClass: (p) => statusClass(p.value ?? '') },
 ]
 
@@ -61,8 +66,8 @@ export function Transactions() {
         <AgGridWrap className="ag-theme-quartz-dark ag-robinhood">
           <AgGridReact<Transaction>
             ref={gridRef}
-            rowData={rowData}
-            columnDefs={columnDefs}
+            rowData={transactionRowData}
+            columnDefs={transactionColumnDefs}
             defaultColDef={{ resizable: true, sortable: true, filter: true }}
             pagination
             paginationPageSize={20}
