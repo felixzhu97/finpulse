@@ -46,30 +46,44 @@ def register(r: APIRouter) -> None:
         svc: Annotated[PortfolioApplicationService, Depends(get_portfolio_service)],
         cache: Annotated[RedisCache, Depends(get_cache)] = None,
     ):
+        import logging, traceback
+        logger = logging.getLogger("api")
         cache_key = f"{PORTFOLIO_AGGREGATE_KEY_PREFIX}demo-portfolio"
         if cache:
-            cached = await cache.get(cache_key)
-            if cached is not None:
-                return cached
+            try:
+                cached = await cache.get(cache_key)
+                if cached is not None:
+                    return cached
+            except Exception as e:
+                logger.warning("cache.get failed: %s", e)
+        portfolio = None
         try:
             portfolio = await svc.get_portfolio()
-        except Exception:
-            from src.core.application.use_cases.portfolio_service import _demo_portfolio
-            portfolio = _demo_portfolio()
+        except Exception as e:
+            logger.error("svc.get_portfolio failed: %s\n%s", e, traceback.format_exc())
+        if portfolio is None:
+            try:
+                from src.core.application.use_cases.portfolio_service import _demo_portfolio
+                portfolio = _demo_portfolio()
+                logger.info("Using demo portfolio fallback")
+            except Exception as e2:
+                logger.error("Even demo fallback failed: %s", e2)
+                raise HTTPException(status_code=503, detail="Portfolio service unavailable")
         try:
             response = assemble_portfolio(portfolio)
             if cache:
-                await cache.set(
-                    cache_key,
-                    response.model_dump(mode="json"),
-                    ttl_seconds=CACHE_TTL_SECONDS,
-                )
+                try:
+                    await cache.set(
+                        cache_key,
+                        response.model_dump(mode="json"),
+                        ttl_seconds=CACHE_TTL_SECONDS,
+                    )
+                except Exception as e:
+                    logger.warning("cache.set failed: %s", e)
             return response
         except Exception as e:
-            from src.core.application.use_cases.portfolio_service import _demo_portfolio
-            portfolio = _demo_portfolio()
-            response = assemble_portfolio(portfolio)
-            return response
+            logger.error("assemble_portfolio failed: %s\n%s", e, traceback.format_exc())
+            raise HTTPException(status_code=500, detail="Failed to assemble portfolio response")
 
     @r.get("/api/v1/portfolio/risk-summary", response_model=RiskSummaryView)
     async def portfolio_risk_summary_get(
