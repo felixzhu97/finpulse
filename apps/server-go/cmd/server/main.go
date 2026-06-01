@@ -110,6 +110,7 @@ func main() {
 	r.Use(gin.Recovery(), cors())
 	r.GET("/health", h.Health)
 	r.GET("/api/v1/quotes", h.Quotes)
+	r.GET("/api/v1/quotes/history", h.QuotesHistory)
 	r.GET("/api/v1/instruments", h.InstrumentsList)
 	r.GET("/api/v1/instruments/:instrument_id", h.InstrumentsGet)
 	r.POST("/api/v1/instruments", h.InstrumentsCreate)

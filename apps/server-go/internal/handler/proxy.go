@@ -43,10 +43,13 @@ func conditionalProxy(analyticsURL, fallbackURL string) gin.HandlerFunc {
 
 func isAnalyticsPath(path string) bool {
 	prefixes := []string{
+		"/api/v1/customers",
+		"/api/v1/portfolio",
 		"/api/v1/risk-metrics",
 		"/api/v1/analytics",
 		"/api/v1/forecast",
 		"/api/v1/valuations",
+		"/api/v1/quotes/history",
 	}
 	for _, p := range prefixes {
 		if strings.HasPrefix(path, p) {

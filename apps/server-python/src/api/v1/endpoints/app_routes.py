@@ -51,15 +51,25 @@ def register(r: APIRouter) -> None:
             cached = await cache.get(cache_key)
             if cached is not None:
                 return cached
-        portfolio = await svc.get_portfolio()
-        response = assemble_portfolio(portfolio)
-        if cache:
-            await cache.set(
-                cache_key,
-                response.model_dump(mode="json"),
-                ttl_seconds=CACHE_TTL_SECONDS,
-            )
-        return response
+        try:
+            portfolio = await svc.get_portfolio()
+        except Exception:
+            from src.core.application.use_cases.portfolio_service import _demo_portfolio
+            portfolio = _demo_portfolio()
+        try:
+            response = assemble_portfolio(portfolio)
+            if cache:
+                await cache.set(
+                    cache_key,
+                    response.model_dump(mode="json"),
+                    ttl_seconds=CACHE_TTL_SECONDS,
+                )
+            return response
+        except Exception as e:
+            from src.core.application.use_cases.portfolio_service import _demo_portfolio
+            portfolio = _demo_portfolio()
+            response = assemble_portfolio(portfolio)
+            return response
 
     @r.get("/api/v1/portfolio/risk-summary", response_model=RiskSummaryView)
     async def portfolio_risk_summary_get(

@@ -12,6 +12,7 @@ func TestProxyHelpers(t *testing.T) {
 
 	t.Run("isAnalyticsPath returns true for analytics paths", func(t *testing.T) {
 		analyticsPaths := []string{
+			"/api/v1/portfolio",
 			"/api/v1/risk-metrics",
 			"/api/v1/analytics",
 			"/api/v1/analytics/portfolio",
@@ -30,7 +31,6 @@ func TestProxyHelpers(t *testing.T) {
 		nonAnalyticsPaths := []string{
 			"/api/v1/instruments",
 			"/health",
-			"/api/v1/customers",
 			"/api/v2/analytics",
 		}
 

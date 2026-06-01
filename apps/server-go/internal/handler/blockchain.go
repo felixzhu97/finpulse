@@ -108,10 +108,8 @@ func (h *Handler) BlockchainGetBlock(c *gin.Context) {
 	for i, t := range txs {
 		txResp[i] = txToJSON(t)
 	}
-	resp := gin.H{
-		"block":        blockToJSON(*block),
-		"transactions": txResp,
-	}
+	resp := blockToJSON(*block)
+	resp["transactions"] = txResp
 	if h.Cache != nil {
 		_ = h.Cache.Set(c.Request.Context(), cacheKey, resp, cacheTTL)
 	}
