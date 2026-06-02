@@ -2,7 +2,7 @@ import type { ComponentType } from "react";
 import { useCallback, useMemo, useState } from "react";
 import type { ViewProps } from "react-native";
 import { Platform, requireNativeComponent, Text, View, PanResponder } from "react-native";
-import { formatChartLabel, formatChartTooltipDate } from "@/src/utils";
+import { formatChartLabel, formatChartTooltipDate } from "@/src/lib/utils";
 
 export type PointSelectPayload = {
   index: number;

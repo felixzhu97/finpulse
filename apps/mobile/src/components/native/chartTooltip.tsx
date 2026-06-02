@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 import { AbsoluteFillView } from "@/src/theme/primitives";
-import { formatChartTooltipDate } from "@/src/utils";
+import { formatChartTooltipDate } from "@/src/lib/utils";
 
 export function formatChartValue(value: number): string {
   if (value >= 1e9) return (value / 1e9).toFixed(2) + "B";

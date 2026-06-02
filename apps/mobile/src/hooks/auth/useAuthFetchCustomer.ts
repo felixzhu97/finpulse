@@ -1,6 +1,6 @@
 import {useAppDispatch, useAppSelector} from "@/src/store";
 import {useEffect} from "react";
-import * as authApi from "@/src/lib/api/auth";
+import * as authApi from "@/src/api/auth";
 import {setCustomer} from "@/src/store/authSlice";
 
 export function useAuthFetchCustomer(): void {

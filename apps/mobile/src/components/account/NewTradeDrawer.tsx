@@ -14,7 +14,7 @@ import {
   getTradeFormData,
   createOrder,
   executeTrade,
-} from "@/src/lib/api";
+} from "@/src/api";
 import type { Instrument } from "@/src/types/instrument";
 import type { Order } from "@/src/types/order";
 import type { Trade } from "@/src/types/trade";

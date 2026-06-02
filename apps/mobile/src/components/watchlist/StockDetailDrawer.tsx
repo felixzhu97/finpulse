@@ -11,8 +11,8 @@ import {
   View,
 } from "react-native";
 import { useDraggableDrawer, type SymbolDisplayData } from "@/src/hooks";
-import { formatPrice, formatSigned } from "@/src/utils";
-import { getStockChangeInfo, PeriodDataProcessor } from "@/src/utils";
+import { formatPrice, formatSigned } from "@/src/lib/utils";
+import { getStockChangeInfo, PeriodDataProcessor } from "@/src/lib/utils";
 import { InteractiveStockChart } from "./InteractiveStockChart";
 import { useTheme } from "@/src/theme";
 import { useAppDispatch, useAppSelector } from "@/src/store";

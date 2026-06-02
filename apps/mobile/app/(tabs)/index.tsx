@@ -9,7 +9,7 @@ import { MetricCard } from "@/src/components/ui/MetricCard";
 import { AssetAllocationChart } from "@/src/components/portfolio/AssetAllocationChart";
 import { NetWorthLineChart } from "@/src/components/portfolio/NetWorthLineChart";
 import { useTheme } from "@/src/theme";
-import { formatScreenDateLong, getCurrencySymbol } from "@/src/utils";
+import { formatScreenDateLong, getCurrencySymbol } from "@/src/lib/utils";
 import { useTranslation } from "@/src/lib/i18n";
 import {
   ScreenRoot,

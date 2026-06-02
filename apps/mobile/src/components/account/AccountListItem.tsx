@@ -1,6 +1,6 @@
 import { memo } from "react";
 import type { Account } from "@/src/types/portfolio";
-import { formatBalance, formatSigned, getStockChangeInfo } from "@/src/utils";
+import { formatBalance, formatSigned, getStockChangeInfo } from "@/src/lib/utils";
 import { Sparkline } from "../ui/Sparkline";
 import {
   ListRow,

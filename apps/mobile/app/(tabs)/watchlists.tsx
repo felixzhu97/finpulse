@@ -25,7 +25,7 @@ import { useSymbolDisplayData, useWatchlists, useQuotesForSymbols } from "@/src/
 import type { Instrument } from "@/src/types/instrument";
 import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/lib/i18n";
-import { formatScreenDate } from "@/src/utils";
+import { formatScreenDate } from "@/src/lib/utils";
 import {
   SafeAreaScreen,
   ScreenHeader,

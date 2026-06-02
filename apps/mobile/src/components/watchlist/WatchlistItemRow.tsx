@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { formatPrice, formatSigned, getStockChangeInfo } from "@/src/utils";
+import { formatPrice, formatSigned, getStockChangeInfo } from "@/src/lib/utils";
 import { Sparkline } from "../ui/Sparkline";
 import {
   ListRowPressable,

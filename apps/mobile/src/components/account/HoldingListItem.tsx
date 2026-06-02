@@ -1,6 +1,6 @@
 import { memo } from "react";
 import type { Holding } from "@/src/types/portfolio";
-import { formatCurrency, formatSigned, formatSignedPercent } from "@/src/utils";
+import { formatCurrency, formatSigned, formatSignedPercent } from "@/src/lib/utils";
 import {
   HoldingRow,
   HoldingRowLeft,

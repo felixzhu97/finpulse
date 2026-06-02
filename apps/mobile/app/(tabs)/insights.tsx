@@ -8,7 +8,7 @@ import { RiskMetricDetailDrawer } from "@/src/components/insights";
 import { useComputedVar, useRiskMetrics, useRiskSummary } from "@/src/hooks";
 import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/lib/i18n";
-import { formatScreenDateLong } from "@/src/utils";
+import { formatScreenDateLong } from "@/src/lib/utils";
 import {
   SafeAreaScreen,
   ScreenHeader,

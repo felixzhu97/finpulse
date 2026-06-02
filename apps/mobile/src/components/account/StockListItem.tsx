@@ -1,6 +1,6 @@
 import { memo } from "react";
 import type { Holding } from "@/src/types/portfolio";
-import { formatPrice, formatSigned, getStockChangeInfo } from "@/src/utils";
+import { formatPrice, formatSigned, getStockChangeInfo } from "@/src/lib/utils";
 import { Sparkline } from "../ui/Sparkline";
 import {
   ListRowPressable,

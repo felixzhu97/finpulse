@@ -1,6 +1,6 @@
 import type { Customer } from "@/src/types/customer";
-import { getBaseUrl } from "../network/config";
-import { getAuthToken } from "../network/authBridge";
+import { getBaseUrl } from "../lib/network/config";
+import { getAuthToken } from "../lib/network/authBridge";
 
 const AUTH_PREFIX = "/api/v1/auth";
 

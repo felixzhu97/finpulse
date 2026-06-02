@@ -2,7 +2,7 @@ import {useAppDispatch, useAppSelector} from "@/src/store";
 import {clearAuth, getAuthStorageKey, setAuth} from "@/src/store/authSlice";
 import {useCallback} from "react";
 import type {ChangePasswordRequest, LoginRequest, RegisterRequest} from "@/src/lib";
-import * as authApi from "@/src/lib/api/auth";
+import * as authApi from "@/src/api/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {setAuthToken} from "@/src/lib/network/authBridge";
 

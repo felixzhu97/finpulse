@@ -6,7 +6,7 @@ import type {
   TransferRequest,
   SeedBalanceRequest,
 } from "@/src/types/blockchain";
-import { httpClient } from "../network/httpClient";
+import { httpClient } from "../lib/network/httpClient";
 
 export async function getBlockchainBalance(
   accountId: string,

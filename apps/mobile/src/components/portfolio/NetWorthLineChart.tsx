@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import type { PortfolioHistoryPoint } from "@/src/types/portfolio";
 import { useTheme } from "@/src/theme";
-import { formatChartLabel, formatCompactCurrency } from "@/src/utils";
+import { formatChartLabel, formatCompactCurrency } from "@/src/lib/utils";
 import styled from "@emotion/native";
 
 const X_LABEL_COUNT = 5;

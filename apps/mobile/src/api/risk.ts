@@ -1,6 +1,6 @@
 import type { RiskMetrics } from "@/src/types/riskMetrics";
 import type { VarComputeResult } from "@/src/types/varCompute";
-import { httpClient } from "../network/httpClient";
+import { httpClient } from "../lib/network/httpClient";
 import { getPortfolioData } from "./portfolio";
 
 function findRiskMetricsForPortfolio(

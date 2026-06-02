@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import { ScrollView, PanResponder } from "react-native";
-import { formatChartLabel } from "@/src/utils";
+import { formatChartLabel } from "@/src/lib/utils";
 
 const MIN_BAR_WIDTH = 52;
 const X_LABEL_COUNT = 5;

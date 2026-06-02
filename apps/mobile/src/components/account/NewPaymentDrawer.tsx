@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PAYMENT_CREATE } from "@fintech/analytics";
 import { useAnalytics } from "@fintech/analytics/react";
-import { getPaymentFormData, createPayment } from "@/src/lib/api";
+import { getPaymentFormData, createPayment } from "@/src/api";
 import type { AccountResource } from "@/src/types/accountResource";
 import type { Payment } from "@/src/types/payment";
 import { useDraggableDrawer } from "@/src/hooks";

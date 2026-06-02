@@ -12,7 +12,7 @@ import { NewPaymentDrawer } from "@/src/components/account/NewPaymentDrawer";
 import { NewTradeDrawer } from "@/src/components/account/NewTradeDrawer";
 import { WalletConnectButton, EthTransferDrawer } from "@/src/components/blockchain";
 import { useWeb3, SEPOLIA_CHAIN_ID } from "@/src/hooks";
-import { formatBalance } from "@/src/utils";
+import { formatBalance } from "@/src/lib/utils";
 import { useTheme } from "@/src/theme";
 import { useTranslation } from "@/src/lib/i18n";
 import {

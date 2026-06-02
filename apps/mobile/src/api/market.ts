@@ -1,8 +1,8 @@
 import type { QuoteData } from "@/src/types/quotes";
 import type { Watchlist, WatchlistItem } from "@/src/types/watchlist";
 import type { Instrument } from "@/src/types/instrument";
-import type { WatchlistWithItems } from "../../types/dto";
-import { httpClient } from "../network/httpClient";
+import type { WatchlistWithItems } from "../types/dto";
+import { httpClient } from "../lib/network/httpClient";
 import { getCustomerFirst } from "./account";
 
 export async function getQuotes(

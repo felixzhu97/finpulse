@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "@emotion/native";
-import { registerCustomer } from "@/src/lib/api";
+import { registerCustomer } from "@/src/api";
 import { useTheme, withTheme } from "@/src/theme";
 import type { Customer } from "@/src/types/customer";
 import { useDraggableDrawer } from "@/src/hooks";

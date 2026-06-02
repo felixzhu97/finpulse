@@ -9,8 +9,8 @@ import type {
   AccountDataResult,
   RegisterCustomerInput,
   UpdatePreferenceInput,
-} from "../../types/dto";
-import { httpClient } from "../network/httpClient";
+} from "../types/dto";
+import { httpClient } from "../lib/network/httpClient";
 import { getPortfolioData } from "./portfolio";
 
 export async function getCustomerFirst(): Promise<Customer | null> {

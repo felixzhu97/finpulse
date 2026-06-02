@@ -4,7 +4,7 @@ import type {
   PortfolioHistoryPoint,
   RiskSummary,
 } from "@/src/types/portfolio";
-import { httpClient } from "../network/httpClient";
+import { httpClient } from "../lib/network/httpClient";
 
 let portfolioCache: Portfolio | null = null;
 
