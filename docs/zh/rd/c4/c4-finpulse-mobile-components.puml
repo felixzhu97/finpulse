@@ -1,0 +1,76 @@
+@startuml c4-finpulse-mobile-components
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/core/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title FinPulse 移动应用 - 组件架构
+
+Container_Boundary(app, "Expo Router 应用") {
+    Component(screens, "页面", "React Native", "(auth)/login, (auth)/signup, (tabs)/index, (tabs)/watchlists, (tabs)/insights, (tabs)/account")
+    Component(layouts, "布局", "React Native", "_layout, (auth)/_layout, (tabs)/_layout")
+}
+
+Container_Boundary(components, "UI 组件") {
+    Component(watchlistComponents, "自选股组件", "React Native", "WatchlistCard, WatchlistItemRow, AddSymbolModal, StockDetailDrawer, InteractiveStockChart, WatchlistSearchBar")
+    Component(portfolioComponents, "投资组合组件", "React Native", "PortfolioSummary, PortfolioPerformanceChart, NetWorthLineChart, AssetAllocationChart")
+    Component(accountComponents, "账户组件", "React Native", "AccountListItem, HoldingListItem, NewPaymentDrawer, NewTradeDrawer, RegisterCustomerDrawer, SettingsDrawer, StockListItem")
+    Component(insightsComponents, "洞察组件", "React Native", "RiskMetricDetailDrawer")
+    Component(blockchainComponents, "区块链组件", "React Native", "WalletConnectButton, EthTransferDrawer")
+    Component(nativeComponents, "原生图表组件", "原生模块", "NativeLineChart, NativeCandleChart, NativeBaselineChart, ScrollableChartContainer, chartTooltip")
+    Component(uiComponents, "UI 组件", "React Native", "MetricCard, SortMenu, GlassView, SearchBar")
+}
+
+Container_Boundary(hooks, "自定义 Hooks") {
+    Component(authHooks, "认证 Hooks", "React Hook", "useAuth, useAuthTokenSync, useAuthRestore, useAuthFetchCustomer")
+    Component(portfolioHooks, "投资组合 Hooks", "React Hook", "usePortfolio")
+    Component(marketHooks, "市场 Hooks", "React Hook", "useWatchlists, useQuotesForSymbols, useSymbolDisplayData")
+    Component(riskHooks, "风险 Hooks", "React Hook", "useRiskSummary, useRiskMetrics, useComputedVar")
+    Component(accountHooks, "账户 Hooks", "React Hook", "useAccountData, useUserPreferences")
+    Component(blockchainHooks, "区块链 Hooks", "React Hook", "useWeb3")
+    Component(sharedHooks, "共享 Hooks", "React Hook", "useAsyncLoad, useDraggableDrawer")
+}
+
+Container_Boundary(store, "Redux Store") {
+    Component(authSlice, "authSlice", "Redux Toolkit", "认证状态: token, customer")
+    Component(quotesSlice, "quotesSlice", "Redux Toolkit", "实时行情、历史记录、连接状态")
+    Component(portfolioSlice, "portfolioSlice", "Redux Toolkit", "投资组合数据缓存")
+    Component(preferencesSlice, "preferencesSlice", "Redux Toolkit", "用户偏好设置")
+    Component(web3Slice, "web3Slice", "Redux Toolkit", "Web3/钱包状态")
+    Component(quoteSocket, "QuoteSocketSubscriber", "React 组件", "WebSocket 连接管理器")
+}
+
+Container_Boundary(lib, "Lib / 基础设施层") {
+    Component(apiClients, "API 客户端", "Fetch", "auth, portfolio, market, account, risk, blockchain APIs")
+    Component(wsClient, "QuoteStreamService", "WebSocket", "行情流客户端")
+    Component(web3Lib, "Web3Service", "ethers.js", "以太坊交互")
+    Component(network, "网络层", "Axios/Fetch", "HTTP 客户端, 认证桥接, 配置")
+}
+
+System_Boundary(external, "外部系统") {
+    System(portfolioAPI, "投资组合分析 API", "REST API")
+    System(quoteWS, "行情 WebSocket", "实时行情")
+    System(ethNode, "以太坊 Sepolia", "区块链")
+}
+
+Rel(screens, layouts, "使用")
+Rel(screens, components, "渲染")
+Rel(components, hooks, "使用")
+Rel(hooks, store, "派发/选择器")
+Rel(store, lib, "数据获取")
+Rel(hooks, lib, "API 调用")
+
+Rel(authHooks, apiClients, "auth/*")
+Rel(portfolioHooks, apiClients, "portfolio/*")
+Rel(marketHooks, apiClients, "market/*")
+Rel(marketHooks, wsClient, "行情订阅")
+Rel(riskHooks, apiClients, "risk/*")
+Rel(accountHooks, apiClients, "account/*")
+Rel(blockchainHooks, web3Lib, "钱包操作")
+
+Rel(wsClient, quoteSocket, "更新 quotesSlice")
+Rel(web3Lib, web3Slice, "更新钱包状态")
+Rel(apiClients, portfolioAPI, "REST 调用")
+
+SHOW_LEGEND()
+
+@enduml

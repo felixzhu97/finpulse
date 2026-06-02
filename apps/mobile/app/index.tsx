@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/src/presentation/hooks/auth";
-import { DarkColors } from "@/src/presentation/theme/colors";
+import { DarkColors } from "@/src/theme/colors";
+import {useAuth} from "@/src/hooks";
 
 export default function IndexScreen() {
   const router = useRouter();

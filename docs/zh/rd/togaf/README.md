@@ -73,14 +73,19 @@ plantuml -tsvg *.puml
 
 ---
 
-**文档版本**：1.3.0  
-**最后更新**：2025年2月  
+**版本**: 1.4.0  
+**最后更新**：2026年6月  
 **维护**：FinPulse 开发团队
 
 ## 最近更新
 
+- **目录重组 (2026)**: 移动端从分层整洁架构重组为扁平结构:
+  - `src/components/` — UI 组件
+  - `src/hooks/` — React hooks
+  - `src/store/` — Redux 状态管理
+  - `src/lib/` — API 和服务（原 `infrastructure/`）
+  - `src/types/` — 领域类型（原 `domain/`）
+  - `src/utils/` — 工具函数
+  - `src/theme/` — 主题配置
 - **Redux 优化（移动端投资组合）**：报价统一走 Redux；`extraSubscribedSymbols` 支持抽屉符号；单 WebSocket；统一使用 useAppSelector/useAppDispatch。
 - **Redux + Emotion（移动端投资组合）**：Portfolio 状态迁至 Redux（portfolio slice）；主屏与列表组件统一使用 Emotion 基元（ScreenRoot、ListRow、CardBordered、SafeAreaScreen 等）实现 Robinhood 风格主题 UI。
-- **整洁架构（移动端投资组合）**：Presentation → Application → Domain；Infrastructure 仅由 DependencyContainer 注入。共享 hooks：**useAsyncLoad**、**runWithLoading**、**useRefreshControl**、**useAccountData**。
-- **OOP 架构**：原生图表代码重构，使用抽象基类（`BaseChartViewManager`、`BaseChartView`、`BaseChartRenderer`）和辅助类（ChartLayoutCalculator、ValueFormatter、AxisLabelManager、ChartDataCalculator）。共享工具：ChartCurve、ChartVertex、ChartPipeline、ChartGrid、ChartThemes。
-- **代码简化**：移除未使用代码（usePerSymbolHistory、重复 PeriodDataProcessor），简化逻辑，提升可维护性

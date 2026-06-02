@@ -3,18 +3,18 @@ import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "rea
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import styled from "@emotion/native";
-import type { Account } from "@/src/domain/entities";
+import type { Account } from "@/src/types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useAccountData, useAuth } from "@/src/presentation/hooks";
-import { SettingsDrawer } from "@/src/presentation/components/account/SettingsDrawer";
-import { RegisterCustomerDrawer } from "@/src/presentation/components/account/RegisterCustomerDrawer";
-import { NewPaymentDrawer } from "@/src/presentation/components/account/NewPaymentDrawer";
-import { NewTradeDrawer } from "@/src/presentation/components/account/NewTradeDrawer";
-import { WalletConnectButton, EthTransferDrawer } from "@/src/presentation/components/blockchain";
-import { useWeb3, SEPOLIA_CHAIN_ID } from "@/src/presentation/hooks";
-import { formatBalance } from "@/src/presentation/utils";
-import { useTheme } from "@/src/presentation/theme";
-import { useTranslation } from "@/src/presentation/i18n";
+import { useAccountData, useAuth } from "@/src/hooks";
+import { SettingsDrawer } from "@/src/components/account/SettingsDrawer";
+import { RegisterCustomerDrawer } from "@/src/components/account/RegisterCustomerDrawer";
+import { NewPaymentDrawer } from "@/src/components/account/NewPaymentDrawer";
+import { NewTradeDrawer } from "@/src/components/account/NewTradeDrawer";
+import { WalletConnectButton, EthTransferDrawer } from "@/src/components/blockchain";
+import { useWeb3, SEPOLIA_CHAIN_ID } from "@/src/hooks";
+import { formatBalance } from "@/src/utils";
+import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/lib/i18n";
 import {
   CardBordered,
   CenteredContainer,
@@ -22,7 +22,7 @@ import {
   RetryButton,
   RetryButtonText,
   SectionTitle,
-} from "@/src/presentation/theme/primitives";
+} from "@/src/theme/primitives";
 
 const ACCOUNT_CARD_PADDING = 20;
 const ACCOUNT_CARD_RADIUS = 16;

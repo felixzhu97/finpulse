@@ -18,14 +18,14 @@ import {
   type StockDetailItem,
   WatchlistSearchBar,
   type WatchlistSearchBarRef,
-} from "@/src/presentation/components/watchlist";
-import { WatchlistItemRow } from "@/src/presentation/components/watchlist/WatchlistItemRow";
-import { SortMenu, type SortOption } from "@/src/presentation/components/ui/SortMenu";
-import { useSymbolDisplayData, useWatchlists, useQuotesForSymbols } from "@/src/presentation/hooks";
-import type { Instrument } from "@/src/domain/entities/instrument";
-import { useTheme } from "@/src/presentation/theme";
-import { useTranslation } from "@/src/presentation/i18n";
-import { formatScreenDate } from "@/src/presentation/utils";
+} from "@/src/components/watchlist";
+import { WatchlistItemRow } from "@/src/components/watchlist/WatchlistItemRow";
+import { SortMenu, type SortOption } from "@/src/components/ui/SortMenu";
+import { useSymbolDisplayData, useWatchlists, useQuotesForSymbols } from "@/src/hooks";
+import type { Instrument } from "@/src/types/instrument";
+import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/lib/i18n";
+import { formatScreenDate } from "@/src/utils";
 import {
   SafeAreaScreen,
   ScreenHeader,
@@ -42,7 +42,7 @@ import {
   EmptyText,
   EmptySubtext,
   LoadingWrap,
-} from "@/src/presentation/theme/primitives";
+} from "@/src/theme/primitives";
 
 interface WatchlistStockRow {
   instrument_id: string;

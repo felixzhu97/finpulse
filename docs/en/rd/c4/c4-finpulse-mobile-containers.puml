@@ -1,0 +1,41 @@
+@startuml c4-finpulse-mobile-containers
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/core/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+title FinPulse Mobile App - Container Architecture
+
+Person(user, "User", "FinPulse mobile application user")
+
+System_Boundary(mobileApp, "FinPulse Mobile App") {
+    Container(app, "Expo Router App", "React Native + Expo Router", "Navigation, screen routing, layout management")
+    Container(reduxStore, "Redux Store", "Redux Toolkit", "Client-side state management")
+    Container(components, "UI Components", "React Native + Emotion", "Reusable UI components")
+    Container(hooks, "Custom Hooks", "React Hooks", "Business logic abstraction")
+    Container(nativeCharts, "Native Charts", "iOS/Android Native Modules", "High-performance financial charts")
+    Container(wsService, "Quote WebSocket", "WebSocket Client", "Real-time stock quote streaming")
+    Container(apiClients, "API Clients", "Fetch + Axios", "REST API communication")
+    Container(web3Service, "Web3 Service", "ethers.js / wagmi", "Ethereum wallet connection")
+}
+
+System(portfolioAPI, "Portfolio Analytics API", "Backend REST API")
+System(marketData, "Market Data Feed", "Real-time quote WebSocket")
+System(ethSepolia, "Ethereum Sepolia", "Ethereum testnet blockchain")
+
+Rel(user, app, "Interacts with screens")
+Rel(app, components, "Renders")
+Rel(app, reduxStore, "Dispatches actions / Reads state")
+Rel(app, hooks, "Uses custom hooks")
+Rel(hooks, reduxStore, "State access")
+Rel(hooks, apiClients, "Fetches data")
+Rel(components, hooks, "Consumes hook data")
+Rel(wsService, marketData, "Subscribes quotes")
+Rel(wsService, reduxStore, "Updates quotes state")
+Rel(apiClients, portfolioAPI, "REST calls")
+Rel(web3Service, ethSepolia, "JSON-RPC calls")
+Rel(app, nativeCharts, "Native chart components")
+Rel(nativeCharts, hooks, "Chart data from hooks")
+
+SHOW_LEGEND()
+
+@enduml

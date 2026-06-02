@@ -32,37 +32,66 @@ The app follows **Clean Architecture** principles with clear separation of conce
 
 ### Architecture Layers
 
-- **Domain Layer** (`src/domain/`): Data shapes only
-  - `entities/`: Domain models (`portfolio.ts`, `quotes.ts`, `customer.ts`, `userPreference.ts`, `watchlist.ts`, `instrument.ts`, `riskMetrics.ts`, `payment.ts`, `trade.ts`, `order.ts`, `blockchain.ts`, `accountResource.ts`, `varCompute.ts`)
+- **Domain Layer** (`src/types/`): Data shapes only
+  - `__tests__/`: Domain model tests (`portfolio`, `quotes`, `customer`, `userPreference`, `watchlist`, `instrument`, `riskMetrics`, `payment`, `trade`, `order`, `blockchain`, `accountResource`, `varCompute`)
   - `dto.ts`: Shared DTOs (`WatchlistWithItems`, `UpdatePreferenceInput`, `AccountDataResult`, `RegisterCustomerInput`)
 
-- **Infrastructure Layer** (`src/infrastructure/`): API and external integrations
-  - `api/`: REST API by domain (`portfolio`, `market`, `account`, `risk`); `getPortfolioData`, `getQuotes`, `getQuotesHistoryBatch`, `getWatchlists`, `getAccountData`, `getRiskMetrics`, etc.; all use `httpClient`
-  - `network/`: HTTP client, WebSocket factory, config (`httpClient.ts`, `quoteSocket.ts`, `config.ts`)
+- **Infrastructure Layer** (`src/lib/`): API and external integrations
+  - `api/`: REST API by domain (`portfolio`, `market`, `account`, `risk`, `auth`, `blockchain`); `getPortfolioData`, `getQuotes`, `getQuotesHistoryBatch`, `getWatchlists`, `getAccountData`, `getRiskMetrics`, etc.; all use `httpClient`
   - `config/`: Web3 config (`web3Config.ts`: `getWeb3Config`, `SEPOLIA_CHAIN_ID`; env: `EXPO_PUBLIC_ETH_RPC_URL`, `EXPO_PUBLIC_ETH_CHAIN_ID`, `EXPO_PUBLIC_ETH_CHAIN_NAME`)
   - `services/`: Quote stream and Web3 (`quoteStreamTypes.ts`, `QuoteStreamService`, `quoteStreamService`, `web3Service`)
 
-- **Presentation Layer** (`src/presentation/`): UI components, hooks, and state management
-  - `components/`: React Native components by feature (`account/`, `portfolio/`, `ui/`, `charts/`, `native/`, `watchlist/`, `insights/`, `blockchain/`)
-  - `hooks/`: React hooks by domain (`portfolio`, `market`, `account`, `risk`, `blockchain`, `common`); call `infrastructure/api` and `infrastructure/services` (`usePortfolio`, `useAccountData`, `useSymbolDisplayData`, `useWeb3`, `usePreferences`, `useWatchlists`, `useRiskMetrics`, `useComputedVar`, `useDraggableDrawer`, etc.); shared utilities (`useAsyncLoad`, `runWithLoading`)
-  - `utils/`: Presentation utilities (`format.ts`, `stockDisplay.ts`, `PeriodDataProcessor.ts`)
-  - `store/`: Redux (quotes slice, preferences slice, portfolio slice, **web3 slice** (connectWallet, disconnectWallet, refreshWalletBalance), selectors, `QuoteSocketSubscriber` using `quoteStreamService`)
+- **Presentation Layer** (`src/components/`): React Native UI components by feature
+  - `account/`: Account management components (list items, drawers, registration)
+  - `blockchain/`: Ethereum and wallet components (transfer, wallet connect)
+  - `insights/`: Risk metric components
+  - `native/`: Native chart components (line, candlestick, histogram, sparkline)
+  - `portfolio/`: Portfolio components (performance chart, allocation, net worth)
+  - `ui/`: Shared UI primitives (MetricCard, SortMenu)
+  - `watchlist/`: Watchlist components (stock list, search, detail drawer)
+
+- **Hooks Layer** (`src/hooks/`): React hooks by domain
+  - `account/`: Account hooks (`useAccountData`, `useUserPreferences`)
+  - `auth/`: Authentication hooks (`useAuth`, `useAuthTokenSync`)
+  - `blockchain/`: Blockchain hooks
+  - `market/`: Market data hooks
+  - `portfolio/`: Portfolio hooks
+  - `risk/`: Risk metrics hooks
+  - `index.ts`: Re-exports all hooks
+
+- **Store Layer** (`src/store/`): Redux state management
+  - `authSlice.ts`: Authentication state (token, customer)
+  - `quotesSlice.ts`: Real-time quotes state with history
+  - `quotesSelectors.ts`: Quote selectors with caching
+  - `preferencesSlice.ts`: User preferences (theme, language)
+  - `web3Slice.ts`: Web3 state (connectWallet, disconnectWallet, balance)
+  - `QuoteSocketSubscriber.tsx`: WebSocket subscription manager
+  - `__tests__/`: Store unit tests
+
+- **Utils Layer** (`src/utils/`): Utility functions
+  - `format.ts`: Formatting utilities (currency, percentage, date)
+  - `stockDisplay.ts`: Stock display helpers
+  - `PeriodDataProcessor.ts`: Time period data processing
+  - `__tests__/`: Utility unit tests
+
+- **App Layer** (`src/app/`): Expo Router file-based routing and screens
+
+- **Shared** (`src/theme/`, `src/i18n/`): Cross-cutting concerns
   - `theme/`: Theme system (`colors.ts`, `useTheme.ts`, `StyledThemeProvider`, `primitives.ts`, `themeTypes.ts`)
   - `i18n/`: Internationalization (`config.ts`, locales, `useTranslation`)
-
-- `app/`: Expo Router file-based routing and screens
 
 ### Dependency Flow
 
 ```
-Presentation (hooks, screens) → Infrastructure (api, services)
-         ↓                              ↓
-      Domain (entities, dto)      network (httpClient, quoteSocket)
+Components / Hooks → lib/ (api, services)
+         ↓                    ↓
+      types/ (domain)    lib/services/ (httpClient, quoteSocket)
 ```
 
-- Presentation depends on Domain (types) and Infrastructure (api + services)
-- Infrastructure API uses `httpClient`; services use `quoteSocket` or Web3
-- No application layer or container; hooks import from `infrastructure/api` and `infrastructure/services` directly
+- Components and hooks depend on types (domain) and lib (api + services)
+- lib API uses `httpClient`; services use `quoteSocket` or Web3
+- Store manages application state (quotes, preferences, web3, auth)
+- No application layer or container; hooks import from `lib/api` and `lib/services` directly
 - `ios/mobileportfolio/`: Native iOS code with OOP structure. Chart components inherit from base classes: `BaseChartViewManager` (abstract RCTViewManager), `BaseChartView` (abstract UIView with Metal setup), `BaseChartRenderer` (abstract Metal renderer). Chart components use helper classes: `ChartLayoutCalculator` (layout calculations), `ValueFormatter` (value formatting), `AxisLabelManager` (axis label management), `ChartDataCalculator` (data calculations). ChartSupport provides shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
 - `android/app/src/main/java/com/anonymous/mobileportfolio/view/`: Native Android code with OOP structure. Chart components use helper classes: `ChartLayoutCalculator`, `ValueFormatter`, `AxisLabelManager`, `HistogramRenderer`. Chart package (`view/chart/`) provides ChartGl, ChartCurve, and per-chart themes. Sparkline and democard packages provide specialized components.
 
@@ -73,9 +102,9 @@ Presentation (hooks, screens) → Infrastructure (api, services)
 
 ## Storybook (native component catalog)
 
-This app uses **Storybook for React Native** to document and exercise native and React Native components (especially the Metal/Kotlin chart bridges in `src/presentation/components/native`).
+This app uses **Storybook for React Native** to document and exercise native and React Native components (especially the Metal/Kotlin chart bridges in `src/components/native`).
 
-- **Stories**: Live under `src/presentation/components/**\/*.stories.tsx`, including the native chart components (`NativeLineChart`, `NativeCandleChart`, `NativeBaselineChart`, `NativeHistogramChart`, `NativeLineOnlyChart`, `NativeSparkline`, `NativeDemoCard`).
+- **Stories**: Live under `src/components/**\/*.stories.tsx`, including the native chart components (`NativeLineChart`, `NativeCandleChart`, `NativeBaselineChart`, `NativeHistogramChart`, `NativeLineOnlyChart`, `NativeSparkline`, `NativeDemoCard`).
 - **Route**: `/storybook` implemented by `app/storybook.tsx`, which wraps `StorybookUIRoot` (from `.rnstorybook`) and adds a simple back bar.
 - **Entry point in UI** (dev only): On the **Account** tab, the **Actions** card shows a `Storybook` row when `__DEV__` is true; tapping it navigates to `/storybook`.
 
@@ -134,7 +163,7 @@ If `pod install` fails with **"RPC failed; curl 56 Recv failure: Operation timed
 
 ## Auth
 
-Login and signup are handled by the Go API (same base URL as portfolio). **Auth flow**: `app/(auth)/login.tsx`, `signup.tsx`; token stored via `authBridge` (AsyncStorage); `useAuth`, `useAuthTokenSync`, `useAuthRestore`, `useAuthFetchCustomer` in `presentation/hooks/auth.ts`; Redux `authSlice` (token, customer, restored). After login, `Authorization: Bearer <token>` is sent by `httpClient`. **Settings** (when logged in): Change password, Log out; logout clears token and redirects to login.
+Login and signup are handled by the Go API (same base URL as portfolio). **Auth flow**: `app/(auth)/login.tsx`, `signup.tsx`; token stored via `authBridge` (AsyncStorage); `useAuth`, `useAuthTokenSync`, `useAuthRestore`, `useAuthFetchCustomer` in `src/hooks/auth/`; Redux `authSlice` (token, customer, restored). After login, `Authorization: Bearer <token>` is sent by `httpClient`. **Settings** (when logged in): Change password, Log out; logout clears token and redirects to login.
 
 ## Backend
 
@@ -183,7 +212,7 @@ Single Redux-backed flow, one WebSocket; **history before real-time**:
 
 The app supports light and dark themes with automatic system theme detection and **Emotion** (@emotion/native) for theme-aware UI:
 
-- **Theme System**: `src/presentation/theme/colors.ts` defines light/dark color schemes. `useTheme.ts` provides the `useTheme()` hook (no circular dependency with `StyledThemeProvider`). `theme/index.ts` re-exports theme APIs; `themeTypes.ts` defines `AppTheme` and augments `@emotion/react` `Theme`.
+- **Theme System**: `src/theme/colors.ts` defines light/dark color schemes. `useTheme.ts` provides the `useTheme()` hook (no circular dependency with `StyledThemeProvider`). `theme/index.ts` re-exports theme APIs; `themeTypes.ts` defines `AppTheme` and augments `@emotion/react` `Theme`.
 - **Styled Components**: Root layout wraps the app with `StyledThemeProvider`, which reads `useTheme()` and injects `{ colors }` into Emotion's `ThemeProvider`. Primitives (`primitives.ts`) include layout primitives (`ScreenRoot`, `ListRow`, `CardBordered`, `SafeAreaScreen`, etc.), text primitives (`LabelText`, `ValueText`, `RowTitle`, etc.), and `withTheme()` for type-safe theme access. Main screens (Dashboard, Account, Watchlist, Insights) and list components use these styled components for consistent, theme-driven styling. **Robinhood-style** UI: consistent section spacing (32px), card radius 16px, action row height 56px; auth screens (login/signup) use dark background and Robin Neon accent.
 - **User Preferences**: Managed via Redux (`preferencesSlice`) for immediate theme updates. Initial loading is component-level: `AppContent` shows a spinner until `usePreferences().loading` is false. Settings drawer allows users to choose light, dark, or auto (follow system) theme.
 - **Theme Persistence**: User theme preference is saved via `/api/v1/user-preferences` and restored on app launch.

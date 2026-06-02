@@ -88,14 +88,19 @@ Technology Architecture
 
 ---
 
-**Version**: 1.3.0  
-**Last updated**: February 2025  
+**Version**: 1.4.0  
+**Last updated**: June 2026  
 **Maintained by**: FinPulse team
 
 ## Recent Updates
 
+- **Directory Restructuring (2026)**: Mobile app reorganized from layered Clean Architecture to flat structure:
+  - `src/components/` — UI components
+  - `src/hooks/` — React hooks
+  - `src/store/` — Redux state management
+  - `src/lib/` — API & services (formerly `infrastructure/`)
+  - `src/types/` — Domain types (formerly `domain/`)
+  - `src/utils/` — Utilities
+  - `src/theme/` — Theming
 - **Redux optimization (Mobile Portfolio)**: Unified quotes via Redux; `extraSubscribedSymbols` for drawer symbols; single WebSocket; useAppSelector/useAppDispatch throughout.
 - **Redux + Emotion (Mobile Portfolio)**: Portfolio state in Redux (portfolio slice); main screens and list components use Emotion primitives (ScreenRoot, ListRow, CardBordered, SafeAreaScreen, etc.) for theme-aware Robinhood-style UI.
-- **Clean Architecture (Mobile Portfolio)**: Presentation → Application → Domain; Infrastructure only in DependencyContainer. Shared hooks: **useAsyncLoad**, **runWithLoading**, **useRefreshControl**, **useAccountData**.
-- **OOP Architecture**: Native chart code refactored with abstract base classes (`BaseChartViewManager`, `BaseChartView`, `BaseChartRenderer`) and helper classes (ChartLayoutCalculator, ValueFormatter, AxisLabelManager, ChartDataCalculator). Shared utilities: ChartCurve, ChartVertex, ChartPipeline, ChartGrid, ChartThemes.
-- **Code Simplification**: Removed unused code (usePerSymbolHistory, duplicate PeriodDataProcessor), simplified logic, improved maintainability through inheritance and abstraction

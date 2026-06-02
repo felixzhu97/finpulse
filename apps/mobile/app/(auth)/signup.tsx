@@ -11,10 +11,10 @@ import { useRouter } from "expo-router";
 import styled from "@emotion/native";
 import { REGISTER } from "@fintech/analytics";
 import { useAnalytics } from "@fintech/analytics/react";
-import { useTheme } from "@/src/presentation/theme";
-import { useAuth } from "@/src/presentation/hooks/auth";
-import { useTranslation } from "@/src/presentation/i18n";
-import { withTheme } from "@/src/presentation/theme/primitives";
+import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/lib/i18n";
+import { withTheme } from "@/src/theme/primitives";
+import {useAuth} from "@/src/hooks";
 
 const Page = styled(SafeAreaView)`
   flex: 1;

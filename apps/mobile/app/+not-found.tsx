@@ -1,4 +1,4 @@
-import { CenteredContainer } from "@/src/presentation/theme/primitives";
+import { CenteredContainer } from "@/src/theme/primitives";
 import styled from "@emotion/native";
 
 const Message = styled.Text`

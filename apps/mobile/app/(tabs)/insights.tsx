@@ -3,12 +3,12 @@ import { ActivityIndicator, Dimensions, Platform, RefreshControl } from "react-n
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BarChart } from "react-native-chart-kit";
-import { MetricCard } from "@/src/presentation/components/ui/MetricCard";
-import { RiskMetricDetailDrawer } from "@/src/presentation/components/insights";
-import { useComputedVar, useRiskMetrics, useRiskSummary } from "@/src/presentation/hooks";
-import { useTheme } from "@/src/presentation/theme";
-import { useTranslation } from "@/src/presentation/i18n";
-import { formatScreenDateLong } from "@/src/presentation/utils";
+import { MetricCard } from "@/src/components/ui/MetricCard";
+import { RiskMetricDetailDrawer } from "@/src/components/insights";
+import { useComputedVar, useRiskMetrics, useRiskSummary } from "@/src/hooks";
+import { useTheme } from "@/src/theme";
+import { useTranslation } from "@/src/lib/i18n";
+import { formatScreenDateLong } from "@/src/utils";
 import {
   SafeAreaScreen,
   ScreenHeader,
@@ -31,7 +31,7 @@ import {
   InsightsChartCard,
   InsightsSummaryCard,
   SummaryBody,
-} from "@/src/presentation/theme/primitives";
+} from "@/src/theme/primitives";
 
 export default function InsightsScreen() {
   const { colors, isDark } = useTheme();

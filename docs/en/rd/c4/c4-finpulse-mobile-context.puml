@@ -1,0 +1,26 @@
+@startuml c4-finpulse-mobile-context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/core/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+title FinPulse Mobile App - System Context
+
+Person(user, "User", "FinPulse mobile application user")
+
+System_Boundary(mobileApp, "FinPulse Mobile App") {
+    System(mobile, "FinPulse Mobile", "React Native/Expo application for portfolio management, market data, and blockchain interactions")
+}
+
+System(portfolioAPI, "Portfolio Analytics API", "RESTful API for portfolio data, risk metrics, account management")
+System(marketData, "Market Data Service", "Real-time stock quotes and historical price data")
+System(ethSepolia, "Ethereum Sepolia", "Ethereum testnet for wallet connections and ETH transfers")
+
+Rel(user, mobile, "Uses", "HTTPS/WebSocket")
+
+Rel(mobile, portfolioAPI, "Fetches portfolio, accounts, risk data", "HTTPS/REST")
+Rel(mobile, marketData, "Subscribes to real-time quotes", "WebSocket")
+Rel(mobile, ethSepolia, "Connects wallet, transfers ETH", "JSON-RPC")
+
+SHOW_LEGEND()
+
+@enduml

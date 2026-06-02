@@ -1,0 +1,41 @@
+@startuml c4-finpulse-mobile-containers
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/core/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+title FinPulse 移动应用 - 容器架构
+
+Person(user, "用户", "FinPulse 移动应用用户")
+
+System_Boundary(mobileApp, "FinPulse 移动应用") {
+    Container(app, "Expo Router 应用", "React Native + Expo Router", "导航、屏幕路由、布局管理")
+    Container(reduxStore, "Redux Store", "Redux Toolkit", "客户端状态管理")
+    Container(components, "UI 组件", "React Native + Emotion", "可复用 UI 组件")
+    Container(hooks, "自定义 Hooks", "React Hooks", "业务逻辑抽象")
+    Container(nativeCharts, "原生图表", "iOS/Android 原生模块", "高性能金融图表")
+    Container(wsService, "行情 WebSocket", "WebSocket 客户端", "实时股票行情流")
+    Container(apiClients, "API 客户端", "Fetch + Axios", "REST API 通信")
+    Container(web3Service, "Web3 服务", "ethers.js / wagmi", "以太坊钱包连接")
+}
+
+System(portfolioAPI, "投资组合分析 API", "后端 REST API")
+System(marketData, "市场数据源", "实时行情 WebSocket")
+System(ethSepolia, "以太坊 Sepolia", "以太坊测试网区块链")
+
+Rel(user, app, "交互操作")
+Rel(app, components, "渲染")
+Rel(app, reduxStore, "派发 actions / 读取 state")
+Rel(app, hooks, "使用自定义 hooks")
+Rel(hooks, reduxStore, "状态访问")
+Rel(hooks, apiClients, "获取数据")
+Rel(components, hooks, "消费 hook 数据")
+Rel(wsService, marketData, "订阅行情")
+Rel(wsService, reduxStore, "更新行情 state")
+Rel(apiClients, portfolioAPI, "REST 调用")
+Rel(web3Service, ethSepolia, "JSON-RPC 调用")
+Rel(app, nativeCharts, "原生图表组件")
+Rel(nativeCharts, hooks, "图表数据来自 hooks")
+
+SHOW_LEGEND()
+
+@enduml

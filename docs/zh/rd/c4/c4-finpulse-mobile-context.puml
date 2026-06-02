@@ -1,0 +1,26 @@
+@startuml c4-finpulse-mobile-context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/core/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+title FinPulse 移动应用 - 系统上下文
+
+Person(user, "用户", "FinPulse 移动应用用户")
+
+System_Boundary(mobileApp, "FinPulse 移动应用") {
+    System(mobile, "FinPulse Mobile", "React Native/Expo 应用程序，用于投资组合管理、市场数据和区块链交互")
+}
+
+System(portfolioAPI, "投资组合分析 API", "投资组合数据、风险指标、账户管理的 RESTful API")
+System(marketData, "市场数据服务", "实时股票行情和历史价格数据")
+System(ethSepolia, "以太坊 Sepolia", "用于钱包连接和 ETH 转账的以太坊测试网")
+
+Rel(user, mobile, "使用", "HTTPS/WebSocket")
+
+Rel(mobile, portfolioAPI, "获取投资组合、账户、风险数据", "HTTPS/REST")
+Rel(mobile, marketData, "订阅实时行情", "WebSocket")
+Rel(mobile, ethSepolia, "连接钱包、转账 ETH", "JSON-RPC")
+
+SHOW_LEGEND()
+
+@enduml

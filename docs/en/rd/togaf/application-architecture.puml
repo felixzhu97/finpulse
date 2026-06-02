@@ -52,26 +52,32 @@ package "Presentation Layer" <<Presentation>> {
 
     component "apps/mobile" as MobilePortfolio {
         component "Expo + React Native" as ExpoRN
-        component "Clean Architecture" as CleanArch {
-            component "Presentation Layer" as PresentationLayer {
-                component "Components" as MobileComponents
-                component "Hooks" as MobileHooks
-                component "Redux Store" as MobileRedux
-                component "Theme & i18n (Emotion, useTheme, primitives)" as MobileThemeI18n
+        component "Flat Structure" as FlatStructure {
+            component "src/components/" as MobileComponents {
+                component "UI Components" as UIRow
+                component "Drawer, Modal, Card" as DrawerModalCard
             }
-            component "Application Layer" as ApplicationLayer {
-                component "Use Cases" as MobileUseCases
-                component "DependencyContainer" as DependencyContainer
+            component "src/hooks/" as MobileHooks
+            component "src/store/" as MobileRedux {
+                component "Redux slices" as ReduxSlices
+                component "QuoteSocketSubscriber" as QuoteSocket
             }
-            component "Domain Layer" as DomainLayer {
-                component "Entities" as MobileEntities
-                component "Repository Interfaces" as MobileRepoInterfaces
+            component "src/lib/" as MobileLib {
+                component "API clients (account, auth, blockchain, market, portfolio, risk)" as APIClients
+                component "Services (web3Service)" as Services
+                component "Config (web3Config)" as Config
             }
-            component "Infrastructure Layer" as InfrastructureLayer {
-                component "Repositories" as MobileRepositories
-                component "API Clients" as MobileApiClients
-                component "Services & Utils" as MobileServicesUtils
+            component "src/types/" as MobileTypes {
+                component "Domain types (dto)" as DomainTypes
+                component "Entity types" as EntityTypes
             }
+            component "src/utils/" as MobileUtils {
+                component "PeriodDataProcessor" as PeriodProcessor
+                component "Format utilities" as Formatters
+                component "Stock display" as StockDisplay
+            }
+            component "src/theme/" as MobileTheme
+            component "src/assets/" as MobileAssets
         }
         component "Stocks screen" as StocksScreen {
             component "StockListItem" as StockListItem
@@ -125,7 +131,7 @@ package "Presentation Layer" <<Presentation>> {
         }
         component "react-native-wagmi-charts" as RNCharts
     }
-    note right of MobilePortfolio: Clean Architecture: Presentation → Application → Domain.\nInfrastructure implements Domain interfaces.\nDependency injection via DependencyContainer.\nThin client: business logic on server.\nTheme: Emotion (@emotion/native), StyledThemeProvider, primitives, useTheme.
+    note right of MobilePortfolio: Flat directory structure (2026):\nsrc/components/ — UI components\nsrc/hooks/ — React hooks\nsrc/store/ — Redux state (slices, websocket)\nsrc/lib/ — API clients & services\nsrc/types/ — Domain types\nsrc/utils/ — Utilities\nsrc/theme/ — Theming\nsrc/assets/ — Static assets\nTheme: Emotion (@emotion/native), useTheme, primitives, Robinhood-style.
 }
 
 package "Business Layer" <<Business>> {
@@ -226,32 +232,28 @@ interface "Market Data API" as MarketDataAPI
 interface "Transaction API" as TransactionAPI
 interface "Risk API" as RiskAPI
 
-' Mobile portfolio Clean Architecture
-ExpoRN --> CleanArch
-CleanArch --> PresentationLayer
-CleanArch --> ApplicationLayer
-CleanArch --> DomainLayer
-CleanArch --> InfrastructureLayer
-PresentationLayer --> ApplicationLayer
-ApplicationLayer --> DomainLayer
-InfrastructureLayer --> DomainLayer
-ApplicationLayer --> InfrastructureLayer
-PresentationLayer --> MobileComponents
-PresentationLayer --> MobileHooks
-PresentationLayer --> MobileRedux
-PresentationLayer --> MobileThemeI18n
-ApplicationLayer --> MobileUseCases
-ApplicationLayer --> DependencyContainer
-DomainLayer --> MobileEntities
-DomainLayer --> MobileRepoInterfaces
-InfrastructureLayer --> MobileRepositories
-InfrastructureLayer --> MobileApiClients
-InfrastructureLayer --> MobileServicesUtils
-MobileRepositories --> MobileRepoInterfaces
-MobileUseCases --> MobileRepoInterfaces
-DependencyContainer --> MobileRepositories
-DependencyContainer --> MobileUseCases
-MobileHooks --> DependencyContainer
+' Mobile portfolio Flat Structure
+ExpoRN --> FlatStructure
+FlatStructure --> MobileComponents
+FlatStructure --> MobileHooks
+FlatStructure --> MobileRedux
+FlatStructure --> MobileLib
+FlatStructure --> MobileTypes
+FlatStructure --> MobileUtils
+FlatStructure --> MobileTheme
+FlatStructure --> MobileAssets
+MobileComponents --> UIRow
+MobileComponents --> DrawerModalCard
+MobileRedux --> ReduxSlices
+MobileRedux --> QuoteSocket
+MobileLib --> APIClients
+MobileLib --> Services
+MobileLib --> Config
+MobileTypes --> DomainTypes
+MobileTypes --> EntityTypes
+MobileUtils --> PeriodProcessor
+MobileUtils --> Formatters
+MobileUtils --> StockDisplay
 
 ' Mobile portfolio native views
 ExpoRN --> StocksScreen

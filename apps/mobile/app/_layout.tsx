@@ -17,14 +17,14 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { createConsoleTransport, createHttpTransport } from "@fintech/analytics";
 import { AnalyticsProvider, useAnalytics } from "@fintech/analytics/react";
 import { SCREEN_VIEW } from "@fintech/analytics";
-import { QuoteSocketSubscriber } from "@/src/presentation/store/QuoteSocketSubscriber";
-import { store } from "@/src/presentation/store";
-import { getBaseUrl } from "@/src/infrastructure/network/config";
-import { useAuth, usePreferences, useAuthTokenSync, useAuthRestore, useAuthFetchCustomer } from "@/src/presentation/hooks";
-import { DarkColors, LightColors } from "@/src/presentation/theme/colors";
-import { StyledThemeProvider } from "@/src/presentation/theme/StyledThemeProvider";
-import "@/src/presentation/i18n/config";
-import { i18n } from "@/src/presentation/i18n";
+import { QuoteSocketSubscriber } from "@/src/store/QuoteSocketSubscriber";
+import { store } from "@/src/store";
+import { getBaseUrl } from "@/src/lib/network/config";
+import { DarkColors, LightColors } from "@/src/theme/colors";
+import { StyledThemeProvider } from "@/src/theme/StyledThemeProvider";
+import "@/src/lib/i18n/config";
+import { i18n } from "@/src/lib/i18n";
+import {useAuth, useAuthFetchCustomer, useAuthRestore, useAuthTokenSync, usePreferences} from "@/src/hooks";
 
 const base = getBaseUrl().replace(/\/$/, "");
 const apiBase = base ? `${base}${base.indexOf("/api/v1") !== -1 ? "" : "/api/v1"}` : "";
@@ -131,7 +131,7 @@ function AppContent() {
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    SpaceMono: require("@/src/presentation/assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require("@/src/assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   useEffect(() => {

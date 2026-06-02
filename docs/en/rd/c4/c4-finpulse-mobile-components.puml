@@ -1,0 +1,76 @@
+@startuml c4-finpulse-mobile-components
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/core/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title FinPulse Mobile App - Component Architecture
+
+Container_Boundary(app, "Expo Router App") {
+    Component(screens, "Screens", "React Native", "(auth)/login, (auth)/signup, (tabs)/index, (tabs)/watchlists, (tabs)/insights, (tabs)/account")
+    Component(layouts, "Layouts", "React Native", "_layout, (auth)/_layout, (tabs)/_layout")
+}
+
+Container_Boundary(components, "UI Components") {
+    Component(watchlistComponents, "Watchlist Components", "React Native", "WatchlistCard, WatchlistItemRow, AddSymbolModal, StockDetailDrawer, InteractiveStockChart, WatchlistSearchBar")
+    Component(portfolioComponents, "Portfolio Components", "React Native", "PortfolioSummary, PortfolioPerformanceChart, NetWorthLineChart, AssetAllocationChart")
+    Component(accountComponents, "Account Components", "React Native", "AccountListItem, HoldingListItem, NewPaymentDrawer, NewTradeDrawer, RegisterCustomerDrawer, SettingsDrawer, StockListItem")
+    Component(insightsComponents, "Insights Components", "React Native", "RiskMetricDetailDrawer")
+    Component(blockchainComponents, "Blockchain Components", "React Native", "WalletConnectButton, EthTransferDrawer")
+    Component(nativeComponents, "Native Chart Components", "Native Module", "NativeLineChart, NativeCandleChart, NativeBaselineChart, ScrollableChartContainer, chartTooltip")
+    Component(uiComponents, "UI Components", "React Native", "MetricCard, SortMenu, GlassView, SearchBar")
+}
+
+Container_Boundary(hooks, "Custom Hooks") {
+    Component(authHooks, "Auth Hooks", "React Hook", "useAuth, useAuthTokenSync, useAuthRestore, useAuthFetchCustomer")
+    Component(portfolioHooks, "Portfolio Hooks", "React Hook", "usePortfolio")
+    Component(marketHooks, "Market Hooks", "React Hook", "useWatchlists, useQuotesForSymbols, useSymbolDisplayData")
+    Component(riskHooks, "Risk Hooks", "React Hook", "useRiskSummary, useRiskMetrics, useComputedVar")
+    Component(accountHooks, "Account Hooks", "React Hook", "useAccountData, useUserPreferences")
+    Component(blockchainHooks, "Blockchain Hooks", "React Hook", "useWeb3")
+    Component(sharedHooks, "Shared Hooks", "React Hook", "useAsyncLoad, useDraggableDrawer")
+}
+
+Container_Boundary(store, "Redux Store") {
+    Component(authSlice, "authSlice", "Redux Toolkit", "Authentication state: token, customer")
+    Component(quotesSlice, "quotesSlice", "Redux Toolkit", "Real-time quotes, history, connection status")
+    Component(portfolioSlice, "portfolioSlice", "Redux Toolkit", "Portfolio data cache")
+    Component(preferencesSlice, "preferencesSlice", "Redux Toolkit", "User preferences")
+    Component(web3Slice, "web3Slice", "Redux Toolkit", "Web3/wallet state")
+    Component(quoteSocket, "QuoteSocketSubscriber", "React Component", "WebSocket connection manager")
+}
+
+Container_Boundary(lib, "Lib / Infrastructure") {
+    Component(apiClients, "API Clients", "Fetch", "auth, portfolio, market, account, risk, blockchain APIs")
+    Component(wsClient, "QuoteStreamService", "WebSocket", "Quote streaming client")
+    Component(web3Lib, "Web3Service", "ethers.js", "Ethereum interactions")
+    Component(network, "Network Layer", "Axios/Fetch", "HTTP client, auth bridge, config")
+}
+
+System_Boundary(external, "External Systems") {
+    System(portfolioAPI, "Portfolio Analytics API", "REST API")
+    System(quoteWS, "Quote WebSocket", "Real-time quotes")
+    System(ethNode, "Ethereum Sepolia", "Blockchain")
+}
+
+Rel(screens, layouts, "Uses")
+Rel(screens, components, "Renders")
+Rel(components, hooks, "Uses")
+Rel(hooks, store, "Dispatch/Selector")
+Rel(store, lib, "Data fetching")
+Rel(hooks, lib, "API calls")
+
+Rel(authHooks, apiClients, "auth/*")
+Rel(portfolioHooks, apiClients, "portfolio/*")
+Rel(marketHooks, apiClients, "market/*")
+Rel(marketHooks, wsClient, "Quote subscription")
+Rel(riskHooks, apiClients, "risk/*")
+Rel(accountHooks, apiClients, "account/*")
+Rel(blockchainHooks, web3Lib, "Wallet operations")
+
+Rel(wsClient, quoteSocket, "Updates quotesSlice")
+Rel(web3Lib, web3Slice, "Updates wallet state")
+Rel(apiClients, portfolioAPI, "REST calls")
+
+SHOW_LEGEND()
+
+@enduml
